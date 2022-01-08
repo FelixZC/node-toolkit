@@ -1,3 +1,3 @@
-import { invokeRequestTemplateGenerator } from '../../utils/type'
+import { invokeRequestTemplateGenerator } from '../utils/type'
 const { writeRequestTemplate } = invokeRequestTemplateGenerator()
 writeRequestTemplate()

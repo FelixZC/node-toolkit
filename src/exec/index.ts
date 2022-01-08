@@ -1,10 +1,10 @@
-import execBabelPlugin from '../../plugins/useBabelPlugin'
+import execBabelPlugin from '../plugins/useBabelPlugin'
 import * as fs from 'fs'
 import * as path from 'path'
-import mdUtils, { groupCache } from '../../utils/md'
-import fsUtils, { fileInfo, mergeSingelPageOptions } from '../../utils/fs'
+import mdUtils, { groupCache } from '../utils/md'
+import fsUtils, { fileInfo, mergeSingelPageOptions } from '../utils/fs'
 import * as os from 'os'
-import { execFileInfo } from '../../plugins/common'
+import { execFileInfo } from '../plugins/common'
 const br = os.EOL //换行符
 const rootPath = path.join('src')
 const fsInstance = new fsUtils(rootPath)

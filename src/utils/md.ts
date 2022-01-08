@@ -4,7 +4,7 @@
  * @date 2021/08/23
  *
  */
-import { parseDocs } from './generate-vue-docs'
+import { parseDocs } from '../plugins/generate-vue-docs'
 import * as os from 'os'
 import * as common from './common'
 const br = os.EOL //换行符
