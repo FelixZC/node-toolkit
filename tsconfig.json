@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ES5",
+    "module": "commonjs",
+    "strict": true,
+    "jsx": "preserve",
+    "allowJs": true,
+    "importHelpers": true,
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "types": ["jest", "jscodeshift", "node"],
+    "lib": ["esnext", "dom", "dom.iterable", "scripthost"],
+    "outDir": "dist",
+    "declaration": true,
+    "noUnusedLocals": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "resolveJsonModule": true,
+    "removeComments": false,
+    "rootDir": "."
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["dist", "node_modules", ".hisroty"]
+}
