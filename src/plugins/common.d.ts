@@ -1,4 +1,4 @@
-export interface execFileInfo {
+export interface ExecFileInfo {
   source: string
   path: string
   extra?: Record<string, any>

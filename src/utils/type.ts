@@ -11,7 +11,7 @@ import type {
   ResponseObject
 } from 'openapi-typescript'
 import { upperFirstletter } from './common'
-interface createRequestTemplateExecListItem {
+interface CreateRequestTemplateExecListItem {
   resource: typeof EamsAmsprojService | typeof SystemBaseService
   typingPath: string
 }
@@ -22,7 +22,7 @@ interface createRequestTemplateExecListItem {
  */
 const tempPath = './node/temp/'
 export const invokeRequestTemplateGenerator = () => {
-  const createRequestTemplateExecList: Array<createRequestTemplateExecListItem> = [
+  const createRequestTemplateExecList: Array<CreateRequestTemplateExecListItem> = [
     { resource: EamsAmsprojService, typingPath: 'src/typings/interface/eams-amsprojService' },
     { resource: SystemBaseService, typingPath: 'src/typings/interface/system-baseService' },
     { resource: BaseStatsService, typingPath: 'src/typings/interface/base-statsService' }
@@ -37,7 +37,7 @@ export const invokeRequestTemplateGenerator = () => {
     return url.replace(paramUrlReg, '${params.$1}')
   }
   //引入请求文件和参数定义文件
-  const createRequestTemplate = (item: createRequestTemplateExecListItem) => {
+  const createRequestTemplate = (item: CreateRequestTemplateExecListItem) => {
     const resource = item.resource
     // const headers: Headers = {}
     const typingPath = item.typingPath

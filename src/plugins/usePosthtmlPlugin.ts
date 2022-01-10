@@ -1,32 +1,19 @@
 import posthtml from 'posthtml'
-import type { Plugin, Options } from 'posthtml'
+import type { Plugin as PosthtmlPlugin, Options } from 'posthtml'
 import type { Options as parserOptions } from 'posthtml-parser'
 import type { Options as renderOptions } from 'posthtml-render'
-import type { execFileInfo } from './common'
+import type { ExecFileInfo } from './common'
 
-interface mergeOptions extends Options, parserOptions, renderOptions {}
+interface MergeOptions extends Options, parserOptions, renderOptions {}
 
-const usePosthtmlPlugin = async (execFileInfo: execFileInfo, pluginsPathList: string[] = []) => {
-  try {
-    const plugins: Plugin<unknown>[] = []
-    if (pluginsPathList.length) {
-      pluginsPathList.forEach((path) => {
-        const result = require(path)
-        if (result.default) {
-          plugins.push(result.default)
-        }
-        return plugins.push(result)
-      })
-    }
-    const result = await posthtml(plugins).process(execFileInfo.source, {
-      recognizeSelfClosing: true,
-      closingSingleTag: 'slash'
-    } as mergeOptions)
-    return result.html
-  } catch (e) {
-    console.log('获取plugin失败')
-    console.log(e)
-  }
+const getPosthtmlPluginActuator = async (
+  execFileInfo: ExecFileInfo,
+  plugins: PosthtmlPlugin<unknown>[] = []
+) => {
+  const result = await posthtml(plugins).process(execFileInfo.source, {
+    recognizeSelfClosing: true,
+    closingSingleTag: 'slash',
+  } as MergeOptions)
+  return result.html
 }
-
-export default usePosthtmlPlugin
+export default getPosthtmlPluginActuator

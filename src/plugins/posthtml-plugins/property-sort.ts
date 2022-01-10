@@ -29,7 +29,7 @@ function sortObjAttr(target: Record<string, any>) {
   return newObj
 }
 
-const posthtmlPlugin: PostHTML.Plugin<unknown> = (tree) => {
+const propertySort: PostHTML.Plugin<unknown> = (tree) => {
   tree.walk((node) => {
     if (node.attrs) {
       const directiveAttrs: typeof node.attrs = {}
@@ -63,10 +63,10 @@ const posthtmlPlugin: PostHTML.Plugin<unknown> = (tree) => {
         ...sortObjAttr(directiveAttrs),
         ...sortObjAttr(normalAttrs),
         ...sortObjAttr(refAttrs),
-        ...sortObjAttr(methodAttrs)
+        ...sortObjAttr(methodAttrs),
       }
     }
     return node
   })
 }
-export default posthtmlPlugin
+export default propertySort

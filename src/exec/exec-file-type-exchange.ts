@@ -1,7 +1,7 @@
 import * as exec from './index'
-import type { filterConditionType, execListType } from './index'
+import type { FilterConditionType, ExecListType } from './index'
 const exchangeVueFileGrammar = () => {
-  const execList: execListType = [
+  const execList: ExecListType = [
     {
       reg: /<script>/g,
       matchContentHandle(content: string) {
@@ -18,7 +18,7 @@ const exchangeVueFileGrammar = () => {
       },
     },
   ]
-  const filterCondition: filterConditionType = (file) => {
+  const filterCondition: FilterConditionType = (file) => {
     return file.extname === '.vue'
   }
   exec.batchReplaceByReg(execList, filterCondition)

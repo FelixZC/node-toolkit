@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES5",
+    "target": "esnext",
     "module": "commonjs",
     "strict": true,
     "jsx": "preserve",
@@ -11,7 +11,7 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "baseUrl": ".",
     "types": ["jest", "jscodeshift", "node"],
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"],

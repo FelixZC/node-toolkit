@@ -4,13 +4,13 @@ import * as os from 'os'
 const userInfo = os.userInfo() //用户信息
 const eol = os.EOL //换行符
 
-interface record {
+interface Record {
   name: string
   type: string
   arguments: IArguments
   error?: Error | unknown
 }
-export interface fileInfo {
+export interface FileInfo {
   filePath: string
   dirname: string
   basename: string
@@ -18,22 +18,15 @@ export interface fileInfo {
   filename: string
   stats: fs.Stats
 }
-interface cache {
+interface Cache {
   [cacheKey: string]: { index: number }
 }
-export interface mergeSingelPageOptions {
-  sourceFileType: string
-  targetFileType: string
-  regList: RegExp[]
-  backupSource: boolean
-  deleteRef: boolean
-}
 
-interface customNameFunction {
+interface CustomNameFunction {
   (filePath: string): string
 }
 
-interface fsInstance {
+interface FsInstance {
   rootPath: string
   folderPath: string
   logPath: string
@@ -41,10 +34,10 @@ interface fsInstance {
   dirPathList: string[]
   saveOperateLog(message: string): void
   getFilePathList(folderPath: string): void
-  getFileInfoList(): fileInfo[]
+  getFileInfoList(): FileInfo[]
   modifyFileName(
-    customBaseName: string | customNameFunction,
-    customExtensionName?: string | customNameFunction,
+    customBaseName: string | CustomNameFunction,
+    customExtensionName?: string | CustomNameFunction,
     filterKeyword?: string,
     filterExtensionName?: string
   ): void
@@ -55,13 +48,13 @@ interface fsInstance {
 //操作日志打印记录
 function log() {
   return function (
-    target: fsInstance,
+    target: FsInstance,
     name: string,
     descriptor: PropertyDescriptor
   ) {
     const fn = descriptor.value
     descriptor.value = function () {
-      const record: record = { name, type: 'log', arguments }
+      const record: Record = { name, type: 'log', arguments }
       target.saveOperateLog.call(this, JSON.stringify(record))
       return fn.apply(this, arguments)
     }
@@ -72,7 +65,7 @@ function log() {
 //异常处理装饰器与异常日志记录
 function catchHandel() {
   return function (
-    target: fsInstance,
+    target: FsInstance,
     name: string,
     descriptor: PropertyDescriptor
   ) {
@@ -82,7 +75,7 @@ function catchHandel() {
         return fn.apply(this, arguments)
       } catch (error) {
         console.error(error)
-        const record: record = { name, type: 'catch', arguments, error }
+        const record: Record = { name, type: 'catch', arguments, error }
         target.saveOperateLog.call(this, JSON.stringify(record))
         return null
       }
@@ -102,7 +95,7 @@ function catchHandel() {
             let fsInstance = new fsUtils(rootPath)
             fsInstance.xx()
  */
-class fsUtils implements fsInstance {
+class fsUtils implements FsInstance {
   folderPath: string
   logPath: string
   filePathList: Array<string>
@@ -197,8 +190,8 @@ class fsUtils implements fsInstance {
               fsInstance.modifyFileName(null, '.test', null, '.txt') //批量处理
    */
   modifyFileName(
-    customBaseName: string | customNameFunction | null,
-    customExtensionName?: string | customNameFunction | null,
+    customBaseName: string | CustomNameFunction | null,
+    customExtensionName?: string | CustomNameFunction | null,
     filterKeyword?: string | null,
     filterExtensionName?: string | null
   ) {
@@ -207,7 +200,7 @@ class fsUtils implements fsInstance {
     }
     let modifyCount = 0
     let filePathListBackup = [...this.filePathList]
-    const cache = <cache>{}
+    const cache = <Cache>{}
     //添置所有已有文件缓存
     for (const filePath of filePathListBackup) {
       cache[filePath] = { index: 0 }

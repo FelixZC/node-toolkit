@@ -1,27 +1,36 @@
-import execBabelPlugin from '../plugins/useBabelPlugin'
+import babel from '@babel/core'
+import runBabelPlugin from '../plugins/useBabelPlugin'
+import getPostcssPluginActuator from 'src/plugins/usePostcssPlugin'
+import getPosthtmlPluginActuator from 'src/plugins/usePosthtmlPlugin'
 import * as fs from 'fs'
 import * as path from 'path'
-import mdUtils, { groupCache } from '../utils/md'
-import fsUtils, { fileInfo, mergeSingelPageOptions } from '../utils/fs'
+import mdUtils, { GroupCache } from '../utils/md'
+import fsUtils from '../utils/fs'
+import type { FileInfo } from '../utils/fs'
 import * as os from 'os'
-import { execFileInfo } from '../plugins/common'
+import { ExecFileInfo } from '../plugins/common'
+import type { Plugin as PosthtmlPlugin } from 'posthtml'
+import type { BabelPlugin } from '../plugins/useBabelPlugin'
+import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
+import runCodemod from '../plugins/useJsCodemod'
+import type { Transform } from 'jscodeshift'
 const br = os.EOL //换行符
 const rootPath = path.join('src')
 const fsInstance = new fsUtils(rootPath)
 const fileInfoList = fsInstance.getFileInfoList()
 
-interface attrsCollection {
+interface AttrsCollection {
   key: string | number
   value: string | number
   standingInitial?: string
 }
 
-interface sourceItem {
+interface SourceItem {
   filename: string
   target: string
 }
 
-interface routeTemplate {
+interface RouteTemplate {
   path: string
   name: string
   component: string
@@ -31,18 +40,18 @@ interface routeTemplate {
   }
 }
 
-interface excelPosition {
+interface ExcelPosition {
   load: string
   save: string
 }
 
-export interface regExec {
+export interface RegExec {
   reg: RegExp
   matchContentHandle(content: string): string
 }
 
-export interface filterConditionType {
-  (item: fileInfo): boolean
+export interface FilterConditionType {
+  (item: FileInfo): boolean
 }
 
 export const getFsInstance = () => {
@@ -54,7 +63,7 @@ export const classifyFilesGroup = (isQueryRepeat = false) => {
   const classifyRepeatFileGroup = () => {
     let group = mdUtils.groupBy(fileInfoList, 'basename') //按文件名分类
     const filesGroupOfRepeat = Object.values(group).filter(
-      (item: groupCache) => item.group.length > 1
+      (item: GroupCache) => item.group.length > 1
     ) //过滤重复命名数组
     group = mdUtils.groupBy(filesGroupOfRepeat, 'extname') //再按文件类型分类
     fs.writeFileSync(
@@ -109,7 +118,7 @@ export const generateRouter = () => {
   const queryReg =
     /(?<tagInfo><(?<tag>title).*>)(?<tagContent>[\s\S]*?)<\/title>/
   let result
-  const routes: routeTemplate[] = []
+  const routes: RouteTemplate[] = []
   fileInfoList
     .filter((i) => i.extname === '.html')
     .forEach((v) => {
@@ -135,57 +144,67 @@ export const generateRouter = () => {
 export const getAttrsAndAnnotation = (targetPath?: string) => {
   const storeFile = require('../js/stote-state')
   const babelPluginPathList = ['../../babel-plugins/extract-annotation']
-  const transform = execBabelPlugin(babelPluginPathList)
-  const attrsCollection = {} as attrsCollection //所有属性描述对象
-  const attrsCollectionGroup: attrsCollection[] = [] //根据首字母分类属性描述对象数组
+  const plugins: BabelPlugin[] = babelPluginPathList.map((pluginPath) => {
+    const result = require(pluginPath)
+    if (result.default) {
+      return result.default(babel)
+    }
+    return result(babel)
+  })
+  const transform = runBabelPlugin(plugins)
+  const AttrsCollection = {} as AttrsCollection //所有属性描述对象
+  const attrsCollectionGroup: AttrsCollection[] = [] //根据首字母分类属性描述对象数组
   if (!transform) {
     return
   }
   //获取注释描述对象
   const handler = (filePath: string) => {
     const content = fs.readFileSync(filePath, 'utf-8')
-    const execFileInfo: execFileInfo = {
+    const execFileInfo: ExecFileInfo = {
       path: filePath,
       source: content,
       extra: { attributesObj: {} as Record<string, any> },
     }
     //不需要新内容
     transform(execFileInfo)
-    if (Object.keys(execFileInfo.extra.attributesObj).length) {
+    if (
+      execFileInfo.extra &&
+      Object.keys(execFileInfo.extra.attributesObj).length
+    ) {
       for (const [key, value] of Object.entries(
         execFileInfo.extra.attributesObj
       )) {
         //冲突处理
-        if (Reflect.get(attrsCollection, key)) {
+        if (Reflect.get(AttrsCollection, key)) {
           const newKey = key + `:arrow_right:(in ${path.basename(filePath)})`
           if (
-            Reflect.get(attrsCollection, newKey) === value ||
-            Reflect.get(attrsCollection, key) === value
+            Reflect.get(AttrsCollection, newKey) === value ||
+            Reflect.get(AttrsCollection, key) === value
           ) {
             continue
           }
-          Reflect.set(attrsCollection, newKey, value)
+          Reflect.set(AttrsCollection, newKey, value)
           attrsCollectionGroup.push({
             standingInitial: newKey.slice(0, 1).toLocaleUpperCase(),
             key: newKey,
             value,
           })
         } else {
-          Reflect.set(attrsCollection, key, value)
+          Reflect.set(AttrsCollection, key, value)
           attrsCollectionGroup.push({
             standingInitial: key.slice(0, 1).toLocaleUpperCase(),
             key,
             value,
           })
         }
-        Reflect.set(attrsCollection, key, value)
+        Reflect.set(AttrsCollection, key, value)
       }
     }
   }
   if (targetPath) {
     handler(targetPath)
   } else {
-    fileInfoList.forEach((item: fileInfo) => {
+    fileInfoList.forEach((item: FileInfo) => {
       handler(item.filePath)
     })
   }
@@ -201,13 +220,13 @@ export const getAttrsAndAnnotation = (targetPath?: string) => {
     }
   )
 
-  const storeTable = mdUtils.createdStoreTable(storeFile, attrsCollection) //获取store属性描述
+  const storeTable = mdUtils.createdStoreTable(storeFile, AttrsCollection) //获取store属性描述
   fs.writeFileSync('./node/query/md/storeTable.md', storeTable, {
     encoding: 'utf-8',
   })
   fs.writeFileSync(
     './node/query/json/attrs-collection.json',
-    JSON.stringify(attrsCollection),
+    JSON.stringify(AttrsCollection),
     {
       encoding: 'utf-8',
     }
@@ -234,8 +253,9 @@ export const getComponentDescription = () => {
   fs.writeFileSync(writeFilePath, str, { encoding: 'utf-8' })
 }
 
+//转化excel内容为json
 export function getJsonFromExecl() {
-  const list: excelPosition[] = [
+  const list: ExcelPosition[] = [
     {
       load: './node/query/excel/nav.xlsx',
       save: './node/query/json/nav.json',
@@ -254,7 +274,7 @@ export function getJsonFromExecl() {
     },
   ]
   //从execl中导入scss变量,和compose-css-variable.js搭配使用合并完整scss变量文件
-  const getExcelProps = (list: excelPosition[]) => {
+  const getExcelProps = (list: ExcelPosition[]) => {
     //excel文件列表和转化输出位置
     const excelUtils = require('../../utils/excel')
     const transformMap = new Map([
@@ -290,7 +310,7 @@ export function getJsonFromExecl() {
   }
 
   //合并scss样式变量,和get-excel-props搭配使用转换excel数据并合并
-  const composeCssVariable = (list: excelPosition[]) => {
+  const composeCssVariable = (list: ExcelPosition[]) => {
     const compose: Record<string, any> = {}
     list.forEach((item) => {
       const filename = path.basename(item.save, path.extname(item.save))
@@ -315,26 +335,9 @@ export function getJsonFromExecl() {
   composeCssVariable(list)
 }
 
-//混合页面
-export const mergePage = () => {
-  const option: mergeSingelPageOptions = {
-    sourceFileType: '.html',
-    targetFileType: '.vue',
-    regList: [
-      /(?<tagInfo><(?<tag>body).*>)[\r\n]?((?<tagContent>[\s\S]*?)<\/body>)?/,
-      /(?<tagInfo><(?<tag>script).*>)[\r\n]?((?<tagContent>[\s\S]*?)<\/script>)?/,
-      /(?<tagInfo><(?<tag>style).*>)[\r\n]?((?<tagContent>[\s\S]*?)<\/style>)?/,
-      /(?<tagInfo><(?<tag>link).*>)[\r\n]?((?<tagContent>[\s\S]*?)<\/link>)?/,
-    ],
-    backupSource: false,
-    deleteRef: true,
-  }
-  fsInstance.mergePage(option)
-}
-
 //按照匹配项，批量更改文件名
 export const modifyFilename = (isDirectlyExec = true) => {
-  const source = require('../json/source.json') as sourceItem[]
+  const source = require('../json/source.json') as SourceItem[]
   const priviewResult = () => {
     //文件信息整合
     const fileInfoList = new fsUtils(
@@ -345,7 +348,7 @@ export const modifyFilename = (isDirectlyExec = true) => {
       return v1.stats.birthtimeMs - v2.stats.birthtimeMs
     })
     //查命名错误和遗漏
-    const tempList: sourceItem[] = []
+    const tempList: SourceItem[] = []
     source.forEach((i) => {
       if (!fileInfoList.some((v) => v.filename === i.filename)) {
         tempList.push(i)
@@ -359,7 +362,7 @@ export const modifyFilename = (isDirectlyExec = true) => {
     const customBaseNameGenerateFunction = (oldFile: string) => {
       const oldFileName = path.basename(oldFile, path.extname(oldFile)) //文件名
       return (
-        source.find((item: sourceItem) => item.filename === oldFileName)
+        source.find((item: SourceItem) => item.filename === oldFileName)
           ?.target || oldFileName
       )
     }
@@ -443,11 +446,11 @@ export const replaceByReg = (
   return { content, isChange }
 }
 
-export type execListType = Array<regExec>
+export type ExecListType = Array<RegExec>
 //根据正则表达式批量替换文件内容
 export const batchReplaceByReg = (
-  execList: execListType,
-  filterCondition?: filterConditionType
+  execList: ExecListType,
+  filterCondition?: FilterConditionType
 ) => {
   let restBasenameList = fileInfoList
   //批量替换
@@ -474,21 +477,20 @@ export const batchReplaceByReg = (
 }
 
 //使用babel插件
-export const useBabelPlugin = (
-  babelPluginPathList: string[],
+export const execBabelPlugin = (
+  babelPlugins: BabelPlugin[],
   targetPath?: string
 ) => {
-  const transform = execBabelPlugin(babelPluginPathList)
-  if (!transform || !babelPluginPathList.length) {
+  if (!babelPlugins.length) {
     return
   }
   const handler = (filePath: string) => {
     const content = fs.readFileSync(filePath, 'utf-8')
-    const execFileInfo: execFileInfo = {
+    const execFileInfo: ExecFileInfo = {
       path: filePath,
       source: content,
     }
-    const newContent = transform(execFileInfo)
+    const newContent = runBabelPlugin(execFileInfo, babelPlugins)
     if (newContent && newContent.length) {
       fs.writeFileSync(filePath, newContent, 'utf-8')
     }
@@ -507,15 +509,17 @@ export const useBabelPlugin = (
 }
 
 //使用psthtml插件
-export const usePosthtmlPlugin = (targetPath?: string) => {
-  const transform = require('../../vue-posthtml-adapter/exec')
-  const handler = (filePath: string) => {
+export const execPosthtmlPlugin = (
+  plugins: PosthtmlPlugin<unknown>[],
+  targetPath?: string
+) => {
+  const handler = async (filePath: string) => {
     const content = fs.readFileSync(filePath, 'utf-8')
-    const execFileInfo: execFileInfo = {
+    const execFileInfo: ExecFileInfo = {
       path: filePath,
       source: content,
     }
-    const newContent = transform(execFileInfo)
+    const newContent = await getPosthtmlPluginActuator(execFileInfo, plugins)
     if (newContent && newContent.length) {
       fs.writeFileSync(filePath, newContent)
     }
@@ -524,6 +528,35 @@ export const usePosthtmlPlugin = (targetPath?: string) => {
     handler(targetPath)
   } else {
     const vaildList = ['.html', '.vue', '.htm', '.xml']
+    const targetList = fileInfoList.filter((fileInfo) =>
+      vaildList.includes(fileInfo.extname)
+    )
+    for (const item of targetList) {
+      handler(item.filePath)
+    }
+  }
+}
+
+//使用babel插件
+export const execCodemod = (codemodList: Transform[], targetPath?: string) => {
+  if (!codemodList.length) {
+    return
+  }
+  const handler = (filePath: string) => {
+    const content = fs.readFileSync(filePath, 'utf-8')
+    const execFileInfo: ExecFileInfo = {
+      path: filePath,
+      source: content,
+    }
+    const newContent = runCodemod(execFileInfo, codemodList)
+    if (newContent && newContent.length) {
+      fs.writeFileSync(filePath, newContent, 'utf-8')
+    }
+  }
+  if (targetPath) {
+    handler(targetPath)
+  } else {
+    const vaildList = ['.js', '.ts', '.jsx', '.tsx', '.vue']
     const targetList = fileInfoList.filter((fileInfo) =>
       vaildList.includes(fileInfo.extname)
     )

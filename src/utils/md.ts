@@ -10,7 +10,7 @@ import * as common from './common'
 const br = os.EOL //换行符
 
 //分组缓存
-export interface groupCache {
+export interface GroupCache {
   [cacheKey: string]: {
     groupKey: string
     count: number
@@ -26,7 +26,7 @@ export interface groupCache {
  * @returns {Object} 分类结果
  */
 function groupBy(arr: Array<Record<string, any>>, groupKey: string) {
-  const cache = {} as groupCache
+  const cache = {} as GroupCache
   if (common.getDataType(arr) !== 'Array') {
     throw new Error('非数组类型，无法分类')
   }
