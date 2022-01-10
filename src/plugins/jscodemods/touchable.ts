@@ -9,11 +9,14 @@ module.exports = function (file, api) {
 
   var j = api.jscodeshift
   var root = j(file.source)
-
   var didTransform = false
   root.find(j.JSXElement).forEach(function (p) {
     var parent = p.value
-    if (getJSXName(parent) !== 'TouchableBounce' && getJSXName(parent) !== 'TouchableOpacity') {
+
+    if (
+      getJSXName(parent) !== 'TouchableBounce' &&
+      getJSXName(parent) !== 'TouchableOpacity'
+    ) {
       return
     }
 
@@ -22,13 +25,14 @@ module.exports = function (file, api) {
     }
 
     var child = parent.children[1]
+
     if (!(child.type === 'JSXElement' && getJSXName(child) === 'View')) {
       return
     }
+
     parent.openingElement.attributes.push(...child.openingElement.attributes)
     parent.children = child.children
     didTransform = true
   })
-
   return didTransform ? root.toSource() : null
 }

@@ -9,14 +9,15 @@ module.exports = function (file, api, options = {}) {
   }
 
   const j = api.jscodeshift
-  const printOptions = options.printOptions || { quote: 'single' }
+  const printOptions = options.printOptions || {
+    quote: 'single',
+  }
   const root = j(file.source)
   let mutations = 0
-
   const JEST_API = {
-    dontMock: 'unmock',
     autoMockOff: 'disableAutomock',
-    autoMockOn: 'enableAutomock'
+    autoMockOn: 'enableAutomock',
+    dontMock: 'unmock',
   }
 
   const isJestCall = (node) =>
@@ -29,12 +30,12 @@ module.exports = function (file, api, options = {}) {
     (mutations += root
       .find(j.CallExpression, {
         callee: {
-          type: 'MemberExpression',
           object: isJestCall,
           property: {
-            name: (name) => apiMethods[name]
-          }
-        }
+            name: (name) => apiMethods[name],
+          },
+          type: 'MemberExpression',
+        },
       })
       .forEach((p) => {
         const name = p.value.callee.property.name
@@ -44,32 +45,31 @@ module.exports = function (file, api, options = {}) {
 
   const JEST_MOCK_FNS = {
     genMockFn: true,
-    genMockFunction: true
+    genMockFunction: true,
   }
-
   const JEST_MOCK_IMPLEMENTATION = {
     mockImpl: true,
-    mockImplementation: true
+    mockImplementation: true,
   }
 
   const updateMockFns = () => {
     mutations += root
       .find(j.CallExpression, {
         callee: {
-          type: 'MemberExpression',
           object: {
-            name: 'jest'
+            name: 'jest',
           },
           property: {
-            name: (name) => JEST_MOCK_FNS[name]
-          }
-        }
+            name: (name) => JEST_MOCK_FNS[name],
+          },
+          type: 'MemberExpression',
+        },
       })
       .forEach((p) => {
         p.value.callee.property.name = 'fn'
-
         const parent = p.parent.node
         const grandParent = p.parent.parent.node
+
         if (
           parent.type == 'MemberExpression' &&
           grandParent.type == 'CallExpression' &&
@@ -84,6 +84,5 @@ module.exports = function (file, api, options = {}) {
 
   updateAPIs(JEST_API)
   updateMockFns()
-
   return mutations ? root.toSource(printOptions) : null
 }

@@ -12,7 +12,9 @@ module.exports = (file, api, options) => {
     return call.size() == 1 ? call.get() : null
   }
 
-  const printOptions = options.printOptions || { quote: 'single' }
+  const printOptions = options.printOptions || {
+    quote: 'single',
+  }
   const root = j(file.source)
 
   const flatten = (a) => (Array.isArray(a) ? [].concat(...a.map(flatten)) : a)
@@ -26,6 +28,7 @@ module.exports = (file, api, options) => {
     ) {
       return node.left
     }
+
     return node
   }
 
@@ -35,7 +38,9 @@ module.exports = (file, api, options) => {
         flatten(
           path.value.arguments
             .map(getObject)
-            .map((p) => (p.type == 'ObjectExpression' ? p.properties : j.spreadProperty(p)))
+            .map((p) =>
+              p.type == 'ObjectExpression' ? p.properties : j.spreadProperty(p)
+            )
         )
       )
     )
@@ -72,7 +77,8 @@ module.exports = (file, api, options) => {
     node.object.object.type == 'ThisExpression' &&
     node.object.property &&
     node.object.property.type == 'Identifier' &&
-    (node.object.property.name == 'state' || node.object.property.name == 'props')
+    (node.object.property.name == 'state' ||
+      node.object.property.name == 'props')
 
   const checkArguments = (path) =>
     path.value.arguments
@@ -88,6 +94,32 @@ module.exports = (file, api, options) => {
       )
 
   const availableFilters = {
+    onlyCallExpressions(path) {
+      var node = path.parent.value
+      return node.type == 'ExpressionStatement'
+    },
+
+    onlyCapitalizedIdentifiers(path) {
+      var node = path.value.arguments[0]
+      return (
+        node.type == 'Identifier' &&
+        node.name.charAt(0) == node.name.charAt(0).toUpperCase()
+      )
+    },
+
+    onlyDefaults(path) {
+      var node = path.value.arguments[0]
+      return node.type == 'Identifier' && node.name == 'defaults'
+    },
+
+    onlyNewExpressions(path) {
+      return path.value.arguments[0].type == 'NewExpression'
+    },
+
+    onlyObjectExpressions(path) {
+      return path.value.arguments[0].type == 'ObjectExpression'
+    },
+
     onlyPrototypeAssignments(path) {
       var node = path.value.arguments[0]
       return (
@@ -97,27 +129,10 @@ module.exports = (file, api, options) => {
         node.property.name == 'prototype'
       )
     },
+
     onlyThisExpressions(path) {
       return path.value.arguments[0].type == 'ThisExpression'
     },
-    onlyNewExpressions(path) {
-      return path.value.arguments[0].type == 'NewExpression'
-    },
-    onlyCapitalizedIdentifiers(path) {
-      var node = path.value.arguments[0]
-      return node.type == 'Identifier' && node.name.charAt(0) == node.name.charAt(0).toUpperCase()
-    },
-    onlyCallExpressions(path) {
-      var node = path.parent.value
-      return node.type == 'ExpressionStatement'
-    },
-    onlyObjectExpressions(path) {
-      return path.value.arguments[0].type == 'ObjectExpression'
-    },
-    onlyDefaults(path) {
-      var node = path.value.arguments[0]
-      return node.type == 'Identifier' && node.name == 'defaults'
-    }
   }
 
   const rmCopyPropertyCalls = (path) => {
@@ -126,7 +141,11 @@ module.exports = (file, api, options) => {
     } else {
       j(path).replaceWith(
         j.callExpression(
-          j.memberExpression(j.identifier('Object'), j.identifier('assign'), false),
+          j.memberExpression(
+            j.identifier('Object'),
+            j.identifier('assign'),
+            false
+          ),
           path.value.arguments.map(getObject)
         )
       )
@@ -140,22 +159,37 @@ module.exports = (file, api, options) => {
   const filters = (options.omitArgumentsCheck ? [] : [checkArguments]).concat(
     options.filters.map((filterName) => availableFilters[filterName])
   )
-
   const declarator = getRequireCall(root, 'copyProperties')
+
   if (declarator) {
     const variableName = declarator.value.id.name
     const didTransform =
       root
-        .find(j.CallExpression, { callee: { name: variableName } })
+        .find(j.CallExpression, {
+          callee: {
+            name: variableName,
+          },
+        })
         .filter((p) => filters.every((filter) => filter(p)))
         .forEach(rmCopyPropertyCalls)
         .size() > 0
+
     if (didTransform) {
-      if (!root.find(j.CallExpression, { callee: { name: variableName } }).size()) {
+      if (
+        !root
+          .find(j.CallExpression, {
+            callee: {
+              name: variableName,
+            },
+          })
+          .size()
+      ) {
         j(declarator).remove()
       }
+
       return root.toSource(printOptions)
     }
   }
+
   return null
 }

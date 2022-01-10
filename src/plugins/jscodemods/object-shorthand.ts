@@ -21,7 +21,9 @@
  */
 module.exports = (file, api, options) => {
   const j = api.jscodeshift
-  const printOptions = options.printOptions || { quote: 'single' }
+  const printOptions = options.printOptions || {
+    quote: 'single',
+  }
   const root = j(file.source)
 
   const isRecursive = (value) => {
@@ -42,10 +44,9 @@ module.exports = (file, api, options) => {
         (value.type === 'Identifier' && key.name === value.name) ||
         (value.type === 'FunctionExpression' && !isRecursive(value))
       )
-    }
-
-    // Can be simplified if the key is a string literal which is equal to the
+    } // Can be simplified if the key is a string literal which is equal to the
     // identifier name of the value.
+
     if (key.type === 'Literal') {
       return value.type === 'Identifier' && key.value === value.name
     }
@@ -55,9 +56,9 @@ module.exports = (file, api, options) => {
 
   root
     .find(j.Property, {
+      computed: false,
       method: false,
       shorthand: false,
-      computed: false
     })
     .filter((p) => canBeSimplified(p.value.key, p.value.value))
     .forEach((p) => {
@@ -71,6 +72,5 @@ module.exports = (file, api, options) => {
         p.value.method = true
       }
     })
-
   return root.toSource(printOptions)
 }

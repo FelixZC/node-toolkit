@@ -1,10 +1,8 @@
-import type { Transform, Parser } from 'jscodeshift'
-
+import type { Parser, Transform } from 'jscodeshift'
 type JSTransformationModule = {
   default: Transform
   parser?: string | Parser
 }
-
 const transformationMap: {
   [name: string]: JSTransformationModule
 } = {
@@ -17,7 +15,6 @@ const transformationMap: {
   'scoped-slots-to-slots': require('./scoped-slots-to-slots'),
   'new-directive-api': require('./new-directive-api'),
   'remove-vue-set-and-delete': require('./remove-vue-set-and-delete'),
-
   // atomic ones
   'remove-contextual-h-from-render': require('./remove-contextual-h-from-render'),
   'remove-production-tip': require('./remove-production-tip'),
@@ -25,10 +22,8 @@ const transformationMap: {
   'remove-vue-use': require('./remove-vue-use'),
   'root-prop-to-use': require('./root-prop-to-use'),
   'vue-as-namespace-import': require('./vue-as-namespace-import'),
-
   // generic utility tranformations
   'add-import': require('./add-import'),
   'remove-extraneous-import': require('./remove-extraneous-import'),
 }
-
 export default transformationMap

@@ -1,31 +1,33 @@
 const DEFAULT_OPTIONS = {
-  'split-imports': false
+  'split-imports': false,
 }
-
 const NATIVE_METHODS = {
-  forEach: 'forEach',
-  each: 'forEach',
-  map: 'map',
   collect: 'map',
-  filter: 'filter',
-  select: 'filter',
-  every: 'every',
-  some: 'some',
-  find: 'find',
-  detect: 'find',
   contains: 'includes',
-  reduce: 'reduce',
-  inject: 'reduce',
-  indexOf: 'indexOf',
-  lastIndexOf: 'lastIndexOf',
+  detect: 'find',
+  each: 'forEach',
+  every: 'every',
+  filter: 'filter',
+  find: 'find',
   first: (j, identifier) => j.memberExpression(identifier, j.literal(0)),
+  forEach: 'forEach',
+  indexOf: 'indexOf',
+  inject: 'reduce',
   last: (j, identifier) =>
     j.memberExpression(
       identifier,
-      j.binaryExpression('-', j.memberExpression(identifier, j.identifier('length')), j.literal(1))
-    )
+      j.binaryExpression(
+        '-',
+        j.memberExpression(identifier, j.identifier('length')),
+        j.literal(1)
+      )
+    ),
+  lastIndexOf: 'lastIndexOf',
+  map: 'map',
+  reduce: 'reduce',
+  select: 'filter',
+  some: 'some',
 }
-
 /**
  * This codemod does a few different things.
  * 1. Convert all underscore imports/requires to lodash imports
@@ -40,40 +42,37 @@ const NATIVE_METHODS = {
  * 1. Does not check for variables with same name in scope
  * 2. Knows nothing of types, so objects using _ methods will break
  */
+
 module.exports = function (fileInfo, { jscodeshift: j }, argOptions) {
   const options = Object.assign({}, DEFAULT_OPTIONS, argOptions)
-  const ast = j(fileInfo.source)
-  // Cache opening comments/position
-  const { comments, loc } = ast.find(j.Program).get('body', 0).node
-  // Cache of underscore methods used
-  j.__methods = {}
+  const ast = j(fileInfo.source) // Cache opening comments/position
 
+  const { comments, loc } = ast.find(j.Program).get('body', 0).node // Cache of underscore methods used
+
+  j.__methods = {}
   ast // Iterate each _.<method>() usage
     .find(j.CallExpression, isUnderscoreExpression)
     .forEach(transformExpression(j, options))
-
   ast // const _ = require('underscore')
     .find(j.VariableDeclaration, isUnderscoreRequire)
     .forEach(transformRequire(j, options))
-
   ast // const _ = require('lodash')
     .find(j.VariableDeclaration, isLodashRequire)
     .forEach(transformRequire(j, options))
-
   ast // import _ from 'underscore'
     .find(j.ImportDeclaration, isUnderscoreImport)
     .forEach(transformImport(j, options))
-
   ast // import _ from 'lodash'
     .find(j.ImportDeclaration, isLodashImport)
-    .forEach(transformImport(j, options))
+    .forEach(transformImport(j, options)) // Restore opening comments/position
 
-  // Restore opening comments/position
-  Object.assign(ast.find(j.Program).get('body', 0).node, { comments, loc })
-
+  Object.assign(ast.find(j.Program).get('body', 0).node, {
+    comments,
+    loc,
+  })
   return ast.toSource({
     arrowParensAlways: true,
-    quote: 'single'
+    quote: 'single',
   })
 }
 
@@ -123,6 +122,7 @@ function transformExpression(j, options) {
   return (ast) => {
     const methodName = ast.node.callee.property.name
     const nativeMapping = NATIVE_METHODS[methodName]
+
     if (nativeMapping) {
       if (typeof nativeMapping === 'function') {
         transformNativeSpecial(j, ast)
@@ -155,7 +155,9 @@ function transformNativeMethod(j, ast) {
 function transformUnderscoreMethod(j, ast) {
   const methodName = ast.node.callee.property.name
   j.__methods[methodName] = true
-  j(ast).replaceWith(j.callExpression(j.identifier(methodName), ast.node.arguments))
+  j(ast).replaceWith(
+    j.callExpression(j.identifier(methodName), ast.node.arguments)
+  )
 }
 
 function transformRequire(j, options) {
@@ -166,7 +168,12 @@ function transformRequire(j, options) {
     } else if (options['split-imports']) {
       j(ast).replaceWith(buildSplitImports(j, imports))
     } else {
-      j(ast).replaceWith(j.importDeclaration(getImportSpecifiers(j, imports), j.literal('lodash')))
+      j(ast).replaceWith(
+        j.importDeclaration(
+          getImportSpecifiers(j, imports),
+          j.literal('lodash')
+        )
+      )
     }
   }
 }
@@ -175,6 +182,7 @@ function transformImport(j, options) {
   const imports = Object.keys(j.__methods)
   return (ast) => {
     ast.node.source = j.literal('lodash')
+
     if (imports.length === 0) {
       j(ast).remove()
     } else if (options['split-imports']) {

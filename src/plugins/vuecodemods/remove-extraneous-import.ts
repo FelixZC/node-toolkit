@@ -1,16 +1,14 @@
-import wrap from '../wrapAstTransformation'
-import type { ASTTransformation } from '../wrapAstTransformation'
 import type {
-  ImportSpecifier,
   ImportDefaultSpecifier,
   ImportNamespaceSpecifier,
+  ImportSpecifier,
 } from 'jscodeshift'
 import type { Collection } from 'jscodeshift/src/Collection'
-
+import wrap from '../wrapAstTransformation'
+import type { ASTTransformation } from '../wrapAstTransformation'
 type Params = {
   localBinding: string
 }
-
 /**
  * Note:
  * here we don't completely remove the import declaration statement
@@ -19,33 +17,33 @@ type Params = {
  * if `foo` is unused, the statement would become `import 'bar'`.
  * It is because we are not sure if the module contains any side effects.
  */
+
 export const transformAST: ASTTransformation<Params> = (
-  { root, j },
+  { j, root },
   { localBinding }
 ) => {
   const usages = root
-    .find(j.Identifier, { name: localBinding })
+    .find(j.Identifier, {
+      name: localBinding,
+    })
     .filter((identifierPath) => {
-      const parent = identifierPath.parent.node
+      const parent = identifierPath.parent.node // Ignore the import specifier
 
-      // Ignore the import specifier
       if (
         j.ImportDefaultSpecifier.check(parent) ||
         j.ImportSpecifier.check(parent) ||
         j.ImportNamespaceSpecifier.check(parent)
       ) {
         return false
-      }
+      } // Ignore properties in MemberExpressions
 
-      // Ignore properties in MemberExpressions
       if (
         j.MemberExpression.check(parent) &&
         parent.property === identifierPath.node
       ) {
         return false
-      }
+      } // Ignore keys in ObjectProperties
 
-      // Ignore keys in ObjectProperties
       if (
         j.ObjectProperty.check(parent) &&
         parent.key === identifierPath.node &&
@@ -89,15 +87,15 @@ export const transformAST: ASTTransformation<Params> = (
     const decl = specifier.closest(j.ImportDeclaration)
     const declNode = decl.get(0).node
     const peerSpecifiers = declNode.specifiers
-    const source = declNode.source.value
+    const source = declNode.source.value // these modules are known to have no side effects
 
-    // these modules are known to have no side effects
     const safelyRemovableModules = [
       'vue',
       'vue-router',
       'vuex',
       '@vue/composition-api',
     ]
+
     if (
       peerSpecifiers.length === 1 &&
       safelyRemovableModules.includes(source)
@@ -109,6 +107,5 @@ export const transformAST: ASTTransformation<Params> = (
     }
   }
 }
-
 export default wrap(transformAST)
 export const parser = 'babylon'

@@ -1,8 +1,4 @@
-import wrap from '../wrapAstTransformation'
-import type { ASTTransformation } from '../wrapAstTransformation'
-
 import type * as N from 'jscodeshift'
-
 /**
  * It is expected to be run after the `createApp` transformataion
  * if a root component is trivial, that is, it contains only one simple prop,
@@ -11,7 +7,10 @@ import type * as N from 'jscodeshift'
  * TODO: implement `remove-trivial-render`,
  * move all other rootProps to the second argument of `createApp`
  */
-export const transformAST: ASTTransformation = ({ root, j }) => {
+
+import wrap from '../wrapAstTransformation'
+import type { ASTTransformation } from '../wrapAstTransformation'
+export const transformAST: ASTTransformation = ({ j, root }) => {
   const appRoots = root.find(j.CallExpression, (node: N.CallExpression) => {
     if (
       node.arguments.length === 1 &&
@@ -38,10 +37,13 @@ export const transformAST: ASTTransformation = ({ root, j }) => {
     }
 
     const { properties } = createAppCall.arguments[0]
+
     if (properties.length !== 1) {
       return
     }
+
     const prop = properties[0]
+
     if (j.SpreadProperty.check(prop) || j.SpreadElement.check(prop)) {
       return
     }
@@ -52,6 +54,7 @@ export const transformAST: ASTTransformation = ({ root, j }) => {
       prop.key.name === 'render'
     ) {
       let renderFnBody
+
       if (j.ObjectMethod.check(prop)) {
         renderFnBody = prop.body
       } else if (j.ArrowFunctionExpression.check(prop.value)) {
@@ -61,6 +64,7 @@ export const transformAST: ASTTransformation = ({ root, j }) => {
       }
 
       let callExpr
+
       if (j.CallExpression.check(renderFnBody)) {
         callExpr = renderFnBody
       } else if (
@@ -84,6 +88,5 @@ export const transformAST: ASTTransformation = ({ root, j }) => {
     }
   })
 }
-
 export default wrap(transformAST)
 export const parser = 'babylon'

@@ -1,12 +1,9 @@
 import type { ArrowFunctionExpression } from 'jscodeshift'
-
+import { transformAST as addImport } from './add-import'
 import wrap from '../wrapAstTransformation'
 import type { ASTTransformation } from '../wrapAstTransformation'
-
-import { transformAST as addImport } from './add-import'
-
 export const transformAST: ASTTransformation = (context) => {
-  const { root, j } = context
+  const { j, root } = context
   const renderFns = root.find(j.ObjectProperty, {
     key: {
       name: 'render',
@@ -15,7 +12,6 @@ export const transformAST: ASTTransformation = (context) => {
       type: 'ArrowFunctionExpression',
     },
   })
-
   const renderMethods = root.find(j.ObjectMethod, {
     key: {
       name: 'render',
@@ -26,19 +22,19 @@ export const transformAST: ASTTransformation = (context) => {
 
   if (renderFns.length || renderMethods.length) {
     addImport(context, {
-      specifier: { type: 'named', imported: 'h' },
       source: 'vue',
+      specifier: {
+        imported: 'h',
+        type: 'named',
+      },
     })
-
     renderFns.forEach(({ node }) => {
       ;(node.value as ArrowFunctionExpression).params.shift()
     })
-
     renderMethods.forEach(({ node }) => {
       node.params.shift()
     })
   }
 }
-
 export default wrap(transformAST)
 export const parser = 'babylon'

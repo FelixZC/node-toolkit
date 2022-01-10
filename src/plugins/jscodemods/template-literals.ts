@@ -23,7 +23,9 @@
  */
 module.exports = function templateLiterals(file, api, options) {
   const j = api.jscodeshift
-  const printOptions = options.printOptions || { quote: 'single' }
+  const printOptions = options.printOptions || {
+    quote: 'single',
+  }
 
   function extractNodes(node, comments, topLevel = false) {
     if (comments) {
@@ -41,14 +43,13 @@ module.exports = function templateLiterals(file, api, options) {
 
     if (!topLevel && node.parenthesizedExpression) {
       return [node]
-    }
-
-    // We need to be careful about not having a stringish node on the left to
+    } // We need to be careful about not having a stringish node on the left to
     // prevent things like 1 + 2 + 'foo', which should evaluate to '3foo' from
     // becoming '12foo'.
+
     return [
       ...(hasStringish(node.left) ? extractNodes(node.left) : [node.left]),
-      ...extractNodes(node.right, node.comments)
+      ...extractNodes(node.right, node.comments),
     ]
   }
 
@@ -65,9 +66,8 @@ module.exports = function templateLiterals(file, api, options) {
       node.callee.property.name === 'toString'
     ) {
       return true
-    }
+    } // String(foo) and new String(foo)
 
-    // String(foo) and new String(foo)
     if (
       ['CallExpression', 'NewExpression'].indexOf(node.type) !== -1 &&
       node.callee.type === 'Identifier' &&
@@ -88,7 +88,11 @@ module.exports = function templateLiterals(file, api, options) {
   }
 
   function isStringishNode(node) {
-    return isStringNode(node) || isTemplateLiteralNode(node) || isCastToStringNode(node)
+    return (
+      isStringNode(node) ||
+      isTemplateLiteralNode(node) ||
+      isCastToStringNode(node)
+    )
   }
 
   function hasStringish(node) {
@@ -106,7 +110,7 @@ module.exports = function templateLiterals(file, api, options) {
       rightQuasis[0] = j.templateElement(
         {
           cooked: lastQuasi.value.cooked + rightQuasis[0].value.cooked,
-          raw: lastQuasi.value.raw + rightQuasis[0].value.raw
+          raw: lastQuasi.value.raw + rightQuasis[0].value.raw,
         },
         false
       )
@@ -117,26 +121,35 @@ module.exports = function templateLiterals(file, api, options) {
 
   function buildTL(nodes, quasis = [], expressions = [], comments = []) {
     if (nodes.length === 0) {
-      return { quasis, expressions, comments }
+      return {
+        comments,
+        expressions,
+        quasis,
+      }
     }
 
     const [node, ...rest] = nodes
-
     const newComments = comments.concat(node.comments || [])
 
     if (node.type === 'Literal') {
       const cooked = node.value.toString()
       let raw = node.raw.toString()
+
       if (typeof node.value === 'string') {
         // We need to remove the opening and trailing quote from the raw value
         // of the string.
-        raw = raw.slice(1, -1)
+        raw = raw.slice(1, -1) // We need to escape ${ to prevent new interpolation.
 
-        // We need to escape ${ to prevent new interpolation.
         raw = raw.replace(/\$\{/g, '\\${')
       }
 
-      const newQuasi = j.templateElement({ cooked, raw }, false)
+      const newQuasi = j.templateElement(
+        {
+          cooked,
+          raw,
+        },
+        false
+      )
       const newQuasis = joinQuasis(quasis, [newQuasi])
       return buildTL(rest, newQuasis, expressions, newComments)
     }
@@ -146,25 +159,35 @@ module.exports = function templateLiterals(file, api, options) {
         j.templateElement(
           {
             cooked: q.value.cooked,
-            raw: q.value.raw
+            raw: q.value.raw,
           },
           false
         )
-      )
-
-      // We need to join the last quasi and the next quasi to prevent
+      ) // We need to join the last quasi and the next quasi to prevent
       // expressions from shifting.
+
       const newQuasis = joinQuasis(quasis, nodeQuasis)
       const newExpressions = expressions.concat(node.expressions)
       return buildTL(rest, newQuasis, newExpressions, newComments)
     }
 
     const newQuasis = joinQuasis(quasis, [
-      j.templateElement({ cooked: '', raw: '' }, false),
-      j.templateElement({ cooked: '', raw: '' }, false)
+      j.templateElement(
+        {
+          cooked: '',
+          raw: '',
+        },
+        false
+      ),
+      j.templateElement(
+        {
+          cooked: '',
+          raw: '',
+        },
+        false
+      ),
     ])
     const newExpressions = expressions.concat(node)
-
     return buildTL(rest, newQuasis, newExpressions, newComments)
   }
 
@@ -177,13 +200,13 @@ module.exports = function templateLiterals(file, api, options) {
 
     const tlOptions = buildTL(tempNodes)
     const tl = j.templateLiteral(tlOptions.quasis, tlOptions.expressions)
+
     if (tl.expressions.length > 0) {
       tl.comments = tlOptions.comments
       return tl
-    }
-
-    // There are no expressions, so let's use a regular string instead of a
+    } // There are no expressions, so let's use a regular string instead of a
     // template literal.
+
     const str = tl.quasis.map((q) => q.value.cooked).join('')
     const strLiteral = j.literal(str)
     strLiteral.comments = tlOptions.comments
@@ -191,7 +214,9 @@ module.exports = function templateLiterals(file, api, options) {
   }
 
   return j(file.source)
-    .find(j.BinaryExpression, { operator: '+' })
+    .find(j.BinaryExpression, {
+      operator: '+',
+    })
     .replaceWith(convertToTemplateString)
     .toSource(printOptions)
 }

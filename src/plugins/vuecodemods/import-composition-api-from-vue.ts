@@ -1,15 +1,13 @@
 // this file is served as a boilerplate template for writing more complex transformations
 import wrap from '../wrapAstTransformation'
-import type { ASTTransformation } from '../wrapAstTransformation'
+import type { ASTTransformation } from '../wrapAstTransformation' // TODO: SetupContext.refs does not exist in Vue 3.0
 
-// TODO: SetupContext.refs does not exist in Vue 3.0
-export const transformAST: ASTTransformation = ({ root, j }) => {
+export const transformAST: ASTTransformation = ({ j, root }) => {
   const importDecl = root.find(j.ImportDeclaration, {
     source: {
       value: '@vue/composition-api',
     },
   })
-
   const specifiers = importDecl.find(j.ImportSpecifier)
   const namespaceSpecifier = importDecl.find(j.ImportNamespaceSpecifier)
 
@@ -18,11 +16,13 @@ export const transformAST: ASTTransformation = ({ root, j }) => {
   }
 
   const lastVCAImportDecl = importDecl.at(-1)
+
   if (specifiers.length) {
     lastVCAImportDecl.insertAfter(
       j.importDeclaration([...specifiers.nodes()], j.stringLiteral('vue'))
     )
   }
+
   if (namespaceSpecifier.length) {
     lastVCAImportDecl.insertAfter(
       j.importDeclaration(
@@ -43,6 +43,5 @@ export const transformAST: ASTTransformation = ({ root, j }) => {
     }
   })
 }
-
 export default wrap(transformAST)
 export const parser = 'babylon'

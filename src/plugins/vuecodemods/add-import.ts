@@ -1,11 +1,10 @@
-import wrap from '../wrapAstTransformation'
-import type { ASTTransformation } from '../wrapAstTransformation'
 import type {
-  ImportSpecifier,
   ImportDefaultSpecifier,
   ImportNamespaceSpecifier,
+  ImportSpecifier,
 } from 'jscodeshift'
-
+import wrap from '../wrapAstTransformation'
+import type { ASTTransformation } from '../wrapAstTransformation'
 type DefaultSpecifierParam = {
   type: 'default'
   local: string
@@ -19,7 +18,6 @@ type NamespaceSpecifierParam = {
   type: 'namespace'
   local: string
 }
-
 type Params = {
   specifier:
     | DefaultSpecifierParam
@@ -27,12 +25,12 @@ type Params = {
     | NamespaceSpecifierParam
   source: string
 }
-
 export const transformAST: ASTTransformation<Params> = (
-  { root, j },
-  { specifier, source }
+  { j, root },
+  { source, specifier }
 ) => {
   let localBinding: string
+
   if (specifier.type === 'named') {
     localBinding = specifier.local || specifier.imported
   } else {
@@ -40,22 +38,22 @@ export const transformAST: ASTTransformation<Params> = (
   }
 
   const duplicate = root.find(j.ImportDeclaration, {
-    specifiers: (
-      arr: Array<
-        ImportSpecifier | ImportDefaultSpecifier | ImportNamespaceSpecifier
-      >
-    ) =>
-      // @ts-ignore there's a bug in ast-types definition, the `local` should be non-nullable
-      arr.some((s) => s.local.name === localBinding),
     source: {
       value: source,
     },
+    specifiers: (
+      arr: Array<
+        ImportSpecifier | ImportDefaultSpecifier | ImportNamespaceSpecifier
+      > // @ts-ignore there's a bug in ast-types definition, the `local` should be non-nullable
+    ) => arr.some((s) => s.local.name === localBinding),
   })
+
   if (duplicate.length) {
     return
   }
 
   let newImportSpecifier
+
   if (specifier.type === 'default') {
     newImportSpecifier = j.importDefaultSpecifier(j.identifier(specifier.local))
   } else if (specifier.type === 'named') {
@@ -73,6 +71,7 @@ export const transformAST: ASTTransformation<Params> = (
       value: source,
     },
   })
+
   if (
     matchedDecl.length &&
     !matchedDecl.find(j.ImportNamespaceSpecifier).length
@@ -84,8 +83,8 @@ export const transformAST: ASTTransformation<Params> = (
       [newImportSpecifier],
       j.stringLiteral(source)
     )
-
     const lastImportDecl = root.find(j.ImportDeclaration).at(-1)
+
     if (lastImportDecl.length) {
       // add the new import declaration after all other import declarations
       lastImportDecl.insertAfter(newImportDecl)
@@ -95,6 +94,5 @@ export const transformAST: ASTTransformation<Params> = (
     }
   }
 }
-
 export default wrap(transformAST)
 export const parser = 'babylon'

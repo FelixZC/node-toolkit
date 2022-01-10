@@ -27,6 +27,7 @@ const vueDefaultOrder = [
   ...['template', 'render'],
   'renderError',
 ]
+
 module.exports = (fileInfo, api) => {
   const j = api.jscodeshift
 
@@ -35,24 +36,30 @@ module.exports = (fileInfo, api) => {
       if (!a.key || !b.key) {
         return 0
       }
+
       if (!a.key.name || !b.key.name) {
         return 0
       }
+
       if (typeof a.key.name === 'number' && typeof b.key.name === 'number') {
         return b.key.name - a.key.name
       }
+
       return a.key.name.localeCompare(b.key.name)
     })
   }
+
   const vueObjectSort = (object) => {
     if (object.properties) {
       object.properties = object.properties.sort((a, b) => {
         if (!a.key || !b.key) {
           return 0
         }
+
         if (!a.key.name || !b.key.name) {
           return 0
         }
+
         return (
           vueDefaultOrder.indexOf(a.key.name) -
           vueDefaultOrder.indexOf(b.key.name)
@@ -60,31 +67,39 @@ module.exports = (fileInfo, api) => {
       })
     }
   }
+
   let b = j(fileInfo.source)
     .find(j.ObjectExpression)
     .forEach(normalObjectSort)
     .toSource()
-  b = j(b).find(j.ObjectPattern).forEach(normalObjectSort).toSource()
-  //vue2
+  b = j(b).find(j.ObjectPattern).forEach(normalObjectSort).toSource() //vue2
+
   if (fileInfo.path.endsWith('.vue') || fileInfo.path.includes('mixin')) {
     b = j(b)
       .find(j.ExportDefaultDeclaration, {
-        declaration: { type: 'ObjectExpression' },
+        declaration: {
+          type: 'ObjectExpression',
+        },
       })
       .forEach((path) => vueObjectSort(path.node.declaration))
       .toSource()
-  }
-  //vue3
+  } //vue3
+
   if (fileInfo.path.endsWith('.vue') || fileInfo.path.includes('mixin')) {
     b = j(b)
       .find(j.ExportDefaultDeclaration, {
-        declaration: { type: 'CallExpression' },
+        declaration: {
+          type: 'CallExpression',
+        },
       })
       .forEach((path) => vueObjectSort(path.node.declaration.arguments[0]))
       .toSource()
   }
+
   return j(b)
-    .find(j.Identifier, { name: 'Vue' })
+    .find(j.Identifier, {
+      name: 'Vue',
+    })
     .filter((path) => path.parentPath.value.type === 'NewExpression')
     .map((path) => path.parentPath)
     .forEach(vueObjectSort)

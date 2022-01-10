@@ -1,26 +1,25 @@
 import wrap from '../wrapAstTransformation'
 import type { ASTTransformation } from '../wrapAstTransformation'
-
-const hookNameMap: { [key: string]: string } = {
+const hookNameMap: {
+  [key: string]: string
+} = {
   bind: 'beforeMount',
-  inserted: 'mounted',
   componentUpdated: 'updated',
+  inserted: 'mounted',
   unbind: 'unmounted',
 }
-
-export const transformAST: ASTTransformation = ({ root, j }) => {
+export const transformAST: ASTTransformation = ({ j, root }) => {
   const directiveRegistration = root.find(j.CallExpression, {
     callee: {
-      type: 'MemberExpression',
       object: {
         name: 'Vue',
       },
       property: {
         name: 'directive',
       },
+      type: 'MemberExpression',
     },
   })
-
   directiveRegistration.forEach(({ node }) => {
     if (
       node.arguments.length === 2 &&
@@ -28,7 +27,6 @@ export const transformAST: ASTTransformation = ({ root, j }) => {
     ) {
       const directiveOptions = node.arguments[1]
       let updateIndex = -1
-
       directiveOptions.properties.forEach((prop, index) => {
         if (
           j.SpreadElement.check(prop) ||
@@ -41,6 +39,7 @@ export const transformAST: ASTTransformation = ({ root, j }) => {
         if (hookNameMap[prop.key.name]) {
           prop.key.name = hookNameMap[prop.key.name]
         }
+
         if (prop.key.name === 'update') {
           updateIndex = index
         }
@@ -48,8 +47,7 @@ export const transformAST: ASTTransformation = ({ root, j }) => {
 
       if (updateIndex !== -1) {
         const nextProp =
-          directiveOptions.properties[updateIndex + 1] ||
-          // if `update` is the last property
+          directiveOptions.properties[updateIndex + 1] || // if `update` is the last property
           directiveOptions.properties[updateIndex - 1]
         nextProp.comments = nextProp.comments || []
         nextProp.comments.push(
@@ -57,12 +55,10 @@ export const transformAST: ASTTransformation = ({ root, j }) => {
             ` __REMOVED__: In Vue 3, there's no 'update' hook for directives `
           )
         )
-        directiveOptions.properties.splice(updateIndex, 1)
-        // TODO: should warn user in the console
+        directiveOptions.properties.splice(updateIndex, 1) // TODO: should warn user in the console
       }
     }
   })
 }
-
 export default wrap(transformAST)
 export const parser = 'babylon'

@@ -4,7 +4,10 @@
   "description": "node-toolkid",
   "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "tsc --pretty && eslint . --ext ts --ext tsx --ext js",
+    "lint:prettier": "prettier --write --loglevel warn \"src/**/*.{js,json,tsx,ts,css,less,scss,vue,html,md}\"",
+    "format": "prettier --write src/**/*.{js,ts,tsx}"
   },
   "author": "pzc",
   "license": "ISC",
@@ -24,6 +27,8 @@
     "@vue/compiler-dom": "^3.0.5",
     "@vue/compiler-sfc": "^3.2.26",
     "debug": "^4.1.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
     "globby": "^11.0.2",
     "jest": "^26.1.0",
     "jscodeshift": "^0.13.0",

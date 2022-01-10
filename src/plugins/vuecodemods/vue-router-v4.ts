@@ -1,34 +1,32 @@
-import wrap from '../wrapAstTransformation'
-import type { ASTTransformation } from '../wrapAstTransformation'
-
 import { transformAST as addImport } from './add-import'
 import { transformAST as removeExtraneousImport } from './remove-extraneous-import'
+import type { ObjectExpression } from 'jscodeshift' // new Router() -> createRouter()
 
-import type { ObjectExpression } from 'jscodeshift'
-
-// new Router() -> createRouter()
+import wrap from '../wrapAstTransformation'
+import type { ASTTransformation } from '../wrapAstTransformation'
 export const transformAST: ASTTransformation = (context) => {
-  const { root, j } = context
+  const { j, root } = context
   const routerImportDecls = root.find(j.ImportDeclaration, {
     source: {
       value: 'vue-router',
     },
   })
-
   const importedVueRouter = routerImportDecls.find(j.ImportDefaultSpecifier)
+
   if (importedVueRouter.length) {
     const localVueRouter = importedVueRouter.get(0).node.local.name
-
     const newVueRouter = root.find(j.NewExpression, {
       callee: {
-        type: 'Identifier',
         name: localVueRouter,
+        type: 'Identifier',
       },
     })
-
     addImport(context, {
-      specifier: { type: 'named', imported: 'createRouter' },
       source: 'vue-router',
+      specifier: {
+        imported: 'createRouter',
+        type: 'named',
+      },
     })
     newVueRouter.replaceWith(({ node }) => {
       // mode: 'history' -> history: createWebHistory(), etc
@@ -49,6 +47,7 @@ export const transformAST: ASTTransformation = (context) => {
 
         if ((p.key as any).name === 'mode') {
           const mode = (p.value as any).value
+
           if (mode === 'hash') {
             historyMode = 'createWebHashHistory'
           } else if (mode === 'history') {
@@ -60,6 +59,7 @@ export const transformAST: ASTTransformation = (context) => {
               `mode must be one of 'hash', 'history', or 'abstract'`
             )
           }
+
           return false
         } else if ((p.key as any).name === 'base') {
           baseValue = p.value
@@ -67,12 +67,14 @@ export const transformAST: ASTTransformation = (context) => {
         }
 
         return true
-      })
+      }) // add the default mode with a hash history
 
-      // add the default mode with a hash history
       addImport(context, {
-        specifier: { type: 'named', imported: historyMode },
         source: 'vue-router',
+        specifier: {
+          imported: historyMode,
+          type: 'named',
+        },
       })
       node.arguments[0].properties = node.arguments[0].properties.filter(
         (p) => !!p
@@ -86,7 +88,6 @@ export const transformAST: ASTTransformation = (context) => {
           )
         )
       )
-
       return j.callExpression(j.identifier('createRouter'), node.arguments)
     })
     removeExtraneousImport(context, {
@@ -94,6 +95,5 @@ export const transformAST: ASTTransformation = (context) => {
     })
   }
 }
-
 export default wrap(transformAST)
 export const parser = 'babylon'

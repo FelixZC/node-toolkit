@@ -1,7 +1,8 @@
 module.exports = (file, api, options) => {
   const j = api.jscodeshift
-
-  const printOptions = options.printOptions || { quote: 'single' }
+  const printOptions = options.printOptions || {
+    quote: 'single',
+  }
   const root = j(file.source)
 
   const getBodyStatement = (fn) => {
@@ -12,8 +13,13 @@ module.exports = (file, api, options) => {
       const inner = fn.body.body[0]
       const comments = (fn.body.comments || []).concat(inner.comments || [])
 
-      if (options['inline-single-expressions'] && inner.type == 'ExpressionStatement') {
-        inner.expression.comments = (inner.expression.comments || []).concat(comments)
+      if (
+        options['inline-single-expressions'] &&
+        inner.type == 'ExpressionStatement'
+      ) {
+        inner.expression.comments = (inner.expression.comments || []).concat(
+          comments
+        )
         return inner.expression
       } else if (inner.type == 'ReturnStatement') {
         if (inner.argument === null) {
@@ -21,25 +27,34 @@ module.exports = (file, api, options) => {
           fn.body.body = []
           return fn.body
         }
+
         const lineStart = fn.loc.start.line
         const originalLineLength = fn.loc.lines.getLineLength(lineStart)
-        const approachDifference = 'function(a, b) {'.length - '(a, b) => );'.length
+        const approachDifference =
+          'function(a, b) {'.length - '(a, b) => );'.length
         const argumentLength = inner.argument.end - inner.argument.start
-
-        const newLength = originalLineLength + argumentLength - approachDifference
+        const newLength =
+          originalLineLength + argumentLength - approachDifference
         const tooLong = maxWidth && newLength > maxWidth
 
         if (!tooLong) {
-          inner.argument.comments = (inner.argument.comments || []).concat(comments)
+          inner.argument.comments = (inner.argument.comments || []).concat(
+            comments
+          )
           return inner.argument
         }
       }
     }
+
     return fn.body
   }
 
   const createArrowFunctionExpression = (fn) => {
-    const arrowFunction = j.arrowFunctionExpression(fn.params, getBodyStatement(fn), false)
+    const arrowFunction = j.arrowFunctionExpression(
+      fn.params,
+      getBodyStatement(fn),
+      false
+    )
     arrowFunction.comments = fn.comments
     arrowFunction.async = fn.async
     return arrowFunction
@@ -49,16 +64,16 @@ module.exports = (file, api, options) => {
     root
       .find(j.CallExpression, {
         callee: {
-          type: 'MemberExpression',
           object: {
+            generator: false,
             type: 'FunctionExpression',
-            generator: false
           },
           property: {
+            name: 'bind',
             type: 'Identifier',
-            name: 'bind'
-          }
-        }
+          },
+          type: 'MemberExpression',
+        },
       })
       .filter(
         (path) =>
@@ -69,10 +84,11 @@ module.exports = (file, api, options) => {
       )
       .forEach((path) => {
         const comments = path.value.comments || []
+
         for (const node of [
           path.value.callee,
           path.value.callee.property,
-          path.value.arguments[0]
+          path.value.arguments[0],
         ]) {
           for (const comment of node.comments || []) {
             comment.leading = false
@@ -80,20 +96,23 @@ module.exports = (file, api, options) => {
             comments.push(comment)
           }
         }
-        const arrowFunction = createArrowFunctionExpression(path.value.callee.object)
+
+        const arrowFunction = createArrowFunctionExpression(
+          path.value.callee.object
+        )
         arrowFunction.comments = (arrowFunction.comments || []).concat(comments)
         j(path).replaceWith(arrowFunction)
       })
       .size() > 0
-
   const replacedCallbacks =
     root
       .find(j.FunctionExpression, {
-        generator: false
+        generator: false,
       })
       .filter((path) => {
         const isArgument =
-          path.parentPath.name === 'arguments' && path.parentPath.value.indexOf(path.value) > -1
+          path.parentPath.name === 'arguments' &&
+          path.parentPath.value.indexOf(path.value) > -1
         const noThis = j(path).find(j.ThisExpression).size() == 0
         const notNamed = !path.value.id || !path.value.id.name
         const noArgumentsRef =
@@ -105,11 +124,13 @@ module.exports = (file, api, options) => {
                 idPath.scope.depth === path.get('body').scope.depth
             )
             .size() === 0
-
         return isArgument && noThis && notNamed && noArgumentsRef
       })
-      .forEach((path) => j(path).replaceWith(createArrowFunctionExpression(path.value)))
+      .forEach((path) =>
+        j(path).replaceWith(createArrowFunctionExpression(path.value))
+      )
       .size() > 0
-
-  return replacedBoundFunctions || replacedCallbacks ? root.toSource(printOptions) : null
+  return replacedBoundFunctions || replacedCallbacks
+    ? root.toSource(printOptions)
+    : null
 }

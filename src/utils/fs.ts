@@ -54,7 +54,7 @@ function log() {
   ) {
     const fn = descriptor.value
     descriptor.value = function () {
-      const record: Record = { name, type: 'log', arguments }
+      const record: Record = { arguments, name, type: 'log' }
       target.saveOperateLog.call(this, JSON.stringify(record))
       return fn.apply(this, arguments)
     }
@@ -75,7 +75,7 @@ function catchHandel() {
         return fn.apply(this, arguments)
       } catch (error) {
         console.error(error)
-        const record: Record = { name, type: 'catch', arguments, error }
+        const record: Record = { arguments, error, name, type: 'catch' }
         target.saveOperateLog.call(this, JSON.stringify(record))
         return null
       }
@@ -116,9 +116,9 @@ class fsUtils implements FsInstance {
    */
   saveOperateLog(message: string) {
     const baseInfo = {
-      user: userInfo.username, //操作用户
-      time: new Date().toLocaleString(), //操作时间
       message, //操作内容记录
+      time: new Date().toLocaleString(), //操作时间
+      user: userInfo.username, //操作用户
     }
     let content = JSON.stringify(baseInfo) + eol
     const divideLine = new Array(100).fill('-').join('-') + eol //添加分割线
@@ -156,11 +156,11 @@ class fsUtils implements FsInstance {
   getFileInfoList() {
     const fileInfoList = this.filePathList.map((filePath) => {
       return {
-        filePath,
-        dirname: path.dirname(filePath),
         basename: path.basename(filePath),
+        dirname: path.dirname(filePath),
         extname: path.extname(filePath),
         filename: path.basename(filePath, path.extname(filePath)),
+        filePath,
         stats: fs.statSync(filePath),
       }
     })

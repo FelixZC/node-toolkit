@@ -3,9 +3,11 @@
 module.exports = function transformer(file, api) {
   const j = api.jscodeshift
   const statement = j.template.statement
-
-  const FUNCTION_TYPES = [j.FunctionDeclaration, j.ArrowFunctionExpression, j.FunctionExpression]
-
+  const FUNCTION_TYPES = [
+    j.FunctionDeclaration,
+    j.ArrowFunctionExpression,
+    j.FunctionExpression,
+  ]
   let updated = false
 
   function getNewName(paramName) {
@@ -27,10 +29,12 @@ module.exports = function transformer(file, api) {
 
   function definedInParentScope(identifierName, scope) {
     let localScope = scope
+
     while (localScope) {
       if (localScope.declares(identifierName)) {
         return true
       }
+
       localScope = localScope.parent
     }
 
@@ -48,10 +52,17 @@ module.exports = function transformer(file, api) {
           return param.properties.map((property) => {
             if (j.Property.check(property)) {
               return property.value.name
-            } else if (j.SpreadProperty.check(property) || j.RestProperty.check(property)) {
+            } else if (
+              j.SpreadProperty.check(property) ||
+              j.RestProperty.check(property)
+            ) {
               return property.argument.name
             } else {
-              throw new Error(`Unexpected Property Type ${property.type} ${j(property).toSource()}`)
+              throw new Error(
+                `Unexpected Property Type ${property.type} ${j(
+                  property
+                ).toSource()}`
+              )
             }
           })
         } else if (param.type === 'RestElement') {
@@ -61,7 +72,9 @@ module.exports = function transformer(file, api) {
         } else if (j.ArrayPattern.check(param)) {
           return [].concat(...getParamNames(param.elements))
         } else {
-          throw new Error(`Unexpected Param Type ${param.type} ${j(param).toSource()}`)
+          throw new Error(
+            `Unexpected Param Type ${param.type} ${j(param).toSource()}`
+          )
         }
       })
     )
@@ -69,20 +82,15 @@ module.exports = function transformer(file, api) {
 
   function updateFunction(func) {
     const params = func.get('params')
-
     const functionScope = func.scope
-
     const newBindings = new Set()
-
     const paramNames = getParamNames(params.value)
-
     const reassignedParamNames = paramNames.filter((paramName) => {
       const numAssignments = j(func)
         .find(j.AssignmentExpression)
         .filter((assignment) => {
-          const left = assignment.node.left
+          const left = assignment.node.left // old = 4;
 
-          // old = 4;
           if (j.Identifier.check(left)) {
             return left.name === paramName
           } else if (j.ObjectPattern.check(left)) {
@@ -93,7 +101,9 @@ module.exports = function transformer(file, api) {
                 return property.argument.name === paramName
               } else {
                 throw new Error(
-                  `Unexpected Property Type ${property.type} ${j(property).toSource()}`
+                  `Unexpected Property Type ${property.type} ${j(
+                    property
+                  ).toSource()}`
                 )
               }
             })
@@ -101,13 +111,11 @@ module.exports = function transformer(file, api) {
 
           return false
         }).length
-
       const numUpdated = j(func).find(j.UpdateExpression, {
         argument: {
-          name: paramName
-        }
+          name: paramName,
+        },
       }).length
-
       return numAssignments > 0 || numUpdated > 0
     })
 
@@ -125,7 +133,9 @@ module.exports = function transformer(file, api) {
       }
 
       j(func.get('body'))
-        .find(j.Identifier, { name: paramName })
+        .find(j.Identifier, {
+          name: paramName,
+        })
         .forEach((identifier) => {
           const parent = identifier.parent.node
 
@@ -138,10 +148,15 @@ module.exports = function transformer(file, api) {
             return
           }
 
-          if (j.Property.check(parent) && parent.key === identifier.node && !parent.computed) {
+          if (
+            j.Property.check(parent) &&
+            parent.key === identifier.node &&
+            !parent.computed
+          ) {
             // { oldName: 3 }
-
-            const closestAssignment = j(identifier).closest(j.AssignmentExpression)
+            const closestAssignment = j(identifier).closest(
+              j.AssignmentExpression
+            )
             const assignmentHasProperty =
               closestAssignment.filter((assignment) => {
                 return (
@@ -174,8 +189,10 @@ module.exports = function transformer(file, api) {
 
           if (scope === functionScope) {
             const bindings = scope.getBindings()[oldName]
+
             if (bindings) {
               const recentBinding = bindings[bindings.length - 1]
+
               if (recentBinding.name === 'id') {
                 return
               }
@@ -191,9 +208,8 @@ module.exports = function transformer(file, api) {
           }
 
           if (scope) {
-            newBindings.add(localVar)
+            newBindings.add(localVar) // ObjectPattern
 
-            // ObjectPattern
             if (identifier.parent && j.Property.check(identifier.parent.node)) {
               const property = identifier.parent
               property.shorthand = false
@@ -205,29 +221,28 @@ module.exports = function transformer(file, api) {
           }
         })
     })
-
     const newBindingStatements = Array.from(newBindings).reverse()
     newBindingStatements.forEach((binding) => {
       updated = true
       functionScope.node.body.body.unshift(binding)
     })
-  }
-
-  // Facebook has generated files with an annotation. We don't want to modify these.
+  } // Facebook has generated files with an annotation. We don't want to modify these.
   // Instead, we should modify the code that generates the files.
   // eslint-disable-next-line no-useless-concat
+
   if (file.source.includes('@' + 'generated')) {
     return null
   }
 
   const root = j(file.source)
-
   FUNCTION_TYPES.forEach((type) => {
     root.find(type).forEach(updateFunction)
   })
 
   if (updated) {
-    return root.toSource({ quote: 'single' })
+    return root.toSource({
+      quote: 'single',
+    })
   }
 
   return null

@@ -4,7 +4,9 @@
  */
 module.exports = (file, api, options) => {
   const j = api.jscodeshift
-  const printOptions = options.printOptions || { quote: 'single' }
+  const printOptions = options.printOptions || {
+    quote: 'single',
+  }
   const root = j(file.source)
 
   const isValidIdentifierNameForProperty = (name) => {
@@ -23,8 +25,8 @@ module.exports = (file, api, options) => {
 
   root
     .find(j.Property, {
+      computed: false,
       method: false,
-      computed: false
     })
     .filter(
       (p) =>
@@ -33,6 +35,5 @@ module.exports = (file, api, options) => {
         isValidIdentifierNameForProperty(p.value.key.value)
     )
     .forEach((p) => (p.value.key = j.identifier(p.value.key.value)))
-
   return root.toSource(printOptions)
 }

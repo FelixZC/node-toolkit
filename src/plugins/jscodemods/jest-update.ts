@@ -13,7 +13,9 @@ module.exports = function (file, api, options = {}) {
   }
 
   const j = api.jscodeshift
-  const printOptions = options.printOptions || { quote: 'single' }
+  const printOptions = options.printOptions || {
+    quote: 'single',
+  }
   const root = j(file.source)
   let mutations = 0
 
@@ -25,18 +27,17 @@ module.exports = function (file, api, options = {}) {
   }
 
   const MOCK_MODULES_API = {
-    dontMock: 'dontMock',
-    setMock: 'setMock',
-    mock: 'mock',
     autoMockOff: 'autoMockOff',
     autoMockOn: 'autoMockOn',
+    dontMock: 'dontMock',
     dumpCache: 'resetModuleRegistry',
-    generateMock: 'genMockFromModule'
+    generateMock: 'genMockFromModule',
+    mock: 'mock',
+    setMock: 'setMock',
   }
-
   const MOCKS_API = {
+    getMockFn: 'genMockFn',
     getMockFunction: 'genMockFn',
-    getMockFn: 'genMockFn'
   }
 
   const moduleMatcher = (moduleName) => (node) =>
@@ -54,15 +55,16 @@ module.exports = function (file, api, options = {}) {
     (mutations += root
       .find(j.CallExpression, {
         callee: {
-          type: 'MemberExpression',
           object: matcher,
           property: {
-            name: (name) => apiMethods[name]
-          }
-        }
+            name: (name) => apiMethods[name],
+          },
+          type: 'MemberExpression',
+        },
       })
       .replaceWith((p) => {
         const name = p.value.callee.property.name
+
         if (apiMethods[name] == name) {
           // short-circuit to keep code style in-tact
           p.value.callee.object = j.identifier('jest')
@@ -70,7 +72,11 @@ module.exports = function (file, api, options = {}) {
         }
 
         return j.callExpression(
-          j.memberExpression(j.identifier('jest'), j.identifier(apiMethods[name]), false),
+          j.memberExpression(
+            j.identifier('jest'),
+            j.identifier(apiMethods[name]),
+            false
+          ),
           p.value.arguments
         )
       })
@@ -78,9 +84,15 @@ module.exports = function (file, api, options = {}) {
 
   const removeRequireCall = (name) => {
     const declarator = getRequireCall(root, name)
+
     if (declarator) {
       const hasMockModulesIdentifier =
-        root.find(j.Identifier, { name: declarator.value.id.name }).size() > 1
+        root
+          .find(j.Identifier, {
+            name: declarator.value.id.name,
+          })
+          .size() > 1
+
       if (!hasMockModulesIdentifier) {
         j(declarator).remove()
         mutations++
@@ -89,10 +101,14 @@ module.exports = function (file, api, options = {}) {
 
     mutations += root
       .find(j.CallExpression, {
+        arguments: [
+          {
+            value: name,
+          },
+        ],
         callee: {
-          name: 'require'
+          name: 'require',
         },
-        arguments: [{ value: name }]
       })
       .filter((p) => p.parent.value.type == 'ExpressionStatement')
       .remove()
@@ -100,12 +116,12 @@ module.exports = function (file, api, options = {}) {
   }
 
   const firstNode = () => root.find(j.Program).get('body', 0)
+
   const comment = firstNode().node.leadingComments
   updateAPIs(moduleMatcher('mock-modules'), MOCK_MODULES_API)
   updateAPIs(moduleMatcher('mocks'), MOCKS_API)
   removeRequireCall('mock-modules')
   removeRequireCall('mocks')
   firstNode().node.comments = comment
-
   return mutations ? root.toSource(printOptions) : null
 }

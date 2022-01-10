@@ -1,3 +1,5 @@
+import { transformAST as removeExtraneousImport } from './remove-extraneous-import'
+
 /**
  * Remove `Vue.use()` calls
  * Per current design, `Vue.use` is replaced by `app.use`.
@@ -9,12 +11,9 @@
  */
 import wrap from '../wrapAstTransformation'
 import type { ASTTransformation } from '../wrapAstTransformation'
-import { transformAST as removeExtraneousImport } from './remove-extraneous-import'
-
 type Params = {
   removablePlugins: string[]
 }
-
 export const transformAST: ASTTransformation<Params> = (
   context,
   { removablePlugins }
@@ -22,20 +21,20 @@ export const transformAST: ASTTransformation<Params> = (
   const { j, root } = context
   const vueUseCalls = root.find(j.CallExpression, {
     callee: {
-      type: 'MemberExpression',
       object: {
         name: 'Vue',
       },
       property: {
         name: 'use',
       },
+      type: 'MemberExpression',
     },
   })
-
   const removedPlugins: string[] = []
   const removableUseCalls = vueUseCalls.filter(({ node }) => {
     if (j.Identifier.check(node.arguments[0])) {
       const plugin = node.arguments[0].name
+
       if (removablePlugins.includes(plugin)) {
         removedPlugins.push(plugin)
         return true
@@ -44,15 +43,12 @@ export const transformAST: ASTTransformation<Params> = (
 
     return false
   })
-
   removableUseCalls.remove()
-
   removedPlugins.forEach((name) =>
     removeExtraneousImport(context, {
       localBinding: name,
     })
   )
 }
-
 export default wrap(transformAST)
 export const parser = 'babylon'

@@ -1,45 +1,55 @@
 export default function transformer(file, api) {
   const j = api.jscodeshift
-
   return j(file.source)
     .find(j.MemberExpression, {
       object: {
+        callee: {
+          name: 'expect',
+          type: 'Identifier',
+        },
         type: 'CallExpression',
-        callee: { type: 'Identifier', name: 'expect' }
       },
-      property: { type: 'Identifier' }
+      property: {
+        type: 'Identifier',
+      },
     })
     .forEach((path) => {
       const toBeArgs = path.parentPath.node.arguments
       const expectArgs = path.node.object.arguments
       const name = path.node.property.name
       const isNot = name.indexOf('Not') !== -1 || name.indexOf('Exclude') !== -1
-
       const renaming = {
-        toExist: 'toBeTruthy',
-        toNotExist: 'toBeFalsy',
-        toNotBe: 'not.toBe',
-        toNotEqual: 'not.toEqual',
-        toNotThrow: 'not.toThrow',
         toBeA: 'toBeInstanceOf',
         toBeAn: 'toBeInstanceOf',
-        toNotBeA: 'not.toBeInstanceOf',
-        toNotBeAn: 'not.toBeInstanceOf',
-        toNotMatch: 'not.toMatch',
         toBeFewerThan: 'toBeLessThan',
+        toBeGreaterThanOrEqualTo: 'toBeGreaterThanOrEqual',
         toBeLessThanOrEqualTo: 'toBeLessThanOrEqual',
         toBeMoreThan: 'toBeGreaterThan',
-        toBeGreaterThanOrEqualTo: 'toBeGreaterThanOrEqual',
-        toInclude: 'toContain',
         toExclude: 'not.toContain',
+        toExist: 'toBeTruthy',
+        toInclude: 'toContain',
+        toNotBe: 'not.toBe',
+        toNotBeA: 'not.toBeInstanceOf',
+        toNotBeAn: 'not.toBeInstanceOf',
         toNotContain: 'not.toContain',
+        toNotEqual: 'not.toEqual',
+        toNotExist: 'toBeFalsy',
+        toNotHaveBeenCalled: 'not.toHaveBeenCalled',
         toNotInclude: 'not.toContain',
-        toNotHaveBeenCalled: 'not.toHaveBeenCalled'
+        toNotMatch: 'not.toMatch',
+        toNotThrow: 'not.toThrow',
       }
+
       if (renaming[name]) {
         path.node.property.name = renaming[name]
       }
-      if (name === 'toBeA' || name === 'toBeAn' || name === 'toNotBeA' || name === 'toNotBeAn') {
+
+      if (
+        name === 'toBeA' ||
+        name === 'toBeAn' ||
+        name === 'toNotBeA' ||
+        name === 'toNotBeAn'
+      ) {
         if (toBeArgs[0].type === 'Literal') {
           expectArgs[0] = j.unaryExpression('typeof', expectArgs[0])
           path.node.property.name = isNot ? 'not.toBe' : 'toBe'
@@ -56,6 +66,7 @@ export default function transformer(file, api) {
         expectArgs[0] = j.template.expression`Object.keys(${expectArgs[0]})`
         path.node.property.name = isNot ? 'not.toContain' : 'toContain'
       }
+
       if (
         name === 'toIncludeKeys' ||
         name === 'toContainKeys' ||
@@ -70,10 +81,14 @@ ${toBeArgs[0]}.forEach(${toBeArgs[0]} => {
   ${path.parentPath.node}
 })`)
       }
+
       if (name === 'toMatch' || name === 'toNotMatch') {
         const arg = toBeArgs[0]
+
         if (arg.type === 'ObjectExpression') {
-          path.node.property.name = isNot ? 'not.toMatchObject' : 'toMatchObject'
+          path.node.property.name = isNot
+            ? 'not.toMatchObject'
+            : 'toMatchObject'
         }
       }
     })

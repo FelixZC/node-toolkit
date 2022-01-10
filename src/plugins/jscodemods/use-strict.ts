@@ -4,11 +4,11 @@ module.exports = (file, api, options) => {
   const hasStrictMode = (body) =>
     body.some((statement) =>
       j.match(statement, {
-        type: 'ExpressionStatement',
         expression: {
           type: 'Literal',
-          value: 'use strict'
-        }
+          value: 'use strict',
+        },
+        type: 'ExpressionStatement',
       })
     )
 
@@ -17,10 +17,12 @@ module.exports = (file, api, options) => {
     return to
   }
 
-  const createUseStrictExpression = () => j.expressionStatement(j.literal('use strict'))
+  const createUseStrictExpression = () =>
+    j.expressionStatement(j.literal('use strict'))
 
   const root = j(file.source)
   const body = root.get().value.program.body
+
   if (!body.length || hasStrictMode(body)) {
     return null
   }
@@ -28,6 +30,9 @@ module.exports = (file, api, options) => {
   body.unshift(withComments(createUseStrictExpression(), body[0]))
   body[0].comments = body[1].comments
   delete body[1].comments
-
-  return root.toSource(options.printOptions || { quote: 'single' })
+  return root.toSource(
+    options.printOptions || {
+      quote: 'single',
+    }
+  )
 }

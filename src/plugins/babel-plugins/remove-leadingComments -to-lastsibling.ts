@@ -2,12 +2,17 @@ import { declare } from '@babel/helper-plugin-utils'
 export default declare((babel) => {
   const { types: t } = babel
   return {
-    name: 'ast-transform', // not required
+    name: 'ast-transform',
+    // not required
     visitor: {
       Identifier(path, state) {
-        const parent = path.findParent((path) => path.node && path.node.leadingComments)
+        const parent = path.findParent(
+          (path) => path.node && path.node.leadingComments
+        )
+
         if (parent && parent.inList && parent.type === 'ObjectProperty') {
           const sibling = parent.getSibling(parent.key - 1)
+
           if (
             sibling.node &&
             !sibling.node.leadingComments &&
@@ -18,8 +23,7 @@ export default declare((babel) => {
             parent.node.leadingComments = null
           }
         }
-      }
-    }
+      },
+    },
   }
-}
-)
+})

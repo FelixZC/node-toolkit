@@ -1,7 +1,6 @@
 import wrap from '../wrapAstTransformation'
 import type { ASTTransformation } from '../wrapAstTransformation'
-
-export const transformAST: ASTTransformation = ({ root, j }) => {
+export const transformAST: ASTTransformation = ({ j, root }) => {
   const productionTipAssignment = root.find(
     j.AssignmentExpression,
     (n) =>
@@ -12,6 +11,5 @@ export const transformAST: ASTTransformation = ({ root, j }) => {
   )
   productionTipAssignment.remove()
 }
-
 export default wrap(transformAST)
 export const parser = 'babylon'

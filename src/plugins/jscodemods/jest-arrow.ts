@@ -16,10 +16,8 @@
  *   });
  * });
  */
-
 export default function transformer(file, api) {
   const j = api.jscodeshift
-
   const functionsToTransform = [
     'describe',
     'beforeEach',
@@ -27,9 +25,8 @@ export default function transformer(file, api) {
     'it',
     'xit',
     'test',
-    'xdescribe'
+    'xdescribe',
   ]
-
   return j(file.source)
     .find(j.ExpressionStatement)
     .filter((path) => {
@@ -42,8 +39,10 @@ export default function transformer(file, api) {
     .forEach((path) => {
       var lastArg = path.node.expression.arguments.length - 1
       var fn = path.node.expression.arguments[lastArg]
-
-      path.node.expression.arguments[lastArg] = j.arrowFunctionExpression(fn.params, fn.body)
+      path.node.expression.arguments[lastArg] = j.arrowFunctionExpression(
+        fn.params,
+        fn.body
+      )
     })
     .toSource()
 }

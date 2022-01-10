@@ -1,18 +1,16 @@
+import * as N from 'jscodeshift'
 import wrap from '../wrapAstTransformation'
 import type { ASTTransformation } from '../wrapAstTransformation'
-
-import * as N from 'jscodeshift'
-
 type Params = {
   rootPropName: string
 }
-
 /**
  * Expected to be run after the `createApp` transformation.
  * Transforms expressions like `createApp({ router })` to `createApp().use(router)`
  */
+
 export const transformAST: ASTTransformation<Params> = (
-  { root, j },
+  { j, root },
   { rootPropName }
 ) => {
   const appRoots = root.find(j.CallExpression, (node: N.CallExpression) => {
@@ -35,7 +33,6 @@ export const transformAST: ASTTransformation<Params> = (
       }
     }
   })
-
   appRoots.replaceWith(({ node: createAppCall }) => {
     const rootProps = createAppCall.arguments[0] as N.ObjectExpression
     const propertyIndex = rootProps.properties.findIndex(
@@ -45,20 +42,17 @@ export const transformAST: ASTTransformation<Params> = (
 
     if (propertyIndex === -1) {
       return createAppCall
-    }
+    } // @ts-ignore
 
-    // @ts-ignore
     const [{ value: pluginInstance }] = rootProps.properties.splice(
       propertyIndex,
       1
     )
-
     return j.callExpression(
       j.memberExpression(createAppCall, j.identifier('use')),
       [pluginInstance]
     )
   })
 }
-
 export default wrap(transformAST)
 export const parser = 'babylon'

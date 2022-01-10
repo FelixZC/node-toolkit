@@ -8,7 +8,9 @@ module.exports = (file, api, options) => {
     return call.size() == 1 ? call.get() : null
   }
 
-  const printOptions = options.printOptions || { quote: 'single' }
+  const printOptions = options.printOptions || {
+    quote: 'single',
+  }
   const root = j(file.source)
 
   const flatten = (a) => (Array.isArray(a) ? [].concat(...a.map(flatten)) : a)
@@ -25,16 +27,23 @@ module.exports = (file, api, options) => {
     )
 
   const declarator = getRequireCall(root, 'merge')
+
   if (declarator) {
     const didTransform =
       root
-        .find(j.CallExpression, { callee: { name: declarator.value.id.name } })
+        .find(j.CallExpression, {
+          callee: {
+            name: declarator.value.id.name,
+          },
+        })
         .forEach(rmMergeCalls)
         .size() > 0
+
     if (didTransform) {
       j(declarator).remove()
       return root.toSource(printOptions)
     }
   }
+
   return null
 }
