@@ -1,5 +1,5 @@
-import type { Transform } from 'jscodeshift'
 import * as exec from './index'
+import type { Transform } from 'jscodeshift'
 const jscodemodeList = ['../plugins/jscodemods/object-sort-key']
 
 try {

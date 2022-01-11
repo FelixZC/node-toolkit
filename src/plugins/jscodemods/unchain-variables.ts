@@ -2,6 +2,7 @@
  * Unchains chained variable declarations.
  */
 import { Transform } from 'jscodeshift'
+
 const transformer: Transform = (file, api, options) => {
   const jscodeshift = api.jscodeshift
   const printOptions = options.printOptions || {
@@ -40,4 +41,5 @@ const transformer: Transform = (file, api, options) => {
     ? chainedDeclarations.toSource(printOptions)
     : null
 }
+
 export default transformer

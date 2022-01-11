@@ -1,5 +1,5 @@
-import type { BabelPlugin } from '../plugins/useBabelPlugin'
 import * as exec from './index'
+import type { BabelPlugin } from '../plugins/useBabelPlugin'
 const babelPluginPathList: string[] = ['../plugins/babel-plugins/import-sort']
 
 try {

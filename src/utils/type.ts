@@ -1,3 +1,6 @@
+import { upperFirstletter } from './common'
+import * as fs from 'fs'
+import * as path from 'path'
 import type {
   Headers,
   OperationObject,
@@ -5,9 +8,6 @@ import type {
   PathItemObject,
   ResponseObject,
 } from 'openapi-typescript'
-import { upperFirstletter } from './common'
-import * as fs from 'fs'
-import * as path from 'path'
 
 const EamsAmsprojService = require('../../api/eams-amsprojService.json')
 

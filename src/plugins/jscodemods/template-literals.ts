@@ -22,6 +22,7 @@
  *   a unicode escape sequence or a unicode character.
  */
 import { Transform } from 'jscodeshift'
+
 const transformer: Transform = (file, api, options) => {
   const j = api.jscodeshift
   const printOptions = options.printOptions || {
@@ -221,4 +222,5 @@ const transformer: Transform = (file, api, options) => {
     .replaceWith(convertToTemplateString)
     .toSource(printOptions)
 }
+
 export default transformer

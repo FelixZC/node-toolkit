@@ -1,7 +1,7 @@
+import posthtml from 'posthtml'
 import type { Options as parserOptions } from 'posthtml-parser'
 import type { Options as renderOptions } from 'posthtml-render'
 import type { ExecFileInfo } from './common'
-import posthtml from 'posthtml'
 import type { Options, Plugin as PosthtmlPlugin } from 'posthtml'
 interface MergeOptions extends Options, parserOptions, renderOptions {}
 

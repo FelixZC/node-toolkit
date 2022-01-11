@@ -1,8 +1,9 @@
+import { Transform } from 'jscodeshift'
+
 function getJSXName(value) {
   return value.openingElement.name.name
 }
 
-import { Transform } from 'jscodeshift'
 const transformer: Transform = (file, api) => {
   if (file.source.indexOf('<Touchable') === -1) {
     return null

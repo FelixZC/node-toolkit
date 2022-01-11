@@ -8,6 +8,7 @@ export interface ImportObj {
 }
 export const getImportObj = (importList: ImportDeclaration[]) => {
   const customImportObjList: ImportObj[] = []
+
   for (const item of importList) {
     const importObj: ImportObj = {
       defaultImportName: '',
@@ -22,11 +23,13 @@ export const getImportObj = (importList: ImportDeclaration[]) => {
         case 'ImportDefaultSpecifier':
           importObj.defaultImportName = specifier.local.name
           break
+
         case 'ImportSpecifier':
           const importName =
             specifier.imported.type === 'Identifier'
               ? specifier.imported.name
               : specifier.imported.value
+
           if (importName === specifier.local.name) {
             importObj.importNameList.push(importName)
           } else {
@@ -34,15 +37,19 @@ export const getImportObj = (importList: ImportDeclaration[]) => {
               `${importName} as ${specifier.local.name}`
             )
           }
+
           break
+
         case 'ImportNamespaceSpecifier':
           importObj.namespace = specifier.local.name
           break
       }
     }
+
     importObj.source = item.source.value
     importObj.kind = item.importKind
     customImportObjList.push(importObj)
   }
+
   return customImportObjList
 }

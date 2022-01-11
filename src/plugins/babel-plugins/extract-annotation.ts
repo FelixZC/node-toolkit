@@ -6,6 +6,7 @@ export default declare((babel) => {
     getExtra() {
       return extra
     },
+
     name: 'ast-transform',
     visitor: {
       Identifier(path) {

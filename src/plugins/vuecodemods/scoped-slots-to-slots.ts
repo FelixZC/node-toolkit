@@ -1,6 +1,6 @@
-import type * as N from 'jscodeshift'
 import wrap from '../wrapAstTransformation'
 import type { ASTTransformation } from '../wrapAstTransformation'
+import type * as N from 'jscodeshift'
 export const transformAST: ASTTransformation = ({ j, root }) => {
   const dotScopedSlots = root.find(j.MemberExpression, {
     property: {

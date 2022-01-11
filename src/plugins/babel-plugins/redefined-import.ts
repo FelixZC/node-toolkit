@@ -1,14 +1,14 @@
 import { declare } from '@babel/helper-plugin-utils'
 import { upperFirstletter } from '../../utils/common'
+import { getImportObj } from './ASTUtils'
+import { NodePath } from '@babel/core'
 import type {
   ImportDeclaration,
   MemberExpression,
   Statement,
   ThisExpression,
 } from '@babel/types'
-import { getImportObj } from './ASTUtils'
 import type { ImportObj } from './ASTUtils'
-import { NodePath } from '@babel/core'
 interface Redefined {
   defaultImportName: string
   importNameList: string[]
@@ -21,12 +21,14 @@ const redefinedList: Redefined[] = [
     source: '@/utils/PublicMethod.js',
   },
 ]
+
 const findParentMemberExpression = (
   p: NodePath<ThisExpression | MemberExpression>
 ) => {
   if (!p) {
     return
   }
+
   const target = p.findParent((path) => path.isMemberExpression())
   return target as NodePath<MemberExpression>
 }
@@ -61,14 +63,17 @@ export default declare((babel) => {
               const redefiend = redefinedList.find(
                 (item) => item.defaultImportName === name
               )
+
               if (redefiend) {
                 let newImport = buildRequire({
                   IMPORT_NAME: t.identifier(`${upperFirstletter(name)}`),
                   SOURCE: redefiend.source,
                 })
+
                 if (!Array.isArray(newImport)) {
                   newImport = [newImport]
                 }
+
                 newDefaultImportNameList.concat(...newImport)
               }
             }
@@ -82,8 +87,10 @@ export default declare((babel) => {
 
       ThisExpression(p) {
         const target = findParentMemberExpression(p)
+
         if (target) {
           const trueTarget = findParentMemberExpression(target)
+
           if (
             trueTarget &&
             trueTarget.node.property.type === 'Identifier' &&
@@ -92,6 +99,7 @@ export default declare((babel) => {
             target.node.property.name.startsWith('$')
           ) {
             const reference = target.node.property.name.slice(1)
+
             if (redefinedList.some((i) => i.defaultImportName === reference)) {
               !refImportNameList.includes(reference) &&
                 refImportNameList.push(reference)

@@ -1,4 +1,5 @@
 import { Transform } from 'jscodeshift'
+
 const transformer: Transform = (file, api) => {
   const j = api.jscodeshift
   const statement = j.template.statement
@@ -246,4 +247,5 @@ const transformer: Transform = (file, api) => {
 
   return null
 }
+
 export default transformer

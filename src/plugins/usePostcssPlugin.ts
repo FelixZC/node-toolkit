@@ -1,5 +1,5 @@
-import type { ExecFileInfo } from './common'
 import postcss from 'postcss'
+import type { ExecFileInfo } from './common'
 import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
 
 const getPostcssPluginActuator = async (

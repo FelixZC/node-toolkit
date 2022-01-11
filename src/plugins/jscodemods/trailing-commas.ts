@@ -2,6 +2,7 @@
  * Adds trailing commas to every object literal and array.
  */
 import { Transform } from 'jscodeshift'
+
 const transformer: Transform = (file, api, options) => {
   const j = api.jscodeshift
 
@@ -51,4 +52,5 @@ const transformer: Transform = (file, api, options) => {
     })
   )
 }
+
 export default transformer

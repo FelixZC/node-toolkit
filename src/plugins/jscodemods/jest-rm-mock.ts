@@ -1,6 +1,6 @@
+import { Transform } from 'jscodeshift'
 import path from 'path'
 
-import { Transform } from 'jscodeshift'
 const transformer: Transform = (file, api, options = {}) => {
   if (
     !file.path.includes(path.sep + '__tests__' + path.sep) &&

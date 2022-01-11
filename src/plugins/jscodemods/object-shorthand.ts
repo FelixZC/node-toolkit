@@ -20,6 +20,7 @@
  * }
  */
 import { Transform } from 'jscodeshift'
+
 const transformer: Transform = (file, api, options) => {
   const j = api.jscodeshift
   const printOptions = options.printOptions || {

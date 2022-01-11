@@ -1,4 +1,3 @@
-import type * as N from 'jscodeshift'
 /**
  * It is expected to be run after the `createApp` transformataion
  * if a root component is trivial, that is, it contains only one simple prop,
@@ -7,9 +6,9 @@ import type * as N from 'jscodeshift'
  * TODO: implement `remove-trivial-render`,
  * move all other rootProps to the second argument of `createApp`
  */
-
 import wrap from '../wrapAstTransformation'
 import type { ASTTransformation } from '../wrapAstTransformation'
+import type * as N from 'jscodeshift'
 export const transformAST: ASTTransformation = ({ j, root }) => {
   const appRoots = root.find(j.CallExpression, (node: N.CallExpression) => {
     if (

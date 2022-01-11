@@ -1,3 +1,4 @@
+import { Transform } from 'jscodeshift'
 const vueDefaultOrder = [
   'el',
   'name',
@@ -28,7 +29,6 @@ const vueDefaultOrder = [
   'renderError',
 ]
 
-import { Transform } from 'jscodeshift'
 const transformer: Transform = (fileInfo, api) => {
   const j = api.jscodeshift
 

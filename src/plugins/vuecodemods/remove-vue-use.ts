@@ -1,5 +1,4 @@
 import { transformAST as removeExtraneousImport } from './remove-extraneous-import'
-
 /**
  * Remove `Vue.use()` calls
  * Per current design, `Vue.use` is replaced by `app.use`.
@@ -9,6 +8,7 @@ import { transformAST as removeExtraneousImport } from './remove-extraneous-impo
  * So we now expect the migration to be done in the `root-prop-to-use` transformation,
  * and the `Vue.use` statements can be just abandoned.
  */
+
 import wrap from '../wrapAstTransformation'
 import type { ASTTransformation } from '../wrapAstTransformation'
 type Params = {

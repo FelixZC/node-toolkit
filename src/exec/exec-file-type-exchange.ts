@@ -1,4 +1,5 @@
-import * as exec from './index'
+import * as exec from './index' // exchangJsToTs()
+
 import type { ExecListType, FilterConditionType } from './index'
 
 const exchangeVueFileGrammar = () => {
@@ -34,4 +35,4 @@ const exchangJsToTs = () => {
   fsInstance.modifyFileName(null, '.ts', null, '.js')
 }
 
-exchangeVueFileGrammar() // exchangJsToTs()
+exchangeVueFileGrammar()

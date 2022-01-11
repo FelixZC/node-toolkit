@@ -1,3 +1,4 @@
+import { Transform } from 'jscodeshift'
 const keywords = {
   abstract: true,
   boolean: true,
@@ -60,7 +61,6 @@ const keywords = {
   with: true,
 }
 
-import { Transform } from 'jscodeshift'
 const transformer: Transform = (file, api) => {
   const j = api.jscodeshift
   const root = j(file.source)

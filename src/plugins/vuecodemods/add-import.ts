@@ -1,9 +1,9 @@
+import wrap from '../wrapAstTransformation'
 import type {
   ImportDefaultSpecifier,
   ImportNamespaceSpecifier,
   ImportSpecifier,
 } from 'jscodeshift'
-import wrap from '../wrapAstTransformation'
 import type { ASTTransformation } from '../wrapAstTransformation'
 type DefaultSpecifierParam = {
   type: 'default'
@@ -44,7 +44,7 @@ export const transformAST: ASTTransformation<Params> = (
     specifiers: (
       arr: Array<
         ImportSpecifier | ImportDefaultSpecifier | ImportNamespaceSpecifier
-      > // @ts-ignore there's a bug in ast-types definition, the `local` should be non-nullable
+      >
     ) => arr.some((s) => s.local.name === localBinding),
   })
 

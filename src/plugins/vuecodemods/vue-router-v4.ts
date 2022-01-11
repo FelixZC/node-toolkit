@@ -1,8 +1,8 @@
 import { transformAST as addImport } from './add-import'
-import { transformAST as removeExtraneousImport } from './remove-extraneous-import'
-import type { ObjectExpression } from 'jscodeshift' // new Router() -> createRouter()
+import { transformAST as removeExtraneousImport } from './remove-extraneous-import' // new Router() -> createRouter()
 
 import wrap from '../wrapAstTransformation'
+import type { ObjectExpression } from 'jscodeshift'
 import type { ASTTransformation } from '../wrapAstTransformation'
 export const transformAST: ASTTransformation = (context) => {
   const { j, root } = context

@@ -6,6 +6,7 @@
  * the the codemod completely deletes the first line.
  */
 import { Transform } from 'jscodeshift'
+
 const transformer: Transform = (file, api) => {
   const j = api.jscodeshift
   const root = j(file.source)
