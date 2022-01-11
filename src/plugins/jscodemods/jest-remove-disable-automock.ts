@@ -5,7 +5,8 @@
  * It also preserves any header comments at the top of the file if
  * the the codemod completely deletes the first line.
  */
-module.exports = function (file, api) {
+import { Transform } from 'jscodeshift'
+const transformer: Transform = (file, api) => {
   const j = api.jscodeshift
   const root = j(file.source)
   let mutations = 0
@@ -109,3 +110,5 @@ module.exports = function (file, api) {
   }
   return mutations > 0 ? root.toSource(printOptions) : null
 }
+
+export default transformer

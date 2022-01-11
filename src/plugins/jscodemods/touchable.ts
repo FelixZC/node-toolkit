@@ -2,7 +2,8 @@ function getJSXName(value) {
   return value.openingElement.name.name
 }
 
-module.exports = function (file, api) {
+import { Transform } from 'jscodeshift'
+const transformer: Transform = (file, api) => {
   if (file.source.indexOf('<Touchable') === -1) {
     return null
   }
@@ -36,3 +37,5 @@ module.exports = function (file, api) {
   })
   return didTransform ? root.toSource() : null
 }
+
+export default transformer

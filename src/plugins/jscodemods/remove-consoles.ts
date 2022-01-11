@@ -1,4 +1,5 @@
-module.exports = (fileInfo, api) => {
+import { Transform } from 'jscodeshift'
+const transformer: Transform = (fileInfo, api) => {
   const j = api.jscodeshift
   return j(fileInfo.source)
     .find(j.CallExpression, {
@@ -13,3 +14,5 @@ module.exports = (fileInfo, api) => {
     .remove()
     .toSource()
 }
+
+export default transformer

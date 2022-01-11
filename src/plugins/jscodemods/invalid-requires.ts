@@ -1,4 +1,5 @@
-module.exports = function (file, api, options) {
+import { Transform } from 'jscodeshift'
+const transformer: Transform = (file, api, options) => {
   const jscodeshift = api.jscodeshift
   const printOptions = options.printOptions || {
     quote: 'single',
@@ -40,3 +41,4 @@ module.exports = function (file, api, options) {
   })
   return requireStatements.size ? root.toSource(printOptions) : null
 }
+export default transformer

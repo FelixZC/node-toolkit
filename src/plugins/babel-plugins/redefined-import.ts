@@ -1,84 +1,34 @@
 import { declare } from '@babel/helper-plugin-utils'
-const redefinedList = [
-  {
-    defaultImportName: 'router',
-    importNameList: [],
-    source: '@/router',
-  },
-  {
-    defaultImportName: 'store',
-    importNameList: [],
-    source: '@/store',
-  },
-  {
-    defaultImportName: 'MessageBox',
-    importNameList: [],
-    source: '@/components/common/extends/element/el-message-box',
-  },
-  {
-    defaultImportName: 'config',
-    importNameList: [],
-    source: '@/../config/ProjectConfig.js',
-  },
-  {
-    defaultImportName: 'api',
-    importNameList: [],
-    source: '@/api',
-  },
+import { upperFirstletter } from '../../utils/common'
+import type {
+  ImportDeclaration,
+  MemberExpression,
+  Statement,
+  ThisExpression,
+} from '@babel/types'
+import { getImportObj } from './ASTUtils'
+import type { ImportObj } from './ASTUtils'
+import { NodePath } from '@babel/core'
+interface Redefined {
+  defaultImportName: string
+  importNameList: string[]
+  source: string
+}
+const redefinedList: Redefined[] = [
   {
     defaultImportName: 'PublicMethod',
     importNameList: [],
     source: '@/utils/PublicMethod.js',
   },
-  {
-    defaultImportName: 'PublicFormatter',
-    importNameList: [],
-    source: '@/utils/PublicFormatter.js',
-  },
-  {
-    defaultImportName: 'PublicMap',
-    importNameList: [],
-    source: '@/utils/PublicMap.js',
-  },
-  {
-    defaultImportName: 'PublicValidator',
-    importNameList: [],
-    source: '@/utils/PublicValidator.js',
-  },
-  {
-    defaultImportName: 'Constant',
-    importNameList: [],
-    source: '@/utils/Constant.js',
-  },
-  {
-    defaultImportName: 'ListDataUtil',
-    importNameList: [],
-    source: '@/utils/ListDataUtil.js',
-  },
-  {
-    defaultImportName: 'TreeDataUtil',
-    importNameList: [],
-    source: '@/utils/TreeDataUtil.js',
-  },
-  {
-    defaultImportName: 'PdfSignUtil',
-    importNameList: [],
-    source: '@/utils/PdfSignUtil.js',
-  },
-  {
-    defaultImportName: 'WindowUtils',
-    importNameList: [],
-    source: '@/utils/WindowUtils.js',
-  },
-  {
-    source: '@/utils/bus.js',
-  },
 ]
-
-function firstToUpper(str) {
-  return str.replace(/\b(\w)(\w*)/g, function ($0, $1, $2) {
-    return $1.toUpperCase() + $2
-  })
+const findParentMemberExpression = (
+  p: NodePath<ThisExpression | MemberExpression>
+) => {
+  if (!p) {
+    return
+  }
+  const target = p.findParent((path) => path.isMemberExpression())
+  return target as NodePath<MemberExpression>
 }
 
 export default declare((babel) => {
@@ -86,62 +36,41 @@ export default declare((babel) => {
   const buildRequire = babel.template(`
   import IMPORT_NAME from 'SOURCE'
 `)
-  let refImportNameList = []
-  let oldImportList = []
+  let refImportNameList: string[] = []
+  let oldImportList: ImportObj[] = []
   return {
     name: 'ast-transform',
     // not required
     visitor: {
       Program: {
         enter(path) {
-          const improtList = path.node.body.filter(
+          const importList = path.node.body.filter(
             (i) => i.type === 'ImportDeclaration'
-          )
-
-          for (const item of improtList) {
-            const importObj = {
-              defaultImportName: '',
-              importNameList: [],
-              source: '',
-            }
-
-            for (const specifier of item.specifiers) {
-              if (specifier.type === 'ImportDefaultSpecifier') {
-                importObj.defaultImportName = specifier.local.name
-              }
-
-              if (specifier.type === 'ImportSpecifier') {
-                if (specifier.imported.name === specifier.local.name) {
-                  importObj.importNameList.push(specifier.imported.name)
-                } else {
-                  importObj.importNameList.push(
-                    `${specifier.imported.name} as ${specifier.local.name}`
-                  )
-                }
-              }
-            }
-
-            importObj.source = item.source.value
-            oldImportList.push(importObj)
-          }
+          ) as ImportDeclaration[]
+          oldImportList = getImportObj(importList)
         },
 
         exit(path) {
           const oldDefaultImportNameList = oldImportList.map(
             (item) => item.defaultImportName
           )
-          const newDefaultImportNameList = []
+          const newDefaultImportNameList: Statement[] = []
 
           for (const name of refImportNameList) {
             if (!oldDefaultImportNameList.includes(name)) {
-              const SOURCE = redefinedList.find(
+              const redefiend = redefinedList.find(
                 (item) => item.defaultImportName === name
-              ).source
-              const newImport = buildRequire({
-                IMPORT_NAME: t.identifier(`${firstToUpper(name)}`),
-                SOURCE,
-              })
-              newDefaultImportNameList.push(newImport)
+              )
+              if (redefiend) {
+                let newImport = buildRequire({
+                  IMPORT_NAME: t.identifier(`${upperFirstletter(name)}`),
+                  SOURCE: redefiend.source,
+                })
+                if (!Array.isArray(newImport)) {
+                  newImport = [newImport]
+                }
+                newDefaultImportNameList.concat(...newImport)
+              }
             }
           }
 
@@ -152,34 +81,32 @@ export default declare((babel) => {
       },
 
       ThisExpression(p) {
-        const target = p.findParent((path) => path.isMemberExpression())
-
+        const target = findParentMemberExpression(p)
         if (target) {
-          const trueTarget = target.findParent((path) =>
-            path.isMemberExpression()
-          )
-
+          const trueTarget = findParentMemberExpression(target)
           if (
             trueTarget &&
+            trueTarget.node.property.type === 'Identifier' &&
+            target.node.property.type === 'Identifier' &&
             target.node.property.name &&
             target.node.property.name.startsWith('$')
           ) {
-            const invoke = trueTarget.node.property.name
             const reference = target.node.property.name.slice(1)
-
             if (redefinedList.some((i) => i.defaultImportName === reference)) {
               !refImportNameList.includes(reference) &&
                 refImportNameList.push(reference)
 
-              if (invoke) {
+              if (trueTarget.node.property.name) {
                 trueTarget.replaceWith(
-                  t.MemberExpression(
-                    t.Identifier(firstToUpper(reference)),
-                    t.identifier(invoke)
+                  t.memberExpression(
+                    t.identifier(upperFirstletter(reference)),
+                    t.identifier(trueTarget.node.property.name)
                   )
                 )
               } else {
-                trueTarget.node.object = t.Identifier(firstToUpper(reference))
+                trueTarget.node.object = t.identifier(
+                  upperFirstletter(reference)
+                )
               }
             }
           }

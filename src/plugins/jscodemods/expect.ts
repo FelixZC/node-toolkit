@@ -1,4 +1,5 @@
-export default function transformer(file, api) {
+import { Transform } from 'jscodeshift'
+const transformer: Transform = (file, api) => {
   const j = api.jscodeshift
   return j(file.source)
     .find(j.MemberExpression, {
@@ -94,3 +95,5 @@ ${toBeArgs[0]}.forEach(${toBeArgs[0]} => {
     })
     .toSource()
 }
+
+export default transformer

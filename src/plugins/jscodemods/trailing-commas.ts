@@ -1,7 +1,8 @@
 /**
  * Adds trailing commas to every object literal and array.
  */
-module.exports = function (file, api, options) {
+import { Transform } from 'jscodeshift'
+const transformer: Transform = (file, api, options) => {
   const j = api.jscodeshift
 
   const objectHasNoTrailingComma = ({ node }) => {
@@ -50,3 +51,4 @@ module.exports = function (file, api, options) {
     })
   )
 }
+export default transformer

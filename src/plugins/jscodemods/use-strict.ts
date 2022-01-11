@@ -1,4 +1,5 @@
-module.exports = (file, api, options) => {
+import { Transform } from 'jscodeshift'
+const transformer: Transform = (file, api, options) => {
   const j = api.jscodeshift
 
   const hasStrictMode = (body) =>
@@ -36,3 +37,5 @@ module.exports = (file, api, options) => {
     }
   )
 }
+
+export default transformer

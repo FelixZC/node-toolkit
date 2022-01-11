@@ -1,4 +1,5 @@
-module.exports = (file, api, options) => {
+import { Transform } from 'jscodeshift'
+const transformer: Transform = (file, api, options) => {
   if (!options.filters) {
     options.filters = []
   }
@@ -193,3 +194,5 @@ module.exports = (file, api, options) => {
 
   return null
 }
+
+export default transformer

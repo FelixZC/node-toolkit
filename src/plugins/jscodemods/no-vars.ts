@@ -1,4 +1,5 @@
-module.exports = function (file, api) {
+import { Transform } from 'jscodeshift'
+const transformer: Transform = (file, api) => {
   const j = api.jscodeshift
   const root = j(file.source)
   const TOP_LEVEL_TYPES = [
@@ -256,3 +257,5 @@ module.exports = function (file, api) {
       .size() !== 0
   return updatedAnything ? root.toSource() : null
 }
+
+export default transformer

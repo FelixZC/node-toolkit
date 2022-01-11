@@ -1,7 +1,8 @@
 /**
  * Unchains chained variable declarations.
  */
-module.exports = function (file, api, options) {
+import { Transform } from 'jscodeshift'
+const transformer: Transform = (file, api, options) => {
   const jscodeshift = api.jscodeshift
   const printOptions = options.printOptions || {
     quote: 'single',
@@ -39,3 +40,4 @@ module.exports = function (file, api, options) {
     ? chainedDeclarations.toSource(printOptions)
     : null
 }
+export default transformer

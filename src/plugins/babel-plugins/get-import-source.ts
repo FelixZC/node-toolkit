@@ -1,45 +1,23 @@
 import { declare } from '@babel/helper-plugin-utils'
+import type { ImportDeclaration } from '@babel/types'
+import { getImportObj } from './ASTUtils'
+import type { ImportObj } from './ASTUtils'
 export default declare((babel) => {
-  const { types: t } = babel
-  const importList = []
+  const extra = {
+    importList: <ImportObj[]>[],
+  } as Record<string, any>
   return {
+    getExtra() {
+      return extra
+    },
     name: 'ast-transform',
-    // not required
     visitor: {
       Program: {
         exit(path) {
-          const improtList = path.node.body.filter(
+          const importList = path.node.body.filter(
             (i) => i.type === 'ImportDeclaration'
-          )
-
-          for (const item of improtList) {
-            const importObj = {
-              defaultImportName: '',
-              importNameList: [],
-              source: '',
-            }
-
-            for (const specifier of item.specifiers) {
-              if (specifier.type === 'ImportDefaultSpecifier') {
-                importObj.defaultImportName = specifier.local.name
-              }
-
-              if (specifier.type === 'ImportSpecifier') {
-                if (specifier.imported.name === specifier.local.name) {
-                  importObj.importNameList.push(specifier.imported.name)
-                } else {
-                  importObj.importNameList.push(
-                    `${specifier.imported.name} as ${specifier.local.name}`
-                  )
-                }
-              }
-            }
-
-            importObj.source = item.source.value
-            importList.push(importObj)
-          }
-
-          console.log(importList)
+          ) as ImportDeclaration[]
+          extra.importList = getImportObj(importList)
         },
       },
     },

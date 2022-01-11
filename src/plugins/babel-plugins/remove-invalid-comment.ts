@@ -35,9 +35,9 @@ export default declare((babel) => {
         const parent = path.findParent(
           (path) =>
             path.node &&
-            (path.node.leadingComments ||
-              path.node.trailingComments ||
-              path.node.innerComments)
+            (!!path.node.leadingComments ||
+              !!path.node.trailingComments ||
+              !!path.node.innerComments)
         )
 
         if (parent) {

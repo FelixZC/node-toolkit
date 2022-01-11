@@ -16,7 +16,8 @@
  *   });
  * });
  */
-export default function transformer(file, api) {
+import { Transform } from 'jscodeshift'
+const transformer: Transform = (file, api) => {
   const j = api.jscodeshift
   const functionsToTransform = [
     'describe',
@@ -46,3 +47,5 @@ export default function transformer(file, api) {
     })
     .toSource()
 }
+
+export default transformer

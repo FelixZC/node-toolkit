@@ -1,6 +1,5 @@
-'use strict'
-
-module.exports = function transformer(file, api) {
+import { Transform } from 'jscodeshift'
+const transformer: Transform = (file, api) => {
   const j = api.jscodeshift
   const statement = j.template.statement
   const FUNCTION_TYPES = [
@@ -247,3 +246,4 @@ module.exports = function transformer(file, api) {
 
   return null
 }
+export default transformer

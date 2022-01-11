@@ -60,7 +60,8 @@ const keywords = {
   with: true,
 }
 
-module.exports = function (file, api) {
+import { Transform } from 'jscodeshift'
+const transformer: Transform = (file, api) => {
   const j = api.jscodeshift
   const root = j(file.source)
   const didTransform = root
@@ -81,3 +82,5 @@ module.exports = function (file, api) {
     .size()
   return didTransform ? root.toSource() : null
 }
+
+export default transformer

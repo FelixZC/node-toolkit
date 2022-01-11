@@ -1,4 +1,5 @@
-module.exports = (file, api, options) => {
+import { Transform } from 'jscodeshift'
+const transformer: Transform = (file, api, options) => {
   const j = api.jscodeshift
 
   const getRequireCall = (path, moduleName) => {
@@ -47,3 +48,5 @@ module.exports = (file, api, options) => {
 
   return null
 }
+
+export default transformer

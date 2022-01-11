@@ -1,16 +1,12 @@
 import { declare } from '@babel/helper-plugin-utils'
 export default declare((babel) => {
-  const { types: t } = babel
   const extra = {} as Record<string, any>
   extra.attributesObj = {} as Record<string, any>
   return {
     getExtra() {
       return extra
     },
-
     name: 'ast-transform',
-
-    // not required
     visitor: {
       Identifier(path) {
         const parent = path.findParent((path) => {

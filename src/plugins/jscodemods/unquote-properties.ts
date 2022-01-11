@@ -2,7 +2,8 @@
  * Removes quotes from object properties whose keys are strings which are valid
  * identifiers. Does not handle quoted methods.
  */
-module.exports = (file, api, options) => {
+import { Transform } from 'jscodeshift'
+const transformer: Transform = (file, api, options) => {
   const j = api.jscodeshift
   const printOptions = options.printOptions || {
     quote: 'single',
@@ -37,3 +38,5 @@ module.exports = (file, api, options) => {
     .forEach((p) => (p.value.key = j.identifier(p.value.key.value)))
   return root.toSource(printOptions)
 }
+
+export default transformer

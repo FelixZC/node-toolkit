@@ -28,11 +28,12 @@ const vueDefaultOrder = [
   'renderError',
 ]
 
-module.exports = (fileInfo, api) => {
+import { Transform } from 'jscodeshift'
+const transformer: Transform = (fileInfo, api) => {
   const j = api.jscodeshift
 
   const normalObjectSort = (obj) => {
-    obj.value.properties = obj.value.properties.sort((a, b) => {
+    obj.value.properties.sort((a, b) => {
       if (!a.key || !b.key) {
         return 0
       }
@@ -51,7 +52,7 @@ module.exports = (fileInfo, api) => {
 
   const vueObjectSort = (object) => {
     if (object.properties) {
-      object.properties = object.properties.sort((a, b) => {
+      object.properties.sort((a, b) => {
         if (!a.key || !b.key) {
           return 0
         }
@@ -105,3 +106,5 @@ module.exports = (fileInfo, api) => {
     .forEach(vueObjectSort)
     .toSource()
 }
+
+export default transformer

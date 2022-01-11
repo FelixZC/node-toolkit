@@ -1,6 +1,7 @@
-const path = require('path')
+import path from 'path'
 
-module.exports = function (file, api, options = {}) {
+import { Transform } from 'jscodeshift'
+const transformer: Transform = (file, api, options = {}) => {
   if (
     !file.path.includes(path.sep + '__tests__' + path.sep) &&
     !file.path.includes(path.sep + '__mocks__' + path.sep)
@@ -79,3 +80,5 @@ module.exports = function (file, api, options = {}) {
   const mutations = removeCalls(options.moduleNames)
   return mutations ? root.toSource(printOptions) : null
 }
+
+export default transformer

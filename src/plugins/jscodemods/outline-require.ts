@@ -1,4 +1,5 @@
-module.exports = function (file, api, options) {
+import { Transform } from 'jscodeshift'
+const transformer: Transform = (file, api, options) => {
   if (file.path.indexOf('/__tests__/') == -1) {
     return null
   }
@@ -218,3 +219,4 @@ module.exports = function (file, api, options) {
   body[0].comments = firstComment
   return root.toSource(printOptions)
 }
+export default transformer

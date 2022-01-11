@@ -21,7 +21,8 @@
  *   template literal. It would be nice to preserve the original--whether it be
  *   a unicode escape sequence or a unicode character.
  */
-module.exports = function templateLiterals(file, api, options) {
+import { Transform } from 'jscodeshift'
+const transformer: Transform = (file, api, options) => {
   const j = api.jscodeshift
   const printOptions = options.printOptions || {
     quote: 'single',
@@ -220,3 +221,4 @@ module.exports = function templateLiterals(file, api, options) {
     .replaceWith(convertToTemplateString)
     .toSource(printOptions)
 }
+export default transformer

@@ -1,4 +1,5 @@
-module.exports = (fileInfo, api) => {
+import { Transform } from 'jscodeshift'
+const transformer: Transform = (fileInfo, api) => {
   const j = api.jscodeshift
   const root = j(fileInfo.source)
   const methodList = [
@@ -117,3 +118,5 @@ module.exports = (fileInfo, api) => {
     trailingComma: true,
   })
 }
+
+export default transformer

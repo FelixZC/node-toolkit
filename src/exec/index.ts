@@ -252,9 +252,8 @@ export const getAttrsAndAnnotation = (targetPath?: string) => {
 
 export const getComponentDescription = () => {
   const writeFilePath = './node/query/md/component-description.md'
-  const filePathList = new fsUtils(
-    path.join('src/components/common')
-  ).filePathList.sort((filePath1, filePath2) => {
+  const fsIntance = new fsUtils(path.join('src/components/common'))
+  const filePathList = fsInstance.filePathList.sort((filePath1, filePath2) => {
     return path.basename(filePath1).localeCompare(path.basename(filePath2))
   })
   let str = ''
