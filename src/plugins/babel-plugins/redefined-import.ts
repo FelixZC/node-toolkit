@@ -1,6 +1,6 @@
 import { declare } from '@babel/helper-plugin-utils'
 import { upperFirstletter } from '../../utils/common'
-import { getImportObj } from './ASTUtils'
+import { getImportObj } from './ast-utils'
 import { NodePath } from '@babel/core'
 import type {
   ImportDeclaration,
@@ -8,7 +8,7 @@ import type {
   Statement,
   ThisExpression,
 } from '@babel/types'
-import type { ImportObj } from './ASTUtils'
+import type { ImportObj } from './ast-utils'
 interface Redefined {
   defaultImportName: string
   importNameList: string[]

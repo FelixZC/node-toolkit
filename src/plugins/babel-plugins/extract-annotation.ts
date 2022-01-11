@@ -1,38 +1,63 @@
 import { declare } from '@babel/helper-plugin-utils'
+import type {
+  FunctionDeclaration,
+  ObjectMethod,
+  ObjectProperty,
+  VariableDeclaration,
+} from '@babel/types'
+import type { NodePath } from '@babel/traverse'
+
 export default declare((babel) => {
   const extra = {} as Record<string, any>
   extra.attributesObj = {} as Record<string, any>
+  const getAnnatation = (
+    path: NodePath<
+      ObjectMethod | ObjectProperty | VariableDeclaration | FunctionDeclaration
+    >
+  ) => {
+    if (
+      path.node.leadingComments?.length ||
+      path.node.trailingComments?.length
+    ) {
+      let key: string = ''
+      switch (path.node.type) {
+        case 'ObjectProperty':
+        case 'ObjectMethod':
+          key = path.node.key.name
+          break
+        case 'FunctionDeclaration':
+          key = path.node.id!.name
+          break
+        case 'VariableDeclaration':
+          key = path.node.declarations[0].id.name
+          break
+      }
+      const comments = path.node.leadingComments || path.node.trailingComments
+      const annotation = comments?.map((item) => item.value).join(',')
+      if (annotation?.length && key) {
+        extra.attributesObj[key] = annotation
+          .replace(/ +\*/g, '')
+          .replace(/[\r\n]/g, '')
+      }
+    }
+  }
   return {
     getExtra() {
       return extra
     },
-
     name: 'ast-transform',
     visitor: {
-      Identifier(path) {
-        const parent = path.findParent((path) => {
-          const isTarget =
-            path.isObjectMethod() ||
-            path.isObjectProperty() ||
-            path.isVariableDeclaration()
-
-          if (isTarget && path.node.leadingComments?.length) {
-            return true
-          }
-
-          return false
-        })
-
-        if (parent) {
-          const key = path.node.name
-          const comments =
-            parent.node.leadingComments || parent.node.trailingComments
-          const annotation = comments?.map((item) => item.value).join(',')
-
-          if (annotation) {
-            extra.attributesObj[key] = annotation
-          }
-        }
+      ObjectMethod(path) {
+        getAnnatation(path)
+      },
+      ObjectProperty(path) {
+        getAnnatation(path)
+      },
+      VariableDeclaration(path) {
+        getAnnatation(path)
+      },
+      FunctionDeclaration(path) {
+        getAnnatation(path)
       },
     },
   }

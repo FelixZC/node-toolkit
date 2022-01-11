@@ -1,4 +1,4 @@
-import { upperFirstletter } from './common'
+import { upperFirstletter, writeFile } from './common'
 import * as fs from 'fs'
 import * as path from 'path'
 import type {
@@ -171,16 +171,7 @@ export const invokeRequestTemplateGenerator = () => {
         },
       ]
       execList.forEach((item) => {
-        try {
-          fs.accessSync(item.writePath, fs.constants.F_OK)
-        } catch {
-          const dirPath = path.dirname(item.writePath)
-          fs.mkdirSync(dirPath, {
-            recursive: true,
-          })
-        }
-
-        fs.writeFileSync(item.writePath, item.content, 'utf-8')
+        writeFile(item.writePath, item.content)
       })
     })
   }

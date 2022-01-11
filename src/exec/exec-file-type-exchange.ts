@@ -1,4 +1,4 @@
-import * as exec from './index' // exchangJsToTs()
+import * as exec from './index'
 
 import type { ExecListType, FilterConditionType } from './index'
 

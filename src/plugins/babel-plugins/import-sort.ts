@@ -1,5 +1,5 @@
 import { declare } from '@babel/helper-plugin-utils'
-import { getImportObj } from './ASTUtils'
+import { getImportObj } from './ast-utils'
 import type {
   ImportDeclaration,
   ImportDefaultSpecifier,
