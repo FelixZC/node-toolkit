@@ -68,7 +68,7 @@ export function stringify(sfcDescriptor: SFCDescriptor) {
         const prevBlock = array[index - 1]
         newlinesBefore = block.startOfOpenTag - prevBlock.endOfCloseTag
       }
-
+      newlinesBefore = newlinesBefore < 0 ? 0 : newlinesBefore
       return (
         sfcCode +
         '\n'.repeat(newlinesBefore) +
