@@ -229,11 +229,14 @@ export const getAttrsAndAnnotation = (targetPath?: string) => {
 
   writeFile(
     'node/query/md/attributes-description-table.md',
-    attributesDescriptionTable
+    attributesDescriptionTable.replace(/\{\{.*\}\}/g, '').replace(/<.*>/g, '')
   )
   const storeTable = mdUtils.createdStoreTable(storeFile, attrsCollection) //获取store属性描述
 
-  writeFile('node/query/md/storeTable.md', storeTable)
+  writeFile(
+    'node/query/md/storeTable.md',
+    storeTable.replace(/\{\{.*\}\}/g, '').replace(/<.*>/g, '')
+  )
   writeFile(
     'node/query/json/attrs-collection.json',
     JSON.stringify(attrsCollection)

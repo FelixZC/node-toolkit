@@ -38,15 +38,13 @@ const transformer: Transform = (fileInfo, api) => {
         return 0
       }
 
-      if (!a.key.name || !b.key.name) {
+      const aKeyName = a.key.name || a.key.value
+      const bKeyName = b.key.name || b.key.value
+      if (!aKeyName || !bKeyName) {
         return 0
       }
 
-      if (typeof a.key.name === 'number' && typeof b.key.name === 'number') {
-        return b.key.name - a.key.name
-      }
-
-      return a.key.name.localeCompare(b.key.name)
+      return aKeyName.localeCompare(bKeyName)
     })
   }
 
@@ -56,14 +54,14 @@ const transformer: Transform = (fileInfo, api) => {
         if (!a.key || !b.key) {
           return 0
         }
-
-        if (!a.key.name || !b.key.name) {
+        const aKeyName = a.key.name || a.key.value
+        const bKeyName = b.key.name || b.key.value
+        if (!aKeyName || !bKeyName) {
           return 0
         }
 
         return (
-          vueDefaultOrder.indexOf(a.key.name) -
-          vueDefaultOrder.indexOf(b.key.name)
+          vueDefaultOrder.indexOf(aKeyName) - vueDefaultOrder.indexOf(bKeyName)
         )
       })
     }
