@@ -43,8 +43,13 @@ const transformer: Transform = (fileInfo, api) => {
       if (!aKeyName || !bKeyName) {
         return 0
       }
-
-      return aKeyName.localeCompare(bKeyName)
+      if (typeof aKeyName === 'number' && typeof bKeyName === 'number') {
+        return aKeyName - bKeyName
+      }
+      if (typeof aKeyName === 'string' && typeof bKeyName === 'string') {
+        return aKeyName.localeCompare(bKeyName)
+      }
+      return 0
     })
   }
 
