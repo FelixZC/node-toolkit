@@ -1,8 +1,6 @@
 import { parse as parseSFC, stringify as stringifySFC } from './sfcUtils'
 import * as babel from '@babel/core'
-import generator from '@babel/generator' // ast 格式化网站   https://astexplorer.net/
-// https://github.com/jamiebuilds/babel-handbook/blob/master/translations/zh-Hans/plugin-handbook.md babel中文文档
-
+import generator from '@babel/generator'
 import * as parser from '@babel/parser'
 import traverse from '@babel/traverse'
 import type { ExecFileInfo } from './common'
