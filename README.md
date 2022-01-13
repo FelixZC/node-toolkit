@@ -20,17 +20,17 @@ pzc 的工具箱，包含：
 
 #### 收集的插件模板:
 
-[ast 转化编译原理](https://github.com/jamiebuilds/the-super-tiny-compiler.git)
+[ast 转化编译原理](https://github.com/jamiebuilds/the-super-tiny-compiler)
 
 [astexplorer 语法树格式化网站](https://astexplorer.net/)
 
-[babel 插件编写手册中文文档](https://github.com/jamiebuilds/babel-handbook/blob/master/translations/zh-Hans/plugin-handbook)
+[babel 插件编写手册](https://github.com/jamiebuilds/babel-handbook)
 
-[js-codemod 模板来源](https://github.com/cpojer/js-codemod.git)
+[js-codemod 模板来源](https://github.com/cpojer/js-codemod)
 
-[vue-codemod 模板来源](https://github.com/vuejs/vue-codemod.git)
+[vue-codemod 模板来源](https://github.com/vuejs/vue-codemod)
 
-[react-codemod 模板来源](https://github.com/reactjs/react-codemod.git)
+[react-codemod 模板来源](https://github.com/reactjs/react-codemod)
 
 #### 使用
 
