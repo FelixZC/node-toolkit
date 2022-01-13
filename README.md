@@ -15,19 +15,21 @@ pzc 的工具箱，包含：
 9. 文本格式化
 10. excel与json互相转化
 11. 文件批量重命名和复制粘贴移动
+
 未完待续...
+
 #### 收集的插件模板:
 
-[编译原理](https://github.com/jamiebuilds/the-super-tiny-compiler.git)
+[ast转化编译原理](https://github.com/jamiebuilds/the-super-tiny-compiler.git)
 
-[ast 格式化网站](https://astexplorer.net/)
+[astexplorer语法树格式化网站](https://astexplorer.net/)
 
-[babel 中文文档](https://github.com/jamiebuilds/babel-handbook/blob/master/translations/zh-Hans/plugin-handbook)
+[babel插件编写手册中文文档](https://github.com/jamiebuilds/babel-handbook/blob/master/translations/zh-Hans/plugin-handbook)
 
-[插件来源 1](https://github.com/cpojer/js-codemod.git)
+[js-codemod模板来源](https://github.com/cpojer/js-codemod.git)
 
-[插件来源 2](https://github.com/vuejs/vue-codemod.git)
+[vue-codemod模板来源](https://github.com/vuejs/vue-codemod.git)
 
-[插件来源 3 ](https://github.com/reactjs/react-codemod.git)
+[react-codemod模板来源](https://github.com/reactjs/react-codemod.git)
 
 
