@@ -33,9 +33,9 @@ export default declare((babel) => {
     return v1.value.localeCompare(v2.value)
   }
 
-  const sortNumberArray = (v1: NumericLiteral, v2: NumericLiteral) => {
-    return v1.value - v2.value
-  } // const { types: t } = babel
+  // const sortNumberArray = (v1: NumericLiteral, v2: NumericLiteral) => {
+  //   return v1.value - v2.value
+  // }
 
   return {
     name: 'ast-transform',
@@ -56,9 +56,9 @@ export default declare((babel) => {
           const isStringArray = elements.every(
             (i) => i && i.type === 'StringLiteral'
           )
-          const isNumberArray = elements.every(
-            (i) => i && i.type === 'NumericLiteral'
-          )
+          // const isNumberArray = elements.every(
+          //   (i) => i && i.type === 'NumericLiteral'
+          // )
 
           if (isObjectArray) {
             ;(elements as ObjectExpression[]).sort(sortObjectArray)
@@ -68,9 +68,9 @@ export default declare((babel) => {
             ;(elements as StringLiteral[]).sort(sortStringArray)
           }
 
-          if (isNumberArray) {
-            ;(elements as NumericLiteral[]).sort(sortNumberArray)
-          }
+          // if (isNumberArray) {
+          //   ;(elements as NumericLiteral[]).sort(sortNumberArray)
+          // }
         }
       },
     },
