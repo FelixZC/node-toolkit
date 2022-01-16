@@ -11,7 +11,6 @@ const jscodemodeList = [
   '../plugins/jscodemods/object-shorthand',
   '../plugins/jscodemods/object-sort-key',
   '../plugins/jscodemods/outline-require',
-  '../plugins/jscodemods/remove-consoles',
   '../plugins/jscodemods/rm-copyProperties',
   '../plugins/jscodemods/rm-merge',
   '../plugins/jscodemods/rm-object-assign',
@@ -22,7 +21,6 @@ const jscodemodeList = [
   '../plugins/jscodemods/unchain-variables',
   '../plugins/jscodemods/unquote-properties',
   '../plugins/jscodemods/updated-computed-props',
-  '../plugins/jscodemods/use-strict',
 ]
 
 try {
