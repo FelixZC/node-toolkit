@@ -41,7 +41,6 @@ function generateArray(table) {
             c: outRow.length + colspan - 1,
             r: R + rowspan - 1,
           },
-
           s: {
             c: outRow.length,
             r: R,
@@ -74,7 +73,6 @@ function sheet_from_array_of_arrays(data, opts) {
       c: 0,
       r: 0,
     },
-
     s: {
       c: 10000000,
       r: 10000000,

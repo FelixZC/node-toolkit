@@ -22,7 +22,6 @@ const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
       // default: "script"
       // default: []
       plugins: ['decorators-legacy', 'jsx', 'typescript'],
-
       sourceType: 'module',
     }) //2,分析修改AST，第一个参数是AST，第二个参数是访问者对象
 
@@ -31,10 +30,7 @@ const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
       traverse(codeAst, pluginObj.visitor)
 
       if (typeof pluginObj.getExtra === 'function') {
-        execFileInfo.extra = {
-          ...execFileInfo.extra,
-          ...pluginObj.getExtra(),
-        }
+        execFileInfo.extra = { ...execFileInfo.extra, ...pluginObj.getExtra() }
       }
     } //3，生成新的代码，第一个参数是AST，第二个是一些可选项，第三个参数是原始的code
 

@@ -250,6 +250,7 @@ class fsUtils implements FsInstance {
       const oldBaseName = path.basename(filePath, oldExtensionName) //文件名
 
       let newBaseName //获取新文件名称，不包含后缀名
+
       let newExtensionName
 
       if (typeof customBaseName === 'function') {

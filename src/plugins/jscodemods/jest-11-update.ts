@@ -32,11 +32,9 @@ const transformer: Transform = (file, api, options = {}) => {
       .find(j.CallExpression, {
         callee: {
           object: isJestCall,
-
           property: {
             name: (name) => apiMethods[name],
           },
-
           type: 'MemberExpression',
         },
       })
@@ -62,11 +60,9 @@ const transformer: Transform = (file, api, options = {}) => {
           object: {
             name: 'jest',
           },
-
           property: {
             name: (name) => JEST_MOCK_FNS[name],
           },
-
           type: 'MemberExpression',
         },
       })

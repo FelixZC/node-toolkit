@@ -3,8 +3,6 @@ import type { Transform } from 'jscodeshift'
 const jscodemodeList = [
   '../plugins/jscodemods/arrow-function',
   '../plugins/jscodemods/arrow-function-arguments',
-  '../plugins/jscodemods/expect',
-  '../plugins/jscodemods/flow-bool-to-boolean',
   '../plugins/jscodemods/invalid-requires',
   '../plugins/jscodemods/no-vars',
   '../plugins/jscodemods/object-shorthand',
@@ -15,7 +13,6 @@ const jscodemodeList = [
   '../plugins/jscodemods/rm-object-assign',
   '../plugins/jscodemods/rm-requires',
   '../plugins/jscodemods/template-literals',
-  '../plugins/jscodemods/touchable',
   '../plugins/jscodemods/trailing-commas',
   '../plugins/jscodemods/unchain-variables',
   '../plugins/jscodemods/unquote-properties',

@@ -58,7 +58,6 @@ const sortImport = (importList: ImportDeclaration[]) => {
 export default declare((babel) => {
   return {
     name: 'ast-transform',
-
     visitor: {
       Program: {
         exit(path) {

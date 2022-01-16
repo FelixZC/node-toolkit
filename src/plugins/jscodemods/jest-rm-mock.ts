@@ -35,6 +35,7 @@ const transformer: Transform = (file, api, options = {}) => {
 
     const descend = (parent, node) => {
       let localNode = node
+
       if (localNode && isJest(localNode)) {
         if (shouldUpdate(localNode)) {
           mutated = true

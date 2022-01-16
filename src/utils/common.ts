@@ -1,11 +1,12 @@
 import * as fs from 'fs'
-import * as path from 'path'//
+import * as path from 'path' //
 
 /**
  * 首字母大写
  * @param str
  * @returns
  */
+
 export const upperFirstletter = (str: string) => {
   return str.slice(0, 1).toUpperCase() + str.slice(1)
 }

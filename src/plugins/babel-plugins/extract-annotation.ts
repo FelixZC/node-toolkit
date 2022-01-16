@@ -53,7 +53,6 @@ export default declare((babel) => {
     },
 
     name: 'ast-transform',
-
     visitor: {
       FunctionDeclaration(path) {
         getAnnatation(path)

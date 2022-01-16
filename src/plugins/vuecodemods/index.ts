@@ -8,15 +8,12 @@ const transformationMap: {
 } = {
   // generic utility tranformations
   'add-import': require('./add-import'),
-
   'define-component': require('./define-component'),
   'new-directive-api': require('./new-directive-api'),
   'new-global-api': require('./new-global-api'),
   'new-vue-to-create-app': require('./new-vue-to-create-app'),
-
   // atomic ones
   'remove-contextual-h-from-render': require('./remove-contextual-h-from-render'),
-
   'remove-extraneous-import': require('./remove-extraneous-import'),
   'remove-production-tip': require('./remove-production-tip'),
   'remove-trivial-root': require('./remove-trivial-root'),

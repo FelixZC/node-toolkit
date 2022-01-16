@@ -150,6 +150,7 @@
 
       FBB_proto.getBlob = function (type) {
         let localType = type
+
         if (!arguments.length) {
           localType = null
         }

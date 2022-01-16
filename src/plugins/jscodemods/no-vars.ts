@@ -29,6 +29,7 @@ const transformer: Transform = (file, api) => {
 
   const findFunctionDeclaration = (node, container) => {
     let localNode = node
+
     while (
       localNode.value.type !== 'FunctionDeclaration' &&
       localNode !== container

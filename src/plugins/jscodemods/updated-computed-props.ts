@@ -67,7 +67,6 @@ const transformer: Transform = (file, api) => {
   const didTransform = root
     .find(j.MemberExpression, {
       computed: true,
-
       property: {
         type: 'Literal',
       },

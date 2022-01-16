@@ -19,21 +19,18 @@ const mdOptions = {
     desc: '说明',
     name: '事件名称',
   },
-
   methods: {
     desc: '说明',
     name: '方法名',
     params: '参数',
     res: '返回值',
   },
-
   props: {
     default: '默认值',
     desc: '说明',
     name: '参数',
     type: '类型',
   },
-
   slots: {
     desc: '说明',
     name: 'name',
@@ -248,10 +245,7 @@ const extract = {
 
 const parseDocs = (vueStr, config = {}) => {
   let localConfig = config
-  localConfig = {
-    ...baseConfig,
-    ...localConfig,
-  }
+  localConfig = { ...baseConfig, ...localConfig }
   const componentInfo = {
     desc: undefined,
     events: undefined,
@@ -343,9 +337,7 @@ const parseDocs = (vueStr, config = {}) => {
   }
 
   if (localConfig.md) {
-    const option = {
-      ...mdOptions,
-    }
+    const option = { ...mdOptions }
 
     if (localConfig.mdOptions) {
       Object.assign(option, localConfig.mdOptions)

@@ -92,26 +92,20 @@ export const formatText = () => {
   const loadAndSaveList = [
     {
       mode: 'md',
-
       //md文件去重
       sourceFilePath: 'node/query/md/query.md',
-
       targetFilePath: 'node/query/md/query.md',
     },
     {
       mode: 'txtToTxt',
-
       //每日n句去重
       sourceFilePath: 'node/query/txt/每日n句.txt',
-
       targetFilePath: 'node/query/txt/每日n句.txt',
     },
     {
       mode: 'txtToMd',
-
       //每日n句转md
       sourceFilePath: 'node/query/txt/每日n句.txt',
-
       targetFilePath: 'node/query/md/sentence.md',
     },
   ]
@@ -140,12 +134,10 @@ export const generateRouter = () => {
           .replace('src/', '@/')
         routes.push({
           component: `_(): Promise<typeof import('*.vue')> => import('${componentPath}')_`,
-
           meta: {
             keepAlive: true,
             title: result.groups!.tagContent,
           },
-
           name: `${v.filename}`,
           path: `/${v.filename}`,
         })
@@ -181,7 +173,6 @@ export const getAttrsAndAnnotation = (targetPath?: string) => {
         extra: {
           attributesObj: {},
         },
-
         path: filePath,
         source: content,
       } //不需要新内容
@@ -337,11 +328,7 @@ export function getJsonFromExecl() {
         for (const query of mediaQuery) {
           const name = `${element.name}${query}`
           const value = element[`value${query}`] || element.value
-          const temp = {
-            ...element,
-            name,
-            value,
-          }
+          const temp = { ...element, name, value }
           formatResult.push(temp)
         }
       }
@@ -469,6 +456,7 @@ export const replaceByReg = (
   matchContentHandle: (content: string) => string
 ) => {
   let localContent = content
+
   if (!reg.global) {
     throw new Error('正则必须使用全局匹配模式')
   }

@@ -70,12 +70,10 @@ const transformer: Transform = (file, api, options) => {
             generator: false,
             type: 'FunctionExpression',
           },
-
           property: {
             name: 'bind',
             type: 'Identifier',
           },
-
           type: 'MemberExpression',
         },
       })

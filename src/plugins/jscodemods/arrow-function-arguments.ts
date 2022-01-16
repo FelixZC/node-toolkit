@@ -21,6 +21,7 @@ const transformer: Transform = (file, api, options) => {
 
   const filterArrowFunctions = (path) => {
     let localPath = path
+
     while (localPath.parent) {
       switch (localPath.value.type) {
         case 'ArrowFunctionExpression':

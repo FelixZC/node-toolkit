@@ -58,7 +58,6 @@ const transformer: Transform = (file, api, options) => {
         id: {
           type: 'Identifier',
         },
-
         init: {
           callee: {
             name: 'require',
