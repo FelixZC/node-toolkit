@@ -16,6 +16,5 @@ try {
   )
   exec.execPosthtmlPlugin(plugins)
 } catch (e) {
-  console.log('获取plugin失败')
   console.log(e)
 }

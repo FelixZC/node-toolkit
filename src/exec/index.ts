@@ -16,9 +16,11 @@ import type { FileInfo } from '../utils/fs'
 import type { ExecFileInfo } from '../plugins/common'
 import type { BabelPlugin } from '../plugins/useBabelPlugin'
 import storeFile from '../query/js/stote-state'
+import * as cliProgress from '../utils/cli-progress'
+
 const br = os.EOL //换行符
 
-const rootPath = path.join('src')
+const rootPath = path.join('src copy')
 const fsInstance = new fsUtils(rootPath)
 const fileInfoList = fsInstance.getFileInfoList()
 interface AttrsCollection {
@@ -162,51 +164,56 @@ export const getAttrsAndAnnotation = (targetPath?: string) => {
   const attrsCollectionGroup: AttrsCollection[] = [] //根据首字母分类属性描述对象数组
 
   const handler = (filePath: string) => {
-    const content = fs.readFileSync(filePath, 'utf-8')
-    const execFileInfo: ExecFileInfo = {
-      extra: {
-        attributesObj: {},
-      },
-      path: filePath,
-      source: content,
-    } //不需要新内容
+    try {
+      const content = fs.readFileSync(filePath, 'utf-8')
+      const execFileInfo: ExecFileInfo = {
+        extra: {
+          attributesObj: {},
+        },
+        path: filePath,
+        source: content,
+      } //不需要新内容
+      runBabelPlugin(execFileInfo, plugins)
 
-    runBabelPlugin(execFileInfo, plugins)
-    const attributesObj = execFileInfo.extra!.attributesObj as Record<
-      string,
-      string
-    >
+      const attributesObj = execFileInfo.extra!.attributesObj as Record<
+        string,
+        string
+      >
 
-    if (Object.keys(attributesObj).length) {
-      for (const [key, value] of Object.entries(attributesObj)) {
-        //冲突处理
-        if (Reflect.get(attrsCollection, key)) {
-          const newKey = key + `:arrow_right:(in ${path.basename(filePath)})`
+      if (Object.keys(attributesObj).length) {
+        for (const [key, value] of Object.entries(attributesObj)) {
+          //冲突处理
+          if (Reflect.get(attrsCollection, key)) {
+            const newKey = key + `:arrow_right:(in ${path.basename(filePath)})`
 
-          if (
-            Reflect.get(attrsCollection, newKey) === value ||
-            Reflect.get(attrsCollection, key) === value
-          ) {
-            continue
+            if (
+              Reflect.get(attrsCollection, newKey) === value ||
+              Reflect.get(attrsCollection, key) === value
+            ) {
+              continue
+            }
+
+            Reflect.set(attrsCollection, newKey, value)
+            attrsCollectionGroup.push({
+              key: newKey,
+              standingInitial: newKey.slice(0, 1).toLocaleUpperCase(),
+              value,
+            })
+          } else {
+            Reflect.set(attrsCollection, key, value)
+            attrsCollectionGroup.push({
+              key,
+              standingInitial: key.slice(0, 1).toLocaleUpperCase(),
+              value,
+            })
           }
 
-          Reflect.set(attrsCollection, newKey, value)
-          attrsCollectionGroup.push({
-            key: newKey,
-            standingInitial: newKey.slice(0, 1).toLocaleUpperCase(),
-            value,
-          })
-        } else {
           Reflect.set(attrsCollection, key, value)
-          attrsCollectionGroup.push({
-            key,
-            standingInitial: key.slice(0, 1).toLocaleUpperCase(),
-            value,
-          })
         }
-
-        Reflect.set(attrsCollection, key, value)
       }
+    } catch (e) {
+      console.error('目标文件出错：', filePath)
+      console.error(e)
     }
   }
 
@@ -217,8 +224,11 @@ export const getAttrsAndAnnotation = (targetPath?: string) => {
     const targetList = fileInfoList.filter((fileInfo) =>
       vaildList.includes(fileInfo.extname)
     )
+    const { updateBar } = cliProgress.useCliProgress(targetList.length)
+
     targetList.forEach((item: FileInfo) => {
       handler(item.filePath)
+      updateBar()
     })
   }
 
@@ -521,15 +531,21 @@ export const execBabelPlugin = (
   }
 
   const handler = (filePath: string) => {
-    const content = fs.readFileSync(filePath, 'utf-8')
-    const execFileInfo: ExecFileInfo = {
-      path: filePath,
-      source: content,
-    }
-    const newContent = runBabelPlugin(execFileInfo, babelPlugins)
+    try {
+      const content = fs.readFileSync(filePath, 'utf-8')
+      const execFileInfo: ExecFileInfo = {
+        path: filePath,
+        source: content,
+      }
 
-    if (newContent && newContent.length) {
-      writeFile(filePath, newContent)
+      const newContent = runBabelPlugin(execFileInfo, babelPlugins)
+
+      if (newContent && newContent.length) {
+        writeFile(filePath, newContent)
+      }
+    } catch (e) {
+      console.error('目标文件出错：', filePath)
+      console.error(e)
     }
   }
 
@@ -540,27 +556,33 @@ export const execBabelPlugin = (
     const targetList = fileInfoList.filter((fileInfo) =>
       vaildList.includes(fileInfo.extname)
     )
-
+    const { updateBar } = cliProgress.useCliProgress(targetList.length)
     for (const item of targetList) {
       handler(item.filePath)
+      updateBar()
     }
   }
-} //使用psthtml插件
-
+}
+//使用psthtml插件
 export const execPosthtmlPlugin = (
   plugins: PosthtmlPlugin<unknown>[],
   targetPath?: string
 ) => {
   const handler = async (filePath: string) => {
-    const content = fs.readFileSync(filePath, 'utf-8')
-    const execFileInfo: ExecFileInfo = {
-      path: filePath,
-      source: content,
-    }
-    const newContent = await getPosthtmlPluginActuator(execFileInfo, plugins)
+    try {
+      const content = fs.readFileSync(filePath, 'utf-8')
+      const execFileInfo: ExecFileInfo = {
+        path: filePath,
+        source: content,
+      }
+      const newContent = await getPosthtmlPluginActuator(execFileInfo, plugins)
 
-    if (newContent && newContent.length) {
-      writeFile(filePath, newContent)
+      if (newContent && newContent.length) {
+        writeFile(filePath, newContent)
+      }
+    } catch (e) {
+      console.error('目标文件出错：', filePath)
+      console.error(e)
     }
   }
 
@@ -571,12 +593,14 @@ export const execPosthtmlPlugin = (
     const targetList = fileInfoList.filter((fileInfo) =>
       vaildList.includes(fileInfo.extname)
     )
+    const { updateBar } = cliProgress.useCliProgress(targetList.length)
 
     for (const item of targetList) {
       handler(item.filePath)
+      updateBar()
     }
   }
-} //使用babel插件
+}
 
 export const execCodemod = (codemodList: Transform[], targetPath?: string) => {
   if (!codemodList.length) {
@@ -584,15 +608,20 @@ export const execCodemod = (codemodList: Transform[], targetPath?: string) => {
   }
 
   const handler = (filePath: string) => {
-    const content = fs.readFileSync(filePath, 'utf-8')
-    const execFileInfo: ExecFileInfo = {
-      path: filePath,
-      source: content,
-    }
-    const newContent = runCodemod(execFileInfo, codemodList)
+    try {
+      const content = fs.readFileSync(filePath, 'utf-8')
+      const execFileInfo: ExecFileInfo = {
+        path: filePath,
+        source: content,
+      }
+      const newContent = runCodemod(execFileInfo, codemodList)
 
-    if (newContent && newContent.length) {
-      writeFile(filePath, newContent)
+      if (newContent && newContent.length) {
+        writeFile(filePath, newContent)
+      }
+    } catch (e) {
+      console.error('目标文件出错：', filePath)
+      console.error(e)
     }
   }
 
@@ -603,9 +632,11 @@ export const execCodemod = (codemodList: Transform[], targetPath?: string) => {
     const targetList = fileInfoList.filter((fileInfo) =>
       vaildList.includes(fileInfo.extname)
     )
+    const { updateBar } = cliProgress.useCliProgress(targetList.length)
 
     for (const item of targetList) {
       handler(item.filePath)
+      updateBar()
     }
   }
 }

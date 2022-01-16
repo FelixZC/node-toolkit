@@ -17,5 +17,5 @@ try {
   })
   exec.execBabelPlugin(plugins)
 } catch (e) {
-  console.log('获取visitor失败', e)
+  console.log(e)
 }

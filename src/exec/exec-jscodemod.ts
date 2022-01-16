@@ -6,11 +6,6 @@ const jscodemodeList = [
   '../plugins/jscodemods/expect',
   '../plugins/jscodemods/flow-bool-to-boolean',
   '../plugins/jscodemods/invalid-requires',
-  '../plugins/jscodemods/jest-11-update',
-  '../plugins/jscodemods/jest-arrow',
-  '../plugins/jscodemods/jest-remove-disable-automock',
-  '../plugins/jscodemods/jest-rm-mock',
-  '../plugins/jscodemods/jest-update',
   '../plugins/jscodemods/no-reassign-params',
   '../plugins/jscodemods/no-vars',
   '../plugins/jscodemods/object-shorthand',
@@ -42,6 +37,5 @@ try {
   })
   exec.execCodemod(codemodList)
 } catch (e) {
-  console.log('获取someCodemod失败')
   console.log(e)
 }
