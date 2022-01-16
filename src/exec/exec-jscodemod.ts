@@ -13,7 +13,6 @@ const jscodemodeList = [
   '../plugins/jscodemods/rm-object-assign',
   '../plugins/jscodemods/rm-requires',
   '../plugins/jscodemods/template-literals',
-  '../plugins/jscodemods/trailing-commas',
   '../plugins/jscodemods/unchain-variables',
   '../plugins/jscodemods/unquote-properties',
   '../plugins/jscodemods/updated-computed-props',
