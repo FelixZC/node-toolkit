@@ -24,7 +24,7 @@ interface CreateRequestTemplateExecListItem {
  * @param options
  */
 
-const tempPath = './node/temp/'
+const tempPath = 'src/node/temp/'
 export const invokeRequestTemplateGenerator = () => {
   const createRequestTemplateExecList: Array<CreateRequestTemplateExecListItem> =
     [
