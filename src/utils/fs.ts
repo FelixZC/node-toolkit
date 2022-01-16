@@ -129,11 +129,12 @@ class fsUtils implements FsInstance {
 
   saveOperateLog(message: string) {
     const baseInfo = {
-      message,
       //操作内容记录
-      time: new Date().toLocaleString(),
+      message,
       //操作时间
-      user: userInfo.username, //操作用户
+      time: new Date().toLocaleString(),
+      //操作用户
+      user: userInfo.username,
     }
     let content = JSON.stringify(baseInfo) + eol
     const divideLine = new Array(100).fill('-').join('-') + eol //添加分割线
@@ -248,7 +249,8 @@ class fsUtils implements FsInstance {
       const oldFileName = path.basename(filePath)
       const oldBaseName = path.basename(filePath, oldExtensionName) //文件名
 
-      let newBaseName, newExtensionName //获取新文件名称，不包含后缀名
+      let newBaseName //获取新文件名称，不包含后缀名
+      let newExtensionName
 
       if (typeof customBaseName === 'function') {
         newBaseName = customBaseName(filePath)

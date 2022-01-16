@@ -42,6 +42,7 @@ export default declare((babel) => {
   let oldImportList: ImportObj[] = []
   return {
     name: 'ast-transform',
+
     // not required
     visitor: {
       Program: {

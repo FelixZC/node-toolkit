@@ -12,6 +12,7 @@ export default declare((babel) => {
     },
 
     name: 'ast-transform',
+
     visitor: {
       Program: {
         exit(path) {

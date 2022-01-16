@@ -1,12 +1,11 @@
 import * as exec from './index'
 import type { Transform } from 'jscodeshift'
 const jscodemodeList = [
-  '../plugins/jscodemods/arrow-function-arguments',
   '../plugins/jscodemods/arrow-function',
+  '../plugins/jscodemods/arrow-function-arguments',
   '../plugins/jscodemods/expect',
   '../plugins/jscodemods/flow-bool-to-boolean',
   '../plugins/jscodemods/invalid-requires',
-  '../plugins/jscodemods/no-reassign-params',
   '../plugins/jscodemods/no-vars',
   '../plugins/jscodemods/object-shorthand',
   '../plugins/jscodemods/object-sort-key',

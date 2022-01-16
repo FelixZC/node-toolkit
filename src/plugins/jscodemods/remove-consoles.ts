@@ -9,6 +9,7 @@ const transformer: Transform = (fileInfo, api) => {
           name: 'console',
           type: 'Identifier',
         },
+
         type: 'MemberExpression',
       },
     })

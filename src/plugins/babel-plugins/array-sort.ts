@@ -39,6 +39,7 @@ export default declare((babel) => {
 
   return {
     name: 'ast-transform',
+
     // not required
     visitor: {
       ArrayExpression(path) {

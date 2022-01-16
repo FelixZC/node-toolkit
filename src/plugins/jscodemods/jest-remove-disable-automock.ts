@@ -41,9 +41,11 @@ const transformer: Transform = (file, api) => {
     const jestUnmocks = root.find(j.CallExpression, {
       callee: {
         object: isJestCall,
+
         property: {
           name: (name) => calls[name],
         },
+
         type: 'MemberExpression',
       },
     }) // do these one at a time, then search for more

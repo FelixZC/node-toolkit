@@ -9,8 +9,10 @@ const transformer: Transform = (file, api) => {
           name: 'expect',
           type: 'Identifier',
         },
+
         type: 'CallExpression',
       },
+
       property: {
         type: 'Identifier',
       },

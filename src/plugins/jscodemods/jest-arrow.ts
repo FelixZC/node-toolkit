@@ -21,13 +21,13 @@ import { Transform } from 'jscodeshift'
 const transformer: Transform = (file, api) => {
   const j = api.jscodeshift
   const functionsToTransform = [
-    'describe',
-    'beforeEach',
     'afterEach',
+    'beforeEach',
+    'describe',
     'it',
-    'xit',
     'test',
     'xdescribe',
+    'xit',
   ]
   return j(file.source)
     .find(j.ExpressionStatement)
@@ -39,8 +39,8 @@ const transformer: Transform = (file, api) => {
       )
     })
     .forEach((path) => {
-      var lastArg = path.node.expression.arguments.length - 1
-      var fn = path.node.expression.arguments[lastArg]
+      const lastArg = path.node.expression.arguments.length - 1
+      const fn = path.node.expression.arguments[lastArg]
       path.node.expression.arguments[lastArg] = j.arrowFunctionExpression(
         fn.params,
         fn.body

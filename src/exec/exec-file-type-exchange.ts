@@ -1,5 +1,4 @@
 import * as exec from './index'
-
 import type { ExecListType, FilterConditionType } from './index'
 
 const exchangeVueFileGrammar = () => {

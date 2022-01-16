@@ -1,5 +1,6 @@
-import babel from '@babel/core'
 import { writeFile } from '../utils/common'
+import babel from '@babel/core'
+import * as cliProgress from '../utils/cli-progress'
 import * as fs from 'fs'
 import fsUtils from '../utils/fs'
 import getPostcssPluginActuator from '../plugins/usePostcssPlugin'
@@ -9,18 +10,16 @@ import * as os from 'os'
 import * as path from 'path'
 import runBabelPlugin from '../plugins/useBabelPlugin'
 import runCodemod from '../plugins/useJsCodemod'
+import storeFile from '../query/js/stote-state'
 import type { Plugin as PosthtmlPlugin } from 'posthtml'
 import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
 import type { Transform } from 'jscodeshift'
 import type { FileInfo } from '../utils/fs'
 import type { ExecFileInfo } from '../plugins/common'
 import type { BabelPlugin } from '../plugins/useBabelPlugin'
-import storeFile from '../query/js/stote-state'
-import * as cliProgress from '../utils/cli-progress'
-
 const br = os.EOL //换行符
 
-const rootPath = path.join('src copy')
+const rootPath = path.join('src')
 const fsInstance = new fsUtils(rootPath)
 const fileInfoList = fsInstance.getFileInfoList()
 interface AttrsCollection {
@@ -66,6 +65,7 @@ export const classifyFilesGroup = (isQueryRepeat = false) => {
     ) //过滤重复命名数组
 
     group = mdUtils.groupBy(filesGroupOfRepeat, 'extname') //再按文件类型分类
+
     writeFile(
       'node/query/json/files-group-repeat.json',
       JSON.stringify(group, null, 2)
@@ -74,6 +74,7 @@ export const classifyFilesGroup = (isQueryRepeat = false) => {
 
   const classifyNormalFilesGroup = () => {
     const group = mdUtils.groupBy(fileInfoList, 'extname') //按文件类型分类
+
     writeFile(
       'node/query/json/files-group.json',
       JSON.stringify(group, null, 2)
@@ -91,20 +92,26 @@ export const formatText = () => {
   const loadAndSaveList = [
     {
       mode: 'md',
+
       //md文件去重
       sourceFilePath: 'node/query/md/query.md',
+
       targetFilePath: 'node/query/md/query.md',
     },
     {
       mode: 'txtToTxt',
+
       //每日n句去重
       sourceFilePath: 'node/query/txt/每日n句.txt',
+
       targetFilePath: 'node/query/txt/每日n句.txt',
     },
     {
       mode: 'txtToMd',
+
       //每日n句转md
       sourceFilePath: 'node/query/txt/每日n句.txt',
+
       targetFilePath: 'node/query/md/sentence.md',
     },
   ]
@@ -133,10 +140,12 @@ export const generateRouter = () => {
           .replace('src/', '@/')
         routes.push({
           component: `_(): Promise<typeof import('*.vue')> => import('${componentPath}')_`,
+
           meta: {
             keepAlive: true,
             title: result.groups!.tagContent,
           },
+
           name: `${v.filename}`,
           path: `/${v.filename}`,
         })
@@ -150,15 +159,17 @@ export const getAttrsAndAnnotation = (targetPath?: string) => {
   const babelPluginPathList = ['../plugins/babel-plugins/extract-annotation']
   const plugins: BabelPlugin[] = babelPluginPathList.map((pluginPath) => {
     const result = require(pluginPath)
+
     if (result.default) {
       return result.default
     }
+
     return result
   })
   const attrsCollection: AttrsCollection = {
     key: '',
-    value: '',
     standingInitial: 'string',
+    value: '',
   } //所有属性描述对象
 
   const attrsCollectionGroup: AttrsCollection[] = [] //根据首字母分类属性描述对象数组
@@ -170,11 +181,12 @@ export const getAttrsAndAnnotation = (targetPath?: string) => {
         extra: {
           attributesObj: {},
         },
+
         path: filePath,
         source: content,
       } //不需要新内容
-      runBabelPlugin(execFileInfo, plugins)
 
+      runBabelPlugin(execFileInfo, plugins)
       const attributesObj = execFileInfo.extra!.attributesObj as Record<
         string,
         string
@@ -184,7 +196,7 @@ export const getAttrsAndAnnotation = (targetPath?: string) => {
         for (const [key, value] of Object.entries(attributesObj)) {
           //冲突处理
           if (Reflect.get(attrsCollection, key)) {
-            const newKey = key + `:arrow_right:(in ${path.basename(filePath)})`
+            const newKey = `${key}:arrow_right:(in ${path.basename(filePath)})`
 
             if (
               Reflect.get(attrsCollection, newKey) === value ||
@@ -220,12 +232,11 @@ export const getAttrsAndAnnotation = (targetPath?: string) => {
   if (targetPath) {
     handler(targetPath)
   } else {
-    const vaildList = ['.js', '.ts', '.jsx', '.tsx', '.vue']
+    const vaildList = ['.js', '.jsx', '.ts', '.tsx', '.vue']
     const targetList = fileInfoList.filter((fileInfo) =>
       vaildList.includes(fileInfo.extname)
     )
     const { updateBar } = cliProgress.useCliProgress(targetList.length)
-
     targetList.forEach((item: FileInfo) => {
       handler(item.filePath)
       updateBar()
@@ -262,7 +273,7 @@ export const getComponentDescription = () => {
   let str = ''
   filePathList.forEach((filePath) => {
     const content = fs.readFileSync(filePath, 'utf-8')
-    str += `### ${path.relative('./', filePath)}` + br
+    str += `### ${path.relative('./', filePath)}${br}`
     str += mdUtils.parseDocs(content, {
       md: true,
     })
@@ -326,7 +337,11 @@ export function getJsonFromExecl() {
         for (const query of mediaQuery) {
           const name = `${element.name}${query}`
           const value = element[`value${query}`] || element.value
-          const temp = { ...element, name, value }
+          const temp = {
+            ...element,
+            name,
+            value,
+          }
           formatResult.push(temp)
         }
       }
@@ -345,14 +360,14 @@ export function getJsonFromExecl() {
     str += ':root {' + br
 
     for (const [groupName, groupValue] of Object.entries(compose)) {
-      str += `//${groupName}` + br
+      str += `//${groupName}${br}`
 
       for (const item of groupValue) {
         if (!item.name || !item.value || item.name === item.value) {
           continue
         }
 
-        str += `${item.name}:${item.value};` + br
+        str += `${item.name}:${item.value};${br}`
       }
 
       str += br
@@ -368,6 +383,7 @@ export function getJsonFromExecl() {
 
 export const modifyFilename = (isDirectlyExec = true) => {
   const source = require('../query/json/source.json') as SourceItem[]
+
   const priviewResult = () => {
     //文件信息整合
     const fileInfoList = new fsUtils(
@@ -430,11 +446,14 @@ export const queryByReg = (
     const readFilePath = appointFilePath || 'node/query/md/query.md'
     const content = fs.readFileSync(readFilePath, 'utf-8')
     const result = mdUtils.queryContentByReg(content, regExpression)
+
     if (result) {
       return result
     }
+
     return ''
   }
+
   if (isBatch) {
     result = batchQuery(reg)
   } else {
@@ -449,20 +468,21 @@ export const replaceByReg = (
   content: string,
   matchContentHandle: (content: string) => string
 ) => {
+  let localContent = content
   if (!reg.global) {
     throw new Error('正则必须使用全局匹配模式')
   }
 
-  let result,
-    isChange = false
+  let result
+  let isChange = false
 
-  while ((result = reg.exec(content))) {
+  while ((result = reg.exec(localContent))) {
     const matchContent = result[0] //有命名指定用指定，没有就使用默认匹配
 
     const leftIndex = result.index
     const rightIndex = leftIndex + matchContent.length
-    const resultLeft = content.slice(0, leftIndex)
-    const resultRight = content.slice(rightIndex)
+    const resultLeft = localContent.slice(0, leftIndex)
+    const resultRight = localContent.slice(rightIndex)
     let replaceResult = ''
 
     if (result.groups?.target) {
@@ -478,14 +498,14 @@ export const replaceByReg = (
       isChange = true
     }
 
-    content = resultLeft + replaceResult + resultRight //移动位置避免替代重复内容
+    localContent = resultLeft + replaceResult + resultRight //移动位置避免替代重复内容
 
     reg.lastIndex = (resultLeft + replaceResult).length
   }
 
   return {
-    content,
     isChange,
+    localContent,
   }
 }
 export type ExecListType = Array<RegExec> //根据正则表达式批量替换文件内容
@@ -537,7 +557,6 @@ export const execBabelPlugin = (
         path: filePath,
         source: content,
       }
-
       const newContent = runBabelPlugin(execFileInfo, babelPlugins)
 
       if (newContent && newContent.length) {
@@ -552,18 +571,19 @@ export const execBabelPlugin = (
   if (targetPath) {
     handler(targetPath)
   } else {
-    const vaildList = ['.js', '.ts', '.jsx', '.tsx', '.vue']
+    const vaildList = ['.js', '.jsx', '.ts', '.tsx', '.vue']
     const targetList = fileInfoList.filter((fileInfo) =>
       vaildList.includes(fileInfo.extname)
     )
     const { updateBar } = cliProgress.useCliProgress(targetList.length)
+
     for (const item of targetList) {
       handler(item.filePath)
       updateBar()
     }
   }
-}
-//使用psthtml插件
+} //使用psthtml插件
+
 export const execPosthtmlPlugin = (
   plugins: PosthtmlPlugin<unknown>[],
   targetPath?: string
@@ -589,7 +609,7 @@ export const execPosthtmlPlugin = (
   if (targetPath) {
     handler(targetPath)
   } else {
-    const vaildList = ['.html', '.vue', '.htm', '.xml']
+    const vaildList = ['.htm', '.html', '.vue', '.xml']
     const targetList = fileInfoList.filter((fileInfo) =>
       vaildList.includes(fileInfo.extname)
     )
@@ -601,7 +621,6 @@ export const execPosthtmlPlugin = (
     }
   }
 }
-
 export const execCodemod = (codemodList: Transform[], targetPath?: string) => {
   if (!codemodList.length) {
     return
@@ -628,7 +647,7 @@ export const execCodemod = (codemodList: Transform[], targetPath?: string) => {
   if (targetPath) {
     handler(targetPath)
   } else {
-    const vaildList = ['.js', '.ts', '.jsx', '.tsx', '.vue']
+    const vaildList = ['.js', '.jsx', '.ts', '.tsx', '.vue']
     const targetList = fileInfoList.filter((fileInfo) =>
       vaildList.includes(fileInfo.extname)
     )

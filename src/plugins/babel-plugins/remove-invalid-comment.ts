@@ -3,6 +3,7 @@ export default declare((babel) => {
   const { types: t } = babel
   return {
     name: 'ast-transform',
+
     // not required
     visitor: {
       BlockStatement(path, state) {

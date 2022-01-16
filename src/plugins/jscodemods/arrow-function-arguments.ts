@@ -20,11 +20,12 @@ const transformer: Transform = (file, api, options) => {
     path.parent.value.type !== 'MemberExpression'
 
   const filterArrowFunctions = (path) => {
-    while (path.parent) {
-      switch (path.value.type) {
+    let localPath = path
+    while (localPath.parent) {
+      switch (localPath.value.type) {
         case 'ArrowFunctionExpression':
           if (
-            j(path)
+            j(localPath)
               .find(j.Identifier, {
                 name: ARGS,
               })
@@ -52,14 +53,14 @@ const transformer: Transform = (file, api, options) => {
           break
       }
 
-      path = path.parent
+      localPath = localPath.parent
     }
 
     return false
   }
 
   const updateArgumentsCalls = (path) => {
-    var afPath = path
+    let afPath = path
 
     while (afPath.parent) {
       if (afPath.value.type == 'ArrowFunctionExpression') {
@@ -72,7 +73,7 @@ const transformer: Transform = (file, api, options) => {
     const { value: fn } = afPath
     const { params } = fn
     const param = params[params.length - 1]
-    var args
+    let args
 
     if (param && param.type == 'RestElement') {
       params.pop()

@@ -115,28 +115,30 @@ function textFormat(content: string, mode = 'md') {
   switch (mode) {
     case 'txtToMd':
       result = result.map((item, index) => {
-        item = item.trim()
+        let localItem = item
+        localItem = localItem.trim()
 
         if ((index + 1) % 2 === 0) {
-          return `${item}${br}` //额外添加行间距
+          return `${localItem}${br}` //额外添加行间距
         }
 
-        return `> ${(index + 2) / 2}. **${item}**  `
+        return `> ${(index + 2) / 2}. **${localItem}**  `
       })
-      title = `## 摘自百度翻译(good good study,day day up)` + br
+      title = `## 摘自百度翻译(good good study,day day up)${br}`
       str = title + result.join(br)
       break
 
     case 'txtToTxt':
       console.log(result.length / 2)
       result = result.map((item, index) => {
-        item = item.trim()
+        let localItem = item
+        localItem = localItem.trim()
 
         if ((index + 1) % 2 === 0) {
-          return `${item}${br}` //额外添加行间距
+          return `${localItem}${br}` //额外添加行间距
         }
 
-        return item
+        return localItem
       })
       str = result.join(br)
       break
@@ -145,8 +147,9 @@ function textFormat(content: string, mode = 'md') {
       console.log(result.length) //输出行结果
 
       result = result.map((item) => {
-        item = item.trim()
-        return item
+        let localItem = item
+        localItem = localItem.trim()
+        return localItem
       })
       str = title + result.join(br)
   }
@@ -209,29 +212,29 @@ function sortArray(
  */
 
 function createdAttributesGroupTable(attrGroup: Record<string, any>) {
-  const dataType = common.getDataType(attrGroup)
+  let localAttrGroup = attrGroup
+  const dataType = common.getDataType(localAttrGroup)
 
   if (dataType !== 'Object') {
     throw new Error('createdAttributesGroupTable数据类型错误')
   }
 
-  attrGroup = sortObjAttr(attrGroup)
+  localAttrGroup = sortObjAttr(localAttrGroup)
   let attributesDescriptionTable = ''
 
-  for (const attrGroupItem of Object.values(attrGroup)) {
+  for (const attrGroupItem of Object.values(localAttrGroup)) {
     if (
       Reflect.get(attrGroupItem, 'groupKey') &&
       Reflect.get(attrGroupItem, 'group')
     ) {
       const title = Reflect.get(attrGroupItem.group[0], attrGroupItem.groupKey)
-      attributesDescriptionTable += `## ${title}` + br
-      attributesDescriptionTable += `|字段|描述|` + br
-      attributesDescriptionTable += `|-|-|` + br
+      attributesDescriptionTable += `## ${title}${br}`
+      attributesDescriptionTable += `|字段|描述|${br}`
+      attributesDescriptionTable += `|-|-|${br}`
       const group = sortArray(attrGroupItem.group, 'key')
 
       for (const groupItem of group) {
-        attributesDescriptionTable +=
-          `${groupItem.key}|${groupItem.value}|` + br
+        attributesDescriptionTable += `${groupItem.key}|${groupItem.value}|${br}`
       }
     }
   }
@@ -253,37 +256,38 @@ function createdStoreTable(
   leavl = 1,
   cache: string[] = []
 ) {
-  const dataType = common.getDataType(stateInStore)
+  let localStateInStore = stateInStore
+  const dataType = common.getDataType(localStateInStore)
 
   if (dataType !== 'Object') {
     throw new Error('createdStoreTable数据类型错误')
   }
 
-  stateInStore = sortObjAttr(stateInStore)
+  localStateInStore = sortObjAttr(localStateInStore)
   let createdStoreTableStr = ''
 
-  if (typeof stateInStore !== 'object') {
+  if (typeof localStateInStore !== 'object') {
     return ''
   }
 
-  if (stateInStore.title) {
-    createdStoreTableStr += `### ${stateInStore.title}` + br
+  if (localStateInStore.title) {
+    createdStoreTableStr += `### ${localStateInStore.title}${br}`
   }
 
   if (leavl === 1) {
-    createdStoreTableStr += `## root` + br
+    createdStoreTableStr += `## root${br}`
   }
 
-  createdStoreTableStr += `|字段|类型|默认|注释|` + br
-  createdStoreTableStr += `|-|-|-|-|` + br
+  createdStoreTableStr += `|字段|类型|默认|注释|${br}`
+  createdStoreTableStr += `|-|-|-|-|${br}`
 
-  for (const key in stateInStore) {
-    const type = common.getDataType(stateInStore[key])
-    const value = JSON.stringify(stateInStore[key])
+  for (const key in localStateInStore) {
+    const type = common.getDataType(localStateInStore[key])
+    const value = JSON.stringify(localStateInStore[key])
     const descript = annotationObj[key] || ''
 
-    if (type === 'Object' && Object.keys(stateInStore[key]).length) {
-      const storeModule = stateInStore[key]
+    if (type === 'Object' && Object.keys(localStateInStore[key]).length) {
+      const storeModule = localStateInStore[key]
       storeModule.title = key
       const nextLeavl = leavl + 1
 
@@ -291,7 +295,7 @@ function createdStoreTable(
         createdStoreTable(storeModule, annotationObj, nextLeavl, cache)
       }
     } else {
-      createdStoreTableStr += `${key}|${type}|${value}|${descript}|` + br
+      createdStoreTableStr += `${key}|${type}|${value}|${descript}|${br}`
     }
   }
 

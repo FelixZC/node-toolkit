@@ -32,7 +32,8 @@ module.exports = {
     const arr = []
     outdata.map((item) => {
       const obj = {}
-      let key, value
+      let key
+      let value
 
       for (const name in item) {
         if (Object.hasOwnProperty.call(item, name)) {

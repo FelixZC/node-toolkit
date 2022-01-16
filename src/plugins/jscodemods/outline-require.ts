@@ -33,7 +33,7 @@ const transformer: Transform = (file, api, options) => {
       node.callee.name == 'require' &&
       node.arguments.length &&
       node.arguments[0].type == 'Literal' &&
-      ['mocks', 'mock-modules'].indexOf(node.arguments[0].value) != -1) ||
+      ['mock-modules', 'mocks'].indexOf(node.arguments[0].value) != -1) ||
       (node.type == 'AssignmentExpression' && isMockModule(node.right)) ||
       (node.type == 'VariableDeclaration' &&
         node.declarations.length &&

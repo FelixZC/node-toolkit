@@ -10,6 +10,7 @@ const transformer: Transform = (file, api, options) => {
           type: 'Literal',
           value: 'use strict',
         },
+
         type: 'ExpressionStatement',
       })
     )

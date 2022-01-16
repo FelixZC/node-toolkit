@@ -13,9 +13,9 @@ export const getImportObj = (importList: ImportDeclaration[]) => {
     const importObj: ImportObj = {
       defaultImportName: '',
       importNameList: [],
+      kind: '',
       namespace: '',
       source: '',
-      kind: '',
     }
 
     for (const specifier of item.specifiers) {

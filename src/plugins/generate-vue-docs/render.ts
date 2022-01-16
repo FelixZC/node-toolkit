@@ -48,10 +48,10 @@ class RenderMd {
 
   propsRender(propsRes, config) {
     const kt = this._getKeysAndTitles(config, [
-      'name',
-      'desc',
-      'type',
       'default',
+      'desc',
+      'name',
+      'type',
     ])
 
     const mdArr = [
@@ -93,7 +93,7 @@ class RenderMd {
    */
 
   slotsRender(slotsRes, config) {
-    const kt = this._getKeysAndTitles(config, ['name', 'desc'])
+    const kt = this._getKeysAndTitles(config, ['desc', 'name'])
 
     const mdArr = [
       ...this.renderTitle('Slots'),
@@ -125,7 +125,7 @@ class RenderMd {
    */
 
   eventsRender(propsRes, config) {
-    const kt = this._getKeysAndTitles(config, ['name', 'desc'])
+    const kt = this._getKeysAndTitles(config, ['desc', 'name'])
 
     const mdArr = [
       ...this.renderTitle('Events'),
@@ -157,7 +157,7 @@ class RenderMd {
    */
 
   methodsRender(slotsRes, config) {
-    const kt = this._getKeysAndTitles(config, ['name', 'desc', 'params', 'res'])
+    const kt = this._getKeysAndTitles(config, ['desc', 'name', 'params', 'res'])
 
     const mdArr = [
       ...this.renderTitle('Methods'),

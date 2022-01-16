@@ -4,7 +4,7 @@ const vueDefaultOrder = [
   'name',
   'parent',
   'functional',
-  ...['delimiters', 'comments'],
+  ...['comments', 'delimiters'],
   ...['components', 'directives', 'filters'],
   'extends',
   'mixins',
@@ -16,16 +16,16 @@ const vueDefaultOrder = [
   'watch',
   ...[
     'beforeCreate',
-    'created',
-    'beforeMount',
-    'mounted',
-    'beforeUpadte',
-    'updated',
     'beforeDestory',
+    'beforeMount',
+    'beforeUpadte',
+    'created',
     'destroyed',
+    'mounted',
+    'updated',
   ],
   'methods',
-  ...['template', 'render'],
+  ...['render', 'template'],
   'renderError',
 ]
 
@@ -40,15 +40,19 @@ const transformer: Transform = (fileInfo, api) => {
 
       const aKeyName = a.key.name || a.key.value
       const bKeyName = b.key.name || b.key.value
+
       if (!aKeyName || !bKeyName) {
         return 0
       }
+
       if (typeof aKeyName === 'number' && typeof bKeyName === 'number') {
         return aKeyName - bKeyName
       }
+
       if (typeof aKeyName === 'string' && typeof bKeyName === 'string') {
         return aKeyName.localeCompare(bKeyName)
       }
+
       return 0
     })
   }
@@ -59,8 +63,10 @@ const transformer: Transform = (fileInfo, api) => {
         if (!a.key || !b.key) {
           return 0
         }
+
         const aKeyName = a.key.name || a.key.value
         const bKeyName = b.key.name || b.key.value
+
         if (!aKeyName || !bKeyName) {
           return 0
         }

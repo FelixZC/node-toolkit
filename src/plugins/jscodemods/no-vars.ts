@@ -4,13 +4,13 @@ const transformer: Transform = (file, api) => {
   const j = api.jscodeshift
   const root = j(file.source)
   const TOP_LEVEL_TYPES = [
+    'ArrowFunctionExpression',
     'Function',
     'FunctionDeclaration',
     'FunctionExpression',
-    'ArrowFunctionExpression',
     'Program',
   ]
-  const FOR_STATEMENTS = ['ForStatement', 'ForOfStatement', 'ForInStatement']
+  const FOR_STATEMENTS = ['ForInStatement', 'ForOfStatement', 'ForStatement']
 
   const getScopeNode = (blockScopeNode) => {
     let scopeNode = blockScopeNode
@@ -28,11 +28,15 @@ const transformer: Transform = (file, api) => {
   }
 
   const findFunctionDeclaration = (node, container) => {
-    while (node.value.type !== 'FunctionDeclaration' && node !== container) {
-      node = node.parentPath
+    let localNode = node
+    while (
+      localNode.value.type !== 'FunctionDeclaration' &&
+      localNode !== container
+    ) {
+      localNode = localNode.parentPath
     }
 
-    return node !== container ? node : null
+    return localNode !== container ? localNode : null
   }
 
   const isForLoopDeclarationWithoutInit = (declaration) => {
@@ -73,11 +77,12 @@ const transformer: Transform = (file, api) => {
   }
 
   const getLocalScope = (scope, parentScope) => {
+    let localScope = scope
     const names = []
 
-    while (scope !== parentScope) {
-      if (Array.isArray(scope.value.body)) {
-        scope.value.body.forEach((node) => {
+    while (localScope !== parentScope) {
+      if (Array.isArray(localScope.value.body)) {
+        localScope.value.body.forEach((node) => {
           if (node.type === 'VariableDeclaration') {
             node.declarations.map(getDeclaratorNames).forEach((dNames) => {
               dNames.forEach((name) => {
@@ -90,8 +95,8 @@ const transformer: Transform = (file, api) => {
         })
       }
 
-      if (Array.isArray(scope.value.params)) {
-        scope.value.params.forEach((id) => {
+      if (Array.isArray(localScope.value.params)) {
+        localScope.value.params.forEach((id) => {
           extractNamesFromIdentifierLike(id).forEach((name) => {
             if (names.indexOf(name) === -1) {
               names.push(name)
@@ -100,7 +105,7 @@ const transformer: Transform = (file, api) => {
         })
       }
 
-      scope = scope.parentPath
+      localScope = localScope.parentPath
     }
 
     return names

@@ -19,18 +19,21 @@ const mdOptions = {
     desc: '说明',
     name: '事件名称',
   },
+
   methods: {
     desc: '说明',
     name: '方法名',
     params: '参数',
     res: '返回值',
   },
+
   props: {
     default: '默认值',
     desc: '说明',
     name: '参数',
     type: '类型',
   },
+
   slots: {
     desc: '说明',
     name: 'name',
@@ -38,6 +41,7 @@ const mdOptions = {
 } // 提取Props
 
 const extractProps = (node) => {
+  let localNode = node
   const props = {} // 获取Props类型
 
   function getPropType(node) {
@@ -75,7 +79,7 @@ const extractProps = (node) => {
     }
   } // 遍历 Props
 
-  node.value.properties.forEach((prop) => {
+  localNode.value.properties.forEach((prop) => {
     const {
       key: { name },
       leadingComments,
@@ -243,7 +247,11 @@ const extract = {
 } // 转换文档
 
 const parseDocs = (vueStr, config = {}) => {
-  config = Object.assign({}, baseConfig, config)
+  let localConfig = config
+  localConfig = {
+    ...baseConfig,
+    ...localConfig,
+  }
   const componentInfo = {
     desc: undefined,
     events: undefined,
@@ -314,8 +322,8 @@ const parseDocs = (vueStr, config = {}) => {
       slot(node, parent) {
         !componentInfo.slots && (componentInfo.slots = {})
         const index = parent.children.findIndex((item) => item === node)
-        let desc = '无描述',
-          name = '-'
+        let desc = '无描述'
+        let name = '-'
 
         if (index > 0) {
           const tag = parent.children[index - 1]
@@ -334,11 +342,13 @@ const parseDocs = (vueStr, config = {}) => {
     })
   }
 
-  if (config.md) {
-    const option = { ...mdOptions }
+  if (localConfig.md) {
+    const option = {
+      ...mdOptions,
+    }
 
-    if (config.mdOptions) {
-      Object.assign(option, config.mdOptions)
+    if (localConfig.mdOptions) {
+      Object.assign(option, localConfig.mdOptions)
     }
 
     return new RenderMd(componentInfo, option).render()

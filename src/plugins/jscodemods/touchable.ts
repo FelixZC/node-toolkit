@@ -9,11 +9,11 @@ const transformer: Transform = (file, api) => {
     return null
   }
 
-  var j = api.jscodeshift
-  var root = j(file.source)
-  var didTransform = false
-  root.find(j.JSXElement).forEach(function (p) {
-    var parent = p.value
+  const j = api.jscodeshift
+  const root = j(file.source)
+  let didTransform = false
+  root.find(j.JSXElement).forEach((p) => {
+    const parent = p.value
 
     if (
       getJSXName(parent) !== 'TouchableBounce' &&
@@ -26,7 +26,7 @@ const transformer: Transform = (file, api) => {
       return
     }
 
-    var child = parent.children[1]
+    const child = parent.children[1]
 
     if (!(child.type === 'JSXElement' && getJSXName(child) === 'View')) {
       return

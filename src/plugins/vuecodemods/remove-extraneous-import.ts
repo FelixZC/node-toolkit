@@ -90,10 +90,10 @@ export const transformAST: ASTTransformation<Params> = (
     const source = declNode.source.value // these modules are known to have no side effects
 
     const safelyRemovableModules = [
+      '@vue/composition-api',
       'vue',
       'vue-router',
       'vuex',
-      '@vue/composition-api',
     ]
 
     if (

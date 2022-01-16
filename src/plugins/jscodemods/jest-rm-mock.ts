@@ -17,7 +17,7 @@ const transformer: Transform = (file, api, options = {}) => {
   const JEST = 'jest'
 
   const isJestFn = (node) =>
-    ['mock', 'unmock', 'disableAutomock'].includes(node.name)
+    ['disableAutomock', 'mock', 'unmock'].includes(node.name)
 
   const removeCalls = (moduleNames) => {
     let mutated = false
@@ -34,14 +34,15 @@ const transformer: Transform = (file, api, options = {}) => {
       node.arguments.some((arg) => moduleNames.includes(arg.value))
 
     const descend = (parent, node) => {
-      if (node && isJest(node)) {
-        if (shouldUpdate(node)) {
+      let localNode = node
+      if (localNode && isJest(localNode)) {
+        if (shouldUpdate(localNode)) {
           mutated = true
-          parent.callee.object = node.callee.object
-          node = parent
+          parent.callee.object = localNode.callee.object
+          localNode = parent
         }
 
-        descend(node, node.callee.object)
+        descend(localNode, localNode.callee.object)
       }
     }
 

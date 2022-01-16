@@ -103,14 +103,15 @@
         data
         /*, endings*/
       ) {
+        let localData = data
         const bb = this.data // decode data to a binary string
 
         if (
           Uint8Array &&
-          (data instanceof ArrayBuffer || data instanceof Uint8Array)
+          (localData instanceof ArrayBuffer || localData instanceof Uint8Array)
         ) {
           let str = ''
-          const buf = new Uint8Array(data)
+          const buf = new Uint8Array(localData)
           let i = 0
           const buf_len = buf.length
 
@@ -119,37 +120,41 @@
           }
 
           bb.push(str)
-        } else if (get_class(data) === 'Blob' || get_class(data) === 'File') {
+        } else if (
+          get_class(localData) === 'Blob' ||
+          get_class(localData) === 'File'
+        ) {
           if (FileReaderSync) {
             const fr = new FileReaderSync()
-            bb.push(fr.readAsBinaryString(data))
+            bb.push(fr.readAsBinaryString(localData))
           } else {
             // async FileReader won't work as BlobBuilder is sync
             throw new FileException('NOT_READABLE_ERR')
           }
-        } else if (data instanceof FakeBlob) {
-          if (data.encoding === 'base64' && atob) {
-            bb.push(atob(data.data))
-          } else if (data.encoding === 'URI') {
-            bb.push(decodeURIComponent(data.data))
-          } else if (data.encoding === 'raw') {
-            bb.push(data.data)
+        } else if (localData instanceof FakeBlob) {
+          if (localData.encoding === 'base64' && atob) {
+            bb.push(atob(localData.data))
+          } else if (localData.encoding === 'URI') {
+            bb.push(decodeURIComponent(localData.data))
+          } else if (localData.encoding === 'raw') {
+            bb.push(localData.data)
           }
         } else {
-          if (typeof data !== 'string') {
-            data = String(data) // convert unsupported types to strings
+          if (typeof localData !== 'string') {
+            localData = String(localData) // convert unsupported types to strings
           } // decode UTF-16 to binary string
 
-          bb.push(unescape(encodeURIComponent(data)))
+          bb.push(unescape(encodeURIComponent(localData)))
         }
       }
 
       FBB_proto.getBlob = function (type) {
+        let localType = type
         if (!arguments.length) {
-          type = null
+          localType = null
         }
 
-        return new FakeBlob(this.data.join(''), type, 'raw')
+        return new FakeBlob(this.data.join(''), localType, 'raw')
       }
 
       FBB_proto.toString = function () {
@@ -157,15 +162,16 @@
       }
 
       FB_proto.slice = function (start, end, type) {
+        let localType = type
         const args = arguments.length
 
         if (args < 3) {
-          type = null
+          localType = null
         }
 
         return new FakeBlob(
           this.data.slice(start, args > 1 ? end : this.data.length),
-          type,
+          localType,
           this.encoding
         )
       }
