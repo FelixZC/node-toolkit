@@ -6,10 +6,8 @@ const exchangeVueFileGrammar = () => {
   const execList: ExecListType = [
     {
       matchContentHandle(content: string) {
-        return `
-        <script>
-        import * as Vue from 'vue'
-        `
+        return `<script>
+        import * as Vue from 'vue'`
       },
 
       reg: /<script>/g,
