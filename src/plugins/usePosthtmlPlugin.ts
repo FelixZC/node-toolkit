@@ -5,7 +5,7 @@ import type { ExecFileInfo } from './common'
 import type { Options, Plugin as PosthtmlPlugin } from 'posthtml'
 interface MergeOptions extends Options, parserOptions, renderOptions {}
 
-const getPosthtmlPluginActuator = async (
+const runPosthtmlPlugin = async (
   execFileInfo: ExecFileInfo,
   plugins: PosthtmlPlugin<unknown>[] = []
 ) => {
@@ -16,4 +16,4 @@ const getPosthtmlPluginActuator = async (
   return result.html
 }
 
-export default getPosthtmlPluginActuator
+export default runPosthtmlPlugin
