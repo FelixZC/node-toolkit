@@ -15,7 +15,7 @@ const jscodemodeList = [
   '../plugins/jscodemods/template-literals',
   '../plugins/jscodemods/unchain-variables',
   '../plugins/jscodemods/unquote-properties',
-  '../plugins/jscodemods/updated-computed-props',
+  '../plugins/jscodemods/updated-computed-props'
 ]
 
 try {

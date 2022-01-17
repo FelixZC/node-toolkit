@@ -3,14 +3,14 @@ import { Transform } from 'jscodeshift'
 const transformer: Transform = (file, api, options) => {
   const jscodeshift = api.jscodeshift
   const printOptions = options.printOptions || {
-    quote: 'single',
+    quote: 'single'
   }
   const requireStatements = new Set()
   const root = jscodeshift(file.source)
     .find(jscodeshift.CallExpression, {
       callee: {
-        name: 'require',
-      },
+        name: 'require'
+      }
     })
     .filter(
       (requireStatement) =>
@@ -25,9 +25,7 @@ const transformer: Transform = (file, api, options) => {
       requireStatement.value.declarations.map((declaration, i) => {
         const kind = requireStatement.value.kind // e.g. var or const
 
-        const variableDeclaration = jscodeshift.variableDeclaration(kind, [
-          declaration,
-        ])
+        const variableDeclaration = jscodeshift.variableDeclaration(kind, [declaration])
 
         if (i == 0) {
           variableDeclaration.comments = requireStatement.value.comments

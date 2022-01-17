@@ -11,10 +11,7 @@ import type { ASTTransformation } from '../wrapAstTransformation'
 import type * as N from 'jscodeshift'
 export const transformAST: ASTTransformation = ({ j, root }) => {
   const appRoots = root.find(j.CallExpression, (node: N.CallExpression) => {
-    if (
-      node.arguments.length === 1 &&
-      j.ObjectExpression.check(node.arguments[0])
-    ) {
+    if (node.arguments.length === 1 && j.ObjectExpression.check(node.arguments[0])) {
       if (j.Identifier.check(node.callee) && node.callee.name === 'createApp') {
         return true
       }
@@ -47,11 +44,7 @@ export const transformAST: ASTTransformation = ({ j, root }) => {
       return
     }
 
-    if (
-      prop.key &&
-      j.Identifier.check(prop.key) &&
-      prop.key.name === 'render'
-    ) {
+    if (prop.key && j.Identifier.check(prop.key) && prop.key.name === 'render') {
       let renderFnBody
 
       if (j.ObjectMethod.check(prop)) {

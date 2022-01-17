@@ -3,21 +3,16 @@ import { Transform } from 'jscodeshift'
 const transformer: Transform = (file, api, options) => {
   const j = api.jscodeshift
   const printOptions = options.printOptions || {
-    quote: 'single',
+    quote: 'single'
   }
   const root = j(file.source)
   const ARGUMENTS = 'arguments'
   const ARGS = 'args'
 
   const createArrowFunctionExpression = (fn, args) =>
-    j.arrowFunctionExpression(
-      (fn.params || []).concat(j.restElement(args)),
-      fn.body,
-      fn.generator
-    )
+    j.arrowFunctionExpression((fn.params || []).concat(j.restElement(args)), fn.body, fn.generator)
 
-  const filterMemberExpressions = (path) =>
-    path.parent.value.type !== 'MemberExpression'
+  const filterMemberExpressions = (path) => path.parent.value.type !== 'MemberExpression'
 
   const filterArrowFunctions = (path) => {
     let localPath = path
@@ -28,7 +23,7 @@ const transformer: Transform = (file, api, options) => {
           if (
             j(localPath)
               .find(j.Identifier, {
-                name: ARGS,
+                name: ARGS
               })
               .size()
           ) {
@@ -86,9 +81,7 @@ const transformer: Transform = (file, api, options) => {
     j(afPath).replaceWith(createArrowFunctionExpression(fn, args))
 
     if (params.length) {
-      j(path).replaceWith(
-        j.arrayExpression(params.concat(j.spreadElement(args)))
-      )
+      j(path).replaceWith(j.arrayExpression(params.concat(j.spreadElement(args))))
     } else {
       j(path).replaceWith(args)
     }
@@ -97,7 +90,7 @@ const transformer: Transform = (file, api, options) => {
   const didTransform =
     root
       .find(j.Identifier, {
-        name: ARGUMENTS,
+        name: ARGUMENTS
       })
       .filter(filterMemberExpressions)
       .filter(filterArrowFunctions)

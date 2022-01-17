@@ -15,7 +15,7 @@ const transformer: Transform = (file, api, options) => {
   }
 
   const printOptions = options.printOptions || {
-    quote: 'single',
+    quote: 'single'
   }
   const root = j(file.source)
 
@@ -40,9 +40,7 @@ const transformer: Transform = (file, api, options) => {
         flatten(
           path.value.arguments
             .map(getObject)
-            .map((p) =>
-              p.type == 'ObjectExpression' ? p.properties : j.spreadProperty(p)
-            )
+            .map((p) => (p.type == 'ObjectExpression' ? p.properties : j.spreadProperty(p)))
         )
       )
     )
@@ -79,8 +77,7 @@ const transformer: Transform = (file, api, options) => {
     node.object.object.type == 'ThisExpression' &&
     node.object.property &&
     node.object.property.type == 'Identifier' &&
-    (node.object.property.name == 'state' ||
-      node.object.property.name == 'props')
+    (node.object.property.name == 'state' || node.object.property.name == 'props')
 
   const checkArguments = (path) =>
     path.value.arguments
@@ -103,10 +100,7 @@ const transformer: Transform = (file, api, options) => {
 
     onlyCapitalizedIdentifiers(path) {
       var node = path.value.arguments[0]
-      return (
-        node.type == 'Identifier' &&
-        node.name.charAt(0) == node.name.charAt(0).toUpperCase()
-      )
+      return node.type == 'Identifier' && node.name.charAt(0) == node.name.charAt(0).toUpperCase()
     },
 
     onlyDefaults(path) {
@@ -134,7 +128,7 @@ const transformer: Transform = (file, api, options) => {
 
     onlyThisExpressions(path) {
       return path.value.arguments[0].type == 'ThisExpression'
-    },
+    }
   }
 
   const rmCopyPropertyCalls = (path) => {
@@ -143,11 +137,7 @@ const transformer: Transform = (file, api, options) => {
     } else {
       j(path).replaceWith(
         j.callExpression(
-          j.memberExpression(
-            j.identifier('Object'),
-            j.identifier('assign'),
-            false
-          ),
+          j.memberExpression(j.identifier('Object'), j.identifier('assign'), false),
           path.value.arguments.map(getObject)
         )
       )
@@ -169,8 +159,8 @@ const transformer: Transform = (file, api, options) => {
       root
         .find(j.CallExpression, {
           callee: {
-            name: variableName,
-          },
+            name: variableName
+          }
         })
         .filter((p) => filters.every((filter) => filter(p)))
         .forEach(rmCopyPropertyCalls)
@@ -181,8 +171,8 @@ const transformer: Transform = (file, api, options) => {
         !root
           .find(j.CallExpression, {
             callee: {
-              name: variableName,
-            },
+              name: variableName
+            }
           })
           .size()
       ) {

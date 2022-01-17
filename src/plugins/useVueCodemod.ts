@@ -56,7 +56,7 @@ export default function runTransformation(
 
   if (extension === '.vue') {
     descriptor = parseSFC(source, {
-      filename: path,
+      filename: path
     }).descriptor // skip .vue files without script block
 
     if (!descriptor.script) {
@@ -77,8 +77,7 @@ export default function runTransformation(
   }
 
   if (parserOption) {
-    parser =
-      typeof parserOption === 'string' ? getParser(parserOption) : parserOption
+    parser = typeof parserOption === 'string' ? getParser(parserOption) : parserOption
   }
 
   const j = jscodeshift.withParser(parser)
@@ -86,7 +85,7 @@ export default function runTransformation(
     j,
     jscodeshift: j,
     report: () => {},
-    stats: () => {},
+    stats: () => {}
   }
   const out = transformation(fileInfo, api, params)
 

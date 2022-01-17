@@ -21,6 +21,6 @@ export const useCliProgress = (total: number) => {
   }
 
   return {
-    updateBar,
+    updateBar
   }
 }

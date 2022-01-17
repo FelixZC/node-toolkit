@@ -1,9 +1,5 @@
 import wrap from '../wrapAstTransformation'
-import type {
-  ImportDefaultSpecifier,
-  ImportNamespaceSpecifier,
-  ImportSpecifier,
-} from 'jscodeshift'
+import type { ImportDefaultSpecifier, ImportNamespaceSpecifier, ImportSpecifier } from 'jscodeshift'
 import type { Collection } from 'jscodeshift/src/Collection'
 import type { ASTTransformation } from '../wrapAstTransformation'
 type Params = {
@@ -18,13 +14,10 @@ type Params = {
  * It is because we are not sure if the module contains any side effects.
  */
 
-export const transformAST: ASTTransformation<Params> = (
-  { j, root },
-  { localBinding }
-) => {
+export const transformAST: ASTTransformation<Params> = ({ j, root }, { localBinding }) => {
   const usages = root
     .find(j.Identifier, {
-      name: localBinding,
+      name: localBinding
     })
     .filter((identifierPath) => {
       const parent = identifierPath.parent.node // Ignore the import specifier
@@ -37,10 +30,7 @@ export const transformAST: ASTTransformation<Params> = (
         return false
       } // Ignore properties in MemberExpressions
 
-      if (
-        j.MemberExpression.check(parent) &&
-        parent.property === identifierPath.node
-      ) {
+      if (j.MemberExpression.check(parent) && parent.property === identifierPath.node) {
         return false
       } // Ignore keys in ObjectProperties
 
@@ -56,27 +46,26 @@ export const transformAST: ASTTransformation<Params> = (
     })
 
   if (!usages.length) {
-    let specifier: Collection<
-      ImportSpecifier | ImportDefaultSpecifier | ImportNamespaceSpecifier
-    > = root.find(j.ImportSpecifier, {
-      local: {
-        name: localBinding,
-      },
-    })
+    let specifier: Collection<ImportSpecifier | ImportDefaultSpecifier | ImportNamespaceSpecifier> =
+      root.find(j.ImportSpecifier, {
+        local: {
+          name: localBinding
+        }
+      })
 
     if (!specifier.length) {
       specifier = root.find(j.ImportDefaultSpecifier, {
         local: {
-          name: localBinding,
-        },
+          name: localBinding
+        }
       })
     }
 
     if (!specifier.length) {
       specifier = root.find(j.ImportNamespaceSpecifier, {
         local: {
-          name: localBinding,
-        },
+          name: localBinding
+        }
       })
     }
 
@@ -89,17 +78,9 @@ export const transformAST: ASTTransformation<Params> = (
     const peerSpecifiers = declNode.specifiers
     const source = declNode.source.value // these modules are known to have no side effects
 
-    const safelyRemovableModules = [
-      '@vue/composition-api',
-      'vue',
-      'vue-router',
-      'vuex',
-    ]
+    const safelyRemovableModules = ['@vue/composition-api', 'vue', 'vue-router', 'vuex']
 
-    if (
-      peerSpecifiers.length === 1 &&
-      safelyRemovableModules.includes(source)
-    ) {
+    if (peerSpecifiers.length === 1 && safelyRemovableModules.includes(source)) {
       decl.remove()
     } else {
       // otherwise, only remove the specifier

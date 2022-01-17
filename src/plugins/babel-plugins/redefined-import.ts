@@ -2,12 +2,7 @@ import { declare } from '@babel/helper-plugin-utils'
 import { upperFirstletter } from '../../utils/common'
 import { getImportObj } from './ast-utils'
 import { NodePath } from '@babel/core'
-import type {
-  ImportDeclaration,
-  MemberExpression,
-  Statement,
-  ThisExpression,
-} from '@babel/types'
+import type { ImportDeclaration, MemberExpression, Statement, ThisExpression } from '@babel/types'
 import type { ImportObj } from './ast-utils'
 interface Redefined {
   defaultImportName: string
@@ -18,13 +13,11 @@ const redefinedList: Redefined[] = [
   {
     defaultImportName: 'PublicMethod',
     importNameList: [],
-    source: '@/utils/PublicMethod.js',
-  },
+    source: '@/utils/PublicMethod.js'
+  }
 ]
 
-const findParentMemberExpression = (
-  p: NodePath<ThisExpression | MemberExpression>
-) => {
+const findParentMemberExpression = (p: NodePath<ThisExpression | MemberExpression>) => {
   if (!p) {
     return
   }
@@ -53,21 +46,17 @@ export default declare((babel) => {
         },
 
         exit(path) {
-          const oldDefaultImportNameList = oldImportList.map(
-            (item) => item.defaultImportName
-          )
+          const oldDefaultImportNameList = oldImportList.map((item) => item.defaultImportName)
           const newDefaultImportNameList: Statement[] = []
 
           for (const name of refImportNameList) {
             if (!oldDefaultImportNameList.includes(name)) {
-              const redefiend = redefinedList.find(
-                (item) => item.defaultImportName === name
-              )
+              const redefiend = redefinedList.find((item) => item.defaultImportName === name)
 
               if (redefiend) {
                 let newImport = buildRequire({
                   IMPORT_NAME: t.identifier(`${upperFirstletter(name)}`),
-                  SOURCE: redefiend.source,
+                  SOURCE: redefiend.source
                 })
 
                 if (!Array.isArray(newImport)) {
@@ -82,7 +71,7 @@ export default declare((babel) => {
           path.node.body = newDefaultImportNameList.concat(path.node.body)
           refImportNameList = []
           oldImportList = []
-        },
+        }
       },
 
       ThisExpression(p) {
@@ -101,8 +90,7 @@ export default declare((babel) => {
             const reference = target.node.property.name.slice(1)
 
             if (redefinedList.some((i) => i.defaultImportName === reference)) {
-              !refImportNameList.includes(reference) &&
-                refImportNameList.push(reference)
+              !refImportNameList.includes(reference) && refImportNameList.push(reference)
 
               if (trueTarget.node.property.name) {
                 trueTarget.replaceWith(
@@ -112,14 +100,12 @@ export default declare((babel) => {
                   )
                 )
               } else {
-                trueTarget.node.object = t.identifier(
-                  upperFirstletter(reference)
-                )
+                trueTarget.node.object = t.identifier(upperFirstletter(reference))
               }
             }
           }
         }
-      },
-    },
+      }
+    }
   }
 })

@@ -15,7 +15,7 @@ export const getImportObj = (importList: ImportDeclaration[]) => {
       importNameList: [],
       kind: '',
       namespace: '',
-      source: '',
+      source: ''
     }
 
     for (const specifier of item.specifiers) {
@@ -33,9 +33,7 @@ export const getImportObj = (importList: ImportDeclaration[]) => {
           if (importName === specifier.local.name) {
             importObj.importNameList.push(importName)
           } else {
-            importObj.importNameList.push(
-              `${importName} as ${specifier.local.name}`
-            )
+            importObj.importNameList.push(`${importName} as ${specifier.local.name}`)
           }
 
           break

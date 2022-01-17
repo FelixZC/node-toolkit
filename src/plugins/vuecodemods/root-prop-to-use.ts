@@ -9,15 +9,9 @@ type Params = {
  * Transforms expressions like `createApp({ router })` to `createApp().use(router)`
  */
 
-export const transformAST: ASTTransformation<Params> = (
-  { j, root },
-  { rootPropName }
-) => {
+export const transformAST: ASTTransformation<Params> = ({ j, root }, { rootPropName }) => {
   const appRoots = root.find(j.CallExpression, (node: N.CallExpression) => {
-    if (
-      node.arguments.length === 1 &&
-      j.ObjectExpression.check(node.arguments[0])
-    ) {
+    if (node.arguments.length === 1 && j.ObjectExpression.check(node.arguments[0])) {
       if (j.Identifier.check(node.callee) && node.callee.name === 'createApp') {
         return true
       }
@@ -44,14 +38,10 @@ export const transformAST: ASTTransformation<Params> = (
       return createAppCall
     } // @ts-ignore
 
-    const [{ value: pluginInstance }] = rootProps.properties.splice(
-      propertyIndex,
-      1
-    )
-    return j.callExpression(
-      j.memberExpression(createAppCall, j.identifier('use')),
-      [pluginInstance]
-    )
+    const [{ value: pluginInstance }] = rootProps.properties.splice(propertyIndex, 1)
+    return j.callExpression(j.memberExpression(createAppCall, j.identifier('use')), [
+      pluginInstance
+    ])
   })
 }
 export default wrap(transformAST)

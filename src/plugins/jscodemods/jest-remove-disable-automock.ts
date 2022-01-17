@@ -13,17 +13,13 @@ const transformer: Transform = (file, api) => {
   let mutations = 0
   const DISABLE_AUTOMOCK_CALLS = {
     autoMockOff: 'disableAutomock',
-    disableAutomock: 'disableAutomock',
+    disableAutomock: 'disableAutomock'
   }
 
   const isGeneratedFile = () => {
     const rootElement = root.get(0).node.program.body[0]
     const headers = !!rootElement && rootElement.comments
-    return (
-      headers &&
-      headers.length > 0 &&
-      headers[0].value.indexOf('@generated') > -1
-    )
+    return headers && headers.length > 0 && headers[0].value.indexOf('@generated') > -1
   }
 
   const isJestCall = (node) =>
@@ -33,19 +29,17 @@ const transformer: Transform = (file, api) => {
       isJestCall(node.callee.object))
 
   const isRootElement = (path) =>
-    path &&
-    path.parentPath &&
-    path.parentPath.value === root.get(0).node.program.body[0]
+    path && path.parentPath && path.parentPath.value === root.get(0).node.program.body[0]
 
   const removeCalls = (calls) => {
     const jestUnmocks = root.find(j.CallExpression, {
       callee: {
         object: isJestCall,
         property: {
-          name: (name) => calls[name],
+          name: (name) => calls[name]
         },
-        type: 'MemberExpression',
-      },
+        type: 'MemberExpression'
+      }
     }) // do these one at a time, then search for more
     // otherwise the list self-clobbers
 
@@ -62,11 +56,9 @@ const transformer: Transform = (file, api) => {
     let header
     const danglers = root
       .find(j.Identifier, {
-        name: 'jest',
+        name: 'jest'
       })
-      .filter(
-        (path) => path.parentPath.value.type === j.ExpressionStatement.name
-      )
+      .filter((path) => path.parentPath.value.type === j.ExpressionStatement.name)
 
     if (danglers.size() > 0) {
       header = getHeader(danglers.paths()[0])
@@ -107,7 +99,7 @@ const transformer: Transform = (file, api) => {
   const printOptions = {
     quote: 'single',
     trailingComma: true,
-    wrapColumn: 80,
+    wrapColumn: 80
   }
   return mutations > 0 ? root.toSource(printOptions) : null
 }

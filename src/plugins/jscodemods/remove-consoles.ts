@@ -7,10 +7,10 @@ const transformer: Transform = (fileInfo, api) => {
       callee: {
         object: {
           name: 'console',
-          type: 'Identifier',
+          type: 'Identifier'
         },
-        type: 'MemberExpression',
-      },
+        type: 'MemberExpression'
+      }
     })
     .remove()
     .toSource()

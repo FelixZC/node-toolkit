@@ -6,13 +6,13 @@ const transformer: Transform = (file, api, options) => {
   }
 
   const printOptions = options.printOptions || {
-    quote: 'single',
+    quote: 'single'
   }
   const REQUIRE_CALL = {
     callee: {
-      name: 'require',
+      name: 'require'
     },
-    type: 'CallExpression',
+    type: 'CallExpression'
   }
   const j = api.jscodeshift
   const root = j(file.source)
@@ -37,9 +37,7 @@ const transformer: Transform = (file, api, options) => {
       (node.type == 'AssignmentExpression' && isMockModule(node.right)) ||
       (node.type == 'VariableDeclaration' &&
         node.declarations.length &&
-        node.declarations.some((declaration) =>
-          isMockModule(declaration.init)
-        )))
+        node.declarations.some((declaration) => isMockModule(declaration.init))))
 
   const isDescribeCall = (node) =>
     node.type == 'CallExpression' &&
@@ -50,10 +48,8 @@ const transformer: Transform = (file, api, options) => {
     node.type == 'CallExpression' &&
     node.callee.type == 'MemberExpression' &&
     ((node.callee.object.type == 'Identifier' &&
-      (node.callee.object.name == 'mocks' ||
-        node.callee.object.name == 'mockModules')) ||
-      (node.callee.object.type == 'CallExpression' &&
-        isMockLike(node.callee.object)))
+      (node.callee.object.name == 'mocks' || node.callee.object.name == 'mockModules')) ||
+      (node.callee.object.type == 'CallExpression' && isMockLike(node.callee.object)))
 
   const isClassDeclaration = (node) => node.type == 'ClassDeclaration'
 
@@ -62,8 +58,7 @@ const transformer: Transform = (file, api, options) => {
   const isFunctionAssignment = (node) =>
     node.type == 'VariableDeclaration' &&
     node.declarations.some(
-      (declaration) =>
-        declaration.init && declaration.init.type == 'FunctionExpression'
+      (declaration) => declaration.init && declaration.init.type == 'FunctionExpression'
     )
 
   const findInsertionPoint = (body) => {
@@ -100,15 +95,10 @@ const transformer: Transform = (file, api, options) => {
   }
 
   const createRequire = (id, requireName) =>
-    j.variableDeclarator(
-      id,
-      j.callExpression(j.identifier('require'), [j.literal(requireName)])
-    )
+    j.variableDeclarator(id, j.callExpression(j.identifier('require'), [j.literal(requireName)]))
 
   const isSideEffectComment = (node) =>
-    node.comments &&
-    node.comments.length == 1 &&
-    /\@side-effect/.test(node.comments[0].value)
+    node.comments && node.comments.length == 1 && /\@side-effect/.test(node.comments[0].value)
 
   const isFluxStore = (node, path) => /Store/.test(node.arguments[0].value)
 
@@ -132,14 +122,11 @@ const transformer: Transform = (file, api, options) => {
       const hasVariableDeclarator = root
         .find(j.VariableDeclarator, {
           id: {
-            name,
-          },
+            name
+          }
         })
         .filter(
-          (p) =>
-            !p.value.init ||
-            p.value.init.type == 'Literal' ||
-            p.value.init.vlaue == 'null'
+          (p) => !p.value.init || p.value.init.type == 'Literal' || p.value.init.vlaue == 'null'
         )
         .replaceWith((p) => createRequire(j.identifier(name), require))
         .size()
@@ -153,14 +140,12 @@ const transformer: Transform = (file, api, options) => {
   const requires = []
   root
     .find(j.VariableDeclarator, {
-      init: REQUIRE_CALL,
+      init: REQUIRE_CALL
     })
     .filter((p) => p.parent.parent && p.parent.parent.value != program)
     .forEach((p) =>
       requires.unshift(
-        j.variableDeclaration('var', [
-          createRequire(p.value.id, p.value.init.arguments[0].value),
-        ])
+        j.variableDeclaration('var', [createRequire(p.value.id, p.value.init.arguments[0].value)])
       )
     )
     .remove()
@@ -170,12 +155,12 @@ const transformer: Transform = (file, api, options) => {
     .find(j.CallExpression, {
       arguments: [
         {
-          body: [],
-        },
+          body: []
+        }
       ],
       callee: {
-        name: 'beforeEach',
-      },
+        name: 'beforeEach'
+      }
     })
     .filter((p) => !p.value.arguments[0].body.body.length)
     .remove() // Cleanup duplicate requires
@@ -183,7 +168,7 @@ const transformer: Transform = (file, api, options) => {
   const requireNames = new Set()
   root
     .find(j.VariableDeclarator, {
-      init: REQUIRE_CALL,
+      init: REQUIRE_CALL
     })
     .filter((p) => p.parent.parent && p.parent.parent.value == program)
     .filter((p) => {
@@ -202,20 +187,18 @@ const transformer: Transform = (file, api, options) => {
 
   root
     .find(j.VariableDeclarator, {
-      init: REQUIRE_CALL,
+      init: REQUIRE_CALL
     })
     .filter((p) => !!p.value.id && p.value.id.name)
     .filter(
       (p) =>
         root
           .find(j.Identifier, {
-            name: p.value.id.name,
+            name: p.value.id.name
           })
           .size() == 1
     )
-    .filter(
-      (p) => p.value.id.name != 'React' || root.find(j.JSXElement).size() == 0
-    )
+    .filter((p) => p.value.id.name != 'React' || root.find(j.JSXElement).size() == 0)
     .remove()
   body[0].comments = firstComment
   return root.toSource(printOptions)

@@ -8,7 +8,7 @@ import {
   ParserOptions,
   RootNode,
   SourceLocation,
-  TextModes,
+  TextModes
 } from '@vue/compiler-core'
 import { RawSourceMap, SourceMapGenerator } from 'source-map'
 import { Statement } from '@babel/types'
@@ -49,14 +49,15 @@ export function stringify(sfcDescriptor: SFCDescriptor) {
     .map((block) => {
       const openTag = makeOpenTag(block)
       const closeTag = makeCloseTag(block)
-      return Object.assign({}, block, {
+      return {
+        ...block,
         closeTag,
         endOfCloseTag: block.loc.end.offset + closeTag.length,
         endOfOpenTag: block.loc.start.offset,
         openTag,
         startOfCloseTag: block.loc.end.offset,
-        startOfOpenTag: block.loc.start.offset - openTag.length,
-      })
+        startOfOpenTag: block.loc.start.offset - openTag.length
+      }
     }) // generate sfc source
     .reduce((sfcCode, block, index, array) => {
       const first = index === 0
@@ -70,13 +71,7 @@ export function stringify(sfcDescriptor: SFCDescriptor) {
       }
 
       newlinesBefore = newlinesBefore < 0 ? 0 : newlinesBefore
-      return (
-        sfcCode +
-        '\n'.repeat(newlinesBefore) +
-        block.openTag +
-        block.content +
-        block.closeTag
-      )
+      return sfcCode + '\n'.repeat(newlinesBefore) + block.openTag + block.content + block.closeTag
     }, '')
 }
 
@@ -155,10 +150,7 @@ export interface SFCParseResult {
   errors: (CompilerError | SyntaxError)[]
 }
 const SFC_CACHE_MAX_SIZE = 500
-const sourceToSFC = new (require('lru-cache'))(SFC_CACHE_MAX_SIZE) as Map<
-  string,
-  SFCParseResult
->
+const sourceToSFC = new (require('lru-cache'))(SFC_CACHE_MAX_SIZE) as Map<string, SFCParseResult>
 export function parse(
   source: string,
   {
@@ -166,11 +158,10 @@ export function parse(
     filename = 'anonymous.vue',
     pad = false,
     sourceMap = true,
-    sourceRoot = '',
+    sourceRoot = ''
   }: SFCParseOptions = {}
 ): SFCParseResult {
-  const sourceKey =
-    source + sourceMap + filename + sourceRoot + pad + compiler.parse
+  const sourceKey = source + sourceMap + filename + sourceRoot + pad + compiler.parse
   const cache = sourceToSFC.get(sourceKey)
 
   if (cache) {
@@ -184,7 +175,7 @@ export function parse(
     scriptSetup: null,
     source,
     styles: [],
-    template: null,
+    template: null
   }
   const errors: (CompilerError | SyntaxError)[] = []
   const ast = compiler.parse(source, {
@@ -213,7 +204,7 @@ export function parse(
     isPreTag: () => true,
     onError: (e) => {
       errors.push(e)
-    },
+    }
   })
   ast.children.forEach((node) => {
     if (node.type !== NodeTypes.ELEMENT) {
@@ -262,8 +253,7 @@ export function parse(
         if (styleBlock.attrs.vars) {
           errors.push(
             new SyntaxError(
-              `<style vars> has been replaced by a new proposal: ` +
-                `https://github.com/vuejs/rfcs/pull/231`
+              '<style vars> has been replaced by a new proposal: https://github.com/vuejs/rfcs/pull/231'
             )
           )
         }
@@ -281,8 +271,7 @@ export function parse(
     if (descriptor.scriptSetup.src) {
       errors.push(
         new SyntaxError(
-          `<script setup> cannot use the "src" attribute because ` +
-            `its syntax will be ambiguous outside of the component.`
+          '<script setup> cannot use the "src" attribute because its syntax will be ambiguous outside of the component.'
         )
       )
       descriptor.scriptSetup = null
@@ -291,8 +280,7 @@ export function parse(
     if (descriptor.script && descriptor.script.src) {
       errors.push(
         new SyntaxError(
-          `<script> cannot use the "src" attribute when <script setup> is ` +
-            `also present because they must be processed together.`
+          '<script> cannot use the "src" attribute when <script setup> is also present because they must be processed together.'
         )
       )
       descriptor.script = null
@@ -320,16 +308,13 @@ export function parse(
 
   const result = {
     descriptor,
-    errors,
+    errors
   }
   sourceToSFC.set(sourceKey, result)
   return result
 }
 
-function createDuplicateBlockError(
-  node: ElementNode,
-  isScriptSetup = false
-): CompilerError {
+function createDuplicateBlockError(node: ElementNode, isScriptSetup = false): CompilerError {
   const err = new SyntaxError(
     `Single file component can contain only one <${node.tag}${
       isScriptSetup ? ` setup` : ``
@@ -339,11 +324,7 @@ function createDuplicateBlockError(
   return err
 }
 
-function createBlock(
-  node: ElementNode,
-  source: string,
-  pad: SFCParseOptions['pad']
-): SFCBlock {
+function createBlock(node: ElementNode, source: string, pad: SFCParseOptions['pad']): SFCBlock {
   const type = node.tag
   let { end, start } = node.loc
   let content = ''
@@ -357,14 +338,14 @@ function createBlock(
   const loc = {
     end,
     source: content,
-    start,
+    start
   }
   const attrs: Record<string, string | true> = {}
   const block: SFCBlock = {
     attrs,
     content,
     loc,
-    type,
+    type
   }
 
   if (pad) {
@@ -406,7 +387,7 @@ function generateSourceMap(
 ): RawSourceMap {
   const map = new SourceMapGenerator({
     file: filename.replace(/\\/g, '/'),
-    sourceRoot: sourceRoot.replace(/\\/g, '/'),
+    sourceRoot: sourceRoot.replace(/\\/g, '/')
   })
   map.setSourceContent(filename, source)
   generated.split(splitRE).forEach((line, index) => {
@@ -419,13 +400,13 @@ function generateSourceMap(
           map.addMapping({
             generated: {
               column: i,
-              line: generatedLine,
+              line: generatedLine
             },
             original: {
               column: i,
-              line: originalLine,
+              line: originalLine
             },
-            source: filename,
+            source: filename
           })
         }
       }
@@ -434,11 +415,7 @@ function generateSourceMap(
   return JSON.parse(map.toString())
 }
 
-function padContent(
-  content: string,
-  block: SFCBlock,
-  pad: SFCParseOptions['pad']
-): string {
+function padContent(content: string, block: SFCBlock, pad: SFCParseOptions['pad']): string {
   content = content.slice(0, block.loc.start.offset)
 
   if (pad === 'space') {

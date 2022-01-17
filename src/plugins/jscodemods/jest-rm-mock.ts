@@ -11,13 +11,12 @@ const transformer: Transform = (file, api, options = {}) => {
 
   const j = api.jscodeshift
   const printOptions = options.printOptions || {
-    quote: 'single',
+    quote: 'single'
   }
   const root = j(file.source)
   const JEST = 'jest'
 
-  const isJestFn = (node) =>
-    ['disableAutomock', 'mock', 'unmock'].includes(node.name)
+  const isJestFn = (node) => ['disableAutomock', 'mock', 'unmock'].includes(node.name)
 
   const removeCalls = (moduleNames) => {
     let mutated = false
@@ -65,10 +64,7 @@ const transformer: Transform = (file, api, options = {}) => {
     const program = root.get(0).node.program
     const body = program.body.filter((statement, index) => {
       if (statement.type === 'ExpressionStatement' && update(statement)) {
-        if (
-          statement.expression.type == 'Identifier' &&
-          statement.expression.name == JEST
-        ) {
+        if (statement.expression.type == 'Identifier' && statement.expression.name == JEST) {
           return false
         }
       }

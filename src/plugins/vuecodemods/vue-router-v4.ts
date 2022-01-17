@@ -8,8 +8,8 @@ export const transformAST: ASTTransformation = (context) => {
   const { j, root } = context
   const routerImportDecls = root.find(j.ImportDeclaration, {
     source: {
-      value: 'vue-router',
-    },
+      value: 'vue-router'
+    }
   })
   const importedVueRouter = routerImportDecls.find(j.ImportDefaultSpecifier)
 
@@ -18,15 +18,15 @@ export const transformAST: ASTTransformation = (context) => {
     const newVueRouter = root.find(j.NewExpression, {
       callee: {
         name: localVueRouter,
-        type: 'Identifier',
-      },
+        type: 'Identifier'
+      }
     })
     addImport(context, {
       source: 'vue-router',
       specifier: {
         imported: 'createRouter',
-        type: 'named',
-      },
+        type: 'named'
+      }
     })
     newVueRouter.replaceWith(({ node }) => {
       // mode: 'history' -> history: createWebHistory(), etc
@@ -55,9 +55,7 @@ export const transformAST: ASTTransformation = (context) => {
           } else if (mode === 'abstract') {
             historyMode = 'createMemoryHistory'
           } else {
-            throw new Error(
-              `mode must be one of 'hash', 'history', or 'abstract'`
-            )
+            throw new Error(`mode must be one of 'hash', 'history', or 'abstract'`)
           }
 
           return false
@@ -73,25 +71,20 @@ export const transformAST: ASTTransformation = (context) => {
         source: 'vue-router',
         specifier: {
           imported: historyMode,
-          type: 'named',
-        },
+          type: 'named'
+        }
       })
-      node.arguments[0].properties = node.arguments[0].properties.filter(
-        (p) => !!p
-      )
+      node.arguments[0].properties = node.arguments[0].properties.filter((p) => !!p)
       node.arguments[0].properties.unshift(
         j.objectProperty(
           j.identifier('history'),
-          j.callExpression(
-            j.identifier(historyMode),
-            baseValue ? [baseValue] : []
-          )
+          j.callExpression(j.identifier(historyMode), baseValue ? [baseValue] : [])
         )
       )
       return j.callExpression(j.identifier('createRouter'), node.arguments)
     })
     removeExtraneousImport(context, {
-      localBinding: localVueRouter,
+      localBinding: localVueRouter
     })
   }
 }

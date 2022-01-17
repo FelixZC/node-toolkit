@@ -25,11 +25,11 @@ const vueDefaultOrder = [
     'created',
     'destroyed',
     'mounted',
-    'updated',
+    'updated'
   ],
   'methods',
   ...['render', 'template'],
-  'renderError',
+  'renderError'
 ]
 
 const transformer: Transform = (fileInfo, api) => {
@@ -74,25 +74,20 @@ const transformer: Transform = (fileInfo, api) => {
           return 0
         }
 
-        return (
-          vueDefaultOrder.indexOf(aKeyName) - vueDefaultOrder.indexOf(bKeyName)
-        )
+        return vueDefaultOrder.indexOf(aKeyName) - vueDefaultOrder.indexOf(bKeyName)
       })
     }
   }
 
-  let b = j(fileInfo.source)
-    .find(j.ObjectExpression)
-    .forEach(normalObjectSort)
-    .toSource()
+  let b = j(fileInfo.source).find(j.ObjectExpression).forEach(normalObjectSort).toSource()
   b = j(b).find(j.ObjectPattern).forEach(normalObjectSort).toSource() //vue2
 
   if (fileInfo.path.endsWith('.vue') || fileInfo.path.includes('mixin')) {
     b = j(b)
       .find(j.ExportDefaultDeclaration, {
         declaration: {
-          type: 'ObjectExpression',
-        },
+          type: 'ObjectExpression'
+        }
       })
       .forEach((path) => vueObjectSort(path.node.declaration))
       .toSource()
@@ -102,8 +97,8 @@ const transformer: Transform = (fileInfo, api) => {
     b = j(b)
       .find(j.ExportDefaultDeclaration, {
         declaration: {
-          type: 'CallExpression',
-        },
+          type: 'CallExpression'
+        }
       })
       .forEach((path) => vueObjectSort(path.node.declaration.arguments[0]))
       .toSource()
@@ -111,7 +106,7 @@ const transformer: Transform = (fileInfo, api) => {
 
   return j(b)
     .find(j.Identifier, {
-      name: 'Vue',
+      name: 'Vue'
     })
     .filter((path) => path.parentPath.value.type === 'NewExpression')
     .map((path) => path.parentPath)

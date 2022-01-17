@@ -8,7 +8,7 @@ const transformer: Transform = (file, api) => {
     'Function',
     'FunctionDeclaration',
     'FunctionExpression',
-    'Program',
+    'Program'
   ]
   const FOR_STATEMENTS = ['ForInStatement', 'ForOfStatement', 'ForStatement']
 
@@ -23,17 +23,14 @@ const transformer: Transform = (file, api) => {
 
     return {
       isInFor,
-      scopeNode,
+      scopeNode
     }
   }
 
   const findFunctionDeclaration = (node, container) => {
     let localNode = node
 
-    while (
-      localNode.value.type !== 'FunctionDeclaration' &&
-      localNode !== container
-    ) {
+    while (localNode.value.type !== 'FunctionDeclaration' && localNode !== container) {
       localNode = localNode.parentPath
     }
 
@@ -51,9 +48,7 @@ const transformer: Transform = (file, api) => {
     } else if (id.type === 'ObjectPattern') {
       return id.properties
         .map((d) =>
-          d.type === 'SpreadProperty'
-            ? [d.argument.name]
-            : extractNamesFromIdentifierLike(d.value)
+          d.type === 'SpreadProperty' ? [d.argument.name] : extractNamesFromIdentifierLike(d.value)
         )
         .reduce((acc, val) => acc.concat(val), [])
     } else if (id.type === 'ArrayPattern') {
@@ -182,10 +177,7 @@ const transformer: Transform = (file, api) => {
 
           const referenceScope = getScopeNode(n.parent).scopeNode
 
-          if (
-            referenceScope === scopeNode ||
-            !hasLocalDeclarationFor(n, scopeNode, n.value.name)
-          ) {
+          if (referenceScope === scopeNode || !hasLocalDeclarationFor(n, scopeNode, n.value.name)) {
             // if the variable is referenced outside the current block
             // scope, revert to using `var`
             const isOutsideCurrentScope =
@@ -250,10 +242,7 @@ const transformer: Transform = (file, api) => {
 
         if (
           declaration.value.declarations.some((declarator) => {
-            return (
-              (!declarator.init && !forLoopWithoutInit) ||
-              isMutated(declaration, declarator)
-            )
+            return (!declarator.init && !forLoopWithoutInit) || isMutated(declaration, declarator)
           })
         ) {
           declaration.value.kind = 'let'

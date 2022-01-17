@@ -26,7 +26,7 @@ import { Transform } from 'jscodeshift'
 const transformer: Transform = (file, api, options) => {
   const j = api.jscodeshift
   const printOptions = options.printOptions || {
-    quote: 'single',
+    quote: 'single'
   }
 
   function extractNodes(node, comments, topLevel = false) {
@@ -51,7 +51,7 @@ const transformer: Transform = (file, api, options) => {
 
     return [
       ...(hasStringish(node.left) ? extractNodes(node.left) : [node.left]),
-      ...extractNodes(node.right, node.comments),
+      ...extractNodes(node.right, node.comments)
     ]
   }
 
@@ -90,11 +90,7 @@ const transformer: Transform = (file, api, options) => {
   }
 
   function isStringishNode(node) {
-    return (
-      isStringNode(node) ||
-      isTemplateLiteralNode(node) ||
-      isCastToStringNode(node)
-    )
+    return isStringNode(node) || isTemplateLiteralNode(node) || isCastToStringNode(node)
   }
 
   function hasStringish(node) {
@@ -112,7 +108,7 @@ const transformer: Transform = (file, api, options) => {
       rightQuasis[0] = j.templateElement(
         {
           cooked: lastQuasi.value.cooked + rightQuasis[0].value.cooked,
-          raw: lastQuasi.value.raw + rightQuasis[0].value.raw,
+          raw: lastQuasi.value.raw + rightQuasis[0].value.raw
         },
         false
       )
@@ -126,7 +122,7 @@ const transformer: Transform = (file, api, options) => {
       return {
         comments,
         expressions,
-        quasis,
+        quasis
       }
     }
 
@@ -148,7 +144,7 @@ const transformer: Transform = (file, api, options) => {
       const newQuasi = j.templateElement(
         {
           cooked,
-          raw,
+          raw
         },
         false
       )
@@ -161,7 +157,7 @@ const transformer: Transform = (file, api, options) => {
         j.templateElement(
           {
             cooked: q.value.cooked,
-            raw: q.value.raw,
+            raw: q.value.raw
           },
           false
         )
@@ -177,17 +173,17 @@ const transformer: Transform = (file, api, options) => {
       j.templateElement(
         {
           cooked: '',
-          raw: '',
+          raw: ''
         },
         false
       ),
       j.templateElement(
         {
           cooked: '',
-          raw: '',
+          raw: ''
         },
         false
-      ),
+      )
     ])
     const newExpressions = expressions.concat(node)
     return buildTL(rest, newQuasis, newExpressions, newComments)
@@ -217,7 +213,7 @@ const transformer: Transform = (file, api, options) => {
 
   return j(file.source)
     .find(j.BinaryExpression, {
-      operator: '+',
+      operator: '+'
     })
     .replaceWith(convertToTemplateString)
     .toSource(printOptions)

@@ -11,7 +11,7 @@ const runPosthtmlPlugin = async (
 ) => {
   const result = await posthtml(plugins).process(execFileInfo.source, {
     closingSingleTag: 'slash',
-    recognizeSelfClosing: true,
+    recognizeSelfClosing: true
   } as MergeOptions)
   return result.html
 }

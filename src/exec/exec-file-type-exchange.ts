@@ -9,15 +9,15 @@ const exchangeVueFileGrammar = () => {
         import * as Vue from 'vue'`
       },
 
-      reg: /<script>/g,
+      reg: /<script>/g
     },
     {
       matchContentHandle(content: string) {
         return `Vue.defineComponent(${content})`
       },
 
-      reg: /export default (?<target>\{[\s\S\n]+)<\/script>/g,
-    },
+      reg: /export default (?<target>\{[\s\S\n]+)<\/script>/g
+    }
   ]
 
   const filterCondition: FilterConditionType = (file) => {

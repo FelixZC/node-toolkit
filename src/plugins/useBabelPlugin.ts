@@ -22,7 +22,7 @@ const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
       // default: "script"
       // default: []
       plugins: ['decorators-legacy', 'jsx', 'typescript'],
-      sourceType: 'module',
+      sourceType: 'module'
     }) //2,分析修改AST，第一个参数是AST，第二个参数是访问者对象
 
     for (const plugin of pluginsList) {
@@ -39,7 +39,7 @@ const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
       {
         compact: 'auto',
         concise: false,
-        retainLines: false,
+        retainLines: false
       },
       execFileInfo.source
     ) //会返回一个对象，code就是生成后的新代码
@@ -51,10 +51,7 @@ const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
   }
 }
 
-const runBabelPlugin = (
-  execFileInfo: ExecFileInfo,
-  pluginsList: BabelPlugin[]
-) => {
+const runBabelPlugin = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
   if (!pluginsList.length) {
     return execFileInfo.source
   }
@@ -63,7 +60,7 @@ const runBabelPlugin = (
     return transform(execFileInfo, pluginsList)
   } else {
     const { descriptor } = parseSFC(execFileInfo.source, {
-      filename: execFileInfo.path,
+      filename: execFileInfo.path
     })
     const scriptBlock = descriptor.script
 

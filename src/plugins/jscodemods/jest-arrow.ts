@@ -27,7 +27,7 @@ const transformer: Transform = (file, api) => {
     'it',
     'test',
     'xdescribe',
-    'xit',
+    'xit'
   ]
   return j(file.source)
     .find(j.ExpressionStatement)
@@ -41,10 +41,7 @@ const transformer: Transform = (file, api) => {
     .forEach((path) => {
       const lastArg = path.node.expression.arguments.length - 1
       const fn = path.node.expression.arguments[lastArg]
-      path.node.expression.arguments[lastArg] = j.arrowFunctionExpression(
-        fn.params,
-        fn.body
-      )
+      path.node.expression.arguments[lastArg] = j.arrowFunctionExpression(fn.params, fn.body)
     })
     .toSource()
 }

@@ -58,7 +58,7 @@ const keywords = {
   void: true,
   volatile: true,
   while: true,
-  with: true,
+  with: true
 }
 
 const transformer: Transform = (file, api) => {
@@ -68,16 +68,12 @@ const transformer: Transform = (file, api) => {
     .find(j.MemberExpression, {
       computed: true,
       property: {
-        type: 'Literal',
-      },
+        type: 'Literal'
+      }
     })
     .filter((p) => !!keywords[p.value.property.value])
     .replaceWith((p) =>
-      j.memberExpression(
-        p.value.object,
-        j.identifier(p.value.property.value),
-        false
-      )
+      j.memberExpression(p.value.object, j.identifier(p.value.property.value), false)
     )
     .size()
   return didTransform ? root.toSource() : null

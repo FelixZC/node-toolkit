@@ -1,9 +1,5 @@
 import wrap from '../wrapAstTransformation'
-import type {
-  ImportDefaultSpecifier,
-  ImportNamespaceSpecifier,
-  ImportSpecifier,
-} from 'jscodeshift'
+import type { ImportDefaultSpecifier, ImportNamespaceSpecifier, ImportSpecifier } from 'jscodeshift'
 import type { ASTTransformation } from '../wrapAstTransformation'
 type DefaultSpecifierParam = {
   type: 'default'
@@ -19,16 +15,10 @@ type NamespaceSpecifierParam = {
   local: string
 }
 type Params = {
-  specifier:
-    | DefaultSpecifierParam
-    | NamedSpecifierParam
-    | NamespaceSpecifierParam
+  specifier: DefaultSpecifierParam | NamedSpecifierParam | NamespaceSpecifierParam
   source: string
 }
-export const transformAST: ASTTransformation<Params> = (
-  { j, root },
-  { source, specifier }
-) => {
+export const transformAST: ASTTransformation<Params> = ({ j, root }, { source, specifier }) => {
   let localBinding: string
 
   if (specifier.type === 'named') {
@@ -39,13 +29,10 @@ export const transformAST: ASTTransformation<Params> = (
 
   const duplicate = root.find(j.ImportDeclaration, {
     source: {
-      value: source,
+      value: source
     },
-    specifiers: (
-      arr: Array<
-        ImportSpecifier | ImportDefaultSpecifier | ImportNamespaceSpecifier
-      >
-    ) => arr.some((s) => s.local.name === localBinding),
+    specifiers: (arr: Array<ImportSpecifier | ImportDefaultSpecifier | ImportNamespaceSpecifier>) =>
+      arr.some((s) => s.local.name === localBinding)
   })
 
   if (duplicate.length) {
@@ -68,21 +55,15 @@ export const transformAST: ASTTransformation<Params> = (
 
   const matchedDecl = root.find(j.ImportDeclaration, {
     source: {
-      value: source,
-    },
+      value: source
+    }
   })
 
-  if (
-    matchedDecl.length &&
-    !matchedDecl.find(j.ImportNamespaceSpecifier).length
-  ) {
+  if (matchedDecl.length && !matchedDecl.find(j.ImportNamespaceSpecifier).length) {
     // add new specifier to the existing import declaration
     matchedDecl.get(0).node.specifiers.push(newImportSpecifier)
   } else {
-    const newImportDecl = j.importDeclaration(
-      [newImportSpecifier],
-      j.stringLiteral(source)
-    )
+    const newImportDecl = j.importDeclaration([newImportSpecifier], j.stringLiteral(source))
     const lastImportDecl = root.find(j.ImportDeclaration).at(-1)
 
     if (lastImportDecl.length) {

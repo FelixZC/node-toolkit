@@ -8,7 +8,7 @@ type Params = {
 export const transformAST: ASTTransformation<Params | undefined> = (
   context,
   { useCompositionApi }: Params = {
-    useCompositionApi: false,
+    useCompositionApi: false
   }
 ) => {
   const { filename, j, root } = context
@@ -18,20 +18,20 @@ export const transformAST: ASTTransformation<Params | undefined> = (
       source: useCompositionApi ? '@vue/composition-api' : 'vue',
       specifier: {
         imported: 'defineComponent',
-        type: 'named',
-      },
+        type: 'named'
+      }
     })
 
   const vueExtend = root.find(j.CallExpression, {
     callee: {
       object: {
-        name: 'Vue',
+        name: 'Vue'
       },
       property: {
-        name: 'extend',
+        name: 'extend'
       },
-      type: 'MemberExpression',
-    },
+      type: 'MemberExpression'
+    }
   })
 
   if (vueExtend.length) {
@@ -40,7 +40,7 @@ export const transformAST: ASTTransformation<Params | undefined> = (
       node.callee = j.identifier('defineComponent')
     })
     removeExtraneousImport(context, {
-      localBinding: 'Vue',
+      localBinding: 'Vue'
     })
   }
 
@@ -58,12 +58,11 @@ export const transformAST: ASTTransformation<Params | undefined> = (
     }
 
     importDefineComponent()
-    defaultExport.nodes()[0].declaration = j.callExpression(
-      j.identifier('defineComponent'),
-      [declarationNode]
-    )
+    defaultExport.nodes()[0].declaration = j.callExpression(j.identifier('defineComponent'), [
+      declarationNode
+    ])
     removeExtraneousImport(context, {
-      localBinding: 'Vue',
+      localBinding: 'Vue'
     })
   }
 }

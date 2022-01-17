@@ -4,7 +4,7 @@ import type { ImportDeclaration } from '@babel/types'
 import type { ImportObj } from './ast-utils'
 export default declare((babel) => {
   const extra = {
-    importList: [] as ImportObj[],
+    importList: [] as ImportObj[]
   } as Record<string, any>
   return {
     getExtra() {
@@ -19,8 +19,8 @@ export default declare((babel) => {
             (i) => i.type === 'ImportDeclaration'
           ) as ImportDeclaration[]
           extra.importList = getImportObj(importList)
-        },
-      },
-    },
+        }
+      }
+    }
   }
 })

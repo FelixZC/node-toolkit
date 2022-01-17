@@ -2,7 +2,7 @@ import * as exec from './index'
 import type { BabelPlugin } from '../plugins/useBabelPlugin'
 const babelPluginPathList: string[] = [
   '../plugins/babel-plugins/array-sort',
-  '../plugins/babel-plugins/import-sort',
+  '../plugins/babel-plugins/import-sort'
 ]
 
 try {

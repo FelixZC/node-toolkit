@@ -6,17 +6,14 @@ export const transformAST: ASTTransformation = (context) => {
   const { j, root } = context
   const vueClassComponentImportDecls = root.find(j.ImportDeclaration, {
     source: {
-      value: 'vue-class-component',
-    },
-  })
-  const ComponentImportSpec = vueClassComponentImportDecls.find(
-    j.ImportSpecifier,
-    {
-      imported: {
-        name: 'Component',
-      },
+      value: 'vue-class-component'
     }
-  )
+  })
+  const ComponentImportSpec = vueClassComponentImportDecls.find(j.ImportSpecifier, {
+    imported: {
+      name: 'Component'
+    }
+  })
   ComponentImportSpec.replaceWith(({ node }) => {
     return j.importSpecifier(j.identifier('Options'), j.identifier('Component'))
   })

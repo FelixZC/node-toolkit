@@ -14,21 +14,18 @@ import type { ASTTransformation } from '../wrapAstTransformation'
 type Params = {
   removablePlugins: string[]
 }
-export const transformAST: ASTTransformation<Params> = (
-  context,
-  { removablePlugins }
-) => {
+export const transformAST: ASTTransformation<Params> = (context, { removablePlugins }) => {
   const { j, root } = context
   const vueUseCalls = root.find(j.CallExpression, {
     callee: {
       object: {
-        name: 'Vue',
+        name: 'Vue'
       },
       property: {
-        name: 'use',
+        name: 'use'
       },
-      type: 'MemberExpression',
-    },
+      type: 'MemberExpression'
+    }
   })
   const removedPlugins: string[] = []
   const removableUseCalls = vueUseCalls.filter(({ node }) => {
@@ -46,7 +43,7 @@ export const transformAST: ASTTransformation<Params> = (
   removableUseCalls.remove()
   removedPlugins.forEach((name) =>
     removeExtraneousImport(context, {
-      localBinding: name,
+      localBinding: name
     })
   )
 }

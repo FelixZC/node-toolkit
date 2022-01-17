@@ -11,14 +11,14 @@ const transformer: Transform = (file, api, options = {}) => {
 
   const j = api.jscodeshift
   const printOptions = options.printOptions || {
-    quote: 'single',
+    quote: 'single'
   }
   const root = j(file.source)
   let mutations = 0
   const JEST_API = {
     autoMockOff: 'disableAutomock',
     autoMockOn: 'enableAutomock',
-    dontMock: 'unmock',
+    dontMock: 'unmock'
   }
 
   const isJestCall = (node) =>
@@ -33,10 +33,10 @@ const transformer: Transform = (file, api, options = {}) => {
         callee: {
           object: isJestCall,
           property: {
-            name: (name) => apiMethods[name],
+            name: (name) => apiMethods[name]
           },
-          type: 'MemberExpression',
-        },
+          type: 'MemberExpression'
+        }
       })
       .forEach((p) => {
         const name = p.value.callee.property.name
@@ -46,11 +46,11 @@ const transformer: Transform = (file, api, options = {}) => {
 
   const JEST_MOCK_FNS = {
     genMockFn: true,
-    genMockFunction: true,
+    genMockFunction: true
   }
   const JEST_MOCK_IMPLEMENTATION = {
     mockImpl: true,
-    mockImplementation: true,
+    mockImplementation: true
   }
 
   const updateMockFns = () => {
@@ -58,13 +58,13 @@ const transformer: Transform = (file, api, options = {}) => {
       .find(j.CallExpression, {
         callee: {
           object: {
-            name: 'jest',
+            name: 'jest'
           },
           property: {
-            name: (name) => JEST_MOCK_FNS[name],
+            name: (name) => JEST_MOCK_FNS[name]
           },
-          type: 'MemberExpression',
-        },
+          type: 'MemberExpression'
+        }
       })
       .forEach((p) => {
         p.value.callee.property.name = 'fn'

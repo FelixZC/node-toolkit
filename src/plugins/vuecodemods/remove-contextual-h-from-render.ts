@@ -6,18 +6,17 @@ export const transformAST: ASTTransformation = (context) => {
   const { j, root } = context
   const renderFns = root.find(j.ObjectProperty, {
     key: {
-      name: 'render',
+      name: 'render'
     },
     value: {
-      type: 'ArrowFunctionExpression',
-    },
+      type: 'ArrowFunctionExpression'
+    }
   })
   const renderMethods = root.find(j.ObjectMethod, {
     key: {
-      name: 'render',
+      name: 'render'
     },
-    params: (params: Array<any>) =>
-      j.Identifier.check(params[0]) && params[0].name === 'h',
+    params: (params: Array<any>) => j.Identifier.check(params[0]) && params[0].name === 'h'
   })
 
   if (renderFns.length || renderMethods.length) {
@@ -25,8 +24,8 @@ export const transformAST: ASTTransformation = (context) => {
       source: 'vue',
       specifier: {
         imported: 'h',
-        type: 'named',
-      },
+        type: 'named'
+      }
     })
     renderFns.forEach(({ node }) => {
       ;(node.value as ArrowFunctionExpression).params.shift()

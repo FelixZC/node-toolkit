@@ -39,12 +39,12 @@ function generateArray(table) {
         ranges.push({
           e: {
             c: outRow.length + colspan - 1,
-            r: R + rowspan - 1,
+            r: R + rowspan - 1
           },
           s: {
             c: outRow.length,
-            r: R,
-          },
+            r: R
+          }
         })
       } //Handle Value
 
@@ -71,12 +71,12 @@ function sheet_from_array_of_arrays(data, opts) {
   const range = {
     e: {
       c: 0,
-      r: 0,
+      r: 0
     },
     s: {
       c: 10000000,
-      r: 10000000,
-    },
+      r: 10000000
+    }
   }
 
   for (let R = 0; R != data.length; ++R) {
@@ -86,12 +86,12 @@ function sheet_from_array_of_arrays(data, opts) {
       if (range.e.r < R) range.e.r = R
       if (range.e.c < C) range.e.c = C
       const cell = {
-        v: data[R][C],
+        v: data[R][C]
       }
       if (cell.v == null) continue
       const cell_ref = XLSX.utils.encode_cell({
         c: C,
-        r: R,
+        r: R
       })
       if (typeof cell.v === 'number') cell.t = 'n'
       else if (typeof cell.v === 'boolean') cell.t = 'b'
@@ -144,11 +144,11 @@ export function export_table_to_excel(id) {
   const wbout = XLSX.write(wb, {
     bookSST: false,
     bookType: 'xlsx',
-    type: 'binary',
+    type: 'binary'
   })
   saveAs(
     new Blob([s2ab(wbout)], {
-      type: 'application/octet-stream',
+      type: 'application/octet-stream'
     }),
     'test.xlsx'
   )
@@ -170,12 +170,12 @@ export function export_json_to_excel(th, jsonData, defaultTitle) {
   const wbout = XLSX.write(wb, {
     bookSST: false,
     bookType: 'xlsx',
-    type: 'binary',
+    type: 'binary'
   })
   const title = defaultTitle || '列表'
   saveAs(
     new Blob([s2ab(wbout)], {
-      type: 'application/octet-stream',
+      type: 'application/octet-stream'
     }),
     title + '.xlsx'
   )

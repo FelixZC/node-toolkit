@@ -25,7 +25,7 @@ module.exports = {
     const XLSX = require('xlsx')
 
     wb = XLSX.read(file, {
-      type: 'buffer',
+      type: 'buffer'
     })
     outdata = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]) // outdata就是你想要的东西
 
@@ -46,5 +46,5 @@ module.exports = {
       arr.push(obj)
     })
     return arr
-  },
+  }
 }

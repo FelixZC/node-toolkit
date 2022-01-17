@@ -3,7 +3,7 @@ import type {
   FunctionDeclaration,
   ObjectMethod,
   ObjectProperty,
-  VariableDeclaration,
+  VariableDeclaration
 } from '@babel/types'
 import type { NodePath } from '@babel/traverse'
 export default declare((babel) => {
@@ -11,14 +11,9 @@ export default declare((babel) => {
   extra.attributesObj = {} as Record<string, any>
 
   const getAnnatation = (
-    path: NodePath<
-      ObjectMethod | ObjectProperty | VariableDeclaration | FunctionDeclaration
-    >
+    path: NodePath<ObjectMethod | ObjectProperty | VariableDeclaration | FunctionDeclaration>
   ) => {
-    if (
-      path.node.leadingComments?.length ||
-      path.node.trailingComments?.length
-    ) {
+    if (path.node.leadingComments?.length || path.node.trailingComments?.length) {
       let key: string = ''
 
       switch (path.node.type) {
@@ -40,9 +35,7 @@ export default declare((babel) => {
       const annotation = comments?.map((item) => item.value).join(',')
 
       if (annotation?.length && key) {
-        extra.attributesObj[key] = annotation
-          .replace(/ +\*/g, '')
-          .replace(/[\r\n]/g, '')
+        extra.attributesObj[key] = annotation.replace(/ +\*/g, '').replace(/[\r\n]/g, '')
       }
     }
   }
@@ -68,7 +61,7 @@ export default declare((babel) => {
 
       VariableDeclaration(path) {
         getAnnatation(path)
-      },
-    },
+      }
+    }
   }
 })

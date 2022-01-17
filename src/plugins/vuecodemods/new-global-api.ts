@@ -14,10 +14,10 @@ export const transformAST: ASTTransformation = (context) => {
   importCompositionApiFromVue(context)
   newVueTocreateApp(context)
   rootPropToUse(context, {
-    rootPropName: 'store',
+    rootPropName: 'store'
   })
   rootPropToUse(context, {
-    rootPropName: 'router',
+    rootPropName: 'router'
   })
   removeTrivialRoot(context)
   removeProductionTip(context) // TODO:
@@ -25,17 +25,17 @@ export const transformAST: ASTTransformation = (context) => {
   // rather than hard-coding the names
 
   removeVueUse(context, {
-    removablePlugins: ['VueRouter', 'Vuex'],
+    removablePlugins: ['VueRouter', 'Vuex']
   })
   removeContextualHFromRender(context)
   removeExtraneousImport(context, {
-    localBinding: 'Vue',
+    localBinding: 'Vue'
   })
   removeExtraneousImport(context, {
-    localBinding: 'Vuex',
+    localBinding: 'Vuex'
   })
   removeExtraneousImport(context, {
-    localBinding: 'VueRouter',
+    localBinding: 'VueRouter'
   })
 }
 export default wrap(transformAST)

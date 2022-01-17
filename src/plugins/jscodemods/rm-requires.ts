@@ -3,7 +3,7 @@ import { Transform } from 'jscodeshift'
 const transformer: Transform = (file, api, options) => {
   const j = api.jscodeshift
   const printOptions = options.printOptions || {
-    quote: 'single',
+    quote: 'single'
   }
   const root = j(file.source)
   const requires = {}
@@ -14,10 +14,7 @@ const transformer: Transform = (file, api, options) => {
     const scopeNode = path.scope.node // Check if we already have a require for this, if we do just use
     // that one.
 
-    if (
-      requires[requireName] &&
-      requires[requireName].scopeNode === scopeNode
-    ) {
+    if (requires[requireName] && requires[requireName].scopeNode === scopeNode) {
       j(path).renameTo(requires[requireName].varName)
       j(path).remove()
       return true
@@ -30,15 +27,12 @@ const transformer: Transform = (file, api, options) => {
     const usages = j(path)
       .closestScope()
       .find(j.Identifier, {
-        name: varName,
+        name: varName
       }) // Ignore require vars
       .filter((identifierPath) => identifierPath.value !== path.value.id) // Ignore properties in MemberExpressions
       .filter((identifierPath) => {
         const parent = identifierPath.parent.value
-        return !(
-          j.MemberExpression.check(parent) &&
-          parent.property === identifierPath.value
-        )
+        return !(j.MemberExpression.check(parent) && parent.property === identifierPath.value)
       })
 
     if (!usages.size()) {
@@ -48,7 +42,7 @@ const transformer: Transform = (file, api, options) => {
 
     requires[requireName] = {
       scopeNode,
-      varName,
+      varName
     }
   }
 
@@ -56,13 +50,13 @@ const transformer: Transform = (file, api, options) => {
     root
       .find(j.VariableDeclarator, {
         id: {
-          type: 'Identifier',
+          type: 'Identifier'
         },
         init: {
           callee: {
-            name: 'require',
-          },
-        },
+            name: 'require'
+          }
+        }
       })
       .filter(filterAndTransformRequires)
       .size() > 0

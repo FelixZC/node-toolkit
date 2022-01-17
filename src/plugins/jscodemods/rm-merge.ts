@@ -11,7 +11,7 @@ const transformer: Transform = (file, api, options) => {
   }
 
   const printOptions = options.printOptions || {
-    quote: 'single',
+    quote: 'single'
   }
   const root = j(file.source)
 
@@ -35,8 +35,8 @@ const transformer: Transform = (file, api, options) => {
       root
         .find(j.CallExpression, {
           callee: {
-            name: declarator.value.id.name,
-          },
+            name: declarator.value.id.name
+          }
         })
         .forEach(rmMergeCalls)
         .size() > 0

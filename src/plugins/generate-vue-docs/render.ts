@@ -47,17 +47,9 @@ class RenderMd {
    */
 
   propsRender(propsRes, config) {
-    const kt = this._getKeysAndTitles(config, [
-      'default',
-      'desc',
-      'name',
-      'type',
-    ])
+    const kt = this._getKeysAndTitles(config, ['default', 'desc', 'name', 'type'])
 
-    const mdArr = [
-      ...this.renderTitle('Attributes'),
-      ...this.renderTabelHeader(kt.titles),
-    ]
+    const mdArr = [...this.renderTitle('Attributes'), ...this.renderTabelHeader(kt.titles)]
 
     for (const key in propsRes) {
       if (Object.hasOwnProperty.call(propsRes, key)) {
@@ -66,12 +58,7 @@ class RenderMd {
         kt.keys.map((key) => {
           if (Object.keys(element).includes(key)) {
             if (key === 'name') {
-              row.push(
-                `${element[key]}${this._tag(element, 'sync')}${this._tag(
-                  element,
-                  'model'
-                )}`
-              )
+              row.push(`${element[key]}${this._tag(element, 'sync')}${this._tag(element, 'model')}`)
             } else {
               row.push(element[key])
             }
@@ -95,10 +82,7 @@ class RenderMd {
   slotsRender(slotsRes, config) {
     const kt = this._getKeysAndTitles(config, ['desc', 'name'])
 
-    const mdArr = [
-      ...this.renderTitle('Slots'),
-      ...this.renderTabelHeader(kt.titles),
-    ]
+    const mdArr = [...this.renderTitle('Slots'), ...this.renderTabelHeader(kt.titles)]
 
     for (const key in slotsRes) {
       if (Object.hasOwnProperty.call(slotsRes, key)) {
@@ -127,10 +111,7 @@ class RenderMd {
   eventsRender(propsRes, config) {
     const kt = this._getKeysAndTitles(config, ['desc', 'name'])
 
-    const mdArr = [
-      ...this.renderTitle('Events'),
-      ...this.renderTabelHeader(kt.titles),
-    ]
+    const mdArr = [...this.renderTitle('Events'), ...this.renderTabelHeader(kt.titles)]
 
     for (const key in propsRes) {
       if (Object.hasOwnProperty.call(propsRes, key)) {
@@ -159,10 +140,7 @@ class RenderMd {
   methodsRender(slotsRes, config) {
     const kt = this._getKeysAndTitles(config, ['desc', 'name', 'params', 'res'])
 
-    const mdArr = [
-      ...this.renderTitle('Methods'),
-      ...this.renderTabelHeader(kt.titles),
-    ]
+    const mdArr = [...this.renderTitle('Methods'), ...this.renderTabelHeader(kt.titles)]
 
     for (const key in slotsRes) {
       if (Object.hasOwnProperty.call(slotsRes, key)) {
@@ -194,10 +172,7 @@ class RenderMd {
    */
 
   renderTabelHeader(header) {
-    return [
-      this.renderTabelRow(header),
-      '|' + header.map(() => '------').join('|') + '|',
-    ]
+    return [this.renderTabelRow(header), '|' + header.map(() => '------').join('|') + '|']
   }
   /**
    * 渲染表格的行
@@ -232,7 +207,7 @@ class RenderMd {
     const titles = keys.map((key) => config[key])
     return {
       keys,
-      titles,
+      titles
     }
   }
   /**
@@ -244,10 +219,7 @@ class RenderMd {
   _funParam(params) {
     if (!params) return '—'
     return params
-      .map(
-        (item) =>
-          `${item.name}:${item.type}${item.desc ? '(' + item.desc + ')' : ''}`
-      )
+      .map((item) => `${item.name}:${item.type}${item.desc ? '(' + item.desc + ')' : ''}`)
       .join(',')
   }
   /**
@@ -263,5 +235,5 @@ class RenderMd {
 }
 
 module.exports = {
-  RenderMd,
+  RenderMd
 }

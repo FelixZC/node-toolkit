@@ -11,30 +11,30 @@ const generate = require('@babel/generator')
 const { RenderMd } = require('./render') // 默认生成配置
 
 const baseConfig = {
-  md: false,
+  md: false
 } // md 生成配置
 
 const mdOptions = {
   events: {
     desc: '说明',
-    name: '事件名称',
+    name: '事件名称'
   },
   methods: {
     desc: '说明',
     name: '方法名',
     params: '参数',
-    res: '返回值',
+    res: '返回值'
   },
   props: {
     default: '默认值',
     desc: '说明',
     name: '参数',
-    type: '类型',
+    type: '类型'
   },
   slots: {
     desc: '说明',
-    name: 'name',
-  },
+    name: 'name'
+  }
 } // 提取Props
 
 const extractProps = (node) => {
@@ -65,12 +65,8 @@ const extractProps = (node) => {
       types.isObjectMethod(node)
     ) {
       try {
-        const code = generate.default(
-          types.isObjectMethod(node) ? node.body : node
-        ).code
-        const fun = eval(
-          `0,${types.isObjectMethod(node) ? 'function ()' : ''} ${code}`
-        )
+        const code = generate.default(types.isObjectMethod(node) ? node.body : node).code
+        const fun = eval(`0,${types.isObjectMethod(node) ? 'function ()' : ''} ${code}`)
         return JSON.stringify(fun())
       } catch (error) {}
     }
@@ -80,10 +76,10 @@ const extractProps = (node) => {
     const {
       key: { name },
       leadingComments,
-      value,
+      value
     } = prop
     props[name] = {
-      name,
+      name
     }
     leadingComments && (props[name].desc = leadingComments[0].value.trim()) // 如果是标识或数组 说明只声明了类型
 
@@ -115,15 +111,12 @@ const extractMethods = (node) => {
     if (types.isObjectMethod(item) && /^[^_]/.test(item.key.name)) {
       methods[item.key.name] = {
         async: item.async,
-        name: item.key.name,
+        name: item.key.name
       }
-    } else if (
-      types.isObjectProperty(item) &&
-      types.isFunctionExpression(item.value)
-    ) {
+    } else if (types.isObjectProperty(item) && types.isFunctionExpression(item.value)) {
       methods[item.key.name] = {
         async: item.value.async,
-        name: item.key.name,
+        name: item.key.name
       }
     } else {
       return
@@ -148,16 +141,14 @@ const extractMethods = (node) => {
           methods[item.key.name].desc = desc[1]
         } // 提取 参数说明
 
-        const matches = comment.value.matchAll(
-          /(@param)[\s]*{([a-zA-Z]*)}[\s]*(\w*)(.*)/g
-        )
+        const matches = comment.value.matchAll(/(@param)[\s]*{([a-zA-Z]*)}[\s]*(\w*)(.*)/g)
 
         for (const matche of matches) {
           !methods[item.key.name].params && (methods[item.key.name].params = [])
           methods[item.key.name].params.push({
             desc: matche[4].trim(),
             name: matche[3],
-            type: matche[2],
+            type: matche[2]
           })
         }
       }
@@ -171,10 +162,8 @@ const extractEvents = (path) => {
   const eventName = path.parent.arguments[0]
   const comments = path.parentPath.parent.leadingComments
   return {
-    desc: comments
-      ? comments.map((item) => item.value.trim()).toString()
-      : '——',
-    name: eventName.value,
+    desc: comments ? comments.map((item) => item.value.trim()).toString() : '——',
+    name: eventName.value
   }
 } // 提取model
 
@@ -183,7 +172,7 @@ const extractModel = (node) => {
   node.value.properties.forEach((item) => {
     const {
       key: { name },
-      value: { value },
+      value: { value }
     } = item
     model[name] = value
   })
@@ -240,7 +229,7 @@ const extract = {
   methods: extractMethods,
   model: extractModel,
   name: (item) => item.value.value,
-  props: extractProps,
+  props: extractProps
 } // 转换文档
 
 const parseDocs = (vueStr, config = {}) => {
@@ -253,14 +242,14 @@ const parseDocs = (vueStr, config = {}) => {
     model: undefined,
     name: undefined,
     props: undefined,
-    slots: undefined,
+    slots: undefined
   }
   const vue = compiler.parse(vueStr)
 
   if (vue.script) {
     const jsAst = parse.parse(vue.script.content, {
       allowImportExportEverywhere: true,
-      plugins: ['jsx'],
+      plugins: ['jsx']
     }) // 遍历js抽象数
 
     traverse.default(jsAst, {
@@ -282,8 +271,7 @@ const parseDocs = (vueStr, config = {}) => {
         }
 
         path.node.declaration.properties.forEach((item) => {
-          if (extract[item.key.name])
-            componentInfo[item.key.name] = extract[item.key.name](item)
+          if (extract[item.key.name]) componentInfo[item.key.name] = extract[item.key.name](item)
         })
       },
 
@@ -301,7 +289,7 @@ const parseDocs = (vueStr, config = {}) => {
             componentInfo.events[event.name] = event
           }
         }
-      },
+      }
     })
     isModelAndSync(componentInfo)
   }
@@ -309,7 +297,7 @@ const parseDocs = (vueStr, config = {}) => {
   if (vue.template) {
     const template = compiler.compile(vue.template.content, {
       comments: true,
-      preserveWhitespace: false,
+      preserveWhitespace: false
     }) // 遍历模板抽象数
 
     traverserTemplateAst(template.ast, {
@@ -330,9 +318,9 @@ const parseDocs = (vueStr, config = {}) => {
         if (node.slotName) name = node.attrsMap.name
         componentInfo.slots[name] = {
           desc,
-          name,
+          name
         }
-      },
+      }
     })
   }
 
@@ -349,7 +337,4 @@ const parseDocs = (vueStr, config = {}) => {
   return componentInfo
 }
 
-module.exports = {
-  parseDocs,
-  RenderMd,
-}
+export { parseDocs, RenderMd }

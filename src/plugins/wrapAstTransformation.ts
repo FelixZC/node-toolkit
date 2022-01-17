@@ -17,12 +17,12 @@ export default function astTransformationToJSCodeshiftModule<Params = any>(
       {
         filename: file.path,
         j,
-        root,
+        root
       },
       options
     )
     return root.toSource({
-      lineTerminator: '\n',
+      lineTerminator: '\n'
     })
   }
 

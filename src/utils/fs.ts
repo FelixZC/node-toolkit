@@ -47,18 +47,14 @@ interface FsInstance {
 } //操作日志打印记录
 
 function log() {
-  return function (
-    target: FsInstance,
-    name: string,
-    descriptor: PropertyDescriptor
-  ) {
+  return function (target: FsInstance, name: string, descriptor: PropertyDescriptor) {
     const fn = descriptor.value
 
     descriptor.value = function () {
       const record: Record = {
         arguments,
         name,
-        type: 'log',
+        type: 'log'
       }
       target.saveOperateLog.call(this, JSON.stringify(record))
       return fn.apply(this, arguments)
@@ -69,11 +65,7 @@ function log() {
 } //异常处理装饰器与异常日志记录
 
 function catchHandel() {
-  return function (
-    target: FsInstance,
-    name: string,
-    descriptor: PropertyDescriptor
-  ) {
+  return function (target: FsInstance, name: string, descriptor: PropertyDescriptor) {
     const fn = descriptor.value
 
     descriptor.value = function () {
@@ -85,7 +77,7 @@ function catchHandel() {
           arguments,
           error,
           name,
-          type: 'catch',
+          type: 'catch'
         }
         target.saveOperateLog.call(this, JSON.stringify(record))
         return null
@@ -134,7 +126,7 @@ class fsUtils implements FsInstance {
       //操作时间
       time: new Date().toLocaleString(),
       //操作用户
-      user: userInfo.username,
+      user: userInfo.username
     }
     let content = JSON.stringify(baseInfo) + eol
     const divideLine = new Array(100).fill('-').join('-') + eol //添加分割线
@@ -181,7 +173,7 @@ class fsUtils implements FsInstance {
         extname: path.extname(filePath),
         filename: path.basename(filePath, path.extname(filePath)),
         filePath,
-        stats: fs.statSync(filePath),
+        stats: fs.statSync(filePath)
       }
     })
     return fileInfoList
@@ -226,7 +218,7 @@ class fsUtils implements FsInstance {
 
     for (const filePath of filePathListBackup) {
       cache[filePath] = {
-        index: 0,
+        index: 0
       }
     }
 
@@ -267,10 +259,7 @@ class fsUtils implements FsInstance {
 
       let newFileName = `${newBaseName}${newExtensionName}` //新旧路径重复，跳过本次循环
 
-      if (
-        newFileName === oldFileName &&
-        newExtensionName === oldExtensionName
-      ) {
+      if (newFileName === oldFileName && newExtensionName === oldExtensionName) {
         return
       }
 
@@ -293,7 +282,7 @@ class fsUtils implements FsInstance {
         Reflect.deleteProperty(cache, oldFilePath) //删除旧缓存
 
         Reflect.set(cache, newFilePath, {
-          index,
+          index
         }) //添加新缓存
         // index = 0
       }
@@ -326,10 +315,7 @@ class fsUtils implements FsInstance {
     const dirName = path.dirname(filePath)
     const extensionName = path.extname(filePath) // 文件扩展名
 
-    const baseName = path
-      .basename(filePath, extensionName)
-      .split('copy')[0]
-      .trim()
+    const baseName = path.basename(filePath, extensionName).split('copy')[0].trim()
     let newFileName = `${baseName} copy${extensionName}`
     let newFilePath = path.resolve(dirName, newFileName)
     let renameCount = 1 //文件已存在

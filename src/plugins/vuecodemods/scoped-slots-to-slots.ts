@@ -5,8 +5,8 @@ export const transformAST: ASTTransformation = ({ j, root }) => {
   const dotScopedSlots = root.find(j.MemberExpression, {
     property: {
       name: '$scopedSlots',
-      type: 'Identifier',
-    },
+      type: 'Identifier'
+    }
   })
   dotScopedSlots.forEach(({ node }) => {
     ;(node.property as N.Identifier).name = '$slots'
@@ -14,8 +14,8 @@ export const transformAST: ASTTransformation = ({ j, root }) => {
   const squareBracketScopedSlots = root.find(j.MemberExpression, {
     property: {
       type: 'StringLiteral',
-      value: '$scopedSlots',
-    },
+      value: '$scopedSlots'
+    }
   })
   squareBracketScopedSlots.forEach(({ node }) => {
     node.property = j.stringLiteral('$slots')

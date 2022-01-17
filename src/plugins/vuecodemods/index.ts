@@ -24,6 +24,6 @@ const transformationMap: {
   'vue-as-namespace-import': require('./vue-as-namespace-import'),
   'vue-class-component-v8': require('./vue-class-component-v8'),
   'vue-router-v4': require('./vue-router-v4'),
-  'vuex-v4': require('./vuex-v4'),
+  'vuex-v4': require('./vuex-v4')
 }
 export default transformationMap

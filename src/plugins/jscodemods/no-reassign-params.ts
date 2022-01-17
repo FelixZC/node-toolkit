@@ -3,11 +3,7 @@ import { Transform } from 'jscodeshift'
 const transformer: Transform = (file, api) => {
   const j = api.jscodeshift
   const statement = j.template.statement
-  const FUNCTION_TYPES = [
-    j.FunctionDeclaration,
-    j.ArrowFunctionExpression,
-    j.FunctionExpression,
-  ]
+  const FUNCTION_TYPES = [j.FunctionDeclaration, j.ArrowFunctionExpression, j.FunctionExpression]
   let updated = false
 
   function getNewName(paramName) {
@@ -52,17 +48,10 @@ const transformer: Transform = (file, api) => {
           return param.properties.map((property) => {
             if (j.Property.check(property)) {
               return property.value.name
-            } else if (
-              j.SpreadProperty.check(property) ||
-              j.RestProperty.check(property)
-            ) {
+            } else if (j.SpreadProperty.check(property) || j.RestProperty.check(property)) {
               return property.argument.name
             } else {
-              throw new Error(
-                `Unexpected Property Type ${property.type} ${j(
-                  property
-                ).toSource()}`
-              )
+              throw new Error(`Unexpected Property Type ${property.type} ${j(property).toSource()}`)
             }
           })
         } else if (param.type === 'RestElement') {
@@ -72,9 +61,7 @@ const transformer: Transform = (file, api) => {
         } else if (j.ArrayPattern.check(param)) {
           return [].concat(...getParamNames(param.elements))
         } else {
-          throw new Error(
-            `Unexpected Param Type ${param.type} ${j(param).toSource()}`
-          )
+          throw new Error(`Unexpected Param Type ${param.type} ${j(param).toSource()}`)
         }
       })
     )
@@ -101,9 +88,7 @@ const transformer: Transform = (file, api) => {
                 return property.argument.name === paramName
               } else {
                 throw new Error(
-                  `Unexpected Property Type ${property.type} ${j(
-                    property
-                  ).toSource()}`
+                  `Unexpected Property Type ${property.type} ${j(property).toSource()}`
                 )
               }
             })
@@ -113,8 +98,8 @@ const transformer: Transform = (file, api) => {
         }).length
       const numUpdated = j(func).find(j.UpdateExpression, {
         argument: {
-          name: paramName,
-        },
+          name: paramName
+        }
       }).length
       return numAssignments > 0 || numUpdated > 0
     })
@@ -134,7 +119,7 @@ const transformer: Transform = (file, api) => {
 
       j(func.get('body'))
         .find(j.Identifier, {
-          name: paramName,
+          name: paramName
         })
         .forEach((identifier) => {
           const parent = identifier.parent.node
@@ -148,15 +133,9 @@ const transformer: Transform = (file, api) => {
             return
           }
 
-          if (
-            j.Property.check(parent) &&
-            parent.key === identifier.node &&
-            !parent.computed
-          ) {
+          if (j.Property.check(parent) && parent.key === identifier.node && !parent.computed) {
             // { oldName: 3 }
-            const closestAssignment = j(identifier).closest(
-              j.AssignmentExpression
-            )
+            const closestAssignment = j(identifier).closest(j.AssignmentExpression)
             const assignmentHasProperty =
               closestAssignment.filter((assignment) => {
                 return (
@@ -241,7 +220,7 @@ const transformer: Transform = (file, api) => {
 
   if (updated) {
     return root.toSource({
-      quote: 'single',
+      quote: 'single'
     })
   }
 

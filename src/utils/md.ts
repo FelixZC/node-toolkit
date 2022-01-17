@@ -5,48 +5,10 @@
  *
  */
 import { parseDocs } from '../plugins/generate-vue-docs'
-import * as common from './common'
+import { getDataType, sortArray, sortObjAttr } from './common'
 import * as os from 'os'
 const br = os.EOL //换行符
-//分组缓存
 
-export interface GroupCache {
-  [cacheKey: string]: {
-    groupKey: string
-    count: number
-    group: Array<object>
-    [key: string]: any
-  }
-}
-/**
- * 根据指定属性分类
- * @param {Array} arr 指定数组
- * @param {String} groupKey //分类依据
- * @returns {Object} 分类结果
- */
-
-function groupBy(arr: Array<Record<string, any>>, groupKey: string) {
-  const cache = {} as GroupCache
-
-  if (common.getDataType(arr) !== 'Array') {
-    throw new Error('非数组类型，无法分类')
-  }
-
-  arr.forEach((element) => {
-    if (cache[element[groupKey]]) {
-      cache[element[groupKey]].group.push(element)
-      cache[element[groupKey]].count++
-    } else {
-      cache[element[groupKey]] = {
-        count: 1,
-        group: [element],
-        groupKey,
-        ...element,
-      }
-    }
-  })
-  return cache
-}
 /**
  * 根据指定正则查找内容
  * @param {String} content 查找内容
@@ -157,55 +119,6 @@ function textFormat(content: string, mode = 'md') {
   return str
 }
 /**
- * 对对象内部属性排序
- * @param {Object} target
- * @returns {Object} 属性排序后对象
- */
-
-function sortObjAttr(target: Record<string, any>) {
-  const dataType = common.getDataType(target)
-
-  if (dataType !== 'Object') {
-    throw new Error('sortObjAttr数据类型错误')
-  }
-
-  const newObj = {} as Record<string, any>
-  const keys = Object.keys(target).sort((a, b) => {
-    return a.localeCompare(b)
-  })
-  keys.forEach((key) => {
-    newObj[key] = target[key]
-  })
-  return newObj
-}
-/**
- * 数组排序
- * @param {Array} arr 原数组
- * @param {Function|string} customSort 自定义排序规则
- * @returns {Array} 排序后数组
- */
-
-function sortArray(
-  arr: Array<Record<string, any>>,
-  customSort: Function | string
-) {
-  const dataType = common.getDataType(arr)
-
-  if (dataType !== 'Array') {
-    throw new Error('sortArray数据类型错误')
-  }
-
-  return arr.sort((a, b) => {
-    if (typeof customSort === 'function') {
-      return customSort(a, b)
-    }
-
-    if (typeof customSort === 'string') {
-      return a[customSort].localeCompare(b[customSort])
-    }
-  })
-}
-/**
  * 创建属性描述表格
  * @param {*} attrGroup //属性描述分组后对象
  * @returns {String} 带首字母索引的属性描述表格字符串
@@ -213,7 +126,7 @@ function sortArray(
 
 function createdAttributesGroupTable(attrGroup: Record<string, any>) {
   let localAttrGroup = attrGroup
-  const dataType = common.getDataType(localAttrGroup)
+  const dataType = getDataType(localAttrGroup)
 
   if (dataType !== 'Object') {
     throw new Error('createdAttributesGroupTable数据类型错误')
@@ -223,10 +136,7 @@ function createdAttributesGroupTable(attrGroup: Record<string, any>) {
   let attributesDescriptionTable = ''
 
   for (const attrGroupItem of Object.values(localAttrGroup)) {
-    if (
-      Reflect.get(attrGroupItem, 'groupKey') &&
-      Reflect.get(attrGroupItem, 'group')
-    ) {
+    if (Reflect.get(attrGroupItem, 'groupKey') && Reflect.get(attrGroupItem, 'group')) {
       const title = Reflect.get(attrGroupItem.group[0], attrGroupItem.groupKey)
       attributesDescriptionTable += `## ${title}${br}`
       attributesDescriptionTable += `|字段|描述|${br}`
@@ -257,7 +167,7 @@ function createdStoreTable(
   cache: string[] = []
 ) {
   let localStateInStore = stateInStore
-  const dataType = common.getDataType(localStateInStore)
+  const dataType = getDataType(localStateInStore)
 
   if (dataType !== 'Object') {
     throw new Error('createdStoreTable数据类型错误')
@@ -282,7 +192,7 @@ function createdStoreTable(
   createdStoreTableStr += `|-|-|-|-|${br}`
 
   for (const key in localStateInStore) {
-    const type = common.getDataType(localStateInStore[key])
+    const type = getDataType(localStateInStore[key])
     const value = JSON.stringify(localStateInStore[key])
     const descript = annotationObj[key] || ''
 
@@ -311,9 +221,7 @@ function createdStoreTable(
 export default {
   createdAttributesGroupTable,
   createdStoreTable,
-  groupBy,
   parseDocs,
   queryContentByReg,
-  sortObjAttr,
-  textFormat,
+  textFormat
 }

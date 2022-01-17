@@ -19,9 +19,7 @@
     view.MozBlobBuilder ||
     (function (view) {
       const get_class = function (object) {
-        return Object.prototype.toString
-          .call(object)
-          .match(/^\[object\s(.*)\]$/)[1]
+        return Object.prototype.toString.call(object).match(/^\[object\s(.*)\]$/)[1]
       }
 
       const FakeBlobBuilder = function BlobBuilder() {
@@ -106,10 +104,7 @@
         let localData = data
         const bb = this.data // decode data to a binary string
 
-        if (
-          Uint8Array &&
-          (localData instanceof ArrayBuffer || localData instanceof Uint8Array)
-        ) {
+        if (Uint8Array && (localData instanceof ArrayBuffer || localData instanceof Uint8Array)) {
           let str = ''
           const buf = new Uint8Array(localData)
           let i = 0
@@ -120,10 +115,7 @@
           }
 
           bb.push(str)
-        } else if (
-          get_class(localData) === 'Blob' ||
-          get_class(localData) === 'File'
-        ) {
+        } else if (get_class(localData) === 'Blob' || get_class(localData) === 'File') {
           if (FileReaderSync) {
             const fr = new FileReaderSync()
             bb.push(fr.readAsBinaryString(localData))

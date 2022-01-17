@@ -6,9 +6,7 @@ export default declare((babel) => {
     // not required
     visitor: {
       Identifier(path, state) {
-        const parent = path.findParent(
-          (path) => path.node && path.node.leadingComments
-        )
+        const parent = path.findParent((path) => path.node && path.node.leadingComments)
 
         if (parent && parent.inList && parent.type === 'ObjectProperty') {
           const sibling = parent.getSibling(parent.key - 1)
@@ -23,7 +21,7 @@ export default declare((babel) => {
             parent.node.leadingComments = null
           }
         }
-      },
-    },
+      }
+    }
   }
 })

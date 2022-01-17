@@ -6,7 +6,7 @@ import type {
   OperationObject,
   ParameterObject,
   PathItemObject,
-  ResponseObject,
+  ResponseObject
 } from 'openapi-typescript'
 
 const EamsAmsprojService = require('../../api/eams-amsprojService.json')
@@ -26,21 +26,20 @@ interface CreateRequestTemplateExecListItem {
 
 const tempPath = 'src/node/temp/'
 export const invokeRequestTemplateGenerator = () => {
-  const createRequestTemplateExecList: Array<CreateRequestTemplateExecListItem> =
-    [
-      {
-        resource: EamsAmsprojService,
-        typingPath: 'src/typings/interface/eams-amsprojService',
-      },
-      {
-        resource: SystemBaseService,
-        typingPath: 'src/typings/interface/system-baseService',
-      },
-      {
-        resource: BaseStatsService,
-        typingPath: 'src/typings/interface/base-statsService',
-      },
-    ]
+  const createRequestTemplateExecList: Array<CreateRequestTemplateExecListItem> = [
+    {
+      resource: EamsAmsprojService,
+      typingPath: 'src/typings/interface/eams-amsprojService'
+    },
+    {
+      resource: SystemBaseService,
+      typingPath: 'src/typings/interface/system-baseService'
+    },
+    {
+      resource: BaseStatsService,
+      typingPath: 'src/typings/interface/base-statsService'
+    }
+  ]
   /**
    * 转化url的参数
    * @param url
@@ -85,10 +84,7 @@ export const invokeRequestTemplateGenerator = () => {
         )
         const hasRef = parameters.some(
           (item) =>
-            item.schema &&
-            Reflect.get(item.schema, '$ref')
-              ?.toLocaleLowerCase()
-              ?.includes('bean')
+            item.schema && Reflect.get(item.schema, '$ref')?.toLocaleLowerCase()?.includes('bean')
         )
         const paramsTypingPath = paramsPosition.length
           ? paramsPosition
@@ -150,7 +146,7 @@ export const invokeRequestTemplateGenerator = () => {
     `
     return {
       requestTemplate,
-      typingTemplate,
+      typingTemplate
     }
   }
 
@@ -160,15 +156,12 @@ export const invokeRequestTemplateGenerator = () => {
       const execList = [
         {
           content: requestTemplate,
-          writePath: path.join(tempPath, item.resource.basePath + '.ts'),
+          writePath: path.join(tempPath, item.resource.basePath + '.ts')
         },
         {
           content: typingTemplate,
-          writePath: path.join(
-            tempPath,
-            item.resource.basePath + '-params-response.d.ts'
-          ),
-        },
+          writePath: path.join(tempPath, item.resource.basePath + '-params-response.d.ts')
+        }
       ]
       execList.forEach((item) => {
         writeFile(item.writePath, item.content)
@@ -177,6 +170,6 @@ export const invokeRequestTemplateGenerator = () => {
   }
 
   return {
-    writeRequestTemplate,
+    writeRequestTemplate
   }
 }

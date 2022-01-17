@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "tsc --pretty && eslint . --ext ts --ext tsx --ext js",
     "lint:prettier": "prettier --write --loglevel warn \"src/**/*.{js,json,tsx,ts,css,less,scss,vue,html,md}\"",
-    "format": "prettier --write src/**/*.{js,ts,tsx}"
+    "format": "prettier --write src/**/*.{js,ts,tsx}",
+    "precommit": "eslint src/**/*.js"
   },
   "author": "pzc",
   "license": "ISC",
@@ -31,8 +32,10 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "globby": "^11.0.2",
+    "husky": "^7.0.4",
     "jest": "^26.1.0",
     "jscodeshift": "^0.13.0",
+    "lint-staged": "^12.1.7",
     "lru-cache": "^6.0.0",
     "openapi-typescript": "^5.0.0",
     "postcss": "^8.4.5",
@@ -53,11 +56,10 @@
       "<rootDir>/node_modules/"
     ]
   },
-  "prettier": {
-    "semi": false,
-    "singleQuote": true
-  },
   "engines": {
     "node": ">= 10.0"
+  },
+  "lint-staged": {
+    "src/**/*.js": ["prettier --write", "git add"]
   }
 }

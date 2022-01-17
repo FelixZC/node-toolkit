@@ -15,7 +15,7 @@ const transformer: Transform = (file, api, options = {}) => {
 
   const j = api.jscodeshift
   const printOptions = options.printOptions || {
-    quote: 'single',
+    quote: 'single'
   }
   const root = j(file.source)
   let mutations = 0
@@ -34,11 +34,11 @@ const transformer: Transform = (file, api, options = {}) => {
     dumpCache: 'resetModuleRegistry',
     generateMock: 'genMockFromModule',
     mock: 'mock',
-    setMock: 'setMock',
+    setMock: 'setMock'
   }
   const MOCKS_API = {
     getMockFn: 'genMockFn',
-    getMockFunction: 'genMockFn',
+    getMockFunction: 'genMockFn'
   }
 
   const moduleMatcher = (moduleName) => (node) =>
@@ -58,10 +58,10 @@ const transformer: Transform = (file, api, options = {}) => {
         callee: {
           object: matcher,
           property: {
-            name: (name) => apiMethods[name],
+            name: (name) => apiMethods[name]
           },
-          type: 'MemberExpression',
-        },
+          type: 'MemberExpression'
+        }
       })
       .replaceWith((p) => {
         const name = p.value.callee.property.name
@@ -73,11 +73,7 @@ const transformer: Transform = (file, api, options = {}) => {
         }
 
         return j.callExpression(
-          j.memberExpression(
-            j.identifier('jest'),
-            j.identifier(apiMethods[name]),
-            false
-          ),
+          j.memberExpression(j.identifier('jest'), j.identifier(apiMethods[name]), false),
           p.value.arguments
         )
       })
@@ -90,7 +86,7 @@ const transformer: Transform = (file, api, options = {}) => {
       const hasMockModulesIdentifier =
         root
           .find(j.Identifier, {
-            name: declarator.value.id.name,
+            name: declarator.value.id.name
           })
           .size() > 1
 
@@ -104,12 +100,12 @@ const transformer: Transform = (file, api, options = {}) => {
       .find(j.CallExpression, {
         arguments: [
           {
-            value: name,
-          },
+            value: name
+          }
         ],
         callee: {
-          name: 'require',
-        },
+          name: 'require'
+        }
       })
       .filter((p) => p.parent.value.type == 'ExpressionStatement')
       .remove()

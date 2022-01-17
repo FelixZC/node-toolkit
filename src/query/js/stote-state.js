@@ -10,7 +10,7 @@ module.exports = {
     catalogOrderby: null,
     catalogPage: {
       pageNum: 1,
-      pageSize: 100,
+      pageSize: 100
     },
     catalogRepeatRecords: [],
     catalogTotal: 0,
@@ -35,11 +35,11 @@ module.exports = {
     tomeOrderby: null,
     tomePage: {
       pageNum: 1,
-      pageSize: 100,
+      pageSize: 100
     },
     tomeRepeatRecords: [],
     tomeTotal: 0,
-    workBasePath: '',
+    workBasePath: ''
   },
   amscatalogworkbase: {
     addSelItem: [],
@@ -52,7 +52,7 @@ module.exports = {
     catalogOrderby: null,
     catalogPage: {
       pageNum: 1,
-      pageSize: 100,
+      pageSize: 100
     },
     catalogRepeatRecords: [],
     catalogTotal: 0,
@@ -77,16 +77,16 @@ module.exports = {
     tomeOrderby: null,
     tomePage: {
       pageNum: 1,
-      pageSize: 100,
+      pageSize: 100
     },
     tomeRepeatRecords: [],
     tomeTotal: 0,
-    workBasePath: '',
+    workBasePath: ''
   },
   amsorg: {
     listData: null,
     searchInput: null,
-    selectRow: null,
+    selectRow: null
   },
   AMSRecordDrawingsManage: {
     addSelItem: [],
@@ -99,7 +99,7 @@ module.exports = {
     catalogOrderby: null,
     catalogPage: {
       pageNum: 1,
-      pageSize: 100,
+      pageSize: 100
     },
     catalogRepeatRecords: [],
     catalogTotal: 0,
@@ -124,11 +124,11 @@ module.exports = {
     tomeOrderby: null,
     tomePage: {
       pageNum: 1,
-      pageSize: 100,
+      pageSize: 100
     },
     tomeRepeatRecords: [],
     tomeTotal: 0,
-    workBasePath: '',
+    workBasePath: ''
   },
   amstomeworkbase: {
     addSelItem: [],
@@ -141,7 +141,7 @@ module.exports = {
     catalogOrderby: null,
     catalogPage: {
       pageNum: 1,
-      pageSize: 100,
+      pageSize: 100
     },
     catalogRepeatRecords: [],
     catalogTotal: 0,
@@ -166,11 +166,11 @@ module.exports = {
     tomeOrderby: null,
     tomePage: {
       pageNum: 1,
-      pageSize: 100,
+      pageSize: 100
     },
     tomeRepeatRecords: [],
     tomeTotal: 0,
-    workBasePath: '',
+    workBasePath: ''
   },
   archivesCompile: {
     addSelItem: [],
@@ -183,7 +183,7 @@ module.exports = {
     catalogOrderby: null,
     catalogPage: {
       pageNum: 1,
-      pageSize: 100,
+      pageSize: 100
     },
     catalogRepeatRecords: [],
     catalogTotal: 0,
@@ -208,34 +208,34 @@ module.exports = {
     tomeOrderby: null,
     tomePage: {
       pageNum: 1,
-      pageSize: 100,
+      pageSize: 100
     },
     tomeRepeatRecords: [],
     tomeTotal: 0,
-    workBasePath: '',
+    workBasePath: ''
   },
   archivesProjOverview: {
     archivesList: null,
-    currentRow: null,
+    currentRow: null
   },
   arcstandard: {
-    selection: [],
+    selection: []
   },
   constructionStats: {
     constructionList: [],
-    searchInput: '',
+    searchInput: ''
   },
   eamsproj: {
     curPactRow: null,
     curProjRow: null,
     pactList: null,
-    projList: null,
+    projList: null
   },
   exitToLogin: false,
   fullTextManage: {
     curLeftListData: null,
     leftListData: null,
-    rightGroupData: null,
+    rightGroupData: null
   },
   home: {
     asideMenus: [],
@@ -243,31 +243,31 @@ module.exports = {
     contentFullShow: false,
     curModule: {
       name: '首页',
-      route: '/home/Index',
+      route: '/home/Index'
     },
     curPact: {
-      name: '广清高速公路扩建工程',
+      name: '广清高速公路扩建工程'
     },
     curProj: {
-      name: '建设档案',
+      name: '建设档案'
     },
     deptList: [],
     headerHeight: 60,
     navMenus: [
       {
         name: '首页',
-        route: '/home/Index',
-      },
+        route: '/home/Index'
+      }
     ],
     noticeList: [],
     selectedIndexDeptID: 0,
-    willDoList: [],
+    willDoList: []
   },
   initorg: {
     curOrgList: null,
     curTreeList: null,
     orgList: null,
-    treeList: null,
+    treeList: null
   },
   initProj: {
     addConstruData: null,
@@ -284,7 +284,7 @@ module.exports = {
     modifyFormData: null,
     projPactsByParentPactId: null,
     projTypeSetting: null,
-    rightTableData: null,
+    rightTableData: null
   },
   isTome: false,
   log: {
@@ -295,12 +295,12 @@ module.exports = {
       endDate: '',
       keyword: '',
       opType: '',
-      userName: '管理员（开发用）',
-    },
+      userName: '管理员（开发用）'
+    }
   },
   msgNotice: {
     curLeftListData: null,
-    leftListData: null,
+    leftListData: null
   },
   namespace: '',
   notice: {
@@ -308,8 +308,7 @@ module.exports = {
     firstEnter: true,
     getPopMsgByTime: '/popMsg/getPopMsgByTime',
     noticeMsg: [],
-    webSocketServerAPI:
-      'ws://121.12.120.221:7020/veams-gateway/system-baseService/webSocketServer',
+    webSocketServerAPI: 'ws://121.12.120.221:7020/veams-gateway/system-baseService/webSocketServer'
   },
   OASystemFileManage: {
     addSelItem: [],
@@ -322,7 +321,7 @@ module.exports = {
     catalogOrderby: null,
     catalogPage: {
       pageNum: 1,
-      pageSize: 100,
+      pageSize: 100
     },
     catalogRepeatRecords: [],
     catalogTotal: 0,
@@ -347,22 +346,22 @@ module.exports = {
     tomeOrderby: null,
     tomePage: {
       pageNum: 1,
-      pageSize: 100,
+      pageSize: 100
     },
     tomeRepeatRecords: [],
     tomeTotal: 0,
-    workBasePath: '',
+    workBasePath: ''
   },
   orgdeptmag: {
     curOrgDept: null,
     curPerson: null,
     orgDeptTree: null,
-    personList: [],
+    personList: []
   },
   pdfmanage: {
     curPdfType: null,
     CurProj: null,
-    projList: null,
+    projList: null
   },
   person: {
     allRecordNum: '',
@@ -400,7 +399,7 @@ module.exports = {
     systemUser: false,
     useGpallas: '',
     userId: '',
-    userName: '',
+    userName: ''
   },
   PMISFileManage: {
     addSelItem: [],
@@ -413,7 +412,7 @@ module.exports = {
     catalogOrderby: null,
     catalogPage: {
       pageNum: 1,
-      pageSize: 100,
+      pageSize: 100
     },
     catalogRepeatRecords: [],
     catalogTotal: 0,
@@ -438,11 +437,11 @@ module.exports = {
     tomeOrderby: null,
     tomePage: {
       pageNum: 1,
-      pageSize: 100,
+      pageSize: 100
     },
     tomeRepeatRecords: [],
     tomeTotal: 0,
-    workBasePath: '',
+    workBasePath: ''
   },
   PmisSysFileManage: {
     addSelItem: [],
@@ -455,7 +454,7 @@ module.exports = {
     catalogOrderby: null,
     catalogPage: {
       pageNum: 1,
-      pageSize: 100,
+      pageSize: 100
     },
     catalogRepeatRecords: [],
     catalogTotal: 0,
@@ -480,11 +479,11 @@ module.exports = {
     tomeOrderby: null,
     tomePage: {
       pageNum: 1,
-      pageSize: 100,
+      pageSize: 100
     },
     tomeRepeatRecords: [],
     tomeTotal: 0,
-    workBasePath: '',
+    workBasePath: ''
   },
   printTemplate: {
     curLeftListData: null,
@@ -492,14 +491,14 @@ module.exports = {
     keyword: null,
     leftListData: null,
     rightGroupData: null,
-    typeSearch: null,
+    typeSearch: null
   },
   projMag: {
     baseTableData: [],
     currentRow: null,
     GPallasPROJ: [],
     searchInput: '',
-    tableData: [],
+    tableData: []
   },
   recordAsyncOpt: {},
   refs: {},
@@ -515,17 +514,17 @@ module.exports = {
     sourcePermission: [],
     templatePers: null,
     typeUnits: null,
-    unConfigPers: null,
+    unConfigPers: null
   },
   roleanalysis: {
     currentRow: null,
     formData: {
-      userName: '',
+      userName: ''
     },
     rightClickRow: null,
     roleAnalysisList: [],
     treeList: null,
-    userName: '',
+    userName: ''
   },
   roleTemplate: {
     activeName: '3',
@@ -537,7 +536,7 @@ module.exports = {
     rightClickRow: null,
     showPermission: null,
     tableData: [],
-    testData: [],
+    testData: []
   },
   showObjectSwitch: false,
   sortTemplate: {
@@ -548,24 +547,24 @@ module.exports = {
       newMid: '',
       newParentId: '',
       oldOrgName: '',
-      tag: true,
+      tag: true
     },
     curOrgList: null,
     curTreeList: null,
     curTreeSelection: null,
     keyWordsStore: null,
     orgList: null,
-    treeList: null,
+    treeList: null
   },
   tableLoading: [false],
   taskList: {
     allTaskList: [],
     selectTaskList: [],
-    targetTaskId: '',
+    targetTaskId: ''
   },
   workHistory: {
     currentRow: null,
     dataList: null,
-    formData: null,
-  },
+    formData: null
+  }
 }

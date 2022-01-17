@@ -24,7 +24,7 @@ import { Transform } from 'jscodeshift'
 const transformer: Transform = (file, api, options) => {
   const j = api.jscodeshift
   const printOptions = options.printOptions || {
-    quote: 'single',
+    quote: 'single'
   }
   const root = j(file.source)
 
@@ -60,7 +60,7 @@ const transformer: Transform = (file, api, options) => {
     .find(j.Property, {
       computed: false,
       method: false,
-      shorthand: false,
+      shorthand: false
     })
     .filter((p) => canBeSimplified(p.value.key, p.value.value))
     .forEach((p) => {

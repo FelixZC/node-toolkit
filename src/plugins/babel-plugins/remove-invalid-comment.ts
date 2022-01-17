@@ -41,10 +41,7 @@ export default declare((babel) => {
         )
 
         if (parent) {
-          if (
-            parent.node.leadingComments &&
-            parent.node.leadingComments.length
-          ) {
+          if (parent.node.leadingComments && parent.node.leadingComments.length) {
             for (const comments of parent.node.leadingComments) {
               if (comments.value.includes('this.')) {
                 parent.node.leadingComments = null
@@ -52,10 +49,7 @@ export default declare((babel) => {
             }
           }
 
-          if (
-            parent.node.trailingComments &&
-            parent.node.trailingComments.length
-          ) {
+          if (parent.node.trailingComments && parent.node.trailingComments.length) {
             for (const comments of parent.node.trailingComments) {
               if (comments.value.includes('this.')) {
                 parent.node.trailingComments = null
@@ -71,7 +65,7 @@ export default declare((babel) => {
             }
           }
         }
-      },
-    },
+      }
+    }
   }
 })

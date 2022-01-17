@@ -1,10 +1,5 @@
 import { declare } from '@babel/helper-plugin-utils'
-import type {
-  NumericLiteral,
-  ObjectExpression,
-  ObjectProperty,
-  StringLiteral,
-} from '@babel/types'
+import type { NumericLiteral, ObjectExpression, ObjectProperty, StringLiteral } from '@babel/types'
 export default declare((babel) => {
   const sortObjectArray = (v1: ObjectExpression, v2: ObjectExpression) => {
     const v1IndexProperty = v1.properties.find(
@@ -31,9 +26,7 @@ export default declare((babel) => {
 
   const sortStringArray = (v1: StringLiteral, v2: StringLiteral) => {
     return v1.value.localeCompare(v2.value)
-  }
-
-  // const sortNumberArray = (v1: NumericLiteral, v2: NumericLiteral) => {
+  } // const sortNumberArray = (v1: NumericLiteral, v2: NumericLiteral) => {
   //   return v1.value - v2.value
   // }
 
@@ -50,13 +43,8 @@ export default declare((babel) => {
         let elements = path.node.elements
 
         if (elements.length) {
-          const isObjectArray = elements.every(
-            (i) => i && i.type === 'ObjectExpression'
-          )
-          const isStringArray = elements.every(
-            (i) => i && i.type === 'StringLiteral'
-          )
-          // const isNumberArray = elements.every(
+          const isObjectArray = elements.every((i) => i && i.type === 'ObjectExpression')
+          const isStringArray = elements.every((i) => i && i.type === 'StringLiteral') // const isNumberArray = elements.every(
           //   (i) => i && i.type === 'NumericLiteral'
           // )
 
@@ -66,13 +54,11 @@ export default declare((babel) => {
 
           if (isStringArray) {
             ;(elements as StringLiteral[]).sort(sortStringArray)
-          }
-
-          // if (isNumberArray) {
+          } // if (isNumberArray) {
           //   ;(elements as NumericLiteral[]).sort(sortNumberArray)
           // }
         }
-      },
-    },
+      }
+    }
   }
 })
