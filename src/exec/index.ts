@@ -494,7 +494,7 @@ export const batchReplaceByReg = (
 
       if (result.isChange) {
         isChange = true
-        content = result.content
+        content = result.localContent
       }
     }
 
@@ -519,10 +519,10 @@ export const execBabelPlugin = (babelPlugins: BabelPlugin[], targetPath?: string
         source: content
       }
       const newContent = runBabelPlugin(execFileInfo, babelPlugins)
-
-      if (newContent && newContent.length) {
-        writeFile(filePath, newContent)
+      if (newContent === content || !newContent.length) {
+        return
       }
+      writeFile(filePath, newContent)
     } catch (e) {
       console.error('目标文件出错：', filePath)
       console.error(e)
@@ -551,11 +551,13 @@ export const execPosthtmlPlugin = (plugins: PosthtmlPlugin<unknown>[], targetPat
         path: filePath,
         source: content
       }
-      const newContent = await getPosthtmlPluginActuator(execFileInfo, plugins)
-
-      if (newContent && newContent.length) {
-        writeFile(filePath, newContent)
+      const result = await getPosthtmlPluginActuator(execFileInfo, plugins)
+      const newContent = result.replace(/=['"]_pzc_['"]/g, '')
+      if (newContent === content || !newContent.length) {
+        return
       }
+      /**替换掉_pzc_填充位 */
+      writeFile(filePath, newContent)
     } catch (e) {
       console.error('目标文件出错：', filePath)
       console.error(e)
@@ -588,10 +590,10 @@ export const execCodemod = (codemodList: Transform[], targetPath?: string) => {
         source: content
       }
       const newContent = runCodemod(execFileInfo, codemodList)
-
-      if (newContent && newContent.length) {
-        writeFile(filePath, newContent)
+      if (newContent === content || !newContent.length) {
+        return
       }
+      writeFile(filePath, newContent)
     } catch (e) {
       console.error('目标文件出错：', filePath)
       console.error(e)
