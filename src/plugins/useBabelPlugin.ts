@@ -19,10 +19,9 @@ const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
   try {
     //1，先将代码转换成ast
     const codeAst = parser.parse(execFileInfo.source, {
-      // default: "script"
-      // default: []
       plugins: ['decorators-legacy', 'jsx', 'typescript'],
-      sourceType: 'module'
+      sourceType: 'module',
+      allowImportExportEverywhere: false
     }) //2,分析修改AST，第一个参数是AST，第二个参数是访问者对象
 
     for (const plugin of pluginsList) {
@@ -39,12 +38,12 @@ const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
       {
         compact: 'auto',
         concise: false,
-        retainLines: false
+        retainLines: true
       },
       execFileInfo.source
     ) //会返回一个对象，code就是生成后的新代码
 
-    return newCode.code
+    return `\n${newCode.code}\n`
   } catch (e) {
     console.log(execFileInfo.path, e)
     return execFileInfo.source
@@ -62,14 +61,15 @@ const runBabelPlugin = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) 
     const { descriptor } = parseSFC(execFileInfo.source, {
       filename: execFileInfo.path
     })
-    const scriptBlock = descriptor.script
+    const scriptBlock = descriptor.script || descriptor.scriptSetup
 
     if (scriptBlock) {
       execFileInfo.source = scriptBlock.content
-      const newScriptContent = transform(execFileInfo, pluginsList)
-      scriptBlock.content = newScriptContent
+      const out = transform(execFileInfo, pluginsList)
+      scriptBlock.content = out
     }
-
+    //强制重新赋值
+    descriptor.script = scriptBlock
     return stringifySFC(descriptor)
   }
 }

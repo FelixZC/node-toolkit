@@ -58,13 +58,13 @@ export default function runTransformation(
     descriptor = parseSFC(source, {
       filename: path
     }).descriptor // skip .vue files without script block
-
-    if (!descriptor.script) {
+    const scriptBlock = descriptor.script || descriptor.scriptSetup
+    if (!scriptBlock) {
       return source
     }
 
-    lang = descriptor.script.lang || 'js'
-    fileInfo.source = descriptor.script.content
+    lang = scriptBlock.lang || 'js'
+    fileInfo.source = scriptBlock.content
   }
 
   let parser = getParser()
@@ -94,11 +94,12 @@ export default function runTransformation(
   } // need to reconstruct the .vue file from descriptor blocks
 
   if (extension === '.vue') {
-    if (out === descriptor!.script!.content) {
+    const scriptBlock = descriptor!.script || descriptor!.scriptSetup
+    if (out === scriptBlock?.content) {
       return source // skipped, don't bother re-stringifying
     }
-
-    descriptor!.script!.content = out
+    scriptBlock!.content = out
+    descriptor!.script = scriptBlock
     return stringifySFC(descriptor!)
   }
 
