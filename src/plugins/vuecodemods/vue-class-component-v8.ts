@@ -1,5 +1,6 @@
 import wrap from '../wrapAstTransformation' // import { Component } from 'vue-class-component' ->
-// import { Options as Component } from 'vue-class-component'
+/** import { Options as Component } from 'vue-class-component' */
+
 
 import type { ASTTransformation } from '../wrapAstTransformation'
 export const transformAST: ASTTransformation = (context) => {

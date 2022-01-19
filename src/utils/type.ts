@@ -73,7 +73,7 @@ export const invokeRequestTemplateGenerator = () => {
       )) {
         const parameters = module.parameters || ([] as ParameterObject[]) // const responses = module.responses as Record<string, ResponseObject>
 
-        const annotation = module.tags?.join('-') + module!.summary
+        const annotation = module.tags?.join('-') + module!.summary?.replace(/\//g, '')
         const methodName = module.operationId
         const parametersPath = `operations['${module.operationId}']['parameters']`
         const responsePath = `operations['${module.operationId}']['responses'][200]['schema']`
@@ -120,7 +120,7 @@ export const invokeRequestTemplateGenerator = () => {
         //创建请求模板
 
         requestTemplate += `
-          //${annotation}
+          /**${annotation} */
           export const ${methodName} = (params: ${typingNamespaceName}.${paramsTypingPathRef}) => {
                return request({
                  url: \`${requestUrl}\`,

@@ -21,7 +21,7 @@ import type { ExecFileInfo } from '../plugins/common'
 import type { BabelPlugin } from '../plugins/useBabelPlugin'
 const br = os.EOL //换行符
 
-const rootPath = path.join('src')
+const rootPath = path.join('src copy')
 const fsInstance = new fsUtils(rootPath)
 const fileInfoList = fsInstance.getFileInfoList()
 interface AttrsCollection {
