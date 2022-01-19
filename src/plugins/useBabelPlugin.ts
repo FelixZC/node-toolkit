@@ -38,7 +38,7 @@ const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
       {
         compact: 'auto',
         concise: false,
-        retainLines: true
+        retainLines: false
       },
       execFileInfo.source
     ) //会返回一个对象，code就是生成后的新代码
