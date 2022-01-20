@@ -5,10 +5,8 @@
   "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "tsc --pretty && eslint . --ext ts --ext tsx --ext js",
-    "lint:prettier": "prettier --write --loglevel warn \"src/**/*.{js,json,tsx,ts,css,less,scss,vue,html,md}\"",
-    "format": "prettier --write src/**/*.{js,ts,tsx}",
-    "precommit": "eslint src/**/*.js"
+    "lint": "prettier --write --loglevel warn \"src/**/*.{js,json,tsx,ts,css,less,scss,vue,html,md}\"",
+    "format": "prettier --write src/**/*.{js,ts,tsx}"
   },
   "author": "pzc",
   "license": "ISC",
@@ -62,10 +60,16 @@
   "engines": {
     "node": ">= 10.0"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
   "lint-staged": {
-    "src/**/*.js": [
+    "src/**": [
       "prettier --write",
-      "git add"
+      "eslint --fix",
+      "git add -n"
     ]
   },
   "config": {
