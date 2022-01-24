@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "prettier --write --loglevel warn \"src/**/*.{js,json,tsx,ts,css,less,scss,vue,html,md}\"",
-    "format": "prettier --write src/**/*.{js,ts,tsx}"
+    "format": "prettier --write src/**/*.{js,ts,tsx}",
+    "prepare": "husky install"
   },
   "author": "pzc",
   "license": "ISC",
@@ -15,7 +16,7 @@
     "@babel/helper-plugin-utils": "^7.16.7",
     "@babel/preset-env": "^7.16.8",
     "@babel/types": "^7.16.8",
-    "@commitlint/cli": "^16.0.2",
+    "@commitlint/cli": "^16.1.0",
     "@commitlint/config-conventional": "^16.0.0",
     "@types/babel__core": "^7.1.18",
     "@types/babel__helper-plugin-utils": "^7.10.0",
@@ -28,15 +29,13 @@
     "@vue/compiler-dom": "^3.2.27",
     "@vue/compiler-sfc": "^3.2.27",
     "cli-progress": "^3.10.0",
-    "cz-conventional-changelog": "^3.3.0",
     "debug": "^4.3.3",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "globby": "^12.2.0",
-    "husky": "^7.0.4",
+    "husky": "^7.0.0",
     "jest": "^27.4.7",
     "jscodeshift": "^0.13.1",
-    "lint-staged": "^12.1.7",
     "lru-cache": "^6.0.0",
     "openapi-typescript": "^5.1.0",
     "postcss": "^8.4.5",
@@ -59,22 +58,5 @@
   },
   "engines": {
     "node": ">= 10.0"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "src/**": [
-      "prettier --write",
-      "eslint --fix",
-      "git add -n"
-    ]
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
   }
 }
