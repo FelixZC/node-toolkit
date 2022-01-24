@@ -5,7 +5,6 @@
   "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "prettier --write --loglevel warn \"src/**/*.{js,json,tsx,ts,css,less,scss,vue,html,md}\"",
     "format": "prettier --write src/**/*.{js,ts,tsx}",
     "prepare": "husky install"
   },
@@ -25,17 +24,26 @@
     "@types/jscodeshift": "^0.11.3",
     "@types/node": "^17.0.9",
     "@types/yargs": "^17.0.8",
+    "@typescript-eslint/eslint-plugin": "^5.10.0",
+    "@typescript-eslint/parser": "^5.10.0",
     "@vue/compiler-core": "^3.2.27",
     "@vue/compiler-dom": "^3.2.27",
     "@vue/compiler-sfc": "^3.2.27",
     "cli-progress": "^3.10.0",
+    "commitizen": "^4.2.4",
+    "cz-conventional-changelog": "^3.3.0",
+    "cz-customizable": "^6.3.0",
     "debug": "^4.3.3",
+    "eslint": "^8.7.0",
+    "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-prettier": "^4.0.0",
     "globby": "^12.2.0",
     "husky": "^7.0.0",
     "jest": "^27.4.7",
     "jscodeshift": "^0.13.1",
+    "lint-staged": "^12.3.1",
     "lru-cache": "^6.0.0",
     "openapi-typescript": "^5.1.0",
     "postcss": "^8.4.5",
@@ -58,5 +66,13 @@
   },
   "engines": {
     "node": ">= 10.0"
+  },
+  "lint-staged": {
+    "*.{js,ts}": "npm run format"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-customizable"
+    }
   }
 }
