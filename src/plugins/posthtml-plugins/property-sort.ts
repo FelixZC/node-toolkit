@@ -1,5 +1,5 @@
-import { sortObjAttr } from '../../utils/common'
 import type PostHTML from 'posthtml'
+import { sortObjAttr } from '../../utils/common'
 
 const propertySort: PostHTML.Plugin<unknown> = (tree) => {
   tree.walk((node) => {
@@ -7,7 +7,7 @@ const propertySort: PostHTML.Plugin<unknown> = (tree) => {
       const directiveAttrs: typeof node.attrs = {}
       const refAttrs: typeof node.attrs = {}
       const methodAttrs: typeof node.attrs = {}
-      const normalAttrs: typeof node.attrs = {} //ps:记得移除="_pzc_"
+      const normalAttrs: typeof node.attrs = {} // ps:记得移除="_pzc_"
 
       for (const key in node.attrs) {
         if (Object.prototype.hasOwnProperty.call(node.attrs, key)) {

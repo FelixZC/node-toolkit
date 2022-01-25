@@ -11,6 +11,7 @@ import { transformAST as removeExtraneousImport } from './remove-extraneous-impo
 
 import wrap from '../wrapAstTransformation'
 import type { ASTTransformation } from '../wrapAstTransformation'
+
 type Params = {
   removablePlugins: string[]
 }

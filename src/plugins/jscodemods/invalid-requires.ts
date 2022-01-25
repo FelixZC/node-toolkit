@@ -1,7 +1,7 @@
 import { Transform } from 'jscodeshift'
 
 const transformer: Transform = (file, api, options) => {
-  const jscodeshift = api.jscodeshift
+  const { jscodeshift } = api
   const printOptions = options.printOptions || {
     quote: 'single'
   }
@@ -23,7 +23,7 @@ const transformer: Transform = (file, api, options) => {
   requireStatements.forEach((requireStatement) => {
     jscodeshift(requireStatement).replaceWith(
       requireStatement.value.declarations.map((declaration, i) => {
-        const kind = requireStatement.value.kind // e.g. var or const
+        const { kind } = requireStatement.value // e.g. var or const
 
         const variableDeclaration = jscodeshift.variableDeclaration(kind, [declaration])
 

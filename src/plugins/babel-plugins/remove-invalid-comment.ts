@@ -1,4 +1,5 @@
 import { declare } from '@babel/helper-plugin-utils'
+
 export default declare((babel) => {
   const { types: t } = babel
   return {

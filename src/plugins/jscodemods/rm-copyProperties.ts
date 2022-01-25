@@ -94,17 +94,17 @@ const transformer: Transform = (file, api, options) => {
 
   const availableFilters = {
     onlyCallExpressions(path) {
-      var node = path.parent.value
+      const node = path.parent.value
       return node.type == 'ExpressionStatement'
     },
 
     onlyCapitalizedIdentifiers(path) {
-      var node = path.value.arguments[0]
+      const node = path.value.arguments[0]
       return node.type == 'Identifier' && node.name.charAt(0) == node.name.charAt(0).toUpperCase()
     },
 
     onlyDefaults(path) {
-      var node = path.value.arguments[0]
+      const node = path.value.arguments[0]
       return node.type == 'Identifier' && node.name == 'defaults'
     },
 
@@ -117,7 +117,7 @@ const transformer: Transform = (file, api, options) => {
     },
 
     onlyPrototypeAssignments(path) {
-      var node = path.value.arguments[0]
+      const node = path.value.arguments[0]
       return (
         node.type == 'MemberExpression' &&
         node.object.type == 'Identifier' &&

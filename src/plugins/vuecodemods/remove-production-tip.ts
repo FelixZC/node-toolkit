@@ -1,5 +1,6 @@
 import wrap from '../wrapAstTransformation'
 import type { ASTTransformation } from '../wrapAstTransformation'
+
 export const transformAST: ASTTransformation = ({ j, root }) => {
   const productionTipAssignment = root.find(
     j.AssignmentExpression,

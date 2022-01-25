@@ -1,11 +1,11 @@
 import { declare } from '@babel/helper-plugin-utils'
-import { getImportObj } from './ast-utils'
 import type {
   ImportDeclaration,
   ImportDefaultSpecifier,
   ImportNamespaceSpecifier,
   ImportSpecifier
 } from '@babel/types'
+import { getImportObj } from './ast-utils'
 
 const sortImportSpecifiers = (item: ImportDeclaration) => {
   const defaultOrNamespaceList: (ImportDefaultSpecifier | ImportNamespaceSpecifier)[] = []
@@ -48,7 +48,7 @@ export default declare((babel) => {
     visitor: {
       Program: {
         exit(path) {
-          let normalImportList = path.node.body.filter(
+          const normalImportList = path.node.body.filter(
             (i) => i.type === 'ImportDeclaration' && i.importKind !== 'type'
           ) as ImportDeclaration[]
 

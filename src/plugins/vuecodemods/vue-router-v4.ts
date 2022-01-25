@@ -1,9 +1,10 @@
+import type { ObjectExpression } from 'jscodeshift'
 import { transformAST as addImport } from './add-import'
 import { transformAST as removeExtraneousImport } from './remove-extraneous-import' // new Router() -> createRouter()
 
 import wrap from '../wrapAstTransformation'
-import type { ObjectExpression } from 'jscodeshift'
 import type { ASTTransformation } from '../wrapAstTransformation'
+
 export const transformAST: ASTTransformation = (context) => {
   const { j, root } = context
   const routerImportDecls = root.find(j.ImportDeclaration, {
@@ -59,7 +60,8 @@ export const transformAST: ASTTransformation = (context) => {
           }
 
           return false
-        } else if ((p.key as any).name === 'base') {
+        }
+        if ((p.key as any).name === 'base') {
           baseValue = p.value
           return false
         }

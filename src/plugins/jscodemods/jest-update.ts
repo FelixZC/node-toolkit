@@ -3,8 +3,8 @@ import path from 'path'
 
 const transformer: Transform = (file, api, options = {}) => {
   if (
-    !file.path.includes(path.sep + '__tests__' + path.sep) &&
-    !file.path.includes(path.sep + '__mocks__' + path.sep)
+    !file.path.includes(`${path.sep}__tests__${path.sep}`) &&
+    !file.path.includes(`${path.sep}__mocks__${path.sep}`)
   ) {
     return null
   }
@@ -64,7 +64,7 @@ const transformer: Transform = (file, api, options = {}) => {
         }
       })
       .replaceWith((p) => {
-        const name = p.value.callee.property.name
+        const { name } = p.value.callee.property
 
         if (apiMethods[name] == name) {
           // short-circuit to keep code style in-tact

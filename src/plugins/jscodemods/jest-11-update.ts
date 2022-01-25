@@ -3,8 +3,8 @@ import path from 'path'
 
 const transformer: Transform = (file, api, options = {}) => {
   if (
-    !file.path.includes(path.sep + '__tests__' + path.sep) &&
-    !file.path.includes(path.sep + '__mocks__' + path.sep)
+    !file.path.includes(`${path.sep}__tests__${path.sep}`) &&
+    !file.path.includes(`${path.sep}__mocks__${path.sep}`)
   ) {
     return null
   }
@@ -39,7 +39,7 @@ const transformer: Transform = (file, api, options = {}) => {
         }
       })
       .forEach((p) => {
-        const name = p.value.callee.property.name
+        const { name } = p.value.callee.property
         p.value.callee.property.name = apiMethods[name]
       })
       .size())

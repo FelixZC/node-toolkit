@@ -3,6 +3,7 @@ import { transformAST as removeExtraneousImport } from './remove-extraneous-impo
 
 import wrap from '../wrapAstTransformation'
 import type { ASTTransformation } from '../wrapAstTransformation'
+
 export const transformAST: ASTTransformation = (context) => {
   const { j, root } = context
   const vuexImportDecls = root.find(j.ImportDeclaration, {

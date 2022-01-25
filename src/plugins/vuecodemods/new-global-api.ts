@@ -9,6 +9,7 @@ import { transformAST as removeContextualHFromRender } from './remove-contextual
 import { transformAST as removeExtraneousImport } from './remove-extraneous-import'
 import wrap from '../wrapAstTransformation'
 import type { ASTTransformation } from '../wrapAstTransformation'
+
 export const transformAST: ASTTransformation = (context) => {
   vueAsNamespaceImport(context)
   importCompositionApiFromVue(context)

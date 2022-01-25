@@ -1,5 +1,6 @@
 import { declare } from '@babel/helper-plugin-utils'
 import type { NumericLiteral, ObjectExpression, ObjectProperty, StringLiteral } from '@babel/types'
+
 export default declare((babel) => {
   const sortObjectArray = (v1: ObjectExpression, v2: ObjectExpression) => {
     const v1IndexProperty = v1.properties.find(
@@ -35,12 +36,12 @@ export default declare((babel) => {
     // not required
     visitor: {
       ArrayExpression(path) {
-        //排除new Map([])影响
+        // 排除new Map([])影响
         if (path.findParent((path) => path.isNewExpression())) {
           return
         }
 
-        let elements = path.node.elements
+        const { elements } = path.node
 
         if (elements.length) {
           const isObjectArray = elements.every((i) => i && i.type === 'ObjectExpression')

@@ -2,6 +2,7 @@
 import wrap from '../wrapAstTransformation' // TODO: SetupContext.refs does not exist in Vue 3.0
 
 import type { ASTTransformation } from '../wrapAstTransformation'
+
 export const transformAST: ASTTransformation = ({ j, root }) => {
   const importDecl = root.find(j.ImportDeclaration, {
     source: {

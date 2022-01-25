@@ -4,10 +4,11 @@
  * @date 2021/08/23
  *
  */
+import * as os from 'os'
 import { parseDocs } from '../plugins/generate-vue-docs'
 import { getDataType, sortArray, sortObjAttr } from './common'
-import * as os from 'os'
-const br = os.EOL //换行符
+
+const br = os.EOL // 换行符
 
 /**
  * 根据指定正则查找内容
@@ -42,13 +43,11 @@ function queryContentByReg(
           ? customHandel(queryResult)
           : queryResult[matchIndex] + br
     }
-  } else {
-    if ((queryResult = queryReg.exec(content))) {
-      str +=
-        customHandel && typeof customHandel === 'function'
-          ? customHandel(queryResult)
-          : queryResult[matchIndex] + br
-    }
+  } else if ((queryResult = queryReg.exec(content))) {
+    str +=
+      customHandel && typeof customHandel === 'function'
+        ? customHandel(queryResult)
+        : queryResult[matchIndex] + br
   }
 
   return str
@@ -69,7 +68,7 @@ function textFormat(content: string, mode = 'md') {
   }
 
   let result = Array.from(new Set(match))
-  result = result.filter((item) => item.match(/[\S]/)) //去除空白行
+  result = result.filter((item) => item.match(/[\S]/)) // 去除空白行
 
   let str = ''
   let title = ''
@@ -81,7 +80,7 @@ function textFormat(content: string, mode = 'md') {
         localItem = localItem.trim()
 
         if ((index + 1) % 2 === 0) {
-          return `${localItem}${br}` //额外添加行间距
+          return `${localItem}${br}` // 额外添加行间距
         }
 
         return `> ${(index + 2) / 2}. **${localItem}**  `
@@ -97,7 +96,7 @@ function textFormat(content: string, mode = 'md') {
         localItem = localItem.trim()
 
         if ((index + 1) % 2 === 0) {
-          return `${localItem}${br}` //额外添加行间距
+          return `${localItem}${br}` // 额外添加行间距
         }
 
         return localItem
@@ -106,7 +105,7 @@ function textFormat(content: string, mode = 'md') {
       break
 
     default:
-      console.log(result.length) //输出行结果
+      console.log(result.length) // 输出行结果
 
       result = result.map((item) => {
         let localItem = item
@@ -210,7 +209,7 @@ function createdStoreTable(
   }
 
   if (leavl === 1) {
-    cache.unshift(createdStoreTableStr) //添加根记录
+    cache.unshift(createdStoreTableStr) // 添加根记录
   } else {
     cache.push(createdStoreTableStr)
   }

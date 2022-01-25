@@ -1,7 +1,8 @@
+import type { ArrowFunctionExpression } from 'jscodeshift'
 import { transformAST as addImport } from './add-import'
 import wrap from '../wrapAstTransformation'
-import type { ArrowFunctionExpression } from 'jscodeshift'
 import type { ASTTransformation } from '../wrapAstTransformation'
+
 export const transformAST: ASTTransformation = (context) => {
   const { j, root } = context
   const renderFns = root.find(j.ObjectProperty, {

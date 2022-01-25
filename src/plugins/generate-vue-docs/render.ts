@@ -26,7 +26,7 @@ class RenderMd {
           case 'events':
           case 'methods':
             if (this.options[key]) {
-              mdArr.push(...this[key + 'Render'](element, this.options[key]))
+              mdArr.push(...this[`${key}Render`](element, this.options[key]))
             }
 
             break
@@ -172,7 +172,7 @@ class RenderMd {
    */
 
   renderTabelHeader(header) {
-    return [this.renderTabelRow(header), '|' + header.map(() => '------').join('|') + '|']
+    return [this.renderTabelRow(header), `|${header.map(() => '------').join('|')}|`]
   }
   /**
    * 渲染表格的行
@@ -181,7 +181,7 @@ class RenderMd {
    */
 
   renderTabelRow(row) {
-    return '|' + row.join('|') + '|'
+    return `|${row.join('|')}|`
   }
   /**
    * 渲染标题
@@ -219,7 +219,7 @@ class RenderMd {
   _funParam(params) {
     if (!params) return '—'
     return params
-      .map((item) => `${item.name}:${item.type}${item.desc ? '(' + item.desc + ')' : ''}`)
+      .map((item) => `${item.name}:${item.type}${item.desc ? `(${item.desc})` : ''}`)
       .join(',')
   }
   /**

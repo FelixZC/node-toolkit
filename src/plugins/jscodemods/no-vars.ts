@@ -45,23 +45,26 @@ const transformer: Transform = (file, api) => {
   const extractNamesFromIdentifierLike = (id) => {
     if (!id) {
       return []
-    } else if (id.type === 'ObjectPattern') {
+    }
+    if (id.type === 'ObjectPattern') {
       return id.properties
         .map((d) =>
           d.type === 'SpreadProperty' ? [d.argument.name] : extractNamesFromIdentifierLike(d.value)
         )
         .reduce((acc, val) => acc.concat(val), [])
-    } else if (id.type === 'ArrayPattern') {
+    }
+    if (id.type === 'ArrayPattern') {
       return id.elements
         .map(extractNamesFromIdentifierLike)
         .reduce((acc, val) => acc.concat(val), [])
-    } else if (id.type === 'Identifier') {
-      return [id.name]
-    } else if (id.type === 'RestElement') {
-      return [id.argument.name]
-    } else {
-      return []
     }
+    if (id.type === 'Identifier') {
+      return [id.name]
+    }
+    if (id.type === 'RestElement') {
+      return [id.argument.name]
+    }
+    return []
   }
 
   const getDeclaratorNames = (declarator) => {

@@ -5,7 +5,9 @@
   "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "format": "prettier --write src/**/*.{js,ts,tsx}",
+    "lint:lint-staged": "lint-staged",
+    "lint:eslint": "eslint --fix src/**/*.{js,jsx,ts,tsx}",
+    "lint:prettier": "prettier --write src/**/*.{js,jsx,ts,tsx}",
     "prepare": "husky install"
   },
   "author": "pzc",
@@ -68,7 +70,10 @@
     "node": ">= 10.0"
   },
   "lint-staged": {
-    "*.{js,ts}": "npm run format"
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   },
   "config": {
     "commitizen": {

@@ -1,4 +1,5 @@
 import { Transform } from 'jscodeshift'
+
 const vueDefaultOrder = [
   'el',
   'name',
@@ -80,7 +81,7 @@ const transformer: Transform = (fileInfo, api) => {
   }
 
   let b = j(fileInfo.source).find(j.ObjectExpression).forEach(normalObjectSort).toSource()
-  b = j(b).find(j.ObjectPattern).forEach(normalObjectSort).toSource() //vue2
+  b = j(b).find(j.ObjectPattern).forEach(normalObjectSort).toSource() // vue2
 
   if (fileInfo.path.endsWith('.vue') || fileInfo.path.includes('mixin')) {
     b = j(b)
@@ -91,7 +92,7 @@ const transformer: Transform = (fileInfo, api) => {
       })
       .forEach((path) => vueObjectSort(path.node.declaration))
       .toSource()
-  } //vue3
+  } // vue3
 
   if (fileInfo.path.endsWith('.vue') || fileInfo.path.includes('mixin')) {
     b = j(b)

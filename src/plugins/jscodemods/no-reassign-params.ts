@@ -2,7 +2,7 @@ import { Transform } from 'jscodeshift'
 
 const transformer: Transform = (file, api) => {
   const j = api.jscodeshift
-  const statement = j.template.statement
+  const { statement } = j.template
   const FUNCTION_TYPES = [j.FunctionDeclaration, j.ArrowFunctionExpression, j.FunctionExpression]
   let updated = false
 
@@ -12,10 +12,9 @@ const transformer: Transform = (file, api) => {
 
     if (isUpperCase) {
       return `Local${paramName}`
-    } else {
-      const upperCase = paramName.charAt(0).toUpperCase() + paramName.slice(1)
-      return `local${upperCase}`
     }
+    const upperCase = paramName.charAt(0).toUpperCase() + paramName.slice(1)
+    return `local${upperCase}`
   }
 
   function getLocalVarStatement(paramName, newName) {
@@ -42,27 +41,31 @@ const transformer: Transform = (file, api) => {
       ...params.map((param) => {
         if (param === null) {
           return null
-        } else if (param.type === 'Identifier') {
+        }
+        if (param.type === 'Identifier') {
           return param.name
-        } else if (param.type === 'ObjectPattern') {
+        }
+        if (param.type === 'ObjectPattern') {
           return param.properties.map((property) => {
             if (j.Property.check(property)) {
               return property.value.name
-            } else if (j.SpreadProperty.check(property) || j.RestProperty.check(property)) {
-              return property.argument.name
-            } else {
-              throw new Error(`Unexpected Property Type ${property.type} ${j(property).toSource()}`)
             }
+            if (j.SpreadProperty.check(property) || j.RestProperty.check(property)) {
+              return property.argument.name
+            }
+            throw new Error(`Unexpected Property Type ${property.type} ${j(property).toSource()}`)
           })
-        } else if (param.type === 'RestElement') {
-          return param.argument.name
-        } else if (j.AssignmentPattern.check(param)) {
-          return param.left.name
-        } else if (j.ArrayPattern.check(param)) {
-          return [].concat(...getParamNames(param.elements))
-        } else {
-          throw new Error(`Unexpected Param Type ${param.type} ${j(param).toSource()}`)
         }
+        if (param.type === 'RestElement') {
+          return param.argument.name
+        }
+        if (j.AssignmentPattern.check(param)) {
+          return param.left.name
+        }
+        if (j.ArrayPattern.check(param)) {
+          return [].concat(...getParamNames(param.elements))
+        }
+        throw new Error(`Unexpected Param Type ${param.type} ${j(param).toSource()}`)
       })
     )
   }
@@ -76,21 +79,20 @@ const transformer: Transform = (file, api) => {
       const numAssignments = j(func)
         .find(j.AssignmentExpression)
         .filter((assignment) => {
-          const left = assignment.node.left // old = 4;
+          const { left } = assignment.node // old = 4;
 
           if (j.Identifier.check(left)) {
             return left.name === paramName
-          } else if (j.ObjectPattern.check(left)) {
+          }
+          if (j.ObjectPattern.check(left)) {
             return left.properties.some((property) => {
               if (j.Property.check(property)) {
                 return property.key.name === paramName
-              } else if (j.RestProperty.check(property)) {
-                return property.argument.name === paramName
-              } else {
-                throw new Error(
-                  `Unexpected Property Type ${property.type} ${j(property).toSource()}`
-                )
               }
+              if (j.RestProperty.check(property)) {
+                return property.argument.name === paramName
+              }
+              throw new Error(`Unexpected Property Type ${property.type} ${j(property).toSource()}`)
             })
           }
 
@@ -164,7 +166,7 @@ const transformer: Transform = (file, api) => {
             return
           }
 
-          let scope = identifier.scope
+          let { scope } = identifier
 
           if (scope === functionScope) {
             const bindings = scope.getBindings()[oldName]

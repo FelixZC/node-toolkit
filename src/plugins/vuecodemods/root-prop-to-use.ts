@@ -1,6 +1,7 @@
 import * as N from 'jscodeshift'
 import wrap from '../wrapAstTransformation'
 import type { ASTTransformation } from '../wrapAstTransformation'
+
 type Params = {
   rootPropName: string
 }

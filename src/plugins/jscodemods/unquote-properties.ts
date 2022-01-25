@@ -17,7 +17,7 @@ const transformer: Transform = (file, api, options) => {
     }
 
     try {
-      new Function(`({${name}: 1})`)() //eslint-disable-line no-new-func
+      new Function(`({${name}: 1})`)() // eslint-disable-line no-new-func
     } catch (e) {
       return false
     }

@@ -3,8 +3,8 @@ import path from 'path'
 
 const transformer: Transform = (file, api, options = {}) => {
   if (
-    !file.path.includes(path.sep + '__tests__' + path.sep) &&
-    !file.path.includes(path.sep + '__mocks__' + path.sep)
+    !file.path.includes(`${path.sep}__tests__${path.sep}`) &&
+    !file.path.includes(`${path.sep}__mocks__${path.sep}`)
   ) {
     return null
   }
@@ -47,7 +47,7 @@ const transformer: Transform = (file, api, options = {}) => {
     }
 
     const update = (statement) => {
-      const expression = statement.expression
+      const { expression } = statement
 
       if (isJest(expression)) {
         descend(expression, expression.callee.object)
@@ -61,7 +61,7 @@ const transformer: Transform = (file, api, options = {}) => {
       }
     }
 
-    const program = root.get(0).node.program
+    const { program } = root.get(0).node
     const body = program.body.filter((statement, index) => {
       if (statement.type === 'ExpressionStatement' && update(statement)) {
         if (statement.expression.type == 'Identifier' && statement.expression.name == JEST) {

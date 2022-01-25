@@ -1,4 +1,5 @@
 import type { Parser, Transform } from 'jscodeshift'
+
 type JSTransformationModule = {
   default: Transform
   parser?: string | Parser

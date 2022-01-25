@@ -6,6 +6,7 @@ import type {
   VariableDeclaration
 } from '@babel/types'
 import type { NodePath } from '@babel/traverse'
+
 export default declare((babel) => {
   const extra = {} as Record<string, any>
   extra.attributesObj = {} as Record<string, any>

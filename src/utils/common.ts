@@ -89,7 +89,7 @@ export function sortArray(arr: Array<Record<string, any>>, customSort: Function 
       return a[customSort].localeCompare(b[customSort])
     }
   })
-} //分组缓存
+} // 分组缓存
 
 export interface GroupCache {
   [cacheKey: string]: {

@@ -1,6 +1,7 @@
-import wrap from '../wrapAstTransformation'
 import type { ImportDefaultSpecifier, ImportNamespaceSpecifier, ImportSpecifier } from 'jscodeshift'
+import wrap from '../wrapAstTransformation'
 import type { ASTTransformation } from '../wrapAstTransformation'
+
 type DefaultSpecifierParam = {
   type: 'default'
   local: string

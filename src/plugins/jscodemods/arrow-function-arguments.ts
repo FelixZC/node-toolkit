@@ -28,11 +28,8 @@ const transformer: Transform = (file, api, options) => {
               .size()
           ) {
             console.error(
-              file.path +
-                ': arrow function uses "' +
-                ARGS +
-                '" already. ' +
-                'Please rename this identifier first.'
+              `${file.path}: arrow function uses "${ARGS}" already. ` +
+                `Please rename this identifier first.`
             )
             return false
           }

@@ -18,7 +18,8 @@ const transformer: Transform = (file, api, options) => {
       if (options['inline-single-expressions'] && inner.type == 'ExpressionStatement') {
         inner.expression.comments = (inner.expression.comments || []).concat(comments)
         return inner.expression
-      } else if (inner.type == 'ReturnStatement') {
+      }
+      if (inner.type == 'ReturnStatement') {
         if (inner.argument === null) {
           // The rare case of a function with a lone return statement.
           fn.body.body = []

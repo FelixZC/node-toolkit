@@ -39,6 +39,7 @@ import { Statement } from '@babel/types'
  */
 
 import * as CompilerDom from '@vue/compiler-dom'
+
 export function stringify(sfcDescriptor: SFCDescriptor) {
   const { customBlocks, script, styles, template } = sfcDescriptor
   return (
@@ -76,7 +77,7 @@ export function stringify(sfcDescriptor: SFCDescriptor) {
 }
 
 function makeOpenTag(block: SFCBlock) {
-  let source = '<' + block.type
+  let source = `<${block.type}`
   source += Object.keys(block.attrs)
     .sort()
     .map((name) => {
@@ -84,13 +85,12 @@ function makeOpenTag(block: SFCBlock) {
 
       if (value === true) {
         return name
-      } else {
-        return `${name}="${value}"`
       }
+      return `${name}="${value}"`
     })
-    .map((attr) => ' ' + attr)
+    .map((attr) => ` ${attr}`)
     .join('')
-  return source + '>'
+  return `${source}>`
 }
 
 function makeCloseTag(block: SFCBlock) {
@@ -151,6 +151,7 @@ export interface SFCParseResult {
 }
 const SFC_CACHE_MAX_SIZE = 500
 const sourceToSFC = new (require('lru-cache'))(SFC_CACHE_MAX_SIZE) as Map<string, SFCParseResult>
+
 export function parse(
   source: string,
   {
@@ -194,9 +195,8 @@ export function parse(
           ))
       ) {
         return TextModes.RAWTEXT
-      } else {
-        return TextModes.DATA
       }
+      return TextModes.DATA
     },
     // there are no components at SFC parsing level
     isNativeTag: () => true,
@@ -420,11 +420,10 @@ function padContent(content: string, block: SFCBlock, pad: SFCParseOptions['pad'
 
   if (pad === 'space') {
     return content.replace(replaceRE, ' ')
-  } else {
-    const offset = content.split(splitRE).length
-    const padChar = block.type === 'script' && !block.lang ? '//\n' : '\n'
-    return Array(offset).join(padChar)
   }
+  const offset = content.split(splitRE).length
+  const padChar = block.type === 'script' && !block.lang ? '//\n' : '\n'
+  return Array(offset).join(padChar)
 }
 
 function hasSrc(node: ElementNode) {

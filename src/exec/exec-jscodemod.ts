@@ -1,5 +1,6 @@
-import * as exec from './index'
 import type { Transform } from 'jscodeshift'
+import * as exec from './index'
+
 const jscodemodeList = [
   '../plugins/jscodemods/arrow-function',
   '../plugins/jscodemods/arrow-function-arguments',

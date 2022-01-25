@@ -1,6 +1,4 @@
 ;(function (view) {
-  'use strict'
-
   view.URL = view.URL || view.webkitURL
 
   if (view.Blob && view.URL) {
@@ -35,7 +33,7 @@
 
       const FBB_proto = FakeBlobBuilder.prototype
       const FB_proto = FakeBlob.prototype
-      const FileReaderSync = view.FileReaderSync
+      const { FileReaderSync } = view
 
       const FileException = function (type) {
         this.code = this[(this.name = type)]
@@ -50,10 +48,10 @@
       const real_create_object_URL = real_URL.createObjectURL
       const real_revoke_object_URL = real_URL.revokeObjectURL
       let URL = real_URL
-      const btoa = view.btoa
-      const atob = view.atob
-      const ArrayBuffer = view.ArrayBuffer
-      const Uint8Array = view.Uint8Array
+      const { btoa } = view
+      const { atob } = view
+      const { ArrayBuffer } = view
+      const { Uint8Array } = view
       FakeBlob.fake = FB_proto.fake = true
 
       while (file_ex_code--) {
@@ -65,7 +63,7 @@
       }
 
       URL.createObjectURL = function (blob) {
-        let type = blob.type
+        let { type } = blob
         let data_URI_header
 
         if (type === null) {
@@ -73,20 +71,22 @@
         }
 
         if (blob instanceof FakeBlob) {
-          data_URI_header = 'data:' + type
+          data_URI_header = `data:${type}`
 
           if (blob.encoding === 'base64') {
-            return data_URI_header + ';base64,' + blob.data
-          } else if (blob.encoding === 'URI') {
-            return data_URI_header + ',' + decodeURIComponent(blob.data)
+            return `${data_URI_header};base64,${blob.data}`
+          }
+          if (blob.encoding === 'URI') {
+            return `${data_URI_header},${decodeURIComponent(blob.data)}`
           }
 
           if (btoa) {
-            return data_URI_header + ';base64,' + btoa(blob.data)
+            return `${data_URI_header};base64,${btoa(blob.data)}`
           }
 
-          return data_URI_header + ',' + encodeURIComponent(blob.data)
-        } else if (real_create_object_URL) {
+          return `${data_URI_header},${encodeURIComponent(blob.data)}`
+        }
+        if (real_create_object_URL) {
           return real_create_object_URL.call(real_URL, blob)
         }
       }
@@ -99,7 +99,7 @@
 
       FBB_proto.append = function (
         data
-        /*, endings*/
+        /* , endings */
       ) {
         let localData = data
         const bb = this.data // decode data to a binary string

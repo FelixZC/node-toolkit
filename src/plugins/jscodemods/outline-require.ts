@@ -62,7 +62,7 @@ const transformer: Transform = (file, api, options) => {
     )
 
   const findInsertionPoint = (body) => {
-    var index = 0
+    let index = 0
 
     for (let i = 0; i < body.length; i++) {
       const item = body[i]
@@ -117,7 +117,7 @@ const transformer: Transform = (file, api, options) => {
     )
     .forEach((p) => {
       const { parent } = p
-      const name = parent.value.left.name
+      const { name } = parent.value.left
       const require = p.value.arguments[0].value
       const hasVariableDeclarator = root
         .find(j.VariableDeclarator, {
@@ -174,7 +174,7 @@ const transformer: Transform = (file, api, options) => {
     .filter((p) => {
       const { name } = p.value.id
       const requireName = p.value.init.arguments[0].value
-      const combined = name + '|' + requireName
+      const combined = `${name}|${requireName}`
       const has = requireNames.has(combined)
 
       if (!has) {

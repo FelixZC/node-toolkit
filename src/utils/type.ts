@@ -1,4 +1,3 @@
-import { upperFirstletter, writeFile } from './common'
 import * as fs from 'fs'
 import * as path from 'path'
 import type {
@@ -8,6 +7,7 @@ import type {
   PathItemObject,
   ResponseObject
 } from 'openapi-typescript'
+import { upperFirstletter, writeFile } from './common'
 
 const EamsAmsprojService = require('../../api/eams-amsprojService.json')
 
@@ -49,12 +49,12 @@ export const invokeRequestTemplateGenerator = () => {
   const transferUrlParams = (url: string) => {
     const paramUrlReg = /\{(.*?)\}/g
     return url.replace(paramUrlReg, '${params.$1}')
-  } //引入请求文件和参数定义文件
+  } // 引入请求文件和参数定义文件
 
   const createRequestTemplate = (item: CreateRequestTemplateExecListItem) => {
-    const resource = item.resource // const headers: Headers = {}
+    const { resource } = item // const headers: Headers = {}
 
-    const typingPath = item.typingPath
+    const { typingPath } = item
     const urls = resource.paths as Record<string, PathItemObject>
     const typingNamespaceName = upperFirstletter(
       `${resource.basePath.split('-')[0].replace('/', '')}ApiTyping`
@@ -104,7 +104,7 @@ export const invokeRequestTemplateGenerator = () => {
 
         let contentType = (module as any).consumes?.length
           ? (module as any).consumes[0]
-          : 'application/json' //替换文档consumes标注错误
+          : 'application/json' // 替换文档consumes标注错误
 
         if (
           method === 'post' &&
@@ -117,7 +117,7 @@ export const invokeRequestTemplateGenerator = () => {
         //   if(param.in ==='header'){
         //   }
         // })
-        //创建请求模板
+        // 创建请求模板
 
         requestTemplate += `
           /**${annotation} */
@@ -156,11 +156,11 @@ export const invokeRequestTemplateGenerator = () => {
       const execList = [
         {
           content: requestTemplate,
-          writePath: path.join(tempPath, item.resource.basePath + '.ts')
+          writePath: path.join(tempPath, `${item.resource.basePath}.ts`)
         },
         {
           content: typingTemplate,
-          writePath: path.join(tempPath, item.resource.basePath + '-params-response.d.ts')
+          writePath: path.join(tempPath, `${item.resource.basePath}-params-response.d.ts`)
         }
       ]
       execList.forEach((item) => {

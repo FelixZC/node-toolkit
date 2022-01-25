@@ -5,7 +5,7 @@ module.exports = {
     node: true
   },
   extends: [
-    'airbnb-base',
+    // 'airbnb-base',
     'plugin:prettier/recommended' // 添加 prettier 插件
   ],
   parser: '@typescript-eslint/parser',
@@ -14,5 +14,8 @@ module.exports = {
     sourceType: 'module'
   },
   plugins: ['@typescript-eslint'],
-  rules: {}
+  rules: {
+    'import/no-unresolved': 'off',
+    'import/extensions': 'off'
+  }
 }

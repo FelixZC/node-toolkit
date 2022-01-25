@@ -1,14 +1,15 @@
-import { parse as parseSFC, stringify as stringifySFC } from './sfcUtils'
 import createDebug from 'debug' // @ts-ignore
 
 import getParser from 'jscodeshift/src/getParser'
 import jscodeshift, { Parser, Transform } from 'jscodeshift'
+import { parse as parseSFC, stringify as stringifySFC } from './sfcUtils'
 import VueTransformation from './vuecodemods/VueTransformation'
 /**
  * The following file is adapted from https://github.com/vuejs/vue-codemod.git
  */
 
 import type { SFCDescriptor } from './sfcUtils'
+
 const debug = createDebug('vue-codemod')
 type FileInfo = {
   path: string

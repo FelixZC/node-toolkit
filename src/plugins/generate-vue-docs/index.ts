@@ -38,17 +38,17 @@ const mdOptions = {
 } // 提取Props
 
 const extractProps = (node) => {
-  let localNode = node
+  const localNode = node
   const props = {} // 获取Props类型
 
   function getPropType(node) {
     if (types.isIdentifier(node)) {
       return node.name
-    } else if (types.isArrayExpression(node)) {
-      return node.elements.map((item) => item.name).join('、')
-    } else {
-      return 'Any'
     }
+    if (types.isArrayExpression(node)) {
+      return node.elements.map((item) => item.name).join('、')
+    }
+    return 'Any'
   } // 获取Props默认值
 
   function getDefaultVal(node) {
@@ -59,13 +59,14 @@ const extractProps = (node) => {
       types.isStringLiteral(node)
     ) {
       return node.value
-    } else if (
+    }
+    if (
       types.isFunctionExpression(node) ||
       types.isArrowFunctionExpression(node) ||
       types.isObjectMethod(node)
     ) {
       try {
-        const code = generate.default(types.isObjectMethod(node) ? node.body : node).code
+        const { code } = generate.default(types.isObjectMethod(node) ? node.body : node)
         const fun = eval(`0,${types.isObjectMethod(node) ? 'function ()' : ''} ${code}`)
         return JSON.stringify(fun())
       } catch (error) {}
@@ -260,12 +261,11 @@ const parseDocs = (vueStr, config = {}) => {
             .map((item) => {
               if (item.type === 'CommentLine') {
                 return item.value.trim()
-              } else {
-                return item.value
-                  .split('\n')
-                  .map((item) => item.replace(/[\s\*]/g, ''))
-                  .filter(Boolean)
               }
+              return item.value
+                .split('\n')
+                .map((item) => item.replace(/[\s\*]/g, ''))
+                .filter(Boolean)
             })
             .toString()
         }
