@@ -5,7 +5,9 @@ dist
 .cache
 .local
 .history
-src copy
+/src copy
+/src/api
+/src/query
 # local env files
 .env.local
 .env.*.local

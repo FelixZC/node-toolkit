@@ -53,9 +53,10 @@ export default declare((babel) => {
             ;(elements as ObjectExpression[]).sort(sortObjectArray)
           }
 
-          if (isStringArray) {
-            ;(elements as StringLiteral[]).sort(sortStringArray)
-          } // if (isNumberArray) {
+          // if (isStringArray) {
+          //   ;(elements as StringLiteral[]).sort(sortStringArray)
+          // }
+          // if (isNumberArray) {
           //   ;(elements as NumericLiteral[]).sort(sortNumberArray)
           // }
         }

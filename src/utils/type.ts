@@ -9,11 +9,11 @@ import type {
 } from 'openapi-typescript'
 import { upperFirstletter, writeFile } from './common'
 
-const EamsAmsprojService = require('../../api/eams-amsprojService.json')
+const EamsAmsprojService = require('../api/eams-amsprojService.json')
 
-const SystemBaseService = require('../../api/system-baseService.json')
+const SystemBaseService = require('../api/system-baseService.json')
 
-const BaseStatsService = require('../../api/base-statsService.json')
+const BaseStatsService = require('../api/base-statsService.json')
 
 interface CreateRequestTemplateExecListItem {
   resource: typeof EamsAmsprojService | typeof SystemBaseService
