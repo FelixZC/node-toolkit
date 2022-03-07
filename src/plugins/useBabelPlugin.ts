@@ -23,8 +23,8 @@ const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
       plugins: ['decorators-legacy', 'jsx', 'typescript'],
       sourceType: 'module',
       allowImportExportEverywhere: false
-    }) // 2,分析修改AST，第一个参数是AST，第二个参数是访问者对象
-
+    })
+    // 2,分析修改AST，第一个参数是AST，第二个参数是访问者对象
     for (const plugin of pluginsList) {
       const pluginObj = plugin(babel)
       traverse(codeAst, pluginObj.visitor)
@@ -32,8 +32,8 @@ const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
       if (typeof pluginObj.getExtra === 'function') {
         execFileInfo.extra = { ...execFileInfo.extra, ...pluginObj.getExtra() }
       }
-    } // 3，生成新的代码，第一个参数是AST，第二个是一些可选项，第三个参数是原始的code
-
+    }
+    // 3，生成新的代码，第一个参数是AST，第二个是一些可选项，第三个参数是原始的code
     const newCode = generator(
       codeAst,
       {
@@ -42,8 +42,8 @@ const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
         retainLines: false
       },
       execFileInfo.source
-    ) // 会返回一个对象，code就是生成后的新代码
-
+    )
+    // 会返回一个对象，code就是生成后的新代码
     return `\n${newCode.code}\n`
   } catch (e) {
     console.log(execFileInfo.path, e)

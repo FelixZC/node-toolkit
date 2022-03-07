@@ -20,7 +20,7 @@ const vueDefaultOrder = [
   'watch',
   ...[
     'beforeCreate',
-    'beforeDestory',
+    'beforeDestroy',
     'beforeMount',
     'beforeUpadte',
     'created',
