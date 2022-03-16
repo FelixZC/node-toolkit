@@ -153,12 +153,13 @@ export const getAttrsAndAnnotation = (targetPath?: string) => {
 
     return result
   })
-  const attrsCollection: AttrsCollection = {
+  // 所有属性描述对象
+  const attrsCollectionTemp: AttrsCollection = {
     key: '',
     standingInitial: 'string',
     value: ''
-  } // 所有属性描述对象
-
+  }
+  // 所有属性描述对象数组
   const attrsCollectionGroup: AttrsCollection[] = [] // 根据首字母分类属性描述对象数组
 
   const handler = (filePath: string) => {
@@ -178,32 +179,30 @@ export const getAttrsAndAnnotation = (targetPath?: string) => {
       if (Object.keys(attributesObj).length) {
         for (const [key, value] of Object.entries(attributesObj)) {
           // 冲突处理
-          if (Reflect.get(attrsCollection, key)) {
+          if (Reflect.get(attrsCollectionTemp, key)) {
             const newKey = `${key}:arrow_right:(in ${path.basename(filePath)})`
 
             if (
-              Reflect.get(attrsCollection, newKey) === value ||
-              Reflect.get(attrsCollection, key) === value
+              Reflect.get(attrsCollectionTemp, newKey) === value ||
+              Reflect.get(attrsCollectionTemp, key) === value
             ) {
               continue
             }
 
-            Reflect.set(attrsCollection, newKey, value)
+            Reflect.set(attrsCollectionTemp, newKey, value)
             attrsCollectionGroup.push({
               key: newKey,
               standingInitial: newKey.slice(0, 1).toLocaleUpperCase(),
               value
             })
           } else {
-            Reflect.set(attrsCollection, key, value)
+            Reflect.set(attrsCollectionTemp, key, value)
             attrsCollectionGroup.push({
               key,
               standingInitial: key.slice(0, 1).toLocaleUpperCase(),
               value
             })
           }
-
-          Reflect.set(attrsCollection, key, value)
         }
       }
     } catch (e) {
@@ -232,13 +231,14 @@ export const getAttrsAndAnnotation = (targetPath?: string) => {
     'src/query/md/attributes-description-table.md',
     attributesDescriptionTable.replace(/\{\{.*\}\}/g, '').replace(/<.*>/g, '')
   )
-  const storeTable = mdUtils.createdStoreTable(storeFile, attrsCollection) // 获取store属性描述
+
+  const storeTable = mdUtils.createdStoreTable(storeFile, attrsCollectionTemp) // 获取store属性描述
 
   writeFile(
     'src/query/md/storeTable.md',
     storeTable.replace(/\{\{.*\}\}/g, '').replace(/<.*>/g, '')
   )
-  writeFile('src/query/json/attrs-collection.json', JSON.stringify(attrsCollection))
+  writeFile('src/query/json/attrs-collection.json', JSON.stringify(attrsCollectionTemp))
 } // 获取自定组件Props,Methods,Slot,Event
 
 export const getComponentDescription = () => {
