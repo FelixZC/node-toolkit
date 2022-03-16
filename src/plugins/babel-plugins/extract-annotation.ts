@@ -3,7 +3,8 @@ import type {
   FunctionDeclaration,
   ObjectMethod,
   ObjectProperty,
-  VariableDeclaration
+  VariableDeclaration,
+  TSPropertySignature
 } from '@babel/types'
 import type { NodePath } from '@babel/traverse'
 
@@ -12,7 +13,13 @@ export default declare((babel) => {
   extra.attributesObj = {} as Record<string, any>
 
   const getAnnatation = (
-    path: NodePath<ObjectMethod | ObjectProperty | VariableDeclaration | FunctionDeclaration>
+    path: NodePath<
+      | ObjectMethod
+      | ObjectProperty
+      | VariableDeclaration
+      | FunctionDeclaration
+      | TSPropertySignature
+    >
   ) => {
     if (path.node.leadingComments?.length || path.node.trailingComments?.length) {
       let key: string = ''
@@ -20,6 +27,7 @@ export default declare((babel) => {
       switch (path.node.type) {
         case 'ObjectProperty':
         case 'ObjectMethod':
+        case 'TSPropertySignature':
           key = path.node.key.name
           break
 
@@ -61,6 +69,9 @@ export default declare((babel) => {
       },
 
       VariableDeclaration(path) {
+        getAnnatation(path)
+      },
+      TSPropertySignature(path) {
         getAnnatation(path)
       }
     }
