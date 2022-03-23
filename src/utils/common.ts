@@ -151,7 +151,7 @@ export const capitalize = function (str: string) {
  * @returns
  */
 export const isPath = (str: string) => {
-  const startsWithList: string[] = ['@', 'src', 'images', 'styles', '/', '~', '../', './']
+  const startsWithList: string[] = ['@', 'src', 'images', 'styles', '~', '../', './']
   for (const tag of startsWithList) {
     if (str.startsWith(tag)) {
       return true
@@ -184,6 +184,6 @@ export const transferRef = (str: string, seperator = '/') => {
       return result
     })
     .join(seperator)
-    .replace(/(\b\w\b)-/g, '$1')
+    .replace(/-(\b\w\b)/g, '$1')
     .replace(/(['"`/\\])-/g, '$1')
 }
