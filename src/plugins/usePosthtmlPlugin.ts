@@ -8,9 +8,9 @@ interface MergeOptions extends Options, parserOptions, renderOptions {}
 
 const runPosthtmlPlugin = async (
   execFileInfo: ExecFileInfo,
-  plugins: PosthtmlPlugin<unknown>[] = []
+  pluginsList: PosthtmlPlugin<unknown>[] = []
 ) => {
-  const result = await posthtml(plugins).process(execFileInfo.source, {
+  const result = await posthtml(pluginsList).process(execFileInfo.source, {
     closingSingleTag: 'slash',
     recognizeSelfClosing: true
   } as MergeOptions)

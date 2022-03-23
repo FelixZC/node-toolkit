@@ -7,8 +7,8 @@ import type { Transform } from 'jscodeshift'
 import { writeFile, groupBy } from '../utils/common'
 import * as cliProgress from '../utils/cli-progress'
 import fsUtils from '../utils/fs'
-import getPostcssPluginActuator from '../plugins/usePostcssPlugin'
-import getPosthtmlPluginActuator from '../plugins/usePosthtmlPlugin'
+import runPostcssPlugin from '../plugins/usePostcssPlugin'
+import runPosthtmlPlugin from '../plugins/usePosthtmlPlugin'
 import mdUtils from '../utils/md'
 import runBabelPlugin from '../plugins/useBabelPlugin'
 import runCodemod from '../plugins/useJsCodemod'
@@ -550,7 +550,7 @@ export const execPosthtmlPlugin = (plugins: PosthtmlPlugin<unknown>[], targetPat
         path: filePath,
         source: content
       }
-      const result = await getPosthtmlPluginActuator(execFileInfo, plugins)
+      const result = await runPosthtmlPlugin(execFileInfo, plugins)
       const newContent = result.replace(/=['"]_pzc_['"]/g, '')
       if (newContent === content || !newContent.length) {
         return
@@ -589,7 +589,7 @@ export const execPostcssPlugin = (plugins: PostcssPlugin[], targetPath?: string)
         path: filePath,
         source: content
       }
-      const result = await getPostcssPluginActuator(execFileInfo, plugins)
+      const result = await runPostcssPlugin(execFileInfo, plugins)
       if (result === content || !result.length) {
         return
       }
@@ -603,7 +603,7 @@ export const execPostcssPlugin = (plugins: PostcssPlugin[], targetPath?: string)
   if (targetPath) {
     handler(targetPath)
   } else {
-    const vaildList = ['.css', '.scss', '.sass', '.less', '.styl']
+    const vaildList = ['.css', '.scss', '.sass', '.less', '.styl', '.vue', '.sugarss']
     const targetList = fileInfoList.filter((fileInfo) => vaildList.includes(fileInfo.extname))
     const { updateBar } = cliProgress.useCliProgress(targetList.length)
     for (const item of targetList) {
