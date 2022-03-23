@@ -6,7 +6,7 @@ import { parse as parseSFC, stringify as stringifySFC } from './sfcUtils'
 const syntax = require('postcss-syntax')({
   rules: [
     {
-      test: /\.(?:[sx]?html?|[sx]ht|vue|ux|php)$/i,
+      test: /\.(?:[sx]?html?|[sx]ht|ux|php)$/i,
       extract: 'html'
     },
     {
