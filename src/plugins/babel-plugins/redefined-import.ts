@@ -1,7 +1,7 @@
 import { declare } from '@babel/helper-plugin-utils'
 import { NodePath } from '@babel/core'
 import type { ImportDeclaration, MemberExpression, Statement, ThisExpression } from '@babel/types'
-import { upperFirstletter } from '../../utils/common'
+import { capitalize } from '../../utils/common'
 import { getImportObj } from './ast-utils'
 import type { ImportObj } from './ast-utils'
 
@@ -56,7 +56,7 @@ export default declare((babel) => {
 
               if (redefiend) {
                 let newImport = buildRequire({
-                  IMPORT_NAME: t.identifier(`${upperFirstletter(name)}`),
+                  IMPORT_NAME: t.identifier(`${capitalize(name)}`),
                   SOURCE: redefiend.source
                 })
 
@@ -96,12 +96,12 @@ export default declare((babel) => {
               if (trueTarget.node.property.name) {
                 trueTarget.replaceWith(
                   t.memberExpression(
-                    t.identifier(upperFirstletter(reference)),
+                    t.identifier(capitalize(reference)),
                     t.identifier(trueTarget.node.property.name)
                   )
                 )
               } else {
-                trueTarget.node.object = t.identifier(upperFirstletter(reference))
+                trueTarget.node.object = t.identifier(capitalize(reference))
               }
             }
           }

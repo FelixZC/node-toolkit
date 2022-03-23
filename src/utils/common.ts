@@ -2,15 +2,6 @@ import * as fs from 'fs'
 import * as path from 'path' //
 
 /**
- * 首字母大写
- * @param str
- * @returns
- */
-
-export const upperFirstletter = (str: string) => {
-  return str.slice(0, 1).toUpperCase() + str.slice(1)
-}
-/**
  * 获取数据类型
  * @param {any} obj
  * @returns {String} 数据构造器对应字符串
@@ -127,4 +118,72 @@ export function groupBy(arr: Array<Record<string, any>>, groupKey: string) {
     }
   })
   return cache
+}
+
+/**
+ * 驼峰转化-
+ * @param str
+ * @returns
+ */
+export const kebabCase = function (str: string) {
+  const hyphenateRE = /([^-])([A-Z])/g
+  return str.replace(hyphenateRE, '$1-$2').replace(hyphenateRE, '$1-$2').toLowerCase()
+}
+
+export const easeUnline = function (str: string) {
+  const easeReg = /[_-]{2}/g
+  const easeReg2 = /^[-_]/g
+  return str.replace(easeReg, '-').replace(easeReg2, '')
+}
+/**
+ * 首字母大写
+ * @param str
+ * @returns
+ */
+export const capitalize = function (str: string) {
+  if (typeof str !== 'string') return str
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+/**
+ * 判断是否为引用路径
+ * @param str
+ * @returns
+ */
+export const isPath = (str: string) => {
+  const startsWithList: string[] = ['@', 'src', 'images', 'styles', '/', '~', '../', './']
+  for (const tag of startsWithList) {
+    if (str.startsWith(tag)) {
+      return true
+    }
+  }
+  return false
+}
+
+/**
+ * 转化导入路径引用驼峰规则
+ * @param str
+ * @param seperator
+ * @returns
+ */
+export const transferRef = (str: string, seperator = '/') => {
+  if (!str) {
+    return str
+  }
+  return str
+    .split(seperator)
+    .map((item) => {
+      /** to stupid to continue  */
+      /** this is situation one */
+      const result = kebabCase(item)
+      if (!result.includes('-') && item !== result) {
+        return '_' + result
+      }
+      /** this is situation two,exec after one*/
+      // const result = easeUnline(item)
+      return result
+    })
+    .join(seperator)
+    .replace(/(\b\w\b)-/g, '$1')
+    .replace(/(['"`/\\])-/g, '$1')
 }

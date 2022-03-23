@@ -7,7 +7,7 @@ import type {
   PathItemObject,
   ResponseObject
 } from 'openapi-typescript'
-import { upperFirstletter, writeFile } from './common'
+import { capitalize, writeFile } from './common'
 
 const EamsAmsprojService = require('../api/eams-amsprojService.json')
 
@@ -56,7 +56,7 @@ export const invokeRequestTemplateGenerator = () => {
 
     const { typingPath } = item
     const urls = resource.paths as Record<string, PathItemObject>
-    const typingNamespaceName = upperFirstletter(
+    const typingNamespaceName = capitalize(
       `${resource.basePath.split('-')[0].replace('/', '')}ApiTyping`
     )
     let requestTemplate = `

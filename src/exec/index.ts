@@ -1,4 +1,3 @@
-import babel from '@babel/core'
 import * as fs from 'fs'
 import * as os from 'os'
 import * as path from 'path'
@@ -577,6 +576,43 @@ export const execPosthtmlPlugin = (plugins: PosthtmlPlugin<unknown>[], targetPat
     }
   }
 }
+/**
+ * 执行postcss插件
+ * @param plugins
+ * @param targetPath
+ */
+export const execPostcssPlugin = (plugins: PostcssPlugin[], targetPath?: string) => {
+  const handler = async (filePath: string) => {
+    try {
+      const content = fs.readFileSync(filePath, 'utf-8')
+      const execFileInfo: ExecFileInfo = {
+        path: filePath,
+        source: content
+      }
+      const result = await getPostcssPluginActuator(execFileInfo, plugins)
+      if (result === content || !result.length) {
+        return
+      }
+      writeFile(filePath, result)
+    } catch (e) {
+      console.error('目标文件出错：', filePath)
+      console.error(e)
+    }
+  }
+
+  if (targetPath) {
+    handler(targetPath)
+  } else {
+    const vaildList = ['.css', '.scss', '.sass', '.less', '.styl']
+    const targetList = fileInfoList.filter((fileInfo) => vaildList.includes(fileInfo.extname))
+    const { updateBar } = cliProgress.useCliProgress(targetList.length)
+    for (const item of targetList) {
+      handler(item.filePath)
+      updateBar()
+    }
+  }
+}
+
 export const execCodemod = (codemodList: Transform[], targetPath?: string) => {
   if (!codemodList.length) {
     return
