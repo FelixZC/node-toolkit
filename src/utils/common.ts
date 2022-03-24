@@ -130,10 +130,6 @@ export const kebabCase = function (str: string) {
   return str.replace(hyphenateRE, '$1-$2').replace(hyphenateRE, '$1-$2').toLowerCase()
 }
 
-export const easeUnline = function (str: string) {
-  const easeReg2 = /^[_]/g
-  return str.replace(easeReg2, '')
-}
 /**
  * 首字母大写
  * @param str
@@ -150,7 +146,7 @@ export const capitalize = function (str: string) {
  * @returns
  */
 export const isPath = (str: string) => {
-  const startsWithList: string[] = ['@', 'src', 'images', 'styles', '~', '../', './']
+  const startsWithList: string[] = ['@', 'src', 'images', 'img', 'styles', '~', '../', './']
   for (const tag of startsWithList) {
     if (str.startsWith(tag)) {
       return true
@@ -171,18 +167,7 @@ export const transferRef = (str: string, seperator = '/') => {
   }
   return str
     .split(seperator)
-    .map((item) => {
-      /** to stupid to continue  */
-      /** 当svn和window组合使用，会出现大小写同源问题 */
-      /** this is situation one  */
-      const result = kebabCase(item)
-      // if (!result.includes('-') && item !== result) {
-      //   return '_' + result
-      // }
-      /** this is situation two,exec after one ，also you can skip them */
-      // const result = easeUnline(item)
-      return result
-    })
+    .map((item) => kebabCase(item))
     .join(seperator)
     .replace(/-(\b\w\b)[^-\w]?/g, '$1')
     .replace(/(['"`/\\])-/g, '$1')
