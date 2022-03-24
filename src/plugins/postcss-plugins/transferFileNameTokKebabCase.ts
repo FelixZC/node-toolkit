@@ -11,7 +11,7 @@ const transferHandler = (rule: Rule | AtRule) => {
     }
   })
   const atRule = rule as AtRule
-  if (atRule.params) {
+  if (atRule.params && !atRule.params.includes('$')) {
     atRule.params = transferRef(atRule.params)
   }
 }

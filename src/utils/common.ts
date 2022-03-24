@@ -131,9 +131,8 @@ export const kebabCase = function (str: string) {
 }
 
 export const easeUnline = function (str: string) {
-  const easeReg = /[_-]{2}/g
-  const easeReg2 = /^[-_]/g
-  return str.replace(easeReg, '-').replace(easeReg2, '')
+  const easeReg2 = /^[_]/g
+  return str.replace(easeReg2, '')
 }
 /**
  * 首字母大写
@@ -174,16 +173,18 @@ export const transferRef = (str: string, seperator = '/') => {
     .split(seperator)
     .map((item) => {
       /** to stupid to continue  */
-      /** this is situation one */
+      /** 当svn和window组合使用，会出现大小写同源问题 */
+      /** this is situation one  */
       const result = kebabCase(item)
-      if (!result.includes('-') && item !== result) {
-        return '_' + result
-      }
-      /** this is situation two,exec after one*/
+      // if (!result.includes('-') && item !== result) {
+      //   return '_' + result
+      // }
+      /** this is situation two,exec after one ，also you can skip them */
       // const result = easeUnline(item)
       return result
     })
     .join(seperator)
-    .replace(/-(\b\w\b)/g, '$1')
+    .replace(/-(\b\w\b)[^-\w]?/g, '$1')
     .replace(/(['"`/\\])-/g, '$1')
+    .replace(/[_-]{2}/g, '-')
 }
