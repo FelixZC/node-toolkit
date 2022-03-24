@@ -6,7 +6,7 @@
       new Blob()
       return
     } catch (e) {
-      console.log(e)
+      console.warn(e)
     }
   } // Internally we use a BlobBuilder implementation to base Blob off of
   // in order to support older browsers that only have BlobBuilder

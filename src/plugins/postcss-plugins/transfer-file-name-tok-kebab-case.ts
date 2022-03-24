@@ -1,4 +1,4 @@
-import { AcceptedPlugin as PostcssPlugin, Rule, AtRule } from 'postcss'
+import { AcceptedPlugin as PostcssPlugin, AtRule, Rule } from 'postcss'
 import { isPath, transferRef } from '../../utils/common'
 
 const transferHandler = (rule: Rule | AtRule) => {
@@ -20,12 +20,12 @@ const transferHandler = (rule: Rule | AtRule) => {
 }
 
 const plugin = (): PostcssPlugin => ({
-  postcssPlugin: 'postcss-reverse-props',
-
   Once(root) {
     root.walkRules(transferHandler)
     root.walkAtRules(transferHandler)
-  }
+  },
+
+  postcssPlugin: 'postcss-reverse-props'
 })
 
 plugin.postcss = true

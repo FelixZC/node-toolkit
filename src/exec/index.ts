@@ -1,18 +1,18 @@
+import { groupBy, writeFile } from '../utils/common'
+import * as cliProgress from '../utils/cli-progress'
 import * as fs from 'fs'
+import fsUtils from '../utils/fs'
+import mdUtils from '../utils/md'
 import * as os from 'os'
 import * as path from 'path'
+import runBabelPlugin from '../plugins/use-babel-plugin'
+import runCodemod from '../plugins/use-js-codemod'
+import runPostcssPlugin from '../plugins/use-postcss-plugin'
+import runPosthtmlPlugin from '../plugins/use-posthtml-plugin'
+import storeFile from '../query/js/stote-state'
 import type { Plugin as PosthtmlPlugin } from 'posthtml'
 import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
 import type { Transform } from 'jscodeshift'
-import { writeFile, groupBy } from '../utils/common'
-import * as cliProgress from '../utils/cli-progress'
-import fsUtils from '../utils/fs'
-import runPostcssPlugin from '../plugins/use-postcss-plugin'
-import runPosthtmlPlugin from '../plugins/use-posthtml-plugin'
-import mdUtils from '../utils/md'
-import runBabelPlugin from '../plugins/use-babel-plugin'
-import runCodemod from '../plugins/use-js-codemod'
-import storeFile from '../query/js/stote-state'
 import type { GroupCache } from '../utils/common'
 import type { FileInfo } from '../utils/fs'
 import type { ExecFileInfo } from '../plugins/common'
@@ -204,8 +204,7 @@ export const getAttrsAndAnnotation = (targetPath?: string) => {
         }
       }
     } catch (e) {
-      console.error('目标文件出错：', filePath)
-      console.error(e)
+      console.warn(e)
     }
   }
 
@@ -500,7 +499,6 @@ export const batchReplaceByReg = (
       modifyCount++
     }
   })
-  console.info(`共修改了${modifyCount}次文件`)
 } // 使用babel插件
 
 export const execBabelPlugin = (babelPlugins: BabelPlugin[], targetPath?: string) => {
@@ -523,8 +521,7 @@ export const execBabelPlugin = (babelPlugins: BabelPlugin[], targetPath?: string
 
       writeFile(filePath, newContent)
     } catch (e) {
-      console.error('目标文件出错：', filePath)
-      console.error(e)
+      console.warn(e)
     }
   }
 
@@ -560,8 +557,7 @@ export const execPosthtmlPlugin = (plugins: PosthtmlPlugin<unknown>[], targetPat
 
       writeFile(filePath, newContent)
     } catch (e) {
-      console.error('目标文件出错：', filePath)
-      console.error(e)
+      console.warn(e)
     }
   }
 
@@ -600,8 +596,7 @@ export const execPostcssPlugin = (plugins: PostcssPlugin[], targetPath?: string)
 
       writeFile(filePath, result)
     } catch (e) {
-      console.error('目标文件出错：', filePath)
-      console.error(e)
+      console.warn(e)
     }
   }
 
@@ -638,8 +633,7 @@ export const execCodemod = (codemodList: Transform[], targetPath?: string) => {
 
       writeFile(filePath, newContent)
     } catch (e) {
-      console.error('目标文件出错：', filePath)
-      console.error(e)
+      console.warn(e)
     }
   }
 

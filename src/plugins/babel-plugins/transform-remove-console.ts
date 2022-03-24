@@ -1,5 +1,5 @@
 import { declare } from '@babel/helper-plugin-utils'
-import type { MemberExpression, Expression, PrivateName } from '@babel/types'
+import type { Expression, MemberExpression, PrivateName } from '@babel/types'
 import type { NodePath } from '@babel/traverse'
 export default declare((babel) => {
   const { types: t } = babel

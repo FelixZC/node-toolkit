@@ -1,5 +1,5 @@
-import type { Transform } from 'jscodeshift'
 import * as exec from './index'
+import type { Transform } from 'jscodeshift'
 const jscodemodeList = [
   '../plugins/jscodemods/arrow-function',
   '../plugins/jscodemods/arrow-function-arguments',
@@ -30,5 +30,5 @@ try {
   })
   exec.execCodemod(codemodList)
 } catch (e) {
-  console.log(e)
+  console.warn(e)
 }

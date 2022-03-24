@@ -1,6 +1,6 @@
-import type * as N from 'jscodeshift'
 import wrap from '../wrap-ast-transformation'
 import type { ASTTransformation } from '../wrap-ast-transformation'
+import type * as N from 'jscodeshift'
 type Params = {
   // if false, do not take expressions like `new HelloWorld().$mount` or
   // `new HelloWorld({ el: '#app' })`into account

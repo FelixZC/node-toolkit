@@ -1,3 +1,4 @@
+import { capitalize, writeFile } from './common'
 import * as fs from 'fs'
 import * as path from 'path'
 import type {
@@ -7,7 +8,6 @@ import type {
   PathItemObject,
   ResponseObject
 } from 'openapi-typescript'
-import { capitalize, writeFile } from './common'
 
 const EamsAmsprojService = require('../api/eams-amsproj-service.json')
 

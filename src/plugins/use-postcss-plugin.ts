@@ -1,36 +1,36 @@
+import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
 import postcss from 'postcss'
 import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
 import type { ExecFileInfo } from './common'
-import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
 
 const syntax = require('postcss-syntax')({
-  rules: [
-    {
-      test: /\.(?:[sx]?html?|[sx]ht|ux|php)$/i,
-      extract: 'html'
-    },
-    {
-      test: /\.(?:markdown|md)$/i,
-      extract: 'markdown'
-    },
-    {
-      test: /\.(?:[cm]?[jt]sx?|es\d*|pac)$/i,
-      extract: 'jsx'
-    },
-    {
-      // custom language for file extension
-      test: /\.postcss$/i,
-      lang: 'scss'
-    }
-  ],
   // custom parser for CSS (using `postcss-safe-parser`)
   css: 'postcss-safe-parser',
+  // custom parser for LESS (by module path)
+  less: './node_modules/postcss-less',
+  rules: [
+    {
+      extract: 'html',
+      test: /\.(?:[sx]?html?|[sx]ht|ux|php)$/i
+    },
+    {
+      extract: 'markdown',
+      test: /\.(?:markdown|md)$/i
+    },
+    {
+      extract: 'jsx',
+      test: /\.(?:[cm]?[jt]sx?|es\d*|pac)$/i
+    },
+    {
+      lang: 'scss',
+      // custom language for file extension
+      test: /\.postcss$/i
+    }
+  ],
   // custom parser for SASS (PostCSS-compatible syntax.)
   sass: require('postcss-sass'),
   // custom parser for SCSS (by module name)
   scss: 'postcss-scss',
-  // custom parser for LESS (by module path)
-  less: './node_modules/postcss-less',
   // custom parser for SugarSS
   sugarss: require('sugarss')
 })

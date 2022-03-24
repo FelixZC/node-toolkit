@@ -1,5 +1,5 @@
-import type PostHTML from 'posthtml'
 import { sortObjAttr } from '../../utils/common'
+import type PostHTML from 'posthtml'
 
 const propertySort: PostHTML.Plugin<unknown> = (tree) => {
   tree.walk((node) => {

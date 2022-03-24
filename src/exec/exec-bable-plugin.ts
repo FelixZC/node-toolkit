@@ -22,5 +22,5 @@ try {
   })
   exec.execBabelPlugin(plugins)
 } catch (e) {
-  console.log(e)
+  console.warn(e)
 }

@@ -3,8 +3,8 @@ import type {
   FunctionDeclaration,
   ObjectMethod,
   ObjectProperty,
-  VariableDeclaration,
-  TSPropertySignature
+  TSPropertySignature,
+  VariableDeclaration
 } from '@babel/types'
 import type { NodePath } from '@babel/traverse'
 export default declare((babel) => {
@@ -67,11 +67,11 @@ export default declare((babel) => {
         getAnnatation(path)
       },
 
-      VariableDeclaration(path) {
+      TSPropertySignature(path) {
         getAnnatation(path)
       },
 
-      TSPropertySignature(path) {
+      VariableDeclaration(path) {
         getAnnatation(path)
       }
     }

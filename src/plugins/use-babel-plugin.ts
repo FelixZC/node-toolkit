@@ -1,11 +1,11 @@
+import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
 import * as babel from '@babel/core'
 import generator from '@babel/generator'
 import * as parser from '@babel/parser'
 import traverse from '@babel/traverse'
+import type { ExecFileInfo } from './common'
 import type * as Babel from '@babel/core'
 import type { PluginObj, Visitor } from '@babel/core'
-import type { ExecFileInfo } from './common'
-import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
 export type BabelAPI = typeof Babel
 export interface CustomPluginObj extends PluginObj {
   getExtra?: () => Record<string, any>
@@ -19,9 +19,9 @@ const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
   try {
     // 1，先将代码转换成ast
     const codeAst = parser.parse(execFileInfo.source, {
+      allowImportExportEverywhere: false,
       plugins: ['decorators-legacy', 'jsx', 'typescript'],
-      sourceType: 'module',
-      allowImportExportEverywhere: false
+      sourceType: 'module'
     }) // 2,分析修改AST，第一个参数是AST，第二个参数是访问者对象
 
     for (const plugin of pluginsList) {
@@ -45,7 +45,6 @@ const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
 
     return `\n${newCode.code}\n`
   } catch (e) {
-    console.log(execFileInfo.path, e)
     return execFileInfo.source
   }
 }

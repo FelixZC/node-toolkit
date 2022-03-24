@@ -1,5 +1,5 @@
-import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
 import * as exec from './index'
+import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
 const pluginsPathList: string[] = ['../plugins/postcss-plugins/transfer-file-name-tok-kebab-case']
 
 try {
@@ -14,5 +14,5 @@ try {
   })
   exec.execPostcssPlugin(plugins)
 } catch (e) {
-  console.log(e)
+  console.warn(e)
 }

@@ -1,6 +1,6 @@
 const a = {
-  cc: '',
   appid: '',
+  cc: '',
   token: '',
   tokenExpires: 0
 }
@@ -19,7 +19,6 @@ const setTemplate = () => {
     `
     })
     .join(',')
-  console.log(b.replace(/\\n/g, '').replace(/['"]/g, ''))
 }
 
 setTemplate()

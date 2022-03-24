@@ -1,7 +1,7 @@
+import { checkPathVaild } from '../utils/common'
 import * as fs from 'fs'
 import * as os from 'os'
 import * as path from 'path'
-import { checkPathVaild } from '../utils/common'
 const userInfo = os.userInfo() // 用户信息
 
 const eol = os.EOL // 换行符
@@ -74,7 +74,6 @@ function catchHandel() {
       try {
         return fn.apply(this, arguments)
       } catch (error) {
-        console.error(error)
         const record: Record = {
           arguments,
           error,
@@ -137,9 +136,7 @@ class fsUtils implements FsInstance {
 
     try {
       fs.appendFileSync(this.logPath, content)
-    } catch (err) {
-      console.error(err)
-    }
+    } catch (err) {}
   }
   /**
    * 获取指定路径所有文件列表
@@ -300,7 +297,6 @@ class fsUtils implements FsInstance {
         modifyCount++
       }
     })
-    console.log(`批量修改完毕，共${modifyCount}个文件产生变化`)
   }
   /**
    * 重命名文件名，存在资源抢占问题，需要二次执行rename，或者记录oldFilePath执行fs.rm

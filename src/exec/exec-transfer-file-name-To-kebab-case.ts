@@ -1,11 +1,12 @@
+import { transferRef } from '../utils/common'
+
 /**
  * 批量修改文件命名和引用为驼峰式规范
  */
 import * as exec from './index'
-import type { BabelPlugin } from '../plugins/use-babel-plugin'
-import { transferRef } from '../utils/common'
-import * as path from 'path'
 import * as fs from 'fs'
+import * as path from 'path'
+import type { BabelPlugin } from '../plugins/use-babel-plugin'
 import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
 import type { Plugin as PosthtmlPlugin } from 'posthtml'
 const babelPluginPathList: string[] = ['../plugins/babel-plugins/transfer-file-name-tok-kebab-case']
@@ -85,5 +86,5 @@ try {
     }
   })
 } catch (e) {
-  console.log(e)
+  console.warn(e)
 }

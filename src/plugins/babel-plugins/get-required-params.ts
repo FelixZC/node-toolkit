@@ -53,9 +53,7 @@ export default declare((babel) => {
       },
 
       Program: {
-        exit(path) {
-          console.log(extra.required)
-        }
+        exit(path) {}
       }
     }
   }

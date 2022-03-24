@@ -1,3 +1,6 @@
+import { parseDocs } from '../plugins/generate-vue-docs'
+import { getDataType, sortArray, sortObjAttr } from './common'
+
 /**
  * md文件生成工具类，完善中...
  * @author pzc
@@ -5,8 +8,6 @@
  *
  */
 import * as os from 'os'
-import { parseDocs } from '../plugins/generate-vue-docs'
-import { getDataType, sortArray, sortObjAttr } from './common'
 const br = os.EOL // 换行符
 
 /**
@@ -62,7 +63,6 @@ function textFormat(content: string, mode = 'md') {
   const match = content.match(reg)
 
   if (!match) {
-    console.log('空文本内容')
     return content
   }
 
@@ -89,7 +89,6 @@ function textFormat(content: string, mode = 'md') {
       break
 
     case 'txtToTxt':
-      console.log(result.length / 2)
       result = result.map((item, index) => {
         let localItem = item
         localItem = localItem.trim()
@@ -103,9 +102,8 @@ function textFormat(content: string, mode = 'md') {
       str = result.join(br)
       break
 
-    default: // 输出行结果
-      console.log(result.length)
-
+    default:
+      // 输出行结果
       result = result.map((item) => {
         let localItem = item
         localItem = localItem.trim()
