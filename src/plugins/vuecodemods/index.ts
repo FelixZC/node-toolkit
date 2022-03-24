@@ -1,5 +1,4 @@
 import type { Parser, Transform } from 'jscodeshift'
-
 type JSTransformationModule = {
   default: Transform
   parser?: string | Parser
@@ -14,7 +13,7 @@ const transformationMap: {
   'new-global-api': require('./new-global-api'),
   'new-vue-to-create-app': require('./new-vue-to-create-app'),
   // atomic ones
-  'remove-contextual-h-from-render': require('./remove-contextual-h-from-render'),
+  'remove-contextual-h-from-render': require('./remove-contextualh-from-render'),
   'remove-extraneous-import': require('./remove-extraneous-import'),
   'remove-production-tip': require('./remove-production-tip'),
   'remove-trivial-root': require('./remove-trivial-root'),

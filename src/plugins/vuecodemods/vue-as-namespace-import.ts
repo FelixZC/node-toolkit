@@ -1,7 +1,6 @@
-import wrap from '../wrapAstTransformation' // import Vue from 'vue' -> import * as Vue from 'vue'
+import wrap from '../wrap-ast-transformation' // import Vue from 'vue' -> import * as Vue from 'vue'
 
-import type { ASTTransformation } from '../wrapAstTransformation'
-
+import type { ASTTransformation } from '../wrap-ast-transformation'
 export const transformAST: ASTTransformation = ({ j, root }) => {
   const importDecl = root.find(j.ImportDeclaration, {
     source: {

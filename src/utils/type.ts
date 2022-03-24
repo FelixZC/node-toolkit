@@ -9,11 +9,11 @@ import type {
 } from 'openapi-typescript'
 import { capitalize, writeFile } from './common'
 
-const EamsAmsprojService = require('../api/eams-amsprojService.json')
+const EamsAmsprojService = require('../api/eams-amsproj-service.json')
 
-const SystemBaseService = require('../api/system-baseService.json')
+const SystemBaseService = require('../api/system-base-service.json')
 
-const BaseStatsService = require('../api/base-statsService.json')
+const BaseStatsService = require('../api/base-stats-service.json')
 
 interface CreateRequestTemplateExecListItem {
   resource: typeof EamsAmsprojService | typeof SystemBaseService
@@ -29,15 +29,15 @@ export const invokeRequestTemplateGenerator = () => {
   const createRequestTemplateExecList: Array<CreateRequestTemplateExecListItem> = [
     {
       resource: EamsAmsprojService,
-      typingPath: 'src/typings/interface/eams-amsprojService'
+      typingPath: 'src/typings/interface/eams-amsproj-service'
     },
     {
       resource: SystemBaseService,
-      typingPath: 'src/typings/interface/system-baseService'
+      typingPath: 'src/typings/interface/system-base-service'
     },
     {
       resource: BaseStatsService,
-      typingPath: 'src/typings/interface/base-statsService'
+      typingPath: 'src/typings/interface/base-stats-service'
     }
   ]
   /**

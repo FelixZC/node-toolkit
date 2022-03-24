@@ -2,7 +2,6 @@ import { declare } from '@babel/helper-plugin-utils'
 import type { ImportDeclaration } from '@babel/types'
 import { getImportObj } from './ast-utils'
 import type { ImportObj } from './ast-utils'
-
 export default declare((babel) => {
   const extra = {
     importList: [] as ImportObj[]

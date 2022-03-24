@@ -76,6 +76,7 @@
           if (blob.encoding === 'base64') {
             return `${data_URI_header};base64,${blob.data}`
           }
+
           if (blob.encoding === 'URI') {
             return `${data_URI_header},${decodeURIComponent(blob.data)}`
           }
@@ -86,6 +87,7 @@
 
           return `${data_URI_header},${encodeURIComponent(blob.data)}`
         }
+
         if (real_create_object_URL) {
           return real_create_object_URL.call(real_URL, blob)
         }

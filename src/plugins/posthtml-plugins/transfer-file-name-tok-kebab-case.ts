@@ -11,10 +11,13 @@ const propertySort: PostHTML.Plugin<unknown> = (tree) => {
           }
         }
       }
+
       const urlReg = /(?:url|require)\(['"`]?([\s\S]*?)['"`]?\)/
+
       for (const [key, value] of Object.entries(node.attrs)) {
         if (typeof value === 'string' && !value.includes('$')) {
           let result
+
           if ((result = urlReg.exec(value))) {
             if (isPath(result[1])) {
               node.attrs[key] = transferRef(value)

@@ -1,5 +1,4 @@
 import type { ImportDeclaration } from '@babel/types'
-
 export interface ImportObj {
   defaultImportName: string
   importNameList: string[]

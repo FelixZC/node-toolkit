@@ -2,14 +2,13 @@ import createDebug from 'debug' // @ts-ignore
 
 import getParser from 'jscodeshift/src/getParser'
 import jscodeshift, { Parser, Transform } from 'jscodeshift'
-import { parse as parseSFC, stringify as stringifySFC } from './sfcUtils'
-import VueTransformation from './vuecodemods/VueTransformation'
+import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
+import VueTransformation from './vuecodemods/vue-transformation'
 /**
  * The following file is adapted from https://github.com/vuejs/vue-codemod.git
  */
 
-import type { SFCDescriptor } from './sfcUtils'
-
+import type { SFCDescriptor } from './sfc-utils'
 const debug = createDebug('vue-codemod')
 type FileInfo = {
   path: string
@@ -59,7 +58,9 @@ export default function runTransformation(
     descriptor = parseSFC(source, {
       filename: path
     }).descriptor // skip .vue files without script block
+
     const scriptBlock = descriptor.script || descriptor.scriptSetup
+
     if (!scriptBlock) {
       return source
     }
@@ -96,9 +97,11 @@ export default function runTransformation(
 
   if (extension === '.vue') {
     const scriptBlock = descriptor!.script || descriptor!.scriptSetup
+
     if (out === scriptBlock?.content) {
       return source // skipped, don't bother re-stringifying
     }
+
     scriptBlock!.content = out
     descriptor!.script = scriptBlock
     return stringifySFC(descriptor!)

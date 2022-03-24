@@ -1,9 +1,7 @@
 const cliProgress = require('cli-progress')
 
 export const useCliProgress = (total: number = 0) => {
-  let count = 0
-
-  // if (!total) {
+  let count = 0 // if (!total) {
   //   throw new Error('cli-progress缺少总数')
   // }
 

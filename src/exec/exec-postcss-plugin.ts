@@ -1,6 +1,7 @@
 import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
 import * as exec from './index'
-const pluginsPathList: string[] = ['../plugins/postcss-plugins/transferFileNameTokKebabCase']
+const pluginsPathList: string[] = ['../plugins/postcss-plugins/transfer-file-name-tok-kebab-case']
+
 try {
   const plugins: PostcssPlugin[] = pluginsPathList.map((pluginPath) => {
     const result = require(pluginPath)

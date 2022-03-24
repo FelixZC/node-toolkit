@@ -1,6 +1,5 @@
 import { declare } from '@babel/helper-plugin-utils'
 import type { NumericLiteral, ObjectExpression, ObjectProperty, StringLiteral } from '@babel/types'
-
 export default declare((babel) => {
   const sortObjectArray = (v1: ObjectExpression, v2: ObjectExpression) => {
     const v1IndexProperty = v1.properties.find(
@@ -51,9 +50,7 @@ export default declare((babel) => {
 
           if (isObjectArray) {
             ;(elements as ObjectExpression[]).sort(sortObjectArray)
-          }
-
-          // if (isStringArray) {
+          } // if (isStringArray) {
           //   ;(elements as StringLiteral[]).sort(sortStringArray)
           // }
           // if (isNumberArray) {

@@ -4,7 +4,6 @@ import type { ImportDeclaration, MemberExpression, Statement, ThisExpression } f
 import { capitalize } from '../../utils/common'
 import { getImportObj } from './ast-utils'
 import type { ImportObj } from './ast-utils'
-
 interface Redefined {
   defaultImportName: string
   importNameList: string[]
@@ -14,7 +13,7 @@ const redefinedList: Redefined[] = [
   {
     defaultImportName: 'PublicMethod',
     importNameList: [],
-    source: '@/utils/PublicMethod.js'
+    source: '@/utils/public-method.js'
   }
 ]
 

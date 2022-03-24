@@ -65,6 +65,7 @@ export default declare((babel) => {
   function createVoid0() {
     return t.unaryExpression('void', t.numericLiteral(0))
   }
+
   return {
     name: 'transform-remove-console',
     visitor: {

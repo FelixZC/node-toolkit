@@ -1,9 +1,8 @@
-import wrap from '../wrapAstTransformation'
-// import { Component } from 'vue-class-component' ->
+import wrap from '../wrap-ast-transformation' // import { Component } from 'vue-class-component' ->
+
 /** import { Options as Component } from 'vue-class-component' */
 
-import type { ASTTransformation } from '../wrapAstTransformation'
-
+import type { ASTTransformation } from '../wrap-ast-transformation'
 export const transformAST: ASTTransformation = (context) => {
   const { j, root } = context
   const vueClassComponentImportDecls = root.find(j.ImportDeclaration, {

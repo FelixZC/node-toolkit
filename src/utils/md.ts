@@ -7,7 +7,6 @@
 import * as os from 'os'
 import { parseDocs } from '../plugins/generate-vue-docs'
 import { getDataType, sortArray, sortObjAttr } from './common'
-
 const br = os.EOL // 换行符
 
 /**
@@ -104,8 +103,8 @@ function textFormat(content: string, mode = 'md') {
       str = result.join(br)
       break
 
-    default:
-      console.log(result.length) // 输出行结果
+    default: // 输出行结果
+      console.log(result.length)
 
       result = result.map((item) => {
         let localItem = item

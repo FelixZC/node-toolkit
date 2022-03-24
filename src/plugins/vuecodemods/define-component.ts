@@ -1,8 +1,7 @@
 import { transformAST as addImport } from './add-import'
 import { transformAST as removeExtraneousImport } from './remove-extraneous-import'
-import wrap from '../wrapAstTransformation'
-import type { ASTTransformation } from '../wrapAstTransformation'
-
+import wrap from '../wrap-ast-transformation'
+import type { ASTTransformation } from '../wrap-ast-transformation'
 type Params = {
   useCompositionApi: boolean
 }

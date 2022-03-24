@@ -103,11 +103,8 @@ function catchHandel() {
 
 class fsUtils implements FsInstance {
   folderPath: string
-
   logPath: string
-
   filePathList: Array<string>
-
   dirPathList: string[] // 使用项目根目录
 
   constructor(public rootPath: string) {
@@ -221,6 +218,7 @@ class fsUtils implements FsInstance {
     let modifyCount = 0
     let filePathListBackup = [...this.filePathList]
     const cache: Cache = {} // 添置所有已有文件缓存
+
     for (const filePath of filePathListBackup) {
       cache[filePath] = {
         index: 0
@@ -249,7 +247,6 @@ class fsUtils implements FsInstance {
       let newBaseName // 获取新文件名称，不包含后缀名
 
       let newExtensionName
-
       let newDirName
 
       if (typeof customBaseName === 'function') {
@@ -293,8 +290,10 @@ class fsUtils implements FsInstance {
       const oldFilePath = path.resolve(oldDirName, oldFileName)
       const newFilePath = path.resolve(newDirName, newFileName)
       const operateResult = this.renameFile(oldFilePath, newFilePath)
+
       if (operateResult) {
         Reflect.deleteProperty(cache, oldFilePath) // 删除旧缓存
+
         Reflect.set(cache, newFilePath, {
           index
         })
@@ -315,6 +314,7 @@ class fsUtils implements FsInstance {
     if (oldFilePath === newFilePath) {
       return false
     }
+
     checkPathVaild(newFilePath)
     fs.renameSync(oldFilePath, newFilePath)
     this.filePathList.push(newFilePath)
@@ -343,6 +343,7 @@ class fsUtils implements FsInstance {
       newFileName = `${baseName} copy ${renameCount}${extensionName}`
       newFilePath = path.resolve(dirName, newFileName)
     }
+
     fs.copyFileSync(filePath, newFilePath)
     this.filePathList.push(newFilePath)
   }

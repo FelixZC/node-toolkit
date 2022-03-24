@@ -1,5 +1,4 @@
 import { Transform } from 'jscodeshift'
-
 const keywords = {
   abstract: true,
   boolean: true,

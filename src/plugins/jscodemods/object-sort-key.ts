@@ -1,5 +1,4 @@
 import { Transform } from 'jscodeshift'
-
 const vueDefaultOrder = [
   'el',
   'name',

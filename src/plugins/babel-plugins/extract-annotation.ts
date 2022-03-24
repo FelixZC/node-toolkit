@@ -7,7 +7,6 @@ import type {
   TSPropertySignature
 } from '@babel/types'
 import type { NodePath } from '@babel/traverse'
-
 export default declare((babel) => {
   const extra = {} as Record<string, any>
   extra.attributesObj = {} as Record<string, any>
@@ -71,6 +70,7 @@ export default declare((babel) => {
       VariableDeclaration(path) {
         getAnnatation(path)
       },
+
       TSPropertySignature(path) {
         getAnnatation(path)
       }

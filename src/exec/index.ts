@@ -7,17 +7,16 @@ import type { Transform } from 'jscodeshift'
 import { writeFile, groupBy } from '../utils/common'
 import * as cliProgress from '../utils/cli-progress'
 import fsUtils from '../utils/fs'
-import runPostcssPlugin from '../plugins/usePostcssPlugin'
-import runPosthtmlPlugin from '../plugins/usePosthtmlPlugin'
+import runPostcssPlugin from '../plugins/use-postcss-plugin'
+import runPosthtmlPlugin from '../plugins/use-posthtml-plugin'
 import mdUtils from '../utils/md'
-import runBabelPlugin from '../plugins/useBabelPlugin'
-import runCodemod from '../plugins/useJsCodemod'
+import runBabelPlugin from '../plugins/use-babel-plugin'
+import runCodemod from '../plugins/use-js-codemod'
 import storeFile from '../query/js/stote-state'
 import type { GroupCache } from '../utils/common'
 import type { FileInfo } from '../utils/fs'
 import type { ExecFileInfo } from '../plugins/common'
-import type { BabelPlugin } from '../plugins/useBabelPlugin'
-
+import type { BabelPlugin } from '../plugins/use-babel-plugin'
 const br = os.EOL // 换行符
 
 const rootPath = path.join('src copy')
@@ -151,14 +150,14 @@ export const getAttrsAndAnnotation = (targetPath?: string) => {
     }
 
     return result
-  })
-  // 所有属性描述对象
+  }) // 所有属性描述对象
+
   const attrsCollectionTemp: AttrsCollection = {
     key: '',
     standingInitial: 'string',
     value: ''
-  }
-  // 所有属性描述对象数组
+  } // 所有属性描述对象数组
+
   const attrsCollectionGroup: AttrsCollection[] = [] // 根据首字母分类属性描述对象数组
 
   const handler = (filePath: string) => {
@@ -230,11 +229,10 @@ export const getAttrsAndAnnotation = (targetPath?: string) => {
     'src/query/md/attributes-description-table.md',
     attributesDescriptionTable.replace(/\{\{.*\}\}/g, '').replace(/<.*>/g, '')
   )
-
   const storeTable = mdUtils.createdStoreTable(storeFile, attrsCollectionTemp) // 获取store属性描述
 
   writeFile(
-    'src/query/md/storeTable.md',
+    'src/query/md/store-table.md',
     storeTable.replace(/\{\{.*\}\}/g, '').replace(/<.*>/g, '')
   )
   writeFile('src/query/json/attrs-collection.json', JSON.stringify(attrsCollectionTemp))
@@ -518,9 +516,11 @@ export const execBabelPlugin = (babelPlugins: BabelPlugin[], targetPath?: string
         source: content
       }
       const newContent = runBabelPlugin(execFileInfo, babelPlugins)
+
       if (newContent === content || !newContent.length) {
         return
       }
+
       writeFile(filePath, newContent)
     } catch (e) {
       console.error('目标文件出错：', filePath)
@@ -552,10 +552,12 @@ export const execPosthtmlPlugin = (plugins: PosthtmlPlugin<unknown>[], targetPat
       }
       const result = await runPosthtmlPlugin(execFileInfo, plugins)
       const newContent = result.replace(/=['"]_pzc_['"]/g, '')
+
       if (newContent === content || !newContent.length) {
         return
       }
       /** 替换掉_pzc_填充位 */
+
       writeFile(filePath, newContent)
     } catch (e) {
       console.error('目标文件出错：', filePath)
@@ -581,6 +583,7 @@ export const execPosthtmlPlugin = (plugins: PosthtmlPlugin<unknown>[], targetPat
  * @param plugins
  * @param targetPath
  */
+
 export const execPostcssPlugin = (plugins: PostcssPlugin[], targetPath?: string) => {
   const handler = async (filePath: string) => {
     try {
@@ -590,9 +593,11 @@ export const execPostcssPlugin = (plugins: PostcssPlugin[], targetPath?: string)
         source: content
       }
       const result = await runPostcssPlugin(execFileInfo, plugins)
+
       if (result === content || !result.length) {
         return
       }
+
       writeFile(filePath, result)
     } catch (e) {
       console.error('目标文件出错：', filePath)
@@ -606,13 +611,13 @@ export const execPostcssPlugin = (plugins: PostcssPlugin[], targetPath?: string)
     const vaildList = ['.css', '.scss', '.sass', '.less', '.styl', '.vue', '.sugarss']
     const targetList = fileInfoList.filter((fileInfo) => vaildList.includes(fileInfo.extname))
     const { updateBar } = cliProgress.useCliProgress(targetList.length)
+
     for (const item of targetList) {
       handler(item.filePath)
       updateBar()
     }
   }
 }
-
 export const execCodemod = (codemodList: Transform[], targetPath?: string) => {
   if (!codemodList.length) {
     return
@@ -626,9 +631,11 @@ export const execCodemod = (codemodList: Transform[], targetPath?: string) => {
         source: content
       }
       const newContent = runCodemod(execFileInfo, codemodList)
+
       if (newContent === content || !newContent.length) {
         return
       }
+
       writeFile(filePath, newContent)
     } catch (e) {
       console.error('目标文件出错：', filePath)

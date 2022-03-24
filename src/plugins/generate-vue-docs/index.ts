@@ -45,9 +45,11 @@ const extractProps = (node) => {
     if (types.isIdentifier(node)) {
       return node.name
     }
+
     if (types.isArrayExpression(node)) {
       return node.elements.map((item) => item.name).join('、')
     }
+
     return 'Any'
   } // 获取Props默认值
 
@@ -60,6 +62,7 @@ const extractProps = (node) => {
     ) {
       return node.value
     }
+
     if (
       types.isFunctionExpression(node) ||
       types.isArrowFunctionExpression(node) ||
@@ -262,6 +265,7 @@ const parseDocs = (vueStr, config = {}) => {
               if (item.type === 'CommentLine') {
                 return item.value.trim()
               }
+
               return item.value
                 .split('\n')
                 .map((item) => item.replace(/[\s\*]/g, ''))

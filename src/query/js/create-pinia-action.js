@@ -4,9 +4,11 @@ const a = {
   token: '',
   tokenExpires: 0
 }
+
 const upperFirstletter = function (str) {
   return str.slice(0, 1).toUpperCase() + str.slice(1)
 }
+
 const setTemplate = () => {
   const b = Object.entries(a)
     .map(([key, value]) => {
@@ -19,4 +21,5 @@ const setTemplate = () => {
     .join(',')
   console.log(b.replace(/\\n/g, '').replace(/['"]/g, ''))
 }
+
 setTemplate()

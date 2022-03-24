@@ -1,8 +1,7 @@
 import type { ImportDefaultSpecifier, ImportNamespaceSpecifier, ImportSpecifier } from 'jscodeshift'
 import type { Collection } from 'jscodeshift/src/Collection'
-import wrap from '../wrapAstTransformation'
-import type { ASTTransformation } from '../wrapAstTransformation'
-
+import wrap from '../wrap-ast-transformation'
+import type { ASTTransformation } from '../wrap-ast-transformation'
 type Params = {
   localBinding: string
 }

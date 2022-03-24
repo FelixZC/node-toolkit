@@ -13,6 +13,7 @@ const transformer: Transform = (file, api) => {
     if (isUpperCase) {
       return `Local${paramName}`
     }
+
     const upperCase = paramName.charAt(0).toUpperCase() + paramName.slice(1)
     return `local${upperCase}`
   }
@@ -42,29 +43,37 @@ const transformer: Transform = (file, api) => {
         if (param === null) {
           return null
         }
+
         if (param.type === 'Identifier') {
           return param.name
         }
+
         if (param.type === 'ObjectPattern') {
           return param.properties.map((property) => {
             if (j.Property.check(property)) {
               return property.value.name
             }
+
             if (j.SpreadProperty.check(property) || j.RestProperty.check(property)) {
               return property.argument.name
             }
+
             throw new Error(`Unexpected Property Type ${property.type} ${j(property).toSource()}`)
           })
         }
+
         if (param.type === 'RestElement') {
           return param.argument.name
         }
+
         if (j.AssignmentPattern.check(param)) {
           return param.left.name
         }
+
         if (j.ArrayPattern.check(param)) {
           return [].concat(...getParamNames(param.elements))
         }
+
         throw new Error(`Unexpected Param Type ${param.type} ${j(param).toSource()}`)
       })
     )
@@ -84,14 +93,17 @@ const transformer: Transform = (file, api) => {
           if (j.Identifier.check(left)) {
             return left.name === paramName
           }
+
           if (j.ObjectPattern.check(left)) {
             return left.properties.some((property) => {
               if (j.Property.check(property)) {
                 return property.key.name === paramName
               }
+
               if (j.RestProperty.check(property)) {
                 return property.argument.name === paramName
               }
+
               throw new Error(`Unexpected Property Type ${property.type} ${j(property).toSource()}`)
             })
           }

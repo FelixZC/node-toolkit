@@ -1,7 +1,7 @@
 import postcss from 'postcss'
 import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
 import type { ExecFileInfo } from './common'
-import { parse as parseSFC, stringify as stringifySFC } from './sfcUtils'
+import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
 
 const syntax = require('postcss-syntax')({
   rules: [
@@ -34,20 +34,26 @@ const syntax = require('postcss-syntax')({
   // custom parser for SugarSS
   sugarss: require('sugarss')
 })
+
 const getSyntax = (stypeType: string | undefined) => {
   switch (stypeType) {
     case 'sass':
       return require('postcss-sass')
+
     case 'scss':
       return require('postcss-scss')
+
     case 'less':
       return require('postcss-less')
+
     case 'unknown':
       return undefined
+
     default:
       return syntax
   }
 }
+
 const transform = async (
   execFileInfo: ExecFileInfo,
   pluginsList: PostcssPlugin[],
@@ -64,9 +70,11 @@ const runPostcssPlugin = async (execFileInfo: ExecFileInfo, pluginsList: Postcss
   if (!pluginsList.length) {
     return execFileInfo.source
   }
+
   if (!execFileInfo.path.endsWith('.vue')) {
     return transform(execFileInfo, pluginsList)
   }
+
   const { descriptor } = parseSFC(execFileInfo.source, {
     filename: execFileInfo.path
   })
@@ -79,6 +87,7 @@ const runPostcssPlugin = async (execFileInfo: ExecFileInfo, pluginsList: Postcss
       style.content = out
     }
   }
+
   return stringifySFC(descriptor)
 }
 

@@ -9,9 +9,8 @@ import { transformAST as removeExtraneousImport } from './remove-extraneous-impo
  * and the `Vue.use` statements can be just abandoned.
  */
 
-import wrap from '../wrapAstTransformation'
-import type { ASTTransformation } from '../wrapAstTransformation'
-
+import wrap from '../wrap-ast-transformation'
+import type { ASTTransformation } from '../wrap-ast-transformation'
 type Params = {
   removablePlugins: string[]
 }

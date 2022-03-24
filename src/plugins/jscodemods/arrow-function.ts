@@ -19,6 +19,7 @@ const transformer: Transform = (file, api, options) => {
         inner.expression.comments = (inner.expression.comments || []).concat(comments)
         return inner.expression
       }
+
       if (inner.type == 'ReturnStatement') {
         if (inner.argument === null) {
           // The rare case of a function with a lone return statement.

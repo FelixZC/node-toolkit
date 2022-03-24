@@ -1,5 +1,4 @@
 import type { Core, JSCodeshift, Transform } from 'jscodeshift'
-
 export type Context = {
   root: ReturnType<Core>
   j: JSCodeshift

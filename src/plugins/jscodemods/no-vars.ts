@@ -46,6 +46,7 @@ const transformer: Transform = (file, api) => {
     if (!id) {
       return []
     }
+
     if (id.type === 'ObjectPattern') {
       return id.properties
         .map((d) =>
@@ -53,17 +54,21 @@ const transformer: Transform = (file, api) => {
         )
         .reduce((acc, val) => acc.concat(val), [])
     }
+
     if (id.type === 'ArrayPattern') {
       return id.elements
         .map(extractNamesFromIdentifierLike)
         .reduce((acc, val) => acc.concat(val), [])
     }
+
     if (id.type === 'Identifier') {
       return [id.name]
     }
+
     if (id.type === 'RestElement') {
       return [id.argument.name]
     }
+
     return []
   }
 

@@ -1,14 +1,16 @@
 import type * as N from 'jscodeshift'
-import wrap from '../wrapAstTransformation'
-import type { ASTTransformation } from '../wrapAstTransformation'
-
+import wrap from '../wrap-ast-transformation'
+import type { ASTTransformation } from '../wrap-ast-transformation'
 type Params = {
   // if false, do not take expressions like `new HelloWorld().$mount` or
   // `new HelloWorld({ el: '#app' })`into account
   includeMaybeComponents?: boolean
 } // Limitations: cannot transform expressions like `new HelloWorld()`
+
 /** FIXME: for ES modules, should use `createApp` instead of `Vue.createApp` */
+
 /** because the latter makes it difficult to tree-shake the vue module */
+
 /** FIXME: need to ensure there will be a Vue import if needed. */
 
 export const transformAST: ASTTransformation<Params | void> = (

@@ -119,52 +119,55 @@ export function groupBy(arr: Array<Record<string, any>>, groupKey: string) {
   })
   return cache
 }
-
 /**
  * 驼峰转化-
  * @param str
  * @returns
  */
+
 export const kebabCase = function (str: string) {
   const hyphenateRE = /([^-])([A-Z])/g
   return str.replace(hyphenateRE, '$1-$2').replace(hyphenateRE, '$1-$2').toLowerCase()
 }
-
 /**
  * 首字母大写
  * @param str
  * @returns
  */
+
 export const capitalize = function (str: string) {
   if (typeof str !== 'string') return str
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
-
 /**
  * 判断是否为引用路径
  * @param str
  * @returns
  */
+
 export const isPath = (str: string) => {
   const startsWithList: string[] = ['@', 'src', 'images', 'img', 'styles', '~', '../', './']
+
   for (const tag of startsWithList) {
     if (str.startsWith(tag)) {
       return true
     }
   }
+
   return false
 }
-
 /**
  * 转化导入路径引用驼峰规则
  * @param str
  * @param seperator
  * @returns
  */
+
 export const transferRef = (str: string, seperator = '/') => {
   if (!str) {
     return str
   }
+
   return str
     .split(seperator)
     .map((item) => kebabCase(item))

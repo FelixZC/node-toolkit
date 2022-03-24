@@ -1,6 +1,5 @@
 import type { Transform } from 'jscodeshift'
 import * as exec from './index'
-
 const jscodemodeList = [
   '../plugins/jscodemods/arrow-function',
   '../plugins/jscodemods/arrow-function-arguments',
@@ -9,7 +8,7 @@ const jscodemodeList = [
   '../plugins/jscodemods/object-shorthand',
   '../plugins/jscodemods/object-sort-key',
   '../plugins/jscodemods/outline-require',
-  '../plugins/jscodemods/rm-copyProperties',
+  '../plugins/jscodemods/rm-copy-properties',
   '../plugins/jscodemods/rm-merge',
   '../plugins/jscodemods/rm-object-assign',
   '../plugins/jscodemods/rm-requires',

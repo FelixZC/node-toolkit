@@ -1,5 +1,5 @@
 import type { Transform } from 'jscodeshift'
-import runVueCodemod from '../plugins/useVueCodemod'
+import runVueCodemod from '../plugins/use-vue-codemod'
 import type { ExecFileInfo } from './common'
 
 const runCodemod = (fileInfo: ExecFileInfo, codemodList: Transform[]) => {

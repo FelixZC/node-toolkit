@@ -7,9 +7,8 @@
  * move all other rootProps to the second argument of `createApp`
  */
 import type * as N from 'jscodeshift'
-import wrap from '../wrapAstTransformation'
-import type { ASTTransformation } from '../wrapAstTransformation'
-
+import wrap from '../wrap-ast-transformation'
+import type { ASTTransformation } from '../wrap-ast-transformation'
 export const transformAST: ASTTransformation = ({ j, root }) => {
   const appRoots = root.find(j.CallExpression, (node: N.CallExpression) => {
     if (node.arguments.length === 1 && j.ObjectExpression.check(node.arguments[0])) {

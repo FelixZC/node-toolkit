@@ -39,7 +39,6 @@ import { Statement } from '@babel/types'
  */
 
 import * as CompilerDom from '@vue/compiler-dom'
-
 export function stringify(sfcDescriptor: SFCDescriptor) {
   const { customBlocks, script, styles, template } = sfcDescriptor
   return (
@@ -86,6 +85,7 @@ function makeOpenTag(block: SFCBlock) {
       if (value === true) {
         return name
       }
+
       return `${name}="${value}"`
     })
     .map((attr) => ` ${attr}`)
@@ -151,7 +151,6 @@ export interface SFCParseResult {
 }
 const SFC_CACHE_MAX_SIZE = 500
 const sourceToSFC = new (require('lru-cache'))(SFC_CACHE_MAX_SIZE) as Map<string, SFCParseResult>
-
 export function parse(
   source: string,
   {
@@ -196,6 +195,7 @@ export function parse(
       ) {
         return TextModes.RAWTEXT
       }
+
       return TextModes.DATA
     },
     // there are no components at SFC parsing level
@@ -421,6 +421,7 @@ function padContent(content: string, block: SFCBlock, pad: SFCParseOptions['pad'
   if (pad === 'space') {
     return content.replace(replaceRE, ' ')
   }
+
   const offset = content.split(splitRE).length
   const padChar = block.type === 'script' && !block.lang ? '//\n' : '\n'
   return Array(offset).join(padChar)

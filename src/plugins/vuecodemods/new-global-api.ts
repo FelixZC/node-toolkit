@@ -5,11 +5,10 @@ import { transformAST as rootPropToUse } from './root-prop-to-use'
 import { transformAST as removeTrivialRoot } from './remove-trivial-root'
 import { transformAST as removeProductionTip } from './remove-production-tip'
 import { transformAST as removeVueUse } from './remove-vue-use'
-import { transformAST as removeContextualHFromRender } from './remove-contextual-h-from-render'
+import { transformAST as removeContextualHFromRender } from './remove-contextualh-from-render'
 import { transformAST as removeExtraneousImport } from './remove-extraneous-import'
-import wrap from '../wrapAstTransformation'
-import type { ASTTransformation } from '../wrapAstTransformation'
-
+import wrap from '../wrap-ast-transformation'
+import type { ASTTransformation } from '../wrap-ast-transformation'
 export const transformAST: ASTTransformation = (context) => {
   vueAsNamespaceImport(context)
   importCompositionApiFromVue(context)
