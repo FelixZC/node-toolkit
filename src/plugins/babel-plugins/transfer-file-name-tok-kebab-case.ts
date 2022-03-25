@@ -21,6 +21,7 @@ export default declare((babel) => {
           path.node.body = [...importListMap, ...otherList]
         }
       },
+
       StringLiteral(path) {
         if (isPath(path.node.value)) {
           path.node.value = transferRef(path.node.value)

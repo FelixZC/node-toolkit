@@ -1,8 +1,8 @@
 import { transferRef } from '../utils/common'
-
 /**
  * 批量修改文件命名和引用为驼峰式规范
  */
+
 import * as exec from './index'
 import * as fs from 'fs'
 import * as path from 'path'

@@ -267,9 +267,9 @@ class fsUtils implements FsInstance {
       }
 
       if (
-        newFileName.toLocaleLowerCase() === oldFileName.toLocaleLowerCase() &&
-        newExtensionName.toLocaleLowerCase() === oldExtensionName.toLocaleLowerCase() &&
-        newDirName.toLocaleLowerCase() === oldDirName.toLocaleLowerCase()
+        newFileName === oldFileName &&
+        newExtensionName === oldExtensionName &&
+        newDirName === oldDirName
       ) {
         return
       }
@@ -297,6 +297,7 @@ class fsUtils implements FsInstance {
         modifyCount++
       }
     })
+    console.log(`批量修改完毕，共${modifyCount}个文件产生变化`)
   }
   /**
    * 重命名文件名，存在资源抢占问题，需要二次执行rename，或者记录oldFilePath执行fs.rm

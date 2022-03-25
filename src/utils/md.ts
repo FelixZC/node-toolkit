@@ -1,12 +1,12 @@
 import { parseDocs } from '../plugins/generate-vue-docs'
 import { getDataType, sortArray, sortObjAttr } from './common'
-
 /**
  * md文件生成工具类，完善中...
  * @author pzc
  * @date 2021/08/23
  *
  */
+
 import * as os from 'os'
 const br = os.EOL // 换行符
 
