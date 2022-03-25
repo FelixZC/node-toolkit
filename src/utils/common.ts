@@ -129,6 +129,11 @@ export const kebabCase = function (str: string) {
   const hyphenateRE = /([^-])([A-Z])/g
   return str.replace(hyphenateRE, '$1-$2').replace(hyphenateRE, '$1-$2').toLowerCase()
 }
+
+export const easeUnline = function (str: string) {
+  const easeReg2 = /^[_-]/g
+  return str.replace(easeReg2, '')
+}
 /**
  * 首字母大写
  * @param str
@@ -170,9 +175,20 @@ export const transferRef = (str: string, seperator = '/') => {
 
   return str
     .split(seperator)
-    .map((item) => kebabCase(item))
+    .map((item) => {
+      let result = kebabCase(item)
+        .replace(/-(\b\w\b)[^\w.-_]?/g, '$1')
+        .replace(/(['"`/\\]_)-/g, '$1')
+        .replace(/[_-]{2}/g, '-')
+      /** 当代码管理工具和window组合使用，会出现文件大小写同源问题 */
+      /** to stupid to continue  */
+      /** this is situation one  */
+      if (!result.includes('-') && item !== result) {
+        result = '_' + result
+      }
+      /** this is situation two,exec after one ，also you can skip them */
+      // result = easeUnline(result)
+      return result
+    })
     .join(seperator)
-    .replace(/-(\b\w\b)[^-\w]?/g, '$1')
-    .replace(/(['"`/\\])-/g, '$1')
-    .replace(/[_-]{2}/g, '-')
 }
