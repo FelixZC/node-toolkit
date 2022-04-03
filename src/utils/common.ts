@@ -177,8 +177,8 @@ export const transferRef = (str: string, seperator = '/') => {
     .split(seperator)
     .map((item) => {
       let result = kebabCase(item)
-        .replace(/-(\b\w\b)[^\w.-_]?/g, '$1')
-        .replace(/(['"`/\\]_)-/g, '$1')
+        .replace(/(\b\w\b)-(?=\b\w\b)/g, '$1')
+        .replace(/([()'"`/\\]_)-/g, '$1')
         .replace(/[_-]{2}/g, '-')
       /** 当代码管理工具和window组合使用，会出现文件大小写同源问题 */
       /** to stupid to continue  */
