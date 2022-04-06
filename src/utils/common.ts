@@ -161,6 +161,7 @@ export const isPath = (str: string) => {
 
   return false
 }
+
 /**
  * 转化导入路径引用驼峰规则
  * @param str
@@ -177,9 +178,9 @@ export const transferRef = (str: string, seperator = '/') => {
     .split(seperator)
     .map((item) => {
       let result = kebabCase(item)
-        .replace(/(\b\w\b)-(?=\b\w\b)/g, '$1')
-        .replace(/([()'"`/\\]_)-/g, '$1')
         .replace(/[_-]{2}/g, '-')
+        .replace(/(['"`/\\])-/g, '$1')
+        .replace(/(\b\w\b)-(?=\b\w\b)/g, '$1')
       /** 当代码管理工具和window组合使用，会出现文件大小写同源问题 */
       /** to stupid to continue  */
       /** this is situation one  */
