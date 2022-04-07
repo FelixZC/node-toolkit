@@ -5,9 +5,18 @@ import * as path from 'path' //
  * 获取数据类型
  * @param {any} obj
  * @returns {String} 数据构造器对应字符串
+ * | 'Undefined'
+   | 'Null'
+   | 'Date'
+   | 'String'
+   | 'Math'
+   | 'Number'
+   | 'Boolean'
+   | 'Object'
+   | 'Array'
+   | 'Function'
  */
-
-export const getDataType = (obj: object) => {
+export const getDataType = (obj: any) => {
   return Object.prototype.toString.call(obj).slice(8, -1)
 }
 /**

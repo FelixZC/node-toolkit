@@ -7,12 +7,28 @@ interface MergeOptions extends Options, parserOptions, renderOptions {}
 
 const runPosthtmlPlugin = async (
   execFileInfo: ExecFileInfo,
-  pluginsList: PosthtmlPlugin<unknown>[] = []
+  posthtmlPlugin: PosthtmlPlugin<unknown>[] = []
 ) => {
-  const result = await posthtml(pluginsList).process(execFileInfo.source, {
+  const result = await posthtml<any, any>(posthtmlPlugin).process(execFileInfo.source, {
     closingSingleTag: 'slash',
     recognizeSelfClosing: true
   } as MergeOptions)
+  if (execFileInfo.extra) {
+    for (const message of result.messages) {
+      switch (typeof message) {
+        case 'object':
+          for (const key in message) {
+            execFileInfo.extra[key] = message[key]
+          }
+          break
+        case 'string':
+          execFileInfo.extra[message] = message
+          break
+        /**其他忽略 */
+        default:
+      }
+    }
+  }
   return result.html
 }
 

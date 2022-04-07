@@ -539,22 +539,28 @@ export const execBabelPlugin = (babelPlugins: BabelPlugin[], targetPath?: string
   }
 } // 使用psthtml插件
 
-export const execPosthtmlPlugin = (plugins: PosthtmlPlugin<unknown>[], targetPath?: string) => {
+export const execPosthtmlPlugin = async (
+  plugins: PosthtmlPlugin<unknown>[],
+  targetPath?: string
+) => {
+  const globalExtra: Record<string, any> = {}
   const handler = async (filePath: string) => {
     try {
       const content = fs.readFileSync(filePath, 'utf-8')
       const execFileInfo: ExecFileInfo = {
         path: filePath,
-        source: content
+        source: content,
+        extra: {}
       }
       const result = await runPosthtmlPlugin(execFileInfo, plugins)
       const newContent = result.replace(/=['"]_pzc_['"]/g, '')
-
+      for (const key in execFileInfo.extra) {
+        globalExtra[key] = execFileInfo.extra[key]
+      }
       if (newContent === content || !newContent.length) {
         return
       }
       /** 替换掉_pzc_填充位 */
-
       writeFile(filePath, newContent)
     } catch (e) {
       console.warn(e)
@@ -562,17 +568,18 @@ export const execPosthtmlPlugin = (plugins: PosthtmlPlugin<unknown>[], targetPat
   }
 
   if (targetPath) {
-    handler(targetPath)
+    await handler(targetPath)
   } else {
     const vaildList = ['.htm', '.html', '.vue', '.xml']
     const targetList = fileInfoList.filter((fileInfo) => vaildList.includes(fileInfo.extname))
     const { updateBar } = cliProgress.useCliProgress(targetList.length)
 
     for (const item of targetList) {
-      handler(item.filePath)
+      await handler(item.filePath)
       updateBar()
     }
   }
+  writeFile('src/query/json/global-extra.json', JSON.stringify(globalExtra))
 }
 /**
  * 执行postcss插件
@@ -580,7 +587,7 @@ export const execPosthtmlPlugin = (plugins: PosthtmlPlugin<unknown>[], targetPat
  * @param targetPath
  */
 
-export const execPostcssPlugin = (plugins: PostcssPlugin[], targetPath?: string) => {
+export const execPostcssPlugin = async (plugins: PostcssPlugin[], targetPath?: string) => {
   const handler = async (filePath: string) => {
     try {
       const content = fs.readFileSync(filePath, 'utf-8')
@@ -601,14 +608,14 @@ export const execPostcssPlugin = (plugins: PostcssPlugin[], targetPath?: string)
   }
 
   if (targetPath) {
-    handler(targetPath)
+    await handler(targetPath)
   } else {
     const vaildList = ['.css', '.scss', '.sass', '.less', '.styl', '.vue', '.sugarss']
     const targetList = fileInfoList.filter((fileInfo) => vaildList.includes(fileInfo.extname))
     const { updateBar } = cliProgress.useCliProgress(targetList.length)
 
     for (const item of targetList) {
-      handler(item.filePath)
+      await handler(item.filePath)
       updateBar()
     }
   }

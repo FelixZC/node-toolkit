@@ -80,7 +80,6 @@ export default declare((babel) => {
             path.replaceWith(createVoid0())
           }
         } else if (isIncludedConsoleBind(callee, (state?.opts as Record<string, any>)?.exclude)) {
-          // console.log.bind()
           path.replaceWith(createNoop())
         }
       },
