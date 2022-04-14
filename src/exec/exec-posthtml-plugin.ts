@@ -1,6 +1,6 @@
 import * as exec from './index'
 import type { Plugin as PosthtmlPlugin } from 'posthtml'
-const pluginsPathList: string[] = ['../plugins/posthtml-plugins/query-tag']
+const pluginsPathList: string[] = ['../plugins/posthtml-plugins/property-sort']
 
 try {
   const plugins: PosthtmlPlugin<unknown>[] = pluginsPathList.map((pluginPath) => {

@@ -76,15 +76,16 @@ try {
     )
     return transferRef(relativeDir, '\\')
   }
+  setTimeout(() => {
+    fsInstance.modifyFileName(customBaseName, null, null, null, customDirName)
+    fsInstance.dirPathList.reverse().forEach((folderPath) => {
+      const result = fs.readdirSync(folderPath)
 
-  fsInstance.modifyFileName(customBaseName, null, null, null, customDirName)
-  fsInstance.dirPathList.reverse().forEach((folderPath) => {
-    const result = fs.readdirSync(folderPath)
-
-    if (!result.length) {
-      fs.rmdirSync(folderPath)
-    }
-  })
+      if (!result.length) {
+        fs.rmdirSync(folderPath)
+      }
+    })
+  }, 0)
 } catch (e) {
   console.warn(e)
 }
