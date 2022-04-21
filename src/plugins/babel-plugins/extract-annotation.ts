@@ -31,7 +31,7 @@ export default declare((babel) => {
           break
 
         case 'FunctionDeclaration':
-          key = path.node.id!.name
+          key = path.node.id.name
           break
 
         case 'VariableDeclaration':

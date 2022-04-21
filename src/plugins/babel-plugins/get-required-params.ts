@@ -35,8 +35,8 @@ export default declare((babel) => {
 
             if (types.isLiteral(value)) {
               currentValue = (value as any).value
-            } //因为for...of是进行顺序迭代，并且required在name之后，就这么决定了
-
+            }
+            //因为for...of是进行顺序迭代，并且required在name之后，就这么决定了
             if (currentKey === 'name' && currentValue) {
               currentName = currentValue
             }
