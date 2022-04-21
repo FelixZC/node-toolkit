@@ -1,4 +1,6 @@
-import type { ImportDeclaration } from '@babel/types'
+import * as t from '@babel/types'
+import { NodePath } from '@babel/core'
+import * as parser from '@babel/parser'
 export interface ImportObj {
   defaultImportName: string
   importNameList: string[]
@@ -6,7 +8,12 @@ export interface ImportObj {
   source: string
   kind?: string | null | undefined
 }
-export const getImportObj = (importList: ImportDeclaration[]) => {
+/**
+ * 获取导入对象
+ * @param importList
+ * @returns
+ */
+export const getImportObj = (importList: t.ImportDeclaration[]) => {
   const customImportObjList: ImportObj[] = []
 
   for (const item of importList) {
@@ -50,4 +57,201 @@ export const getImportObj = (importList: ImportDeclaration[]) => {
   }
 
   return customImportObjList
+}
+
+/**
+ * 查找包含指定对象属性名的对象属性
+ * @param target
+ * @param key
+ * @returns
+ */
+export const findObjectPropertyWithIdentifierKey = (target: t.ObjectExpression, key: string) => {
+  if (!key) {
+    return null
+  }
+  const result = target.properties.find(
+    (item) => t.isObjectProperty(item) && t.isIdentifier(item.key) && item.key.name === key
+  )
+  return result as t.ObjectProperty
+}
+
+/**
+ * 添加新属性
+ * @param elements
+ * @param input
+ * @returns
+ */
+export const addObjectNewProperty = (
+  elements: t.ObjectExpression[],
+  input: Record<string, any> | string
+) => {
+  for (const element of elements) {
+    let newObjectExpressopm: t.ObjectExpression
+    if (typeof input === 'string') {
+      let astCode = parser.parseExpression(input)
+      if (t.isObjectExpression(astCode)) {
+        newObjectExpressopm = astCode
+      } else {
+        throw new Error('addObjectNewProperty提供input格式错误')
+      }
+    } else {
+      newObjectExpressopm = createTemplateNode(input)
+    }
+    element.properties = [...element.properties, ...newObjectExpressopm.properties]
+  }
+  return elements
+}
+
+/**
+ * 添加新对象
+ * @param elements
+ * @param input
+ */
+export const addNewObject = (
+  elements: t.ObjectExpression[],
+  input: Record<string, any> | string
+) => {
+  let newObjectExpressopm: t.ObjectExpression
+  if (typeof input === 'string') {
+    let astCode = parser.parseExpression(input)
+    if (t.isObjectExpression(astCode)) {
+      newObjectExpressopm = astCode
+    } else {
+      throw new Error('addNewObject提供input格式错误')
+    }
+  } else {
+    newObjectExpressopm = createTemplateNode(input)
+  }
+  elements.push(newObjectExpressopm)
+  return elements
+}
+/**
+ * 对象数组过滤相同属性对象
+ * @param elements
+ * @param key
+ * @returns
+ */
+export const filterSameObject = (elements: t.ObjectExpression[], key = 'prop') => {
+  const values: string[] = []
+  const samePropItems: t.ObjectExpression[] = []
+  for (const item of elements) {
+    const target = findObjectPropertyWithIdentifierKey(item, key)
+    if (target) {
+      const key = (target.key as t.Identifier).name
+      const value = (target.value as t.StringLiteral).value
+      if (key && value) {
+        if (values.includes(value)) {
+          samePropItems.push(item)
+        } else {
+          values.push(value)
+        }
+      }
+    }
+  }
+  //移除相同prop的数组
+  for (const item of samePropItems) {
+    elements.splice(elements.indexOf(item), 1)
+  }
+  return elements
+}
+
+//过滤对象相同属性
+export const filterSameProperty = (elements: t.ObjectExpression[]) => {
+  for (const element of elements) {
+    const keys: string[] = []
+    const sameProperty: (t.ObjectMethod | t.ObjectProperty | t.SpreadElement)[] = []
+    for (const property of element.properties) {
+      if (!t.isSpreadElement(property) && t.isIdentifier(property.key)) {
+        const key = property.key.name
+        if (keys.includes(key)) {
+          sameProperty.push(property)
+        } else {
+          keys.push(key)
+        }
+      }
+    }
+    //移除相同prop的数组
+    for (const property of sameProperty) {
+      element.properties.splice(element.properties.indexOf(property), 1)
+    }
+  }
+  return elements
+}
+/**
+ * 获取节点方法名
+ * @param path
+ * @returns
+ */
+export const getMethodName = (path: NodePath<t.Function>) => {
+  let functionName: string | number = ''
+  if (t.isArrowFunctionExpression(path.node)) {
+    const definedNodePath = path.findParent((path) => t.isVariableDeclarator(path.node))
+    definedNodePath &&
+      (functionName = ((definedNodePath.node as t.VariableDeclarator).id as t.Identifier).name)
+  } else if (
+    t.isClassMethod(path.node) ||
+    t.isClassPrivateMethod(path.node) ||
+    t.isObjectMethod(path.node)
+  ) {
+    switch (path.node.key.type) {
+      case 'Identifier':
+        functionName = path.node.key.name
+        break
+      case 'NumericLiteral':
+      case 'StringLiteral':
+        functionName = path.node.key.value
+        break
+    }
+  } else {
+    functionName = path.node.id!.name
+  }
+  return functionName
+}
+
+/**
+ * 匹配对象表达式
+ * @param target
+ * @param key
+ * @param value
+ */
+export const matchObjectExpress = (
+  elements: t.ObjectExpression[],
+  key = 'label',
+  value: string
+) => {
+  return elements.find((element) => {
+    let labelObjectProperty = findObjectPropertyWithIdentifierKey(element, key)
+    return (
+      labelObjectProperty &&
+      t.isLiteral(labelObjectProperty.value) &&
+      value === (labelObjectProperty.value as t.StringLiteral)?.value
+    )
+  })
+}
+
+/**
+ * 创造模板节点
+ * @param defaultOption
+ * @returns
+ */
+export const createTemplateNode = (defaultOption: Record<string, any>) => {
+  const properties = Object.entries(defaultOption).map(([key, value]) => {
+    let valueNode: t.Expression
+    switch (typeof value) {
+      case 'boolean':
+        valueNode = t.booleanLiteral(value)
+        break
+      case 'string':
+        valueNode = t.stringLiteral(value)
+        break
+      case 'number':
+        valueNode = t.numericLiteral(value)
+        break
+      default:
+        valueNode = t.nullLiteral()
+    }
+    return t.objectProperty(t.identifier(key), valueNode)
+  })
+  const templateNode = t.objectExpression(properties)
+  return templateNode
 }
