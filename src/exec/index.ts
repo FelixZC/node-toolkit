@@ -40,10 +40,6 @@ interface RouteTemplate {
     keepAlive: boolean
   }
 }
-interface ExcelPosition {
-  load: string
-  save: string
-}
 export interface RegExec {
   reg: RegExp
   matchContentHandle(content: string): string
@@ -257,97 +253,7 @@ export const getComponentDescription = () => {
   }
 
   writeFile(writeFilePath, str)
-} // 转化excel内容为json
-
-export function getJsonFromExecl() {
-  const list: ExcelPosition[] = [
-    {
-      load: 'src/query/excel/nav.xlsx',
-      save: 'src/query/json/nav.json'
-    },
-    {
-      load: 'src/query/excel/nav-layout.xlsx',
-      save: 'src/query/json/nav-layout.json'
-    },
-    {
-      load: 'src/query/excel/smenu.xlsx',
-      save: 'src/query/json/smenu.json'
-    },
-    {
-      load: 'src/query/excel/tab.xlsx',
-      save: 'src/query/json/tab.json'
-    }
-  ] // 从execl中导入scss变量,和compose-css-variable.js搭配使用合并完整scss变量文件
-
-  const getExcelProps = (list: ExcelPosition[]) => {
-    // excel文件列表和转化输出位置
-    const excelUtils = require('../../utils/excel')
-
-    const transformMap = new Map([
-      ['名称', 'description'],
-      ['值(lg)', 'value-lg'],
-      ['值(xl)', 'value-xl'],
-      ['值', 'value'],
-      ['变量名（开发用）', 'name'],
-      ['备注', 'remark']
-    ])
-    list.forEach((item) => {
-      const content = fs.readFileSync(item.load)
-      const outdata = excelUtils.importfxx(content, transformMap)
-      const formatResult = []
-
-      for (let index = 0; index < outdata.length; index++) {
-        const element = outdata[index]
-
-        if (!element.name) {
-          continue
-        }
-
-        element.value = element.value || element['value-lg'] || element['value-xl']
-        const mediaQuery = ['-lg', '-xl']
-
-        for (const query of mediaQuery) {
-          const name = `${element.name}${query}`
-          const value = element[`value${query}`] || element.value
-          const temp = { ...element, name, value }
-          formatResult.push(temp)
-        }
-      }
-
-      writeFile(item.save, JSON.stringify(formatResult))
-    })
-  } // 合并scss样式变量,和get-excel-props搭配使用转换excel数据并合并
-
-  const composeCssVariable = (list: ExcelPosition[]) => {
-    const compose: Record<string, any> = {}
-    list.forEach((item) => {
-      const filename = path.basename(item.save, path.extname(item.save))
-      compose[filename] = require(item.save)
-    })
-    let str = ''
-    str += `:root {${br}`
-
-    for (const [groupName, groupValue] of Object.entries(compose)) {
-      str += `//${groupName}${br}`
-
-      for (const item of groupValue) {
-        if (!item.name || !item.value || item.name === item.value) {
-          continue
-        }
-
-        str += `${item.name}:${item.value};${br}`
-      }
-
-      str += br
-    }
-
-    str += '}'
-    writeFile('src/query/css/index.scss', str)
-  }
-
-  getExcelProps(list)
-  composeCssVariable(list)
-} // 按照匹配项，批量更改文件名
+}
 
 export const modifyFilename = (isDirectlyExec = true) => {
   const source = require('../query/json/source.json') as SourceItem[]
