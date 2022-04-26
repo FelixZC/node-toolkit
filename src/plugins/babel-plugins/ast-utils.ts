@@ -86,18 +86,8 @@ export const addObjectNewProperty = (
   input: Record<string, any> | string
 ) => {
   for (const element of elements) {
-    let newObjectExpressopm: t.ObjectExpression
-    if (typeof input === 'string') {
-      let astCode = parser.parseExpression(input)
-      if (t.isObjectExpression(astCode)) {
-        newObjectExpressopm = astCode
-      } else {
-        throw new Error('addObjectNewProperty提供input格式错误')
-      }
-    } else {
-      newObjectExpressopm = createTemplateNode(input)
-    }
-    element.properties = [...element.properties, ...newObjectExpressopm.properties]
+    let newObjectExpression = createObjectTemplateNode(input)
+    element.properties = [...element.properties, ...newObjectExpression.properties]
   }
   return elements
 }
@@ -111,18 +101,8 @@ export const addNewObject = (
   elements: t.ObjectExpression[],
   input: Record<string, any> | string
 ) => {
-  let newObjectExpressopm: t.ObjectExpression
-  if (typeof input === 'string') {
-    let astCode = parser.parseExpression(input)
-    if (t.isObjectExpression(astCode)) {
-      newObjectExpressopm = astCode
-    } else {
-      throw new Error('addNewObject提供input格式错误')
-    }
-  } else {
-    newObjectExpressopm = createTemplateNode(input)
-  }
-  elements.push(newObjectExpressopm)
+  let newObjectExpression = createObjectTemplateNode(input)
+  elements.push(newObjectExpression)
   return elements
 }
 /**
@@ -132,7 +112,7 @@ export const addNewObject = (
  * @returns
  */
 export const filterSameObject = (elements: t.ObjectExpression[], key = 'prop') => {
-  const values: string[] = []
+  const cache: Record<string, any> = {}
   const samePropItems: t.ObjectExpression[] = []
   for (const item of elements) {
     const target = findObjectPropertyWithIdentifierKey(item, key)
@@ -140,11 +120,11 @@ export const filterSameObject = (elements: t.ObjectExpression[], key = 'prop') =
       const key = (target.key as t.Identifier).name
       const value = (target.value as t.StringLiteral).value
       if (key && value) {
-        if (values.includes(value)) {
-          samePropItems.push(item)
-        } else {
-          values.push(value)
+        //移除重复key值旧对象
+        if (Reflect.has(cache, key + value)) {
+          samePropItems.push(cache[key + value])
         }
+        cache[key + value] = item
       }
     }
   }
@@ -158,16 +138,16 @@ export const filterSameObject = (elements: t.ObjectExpression[], key = 'prop') =
 //过滤对象相同属性
 export const filterSameProperty = (elements: t.ObjectExpression[]) => {
   for (const element of elements) {
-    const keys: string[] = []
+    const cache: Record<string, any> = {}
     const sameProperty: (t.ObjectMethod | t.ObjectProperty | t.SpreadElement)[] = []
     for (const property of element.properties) {
       if (!t.isSpreadElement(property) && t.isIdentifier(property.key)) {
         const key = property.key.name
-        if (keys.includes(key)) {
-          sameProperty.push(property)
-        } else {
-          keys.push(key)
+        //移除旧属性值
+        if (Reflect.has(cache, key)) {
+          sameProperty.push(cache[key])
         }
+        cache[key] = property
       }
     }
     //移除相同prop的数组
@@ -234,24 +214,35 @@ export const matchObjectExpress = (
  * @param defaultOption
  * @returns
  */
-export const createTemplateNode = (defaultOption: Record<string, any>) => {
-  const properties = Object.entries(defaultOption).map(([key, value]) => {
-    let valueNode: t.Expression
-    switch (typeof value) {
-      case 'boolean':
-        valueNode = t.booleanLiteral(value)
-        break
-      case 'string':
-        valueNode = t.stringLiteral(value)
-        break
-      case 'number':
-        valueNode = t.numericLiteral(value)
-        break
-      default:
-        valueNode = t.nullLiteral()
+export const createObjectTemplateNode = (input: Record<string, any> | string) => {
+  let newObjectExpression: t.ObjectExpression
+  if (typeof input === 'string') {
+    let astCode = parser.parseExpression(input)
+    if (t.isObjectExpression(astCode)) {
+      newObjectExpression = astCode
+    } else {
+      throw new Error('createObjectTemplateNode提供input格式错误')
     }
-    return t.objectProperty(t.identifier(key), valueNode)
-  })
-  const templateNode = t.objectExpression(properties)
-  return templateNode
+  } else {
+    newObjectExpression = t.objectExpression(
+      Object.entries(input).map(([key, value]) => {
+        let valueNode: t.Expression
+        switch (typeof value) {
+          case 'boolean':
+            valueNode = t.booleanLiteral(value)
+            break
+          case 'string':
+            valueNode = t.stringLiteral(value)
+            break
+          case 'number':
+            valueNode = t.numericLiteral(value)
+            break
+          default:
+            valueNode = t.nullLiteral()
+        }
+        return t.objectProperty(t.identifier(key), valueNode)
+      })
+    )
+  }
+  return newObjectExpression
 }

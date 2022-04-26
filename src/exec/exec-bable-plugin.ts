@@ -5,8 +5,8 @@
 import * as exec from './index'
 import type { BabelPlugin } from '../plugins/use-babel-plugin'
 const babelPluginPathList: string[] = [
-  // '../plugins/babel-plugins/create-object-array-in-switch-by-old'
-  '../plugins/babel-plugins/import-sort'
+  '../plugins/babel-plugins/create-object-array-in-switch-by-old'
+  // '../plugins/babel-plugins/import-sort'
   // '../plugins/babel-plugins/transform-remove-console'
 ]
 
