@@ -65,13 +65,17 @@ export const getImportObj = (importList: t.ImportDeclaration[]) => {
  * @param key
  * @returns
  */
-export const findObjectPropertyWithIdentifierKey = (target: t.ObjectExpression, key: string) => {
+export const findObjectPropertyWithKey = (target: t.ObjectExpression, key: string) => {
   if (!key) {
     return null
   }
-  const result = target.properties.find(
-    (item) => t.isObjectProperty(item) && t.isIdentifier(item.key) && item.key.name === key
-  )
+  const result = target.properties.find((item) => {
+    if (t.isObjectProperty(item)) {
+      const taget = (item.key as t.Identifier).name || (item.key as t.StringLiteral).value
+      return taget === key
+    }
+    return false
+  })
   return result as t.ObjectProperty
 }
 
@@ -115,9 +119,9 @@ export const filterSameObject = (elements: t.ObjectExpression[], key = 'prop') =
   const cache: Record<string, any> = {}
   const samePropItems: t.ObjectExpression[] = []
   for (const item of elements) {
-    const target = findObjectPropertyWithIdentifierKey(item, key)
+    const target = findObjectPropertyWithKey(item, key)
     if (target) {
-      const key = (target.key as t.Identifier).name
+      const key = (target.key as t.Identifier).name || (target.key as t.StringLiteral).value
       const value = (target.value as t.StringLiteral).value
       if (key && value) {
         //移除重复key值旧对象
@@ -141,8 +145,8 @@ export const filterSameProperty = (elements: t.ObjectExpression[]) => {
     const cache: Record<string, any> = {}
     const sameProperty: (t.ObjectMethod | t.ObjectProperty | t.SpreadElement)[] = []
     for (const property of element.properties) {
-      if (!t.isSpreadElement(property) && t.isIdentifier(property.key)) {
-        const key = property.key.name
+      if (t.isObjectProperty(property)) {
+        const key = (property.key as t.Identifier).name || (property.key as t.StringLiteral).value
         //移除旧属性值
         if (Reflect.has(cache, key)) {
           sameProperty.push(cache[key])
@@ -200,7 +204,7 @@ export const matchObjectExpress = (
   value: string
 ) => {
   return elements.find((element) => {
-    let labelObjectProperty = findObjectPropertyWithIdentifierKey(element, key)
+    let labelObjectProperty = findObjectPropertyWithKey(element, key)
     return (
       labelObjectProperty &&
       t.isLiteral(labelObjectProperty.value) &&

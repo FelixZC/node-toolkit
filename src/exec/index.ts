@@ -9,7 +9,6 @@ import runBabelPlugin from '../plugins/use-babel-plugin'
 import runCodemod from '../plugins/use-js-codemod'
 import runPostcssPlugin from '../plugins/use-postcss-plugin'
 import runPosthtmlPlugin from '../plugins/use-posthtml-plugin'
-import storeFile from '../query/js/stote-state'
 import type { Plugin as PosthtmlPlugin } from 'posthtml'
 import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
 import type { Transform } from 'jscodeshift'
@@ -17,9 +16,9 @@ import type { GroupCache } from '../utils/common'
 import type { FileInfo } from '../utils/fs'
 import type { ExecFileInfo } from '../plugins/common'
 import type { BabelPlugin } from '../plugins/use-babel-plugin'
+import storeFile from '../query/js/stote-state'
 const br = os.EOL // 换行符
-
-const rootPath = path.join('src copy')
+const rootPath = path.join('src-copy')
 const fsInstance = new fsUtils(rootPath)
 const fileInfoList = fsInstance.getFileInfoList()
 interface AttrsCollection {
@@ -62,13 +61,13 @@ export const classifyFilesGroup = (isQueryRepeat = false) => {
 
     group = groupBy(filesGroupOfRepeat, 'extname') // 再按文件类型分类
 
-    writeFile('src/query/json/files-group-repeat.json', JSON.stringify(group, null, 2))
+    writeFile('dist/src/query/json/files-group-repeat.json', JSON.stringify(group, null, 2))
   } // 查询同一类型文件
 
   const classifyNormalFilesGroup = () => {
     const group = groupBy(fileInfoList, 'extname') // 按文件类型分类
 
-    writeFile('src/query/json/files-group.json', JSON.stringify(group, null, 2))
+    writeFile('dist/src/query/json/files-group.json', JSON.stringify(group, null, 2))
   }
 
   if (isQueryRepeat) {
@@ -83,20 +82,20 @@ export const formatText = () => {
     {
       mode: 'md',
       // md文件去重
-      sourceFilePath: 'src/query/md/query.md',
-      targetFilePath: 'src/query/md/query.md'
+      sourceFilePath: 'dist/src/query/md/query.md',
+      targetFilePath: 'dist/src/query/md/query.md'
     },
     {
       mode: 'txtToTxt',
       // 每日n句去重
-      sourceFilePath: 'src/query/txt/每日n句.txt',
-      targetFilePath: 'src/query/txt/每日n句.txt'
+      sourceFilePath: 'dist/src/query/txt/每日n句.txt',
+      targetFilePath: 'dist/src/query/txt/每日n句.txt'
     },
     {
       mode: 'txtToMd',
       // 每日n句转md
-      sourceFilePath: 'src/query/txt/每日n句.txt',
-      targetFilePath: 'src/query/md/sentence.md'
+      sourceFilePath: 'dist/src/query/txt/每日n句.txt',
+      targetFilePath: 'dist/src/query/md/sentence.md'
     }
   ]
 
@@ -120,7 +119,7 @@ export const generateRouter = () => {
         const componentPath = path
           .relative('./', path.resolve(v.dirname, `${v.filename}.vue`))
           .replace(/\\/g, '/')
-          .replace('src/', '@/')
+          .replace('dist/src/', '@/')
         routes.push({
           component: `_(): Promise<typeof import('*.vue')> => import('${componentPath}')_`,
           meta: {
@@ -133,7 +132,7 @@ export const generateRouter = () => {
       }
     })
   const output = JSON.stringify(routes, null, 2).replace(/(['"]_|_['"])/g, '')
-  writeFile('src/query/json/routes.json', output)
+  writeFile('dist/src/query/json/routes.json', output)
 } // 获取项目中拥有注释属性
 
 export const getAttrsAndAnnotation = (targetPath?: string) => {
@@ -221,21 +220,21 @@ export const getAttrsAndAnnotation = (targetPath?: string) => {
   const attributesDescriptionTable = mdUtils.createdAttributesGroupTable(attrsGroup) // 获取项目使用属性描述
 
   writeFile(
-    'src/query/md/attributes-description-table.md',
+    'dist/src/query/md/attributes-description-table.md',
     attributesDescriptionTable.replace(/\{\{.*\}\}/g, '').replace(/<.*>/g, '')
   )
   const storeTable = mdUtils.createdStoreTable(storeFile, attrsCollectionTemp) // 获取store属性描述
 
   writeFile(
-    'src/query/md/store-table.md',
+    'dist/src/query/md/store-table.md',
     storeTable.replace(/\{\{.*\}\}/g, '').replace(/<.*>/g, '')
   )
-  writeFile('src/query/json/attrs-collection.json', JSON.stringify(attrsCollectionTemp))
+  writeFile('dist/src/query/json/attrs-collection.json', JSON.stringify(attrsCollectionTemp))
 } // 获取自定组件Props,Methods,Slot,Event
 
 export const getComponentDescription = () => {
-  const writeFilePath = 'src/query/md/component-description.md'
-  const fsIntance = new fsUtils(path.join('src/components/common'))
+  const writeFilePath = 'dist/src/query/md/component-description.md'
+  const fsIntance = new fsUtils(path.join('dist/src/components/common'))
   const filePathList = fsIntance.filePathList.sort((filePath1, filePath2) => {
     return path.basename(filePath1).localeCompare(path.basename(filePath2))
   })
@@ -255,47 +254,10 @@ export const getComponentDescription = () => {
   writeFile(writeFilePath, str)
 }
 
-export const modifyFilename = (isDirectlyExec = true) => {
-  const source = require('../query/json/source.json') as SourceItem[]
-
-  const priviewResult = () => {
-    // 文件信息整合
-    const fileInfoList = new fsUtils(path.join('src/assets/images/aside-icon')).getFileInfoList() // 按创建时间进行排序
-
-    fileInfoList.sort((v1, v2) => {
-      return v1.stats.birthtimeMs - v2.stats.birthtimeMs
-    }) // 查命名错误和遗漏
-
-    const tempList: SourceItem[] = []
-    source.forEach((i) => {
-      if (!fileInfoList.some((v) => v.filename === i.filename)) {
-        tempList.push(i)
-      }
-    }) // 预览
-
-    writeFile('src/query/json/priview.json', JSON.stringify(tempList))
-  }
-
-  const modifyFilenameHandle = () => {
-    // 自定义命名
-    const customBaseNameGenerateFunction = (oldFile: string) => {
-      const oldFileName = path.basename(oldFile, path.extname(oldFile)) // 文件名
-
-      return source.find((item: SourceItem) => item.filename === oldFileName)?.target || oldFileName
-    }
-
-    fsInstance.modifyFileName(customBaseNameGenerateFunction)
-  }
-
-  if (isDirectlyExec) {
-    modifyFilenameHandle()
-  } else {
-    priviewResult() // 先预览下结果
-  }
-} // 根据提供正则查询
+// 根据提供正则查询
 
 export const queryByReg = (reg: RegExp, isBatch = false, appointFilePath?: string) => {
-  const writeFilePath = 'src/query/md/query.md'
+  const writeFilePath = 'dist/src/query/md/query.md'
   let result = '' // 批量查询
 
   const batchQuery = (regExpression: RegExp) => {
@@ -308,7 +270,7 @@ export const queryByReg = (reg: RegExp, isBatch = false, appointFilePath?: strin
   } // 指定查询
 
   const pageQuery = (regExpression: RegExp) => {
-    const readFilePath = appointFilePath || 'src/query/md/query.md'
+    const readFilePath = appointFilePath || 'dist/src/query/md/query.md'
     const content = fs.readFileSync(readFilePath, 'utf-8')
     const result = mdUtils.queryContentByReg(content, regExpression)
 
@@ -485,7 +447,7 @@ export const execPosthtmlPlugin = async (
       updateBar()
     }
   }
-  writeFile('src/query/json/global-extra.json', JSON.stringify(globalExtra))
+  writeFile('dist/src/query/json/global-extra.json', JSON.stringify(globalExtra))
 }
 /**
  * 执行postcss插件

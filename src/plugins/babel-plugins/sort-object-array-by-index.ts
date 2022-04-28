@@ -1,6 +1,6 @@
 import { declare } from '@babel/helper-plugin-utils'
 import * as t from '@babel/types'
-import { findObjectPropertyWithIdentifierKey } from './ast-utils'
+import { findObjectPropertyWithKey } from './ast-utils'
 
 /**
  * 重置Index
@@ -9,7 +9,7 @@ import { findObjectPropertyWithIdentifierKey } from './ast-utils'
 export const resetIndexObjectProperty = (elements: t.ObjectExpression[]) => {
   let count = 0
   for (const element of elements) {
-    const indexProperty = findObjectPropertyWithIdentifierKey(element, 'index')
+    const indexProperty = findObjectPropertyWithKey(element, 'index')
     if (indexProperty && indexProperty.value) {
       indexProperty.value = t.numericLiteral(count)
     } else {
@@ -33,8 +33,8 @@ export const getSortMethod = () => {
    * @returns
    */
   const sortHandle = (v1: t.ObjectExpression, v2: t.ObjectExpression) => {
-    const v1IndexProperty = findObjectPropertyWithIdentifierKey(v1, 'index')
-    const v2IndexProperty = findObjectPropertyWithIdentifierKey(v2, 'index')
+    const v1IndexProperty = findObjectPropertyWithKey(v1, 'index')
+    const v2IndexProperty = findObjectPropertyWithKey(v2, 'index')
     if (!v1IndexProperty || !v2IndexProperty) {
       return 0
     }
