@@ -86,14 +86,12 @@ export const findObjectPropertyWithKey = (target: t.ObjectExpression, key: strin
  * @returns
  */
 export const addObjectNewProperty = (
-  elements: t.ObjectExpression[],
+  element: t.ObjectExpression,
   input: Record<string, any> | string
 ) => {
-  for (const element of elements) {
-    let newObjectExpression = createObjectTemplateNode(input)
-    element.properties = [...element.properties, ...newObjectExpression.properties]
-  }
-  return elements
+  let newObjectExpression = createObjectTemplateNode(input)
+  element.properties = [...element.properties, ...newObjectExpression.properties]
+  return element
 }
 
 /**
@@ -140,27 +138,26 @@ export const filterSameObject = (elements: t.ObjectExpression[], key = 'prop') =
 }
 
 //过滤对象相同属性
-export const filterSameProperty = (elements: t.ObjectExpression[]) => {
-  for (const element of elements) {
-    const cache: Record<string, any> = {}
-    const sameProperty: (t.ObjectMethod | t.ObjectProperty | t.SpreadElement)[] = []
-    for (const property of element.properties) {
-      if (t.isObjectProperty(property)) {
-        const key = (property.key as t.Identifier).name || (property.key as t.StringLiteral).value
-        //移除旧属性值
-        if (Reflect.has(cache, key)) {
-          sameProperty.push(cache[key])
-        }
-        cache[key] = property
+export const filterSameProperty = (element: t.ObjectExpression) => {
+  const cache: Record<string, any> = {}
+  const sameProperty: (t.ObjectMethod | t.ObjectProperty | t.SpreadElement)[] = []
+  for (const property of element.properties) {
+    if (t.isObjectProperty(property)) {
+      const key = (property.key as t.Identifier).name || (property.key as t.StringLiteral).value
+      //移除旧属性值
+      if (Reflect.has(cache, key)) {
+        sameProperty.push(cache[key])
       }
-    }
-    //移除相同prop的数组
-    for (const property of sameProperty) {
-      element.properties.splice(element.properties.indexOf(property), 1)
+      cache[key] = property
     }
   }
-  return elements
+  //移除相同prop的数组
+  for (const property of sameProperty) {
+    element.properties.splice(element.properties.indexOf(property), 1)
+  }
+  return element
 }
+
 /**
  * 获取节点方法名
  * @param path

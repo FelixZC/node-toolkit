@@ -91,11 +91,11 @@ export function sortArray(arr: Array<Record<string, any>>, customSort: Function 
   })
 } // 分组缓存
 
-export interface GroupCache {
+export interface GroupCache<T> {
   [cacheKey: string]: {
     groupKey: string
     count: number
-    group: Array<object>
+    group: Array<T>
     [key: string]: any
   }
 }
@@ -106,19 +106,20 @@ export interface GroupCache {
  * @returns {Object} 分类结果
  */
 
-export function groupBy(arr: Array<Record<string, any>>, groupKey: string) {
-  const cache = {} as GroupCache
+export function groupBy<T extends Record<string, any>>(arr: T[], groupKey: string) {
+  const cache = {} as GroupCache<T>
 
   if (getDataType(arr) !== 'Array') {
     throw new Error('非数组类型，无法分类')
   }
 
   arr.forEach((element) => {
-    if (cache[element[groupKey]]) {
-      cache[element[groupKey]].group.push(element)
-      cache[element[groupKey]].count++
+    const cacheKey = element[groupKey]
+    if (cache[cacheKey]) {
+      cache[cacheKey].group.push(element)
+      cache[cacheKey].count++
     } else {
-      cache[element[groupKey]] = {
+      cache[cacheKey] = {
         count: 1,
         group: [element],
         groupKey,
@@ -201,4 +202,51 @@ export const transferRef = (str: string, seperator = '/') => {
       return result
     })
     .join(seperator)
+}
+
+export function strToJson(str: string) {
+  var json = eval('(' + str + ')')
+  return json
+}
+
+/**
+ * 设置嵌套对象属性
+ * @param target
+ * @param keys
+ * @param value
+ */
+export const setValueByKeys = (
+  target: Record<string, any> = {},
+  keys: string[] | string,
+  value: any
+) => {
+  if (typeof keys === 'string') {
+    keys = keys.split(',')
+  }
+  keys.reduce((previousValue, currentKey, currentIndex) => {
+    if (currentIndex === keys.length - 1) {
+      previousValue[currentKey] = value
+    } else {
+      return (
+        previousValue?.[currentKey] ||
+        Object.defineProperty({}, currentKey, {
+          value: {}
+        })
+      )
+    }
+  }, target)
+}
+
+/**
+ * 获取嵌套对象属性
+ * @param target
+ * @param keys
+ */
+export const getValueByKeys = (target: Record<string, any> = {}, keys: string[] | string): any => {
+  if (typeof keys === 'string') {
+    keys = keys.split(',')
+  }
+  return keys.reduce((previousValue, currentKey) => {
+    return previousValue?.[currentKey]
+  }, target)
 }
