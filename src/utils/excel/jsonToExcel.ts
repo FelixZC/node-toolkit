@@ -1,5 +1,5 @@
 import * as xlsx from 'xlsx'
-import { getValueByKey, getSortTypeName, getTypeMap, keyValueMap } from './utils/map'
+import { getValueByKey, getSortTypeName, keyValueMap } from './utils/map'
 //@ts-ignore
 import source from '../../query/json/excelObjectList.json'
 import { groupBy } from '../common'
@@ -36,9 +36,6 @@ const runJsonToExcel = () => {
               break
             case '是否增改':
               cell[key] = cell[key] ? 'Y' : 'N'
-              break
-            case '数据类型':
-              cell[key] = getTypeMap(cell[key])
               break
           }
         }

@@ -75,31 +75,3 @@ export function getFileType(value: FileTypeMap['fileTypeLabel']) {
   ])
   return fileTypeMap.get(value) || '无归属'
 }
-
-export const getTypeMap = (input: string) => {
-  let type: SheetType['数据类型']
-  switch (input) {
-    case '字符型':
-      type = 'input'
-      breakStatement
-
-    case '数值型':
-      type = 'number'
-      break
-
-    case '日期型':
-      type = 'date'
-      break
-
-    case '时间型':
-      type = 'time'
-      break
-
-    case '布尔型':
-      type = 'radio'
-      break
-    default:
-      type = 'input'
-  }
-  return type
-}
