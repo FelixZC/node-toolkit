@@ -1,15 +1,14 @@
 import { declare } from '@babel/helper-plugin-utils'
 import { writeFile, strToJson, setValueByKeys, getValueByKeys } from '../../utils/common'
-import formRef from './output/index'
+import formRef from '../../utils/excel/output/index'
 import {
   matchObjectExpress,
   createObjectTemplateNode,
   getMethodName,
   filterSameProperty,
   filterSameObject,
-  addObjectNewProperty,
-  addNewObject,
-  findObjectPropertyWithKey
+  findObjectPropertyWithKey,
+  replaceExpressionProperty
 } from './ast-utils'
 import generator from '@babel/generator'
 import * as parser from '@babel/parser'
@@ -21,7 +20,6 @@ import * as t from '@babel/types'
 import { NodePath } from '@babel/core'
 import { defaultObjDeatil } from '../../utils/excel/excelToJson'
 import type { ObjDeatil } from '../../utils/excel/typing/type'
-import { constants } from 'buffer'
 type FunctionName = 'annexForm' | 'tomeForm' | 'catalogForm' | 'tomeCatalogForm'
 const functionNameList: FunctionName[] = ['annexForm', 'tomeForm', 'catalogForm', 'tomeCatalogForm']
 
@@ -43,16 +41,16 @@ const getNewExpressionArray = (
 ) => {
   let switchCondition = (test as t.StringLiteral)?.value
   let outputSort = formRef[functionName](switchCondition) as ObjDeatil[]
-  if (!outputSort.length) {
-    return elements
-  }
   const newElements = outputSort.map((item) => {
-    const source = matchObjectExpress(elements, 'prop', item.prop)
+    const matchObjIndex = matchObjectExpress(elements, 'prop', item.prop)
     let newObjectExpression: t.ObjectExpression
     /**1、已存在对象则创造新对象的同时，合并原有对象属性，2、不存在则直接创造新对象 */
-    if (source) {
+    if (matchObjIndex > -1) {
       newObjectExpression = createObjectTemplateNode(JSON.stringify(item))
-      newObjectExpression.properties = [...source.properties, ...newObjectExpression.properties]
+      newObjectExpression.properties = [
+        ...elements[matchObjIndex].properties,
+        ...newObjectExpression.properties
+      ]
     } else {
       newObjectExpression = createObjectTemplateNode(JSON.stringify(item))
       if (item.type !== 'index' && item.type !== 'selection') {
@@ -92,7 +90,7 @@ const saveObjectCache = (newObjectExpression: t.ObjectExpression, keys: string[]
     setValueByKeys(
       sameObjectCache,
       [...keys, propPropertyValue],
-      strToJson(generator(newObjectExpression).code)
+      generator(newObjectExpression).code
     )
   }
 }
@@ -126,7 +124,7 @@ const loadObjectCache = (newObjectExpression: t.ObjectExpression, keys: string[]
         setValueByKeys(
           newObjectCache,
           [...keys, propPropertyValue],
-          strToJson(generator(newObjectExpression).code)
+          generator(newObjectExpression).code
         )
         break
     }
@@ -240,10 +238,14 @@ export default declare((babel) => {
 
                     let result = elements as t.ObjectExpression[]
                     result = getNewExpressionArray(result, test, functionName as FunctionName)
-                    result = handleExpressionArray(result, test, functionName as FunctionName)
+                    // result = replaceExpressionProperty(result, 'prop', 'mutualNum', {
+                    //   Tshow: true,
+                    //   Fshow: true
+                    // })
                     /** 如果文档不规范，下面两行代码会影响输出结果 */
                     result = filterSameObject(result, 'prop')
                     result = result.map((element) => filterSameProperty(element))
+                    result = handleExpressionArray(result, test, functionName as FunctionName)
                     path.node.elements = resetIndexObjectProperty(result)
                   }
                 })

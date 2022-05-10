@@ -1,7 +1,7 @@
 import * as path from 'path'
 import * as xlsx from 'xlsx'
-import type { SheetType, OutputObj, FileTypeMap, ClassifyResult } from './typing/type'
-import { getSortTypeName, getFileType } from './utils/map'
+import type { SheetType, OutputObj, ClassifyResult } from './typing/type'
+import { getSortTypeName, getFileType, fileTypeMap } from './utils/map'
 import { writeFile } from '../common'
 import type { ObjDeatil } from './typing/type'
 
@@ -100,9 +100,9 @@ export default function runExcelToJson() {
   })
   const SheetNames = workBook.SheetNames //获取表名
 
-  const fileTypeList: FileTypeMap['fileTypeValue'][] = ['tome', 'catalog', 'annex', 'tomeCatalog']
+  const fileTypeList = Array.from(fileTypeMap.values())
   const outputMap: OutputObj[] = fileTypeList.map((fileType) => {
-    const filePath = `./output/${fileType}Form.ts`
+    const filePath = `./output/${fileType}Form.js`
     return {
       fileType,
       outputPath: path.format({
@@ -147,7 +147,7 @@ export default function runExcelToJson() {
     const outputPath = outputItem.outputPath
     let outputContent = `
         export default function ${functionName}(sortType='common'){
-            let form:any[]=[]
+            let form=[]
             switch (sortType){
                  ${result}
             }

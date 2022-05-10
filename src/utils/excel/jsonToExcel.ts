@@ -1,20 +1,23 @@
 import * as xlsx from 'xlsx'
-import { getValueByKey, getSortTypeName, keyValueMap } from './utils/map'
+import { getValueByKey, getSortTypeName, keyValueMap, fileTypeMap } from './utils/map'
 //@ts-ignore
 import source from '../../query/json/excelObjectList.json'
 import { groupBy } from '../common'
 import type { ObjDeatil, SheetType } from './typing/type'
 
 const runJsonToExcel = () => {
-  const sourceGroup = groupBy<ObjDeatil>(source, 'sortTypeValue')
-  const sourceGroupTemp = {} as typeof sourceGroup
-  // 已经排序完毕，懒得再排序了
-  for (const groupKey of Object.keys(sourceGroup).reverse()) {
-    sourceGroupTemp[groupKey] = sourceGroup[groupKey]
+  if (!source?.length) {
+    throw new Error('runJsonToExcel缺少数据来源')
   }
+  const fileTypeList = Array.from(fileTypeMap.keys())
+  const localSource = source.filter((item: any) => item.sortTypeValue) as ObjDeatil[]
+  localSource.sort((v1, v2) => {
+    return fileTypeList.indexOf(v1.resoure) - fileTypeList.indexOf(v2.resoure)
+  })
+  const sourceGroup = groupBy<ObjDeatil>(localSource, 'sortTypeValue')
   const workbook = xlsx.utils.book_new()
   const header = Object.values(keyValueMap)
-  for (const [sortTypeValue, groupItem] of Object.entries(sourceGroupTemp)) {
+  for (const [sortTypeValue, groupItem] of Object.entries(sourceGroup)) {
     const sheetName = getSortTypeName(sortTypeValue)
     if (sheetName) {
       const sheetContent = groupItem.group.map((item) => {
@@ -46,7 +49,7 @@ const runJsonToExcel = () => {
     }
   }
 
-  xlsx.writeFileXLSX(workbook, './src/query/excel/test.xlsx', {
+  xlsx.writeFileXLSX(workbook, './dist/src/query/excel/test.xlsx', {
     cellStyles: true
   })
 }

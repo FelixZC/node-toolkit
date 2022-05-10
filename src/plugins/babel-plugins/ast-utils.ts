@@ -200,7 +200,7 @@ export const matchObjectExpress = (
   key = 'label',
   value: string
 ) => {
-  return elements.find((element) => {
+  return elements.findIndex((element) => {
     let labelObjectProperty = findObjectPropertyWithKey(element, key)
     return (
       labelObjectProperty &&
@@ -246,4 +246,25 @@ export const createObjectTemplateNode = (input: Record<string, any> | string) =>
     )
   }
   return newObjectExpression
+}
+
+/**
+ * 新增对象属性值
+ * @param elements
+ * @param key
+ * @param value
+ * @param newProperty
+ * @returns
+ */
+export const replaceExpressionProperty = (
+  elements: t.ObjectExpression[],
+  key: string = 'prop',
+  value: string,
+  newProperty: string | Record<string, any>
+) => {
+  const matchObjIndex = matchObjectExpress(elements, key, value)
+  if (matchObjIndex > -1) {
+    elements[matchObjIndex] = addObjectNewProperty(elements[matchObjIndex], newProperty)
+  }
+  return elements
 }

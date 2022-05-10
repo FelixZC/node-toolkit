@@ -1,6 +1,6 @@
 export interface FileTypeMap {
-  fileTypeValue: 'tome' | 'catalog' | 'annex' | 'tomeCatalog'
-  fileTypeLabel: '案卷目录级' | '文件目录级' | '文件内容级' | '卷内目录级'
+  fileTypeValue: 'tome' | 'tomeCatalog' | 'catalog' | 'annex'
+  fileTypeLabel: '案卷目录级' | '卷内目录级' | '文件目录级' | '文件内容级'
 }
 export interface SheetType {
   门类字段: string
@@ -35,21 +35,20 @@ export interface OutputObj {
 
 export interface ObjDeatil {
   label: string
-  index?: number
+  index: number
   prop: string
   rowShow: number | null
   Fshow: boolean
   Tshow: boolean
   required: boolean
-  remark?: string
-  captureShape?: string
-  resoure?: string
-  refDocument?: string
-  resoure?: string
-  fileType?: string
-  sortTypeValue?: string
-  sortTypeLabel?: string
-  type?:
+  remark: string
+  captureShape: string
+  resoure: FileTypeMap['fileTypeLabel']
+  refDocument: string
+  fileType: FileTypeMap['fileTypeValue']
+  sortTypeValue: string
+  sortTypeLabel: string
+  type:
     | 'input'
     | 'number'
     | 'autocomplete'

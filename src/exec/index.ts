@@ -51,22 +51,19 @@ export const getFsInstance = () => {
 } // 文件分类
 
 export const classifyFilesGroup = (isQueryRepeat = false) => {
-  // 查询命名重复
+  /** 查询命名重复 */
   const classifyRepeatFileGroup = () => {
-    let group = groupBy(fileInfoList, 'basename') // 按文件名分类
+    const group = groupBy(fileInfoList, 'basename') // 按文件名分类
 
-    const filesGroupOfRepeat = Object.values(group).filter(
-      (item: GroupCache) => item.group.length > 1
-    ) // 过滤重复命名数组
+    const filesGroupOfRepeat = Object.values(group).filter((item) => item.group.length > 1) // 过滤重复命名数组
 
-    group = groupBy(filesGroupOfRepeat, 'extname') // 再按文件类型分类
+    const newGroup = groupBy(filesGroupOfRepeat, 'extname') // 再按文件类型分类
 
-    writeFile('dist/src/query/json/files-group-repeat.json', JSON.stringify(group, null, 2))
-  } // 查询同一类型文件
-
+    writeFile('dist/src/query/json/files-group-repeat.json', JSON.stringify(newGroup, null, 2))
+  }
+  /** 查询同一类型文件 */
   const classifyNormalFilesGroup = () => {
     const group = groupBy(fileInfoList, 'extname') // 按文件类型分类
-
     writeFile('dist/src/query/json/files-group.json', JSON.stringify(group, null, 2))
   }
 
@@ -348,7 +345,6 @@ export const batchReplaceByReg = (
     restBasenameList = restBasenameList.filter(filterCondition)
   }
 
-  let modifyCount = 0
   restBasenameList.forEach((item) => {
     let content = fs.readFileSync(item.filePath, 'utf-8')
     let isChange = false
