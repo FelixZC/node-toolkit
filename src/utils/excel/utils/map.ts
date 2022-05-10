@@ -1,4 +1,4 @@
-import type { SheetType, FileTypeMap } from '../typing/type'
+import type { SheetType, FileTypeValue, FileTypeLabel } from '../typing/type'
 
 /**
  * excel表格属性于名称对应字段，固定顺序，不要变更
@@ -72,12 +72,19 @@ export function getSortTypeName(sortType: string, isReverse = false) {
 /**
  * 档案级别映射表，固定顺序，不要变更
  */
-export const fileTypeMap = new Map<FileTypeMap['fileTypeLabel'], FileTypeMap['fileTypeValue']>([
+export const fileTypeMap = new Map<FileTypeLabel, FileTypeValue>([
   ['案卷目录级', 'tome'],
   ['卷内目录级', 'tomeCatalog'],
   ['文件目录级', 'catalog'],
   ['文件内容级', 'annex']
 ])
-export function getFileType(value: FileTypeMap['fileTypeLabel']) {
-  return fileTypeMap.get(value)
+export function getFileType(value: FileTypeLabel | FileTypeValue, isReverse?: false) {
+  if (isReverse) {
+    const newArr = Array.from(fileTypeMap).map((item) => item.reverse()) as Iterable<
+      readonly [FileTypeValue, FileTypeLabel]
+    >
+    const reverseMap = new Map(newArr)
+    return reverseMap.get(value as FileTypeValue)
+  }
+  return fileTypeMap.get(value as FileTypeLabel)
 }

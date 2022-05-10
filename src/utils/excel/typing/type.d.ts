@@ -1,7 +1,7 @@
-export interface FileTypeMap {
-  fileTypeValue: 'tome' | 'tomeCatalog' | 'catalog' | 'annex'
-  fileTypeLabel: '案卷目录级' | '卷内目录级' | '文件目录级' | '文件内容级'
-}
+import { type } from 'os'
+
+export type FileTypeValue = 'tome' | 'tomeCatalog' | 'catalog' | 'annex'
+export type FileTypeLabel = '案卷目录级' | '卷内目录级' | '文件目录级' | '文件内容级'
 export interface SheetType {
   门类字段: string
   后端字段: string
@@ -24,12 +24,12 @@ export interface SheetType {
     | 'index'
   捕获形式: string
   前端行数: number
-  所属: FileTypeMap['fileTypeLabel']
+  所属: FileTypeLabel
   参考文档: string
   核对备注: any
 }
 export interface OutputObj {
-  fileType: FileTypeMap['fileTypeValue']
+  fileType: FileTypeValue
   outputPath: string
 }
 
@@ -43,9 +43,9 @@ export interface ObjDeatil {
   required: boolean
   remark: string
   captureShape: string
-  resoure: FileTypeMap['fileTypeLabel']
+  resoure: FileTypeLabel
   refDocument: string
-  fileType: FileTypeMap['fileTypeValue']
+  fileType: FileTypeValue
   sortTypeValue: string
   sortTypeLabel: string
   type:

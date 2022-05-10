@@ -3,7 +3,7 @@ import * as xlsx from 'xlsx'
 import type { SheetType, OutputObj, ClassifyResult } from './typing/type'
 import { getSortTypeName, getFileType, fileTypeMap } from './utils/map'
 import { writeFile } from '../common'
-import type { ObjDeatil } from './typing/type'
+import type { ObjDeatil, FileTypeValue } from './typing/type'
 
 /**
  * 默认初始值，导入导出时作类型校验用
@@ -17,10 +17,10 @@ export const defaultObjDeatil: ObjDeatil = {
   required: false,
   remark: '存在不符合约定单元格',
   captureShape: '',
-  resoure: '',
+  resoure: '案卷目录级',
   refDocument: '',
   rowShow: 1,
-  fileType: '',
+  fileType: 'tome',
   index: 0,
   sortTypeValue: '',
   sortTypeLabel: ''
@@ -42,7 +42,6 @@ function classifyData(jsonData: SheetType[], sheetname: string) {
     Fshow: false,
     index: 1,
     label: '序号',
-    prop: '',
     Tshow: true,
     type: 'index'
   }
@@ -55,7 +54,7 @@ function classifyData(jsonData: SheetType[], sheetname: string) {
 
   jsonData.forEach((item, index) => {
     // 先判断是那个表格的-并且是否显示（Tshow）为yes 或者是否增改（Fshow）未yes
-    const fileType = getFileType(item['所属'])
+    const fileType = getFileType(item['所属']) as FileTypeValue
     const classifyResultKey = `${fileType}List` as keyof typeof classifyResult
 
     if (fileType) {
@@ -146,7 +145,7 @@ export default function runExcelToJson() {
     const result = cache[cacheKey]
     const outputPath = outputItem.outputPath
     let outputContent = `
-        export default function ${functionName}(sortType='common'){
+       module.exports =  function ${functionName}(sortType='common'){
             let form=[]
             switch (sortType){
                  ${result}

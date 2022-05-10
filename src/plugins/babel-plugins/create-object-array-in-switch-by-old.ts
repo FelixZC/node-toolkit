@@ -7,8 +7,9 @@ import {
   getMethodName,
   filterSameProperty,
   filterSameObject,
-  findObjectPropertyWithKey,
-  replaceExpressionProperty
+  findObjectPropertyWithKey
+  // replaceExpressionProperty,
+  // addObjectNewProperty
 } from './ast-utils'
 import generator from '@babel/generator'
 import * as parser from '@babel/parser'
@@ -20,6 +21,7 @@ import * as t from '@babel/types'
 import { NodePath } from '@babel/core'
 import { defaultObjDeatil } from '../../utils/excel/excelToJson'
 import type { ObjDeatil } from '../../utils/excel/typing/type'
+// import { getFileType } from '../../utils/excel/utils/map'
 type FunctionName = 'annexForm' | 'tomeForm' | 'catalogForm' | 'tomeCatalogForm'
 const functionNameList: FunctionName[] = ['annexForm', 'tomeForm', 'catalogForm', 'tomeCatalogForm']
 
@@ -28,13 +30,13 @@ const sameObjectCache: Record<string, ObjDeatil> = {}
 const excelObjectList: ObjDeatil[] = []
 
 /**
- * 根据提供模板，复写匹配对象
+ * 以excel为主，代码为辅，复写已有属性
  * @param elements
  * @param test
  * @param functionName
  * @returns
  */
-const getNewExpressionArray = (
+const getNewExpressionArrayByExcel = (
   elements: t.ObjectExpression[],
   test: t.Expression | null | undefined,
   functionName: FunctionName
@@ -64,6 +66,45 @@ const getNewExpressionArray = (
   return newElements
 }
 
+/**
+ * 以代码为主，excel为辅，复写已有属性
+ * @param elements
+ * @param test
+ * @param functionName
+ * @returns
+ */
+// const checkExpressionArrayWithExcel = (
+//   elements: t.ObjectExpression[],
+//   test: t.Expression | null | undefined,
+//   functionName: FunctionName
+// ) => {
+//   let switchCondition = (test as t.StringLiteral)?.value
+//   let outputSort = formRef[functionName](switchCondition) as ObjDeatil[]
+//   return elements.map((element) => {
+//     const propProperty = findObjectPropertyWithKey(element, 'prop')
+//     if (propProperty) {
+//       const propPropertyValue = (propProperty.value as t.StringLiteral).value
+//       const item = outputSort.find((item) => item.prop === propPropertyValue)
+//       let newObjectExpression: t.ObjectExpression
+//       if (item) {
+//         newObjectExpression = createObjectTemplateNode(JSON.stringify(item))
+//         newObjectExpression.properties = [...element.properties, ...newObjectExpression.properties]
+//       } else {
+//         newObjectExpression = addObjectNewProperty(
+//           element,
+//           JSON.stringify({
+//             sortTypeValue: switchCondition || 'common',
+//             //@ts-ignore
+//             resoure: getFileType(functionName.split('Form')[0], true)
+//           })
+//         )
+//       }
+//       return newObjectExpression
+//     }
+
+//     return element
+//   })
+// }
 /**
  * 保存已知对象
  * @param newObjectExpression
@@ -237,7 +278,11 @@ export default declare((babel) => {
                     }
 
                     let result = elements as t.ObjectExpression[]
-                    result = getNewExpressionArray(result, test, functionName as FunctionName)
+                    result = getNewExpressionArrayByExcel(
+                      result,
+                      test,
+                      functionName as FunctionName
+                    )
                     // result = replaceExpressionProperty(result, 'prop', 'mutualNum', {
                     //   Tshow: true,
                     //   Fshow: true
