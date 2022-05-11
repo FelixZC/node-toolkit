@@ -1,36 +1,39 @@
 //@ts-nocheck
+/**
+ * 提取vue2组件信息，搬运自https://github.com/MaLuns/generate-vue-docs
+ */
 import * as compiler from '@vue/compiler-sfc'
-// import * as parse from '@babel/parser'
+import * as parser from '@babel/parser'
 import * as traverse from '@babel/traverse'
 import * as t from '@babel/types'
 import * as generate from '@babel/generator'
+import type { ElementNode, TemplateChildNode, AttributeNode } from '@vue/compiler-core'
 const { RenderMd } = require('./render') // 默认生成配置
 
 const baseConfig = {
   md: false
 } // md 生成配置
 
-const mdOptions = {
-  events: {
-    desc: '说明',
-    name: '事件名称'
-  },
-  methods: {
-    desc: '说明',
-    name: '方法名',
-    params: '参数',
-    res: '返回值'
-  },
-  props: {
-    default: '默认值',
-    desc: '说明',
-    name: '参数',
-    type: '类型'
-  },
-  slots: {
-    desc: '说明',
-    name: 'name'
-  }
+export interface MdOption {
+  desc: string
+  name: string
+  params?: string
+  res?: string
+  default?: string
+  type?: string
+}
+export interface MdOptions {
+  events: MdOption
+  methods: MdOption
+  props: MdOption
+  slots: MdOption
+}
+
+const mdOptions: MdOptions = {
+  props: { name: '参数', desc: '说明', type: '类型', default: '默认值' },
+  slots: { name: 'name', desc: '说明' },
+  events: { name: '事件名称', desc: '说明' },
+  methods: { name: '方法名', desc: '说明', params: '参数', res: '返回值' }
 } // 提取Props
 
 const extractProps = (node) => {
@@ -208,14 +211,14 @@ const isModelAndSync = (comInfo) => {
   }
 } // 遍历模板抽象数
 
-const traverserTemplateAst = (ast, visitor = {}) => {
-  function traverseArray(array, parent) {
+const traverserTemplateAst = (ast: ElementNode, visitor = {}) => {
+  function traverseArray(array: TemplateChildNode[], parent: ElementNode) {
     array.forEach((child) => {
-      traverseNode(child, parent)
+      traverseNode(child as ElementNode, parent)
     })
   }
 
-  function traverseNode(node, parent) {
+  function traverseNode(node: ElementNode, parent: ElementNode) {
     visitor.enter && visitor.enter(node, parent)
     visitor[node.tag] && visitor[node.tag](node, parent)
     node.children && traverseArray(node.children, node)
@@ -245,59 +248,65 @@ const parseDocs = (vueStr: string, config = {}) => {
     slots: undefined
   }
   const vue = compiler.parse(vueStr)
-  if (vue.descriptor.script?.scriptAst || vue.descriptor.scriptSetup?.scriptAst) {
-    const jst = vue.descriptor.script?.scriptAst || vue.descriptor.scriptSetup?.scriptAst
-    traverse.default(jst, {
-      ExportDefaultDeclaration(path) {
-        // 组件描述
-        if (path.node.leadingComments) {
-          componentInfo.desc = path.node.leadingComments
-            .map((item) => {
-              if (item.type === 'CommentLine') {
-                return item.value.trim()
-              }
+  if (vue.descriptor.script || vue.descriptor.scriptSetup) {
+    const content = vue.descriptor.script?.content || vue.descriptor.scriptSetup?.content
+    if (content) {
+      const jst = parser.parse(content, {
+        allowImportExportEverywhere: false,
+        plugins: ['decorators-legacy', 'jsx', 'typescript'],
+        sourceType: 'module'
+      })
+      traverse.default(jst, {
+        ExportDefaultDeclaration(path) {
+          // 组件描述
+          if (path.node.leadingComments) {
+            componentInfo.desc = path.node.leadingComments
+              .map((item) => {
+                if (item.type === 'CommentLine') {
+                  return item.value.trim()
+                }
 
-              return item.value
-                .split('\n')
-                .map((item) => item.replace(/[\s\*]/g, ''))
-                .filter(Boolean)
+                return item.value
+                  .split('\n')
+                  .map((item) => item.replace(/[\s\*]/g, ''))
+                  .filter(Boolean)
+              })
+              .toString()
+          }
+          if (t.isObjectExpression(path.node.declaration)) {
+            path.node.declaration.properties.forEach((item) => {
+              if (!t.isSpreadElement(item)) {
+                const key = (item.key as t.Identifier).name || (item.key as t.StringLiteral).value
+                if (extract[key]) {
+                  componentInfo[key] = extract[key](item)
+                }
+              }
             })
-            .toString()
-        }
-        if (t.isObjectExpression(path.node.declaration)) {
-          path.node.declaration.properties.forEach((item) => {
-            if (!t.isSpreadElement(item)) {
-              const key = (item.key as t.Identifier).name || (item.key as t.StringLiteral).value
-              if (extract[key]) {
-                componentInfo[key] = extract[key](item)
-              }
+          }
+        },
+
+        MemberExpression(path) {
+          // 判断是不是event
+          if (path.node.property.name === '$emit') {
+            const event = extractEvents(path)
+            !componentInfo.events && (componentInfo.events = {})
+
+            if (componentInfo.events[event.name]) {
+              componentInfo.events[event.name].desc = event.desc
+                ? event.desc
+                : componentInfo.events[event.name].desc
+            } else {
+              componentInfo.events[event.name] = event
             }
-          })
-        }
-      },
-
-      MemberExpression(path) {
-        // 判断是不是event
-        if (path.node.property.name === '$emit') {
-          const event = extractEvents(path)
-          !componentInfo.events && (componentInfo.events = {})
-
-          if (componentInfo.events[event.name]) {
-            componentInfo.events[event.name].desc = event.desc
-              ? event.desc
-              : componentInfo.events[event.name].desc
-          } else {
-            componentInfo.events[event.name] = event
           }
         }
-      }
-    })
-    isModelAndSync(componentInfo)
+      })
+      isModelAndSync(componentInfo)
+    }
   }
-
   if (vue.descriptor.template) {
     traverserTemplateAst(vue.descriptor.template.ast, {
-      slot(node, parent) {
+      slot(node: ElementNode, parent: ElementNode) {
         !componentInfo.slots && (componentInfo.slots = {})
         const index = parent.children.findIndex((item) => item === node)
         let desc = '无描述'
@@ -306,12 +315,17 @@ const parseDocs = (vueStr: string, config = {}) => {
         if (index > 0) {
           const tag = parent.children[index - 1]
 
-          if (tag.isComment) {
-            desc = tag.text.trim()
+          if (tag.type === 3) {
+            desc = tag.content.trim()
           }
         }
 
-        if (node.slotName) name = node.attrsMap.name
+        if (node.tagType === 2) {
+          const nameAttr = node.props.find((prop) => prop.name === 'name')
+          if (nameAttr && Reflect.has(nameAttr, 'value')) {
+            name = (nameAttr as AttributeNode).value?.content || name
+          }
+        }
         componentInfo.slots[name] = {
           desc,
           name

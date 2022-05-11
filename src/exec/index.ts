@@ -18,7 +18,7 @@ import type { ExecFileInfo } from '../plugins/common'
 import type { BabelPlugin } from '../plugins/use-babel-plugin'
 const br = os.EOL // 换行符
 
-/** 项目根目录 */
+/** 项目根目录，在此变更执行目录 */
 const rootPath = path.join('src-copy')
 const fsInstance = new fsUtils(rootPath)
 const fileInfoList = fsInstance.getFileInfoList()
@@ -26,15 +26,6 @@ interface AttrsCollection {
   key: string | number
   value: string | number
   standingInitial?: string
-}
-interface RouteTemplate {
-  path: string
-  name: string
-  component: string
-  meta: {
-    title: string
-    keepAlive: boolean
-  }
 }
 export interface RegExec {
   reg: RegExp
@@ -220,8 +211,7 @@ export const getAttrsAndAnnotation = (targetPath?: string) => {
  */
 export const getComponentDescription = () => {
   const writeFilePath = 'dist/src/query/md/component-description.md'
-  const fsIntance = new fsUtils(path.join('dist/src/components/common'))
-  const filePathList = fsIntance.filePathList.sort((filePath1, filePath2) => {
+  const filePathList = fsInstance.filePathList.sort((filePath1, filePath2) => {
     return path.basename(filePath1).localeCompare(path.basename(filePath2))
   })
   let str = ''
