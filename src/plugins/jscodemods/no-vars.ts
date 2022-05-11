@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { Transform } from 'jscodeshift'
 
 const transformer: Transform = (file, api) => {

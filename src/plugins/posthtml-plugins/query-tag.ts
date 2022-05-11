@@ -1,3 +1,6 @@
+/**
+ * 标签查询
+ */
 import type PostHTML from 'posthtml'
 const tagList: string[] = []
 

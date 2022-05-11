@@ -1,3 +1,4 @@
+//@ts-nocheck
 /**
  * Unchains chained variable declarations.
  */

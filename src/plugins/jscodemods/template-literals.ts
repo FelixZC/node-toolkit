@@ -1,3 +1,4 @@
+//@ts-nocheck
 /**
  * Replaces string concatenation with template literals.
  * Adapted from https://vramana.github.io/blog/2015/12/21/codemod-tutorial/

@@ -1,3 +1,6 @@
+/**
+ * 操作指定函数，嵌套在switch中的对象数组
+ */
 import { declare } from '@babel/helper-plugin-utils'
 import { getValueByKeys, setValueByKeys, strToJson, writeFile } from '../../utils/common'
 import {
@@ -303,19 +306,22 @@ export default declare((babel) => {
                     }
 
                     let result = elements as t.ObjectExpression[]
+                    /** 可与checkExpressionArrayWithExcel交换使用 */
                     result = getNewExpressionArrayByExcel(
                       result,
                       test,
                       functionName as FunctionName
-                    ) // result = replaceExpressionProperty(result, 'prop', 'mutualNum', {
+                    )
+                    /** 替换符合条件的对象属性 */
+                    // result = replaceExpressionProperty(result, 'prop', 'mutualNum', {
                     //   Tshow: true,
                     //   Fshow: true
                     // })
-
-                    /** 如果文档不规范，下面两行代码会影响输出结果 */
-
+                    /** 过滤指定相同属性对象 */
                     result = filterSameObject(result, 'prop')
+                    /** 过滤相同属性 */
                     result = result.map((element) => filterSameProperty(element))
+                    /** 添加缓存记录 */
                     result = handleExpressionArray(result, test, functionName as FunctionName)
                     path.node.elements = resetIndexObjectProperty(result)
                   }

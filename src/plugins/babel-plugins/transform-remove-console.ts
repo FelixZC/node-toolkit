@@ -1,3 +1,6 @@
+/**
+ * 移除console打印
+ */
 import { declare } from '@babel/helper-plugin-utils'
 import type { Expression, MemberExpression, PrivateName } from '@babel/types'
 import type { NodePath } from '@babel/traverse'

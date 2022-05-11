@@ -1,3 +1,6 @@
+/**
+ * 变更驼峰命名
+ */
 import { declare } from '@babel/helper-plugin-utils'
 import { isPath, transferRef } from '../../utils/common'
 export default declare((babel) => {

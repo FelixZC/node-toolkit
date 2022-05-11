@@ -1,3 +1,6 @@
+/**
+ * 根据属性index对对象数组进行排序
+ */
 import { declare } from '@babel/helper-plugin-utils'
 import { findObjectPropertyWithKey } from './ast-utils'
 import * as t from '@babel/types' //

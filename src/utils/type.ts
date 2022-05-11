@@ -9,12 +9,9 @@ import type {
   ResponseObject
 } from 'openapi-typescript'
 
-const EamsAmsprojService = require('../api/eams-amsproj-service.json')
-
-const SystemBaseService = require('../api/system-base-service.json')
-
-const BaseStatsService = require('../api/base-stats-service.json')
-
+import * as EamsAmsprojService from '../api/eams-amsproj-service.json'
+import * as SystemBaseService from '../api/system-base-service.json'
+import * as BaseStatsService from '../api/base-stats-service.json'
 interface CreateRequestTemplateExecListItem {
   resource: typeof EamsAmsprojService | typeof SystemBaseService
   typingPath: string

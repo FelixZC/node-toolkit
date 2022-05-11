@@ -46,8 +46,12 @@ interface FsInstance {
   ): void
   renameFile(oldFilePath: string, newFilePath: string): boolean
   copyFile(filePath: string): void
-} // 操作日志打印记录
+}
 
+/**
+ * 操作日志打印记录
+ * @returns
+ */
 function log() {
   return function (target: FsInstance, name: string, descriptor: PropertyDescriptor) {
     const fn = descriptor.value
@@ -64,8 +68,12 @@ function log() {
 
     return descriptor
   }
-} // 异常处理装饰器与异常日志记录
+}
 
+/**
+ * 异常处理装饰器与异常日志记录
+ * @returns
+ */
 function catchHandel() {
   return function (target: FsInstance, name: string, descriptor: PropertyDescriptor) {
     const fn = descriptor.value

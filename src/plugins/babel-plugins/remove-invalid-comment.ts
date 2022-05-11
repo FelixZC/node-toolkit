@@ -1,3 +1,6 @@
+/**
+ * 移除包含this的无效代码
+ */
 import { declare } from '@babel/helper-plugin-utils'
 export default declare((babel) => {
   const { types: t } = babel

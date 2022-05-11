@@ -207,10 +207,17 @@ export const transferRef = (str: string, seperator = '/') => {
     })
     .join(seperator)
 }
+
+/**
+ * 执行string代码,存在无效引用则报错
+ * @param str
+ * @returns
+ */
 export function strToJson(str: string) {
   const json = eval('(' + str + ')')
   return json
 }
+
 /**
  * 设置嵌套对象属性
  * @param target

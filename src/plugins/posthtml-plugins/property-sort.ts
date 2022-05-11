@@ -1,3 +1,6 @@
+/**
+ * 属性键值排序
+ */
 import { sortObjAttr } from '../../utils/common'
 import type PostHTML from 'posthtml'
 

@@ -1,4 +1,7 @@
-/** 构建成Markdown */
+//@ts-nocheck
+/**
+ * 构建成Markdown
+ */
 class RenderMd {
   constructor(parserResult, options = {}) {
     this.parserResult = parserResult

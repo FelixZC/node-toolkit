@@ -13,12 +13,12 @@ import storeFile from '../query/js/stote-state'
 import type { Plugin as PosthtmlPlugin } from 'posthtml'
 import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
 import type { Transform } from 'jscodeshift'
-import type { GroupCache } from '../utils/common'
 import type { FileInfo } from '../utils/fs'
 import type { ExecFileInfo } from '../plugins/common'
 import type { BabelPlugin } from '../plugins/use-babel-plugin'
 const br = os.EOL // 换行符
 
+/** 项目根目录 */
 const rootPath = path.join('src-copy')
 const fsInstance = new fsUtils(rootPath)
 const fileInfoList = fsInstance.getFileInfoList()
@@ -26,10 +26,6 @@ interface AttrsCollection {
   key: string | number
   value: string | number
   standingInitial?: string
-}
-interface SourceItem {
-  filename: string
-  target: string
 }
 interface RouteTemplate {
   path: string
@@ -49,8 +45,12 @@ export interface FilterConditionType {
 }
 export const getFsInstance = () => {
   return fsInstance
-} // 文件分类
+}
 
+/**
+ * 文件分类
+ * @param isQueryRepeat
+ */
 export const classifyFilesGroup = (isQueryRepeat = false) => {
   /** 查询命名重复 */
   const classifyRepeatFileGroup = () => {
@@ -75,8 +75,11 @@ export const classifyFilesGroup = (isQueryRepeat = false) => {
   } else {
     classifyNormalFilesGroup()
   }
-} // 文本转化并格式
+}
 
+/**
+ * 文本转化并格式
+ */
 export const formatText = () => {
   const loadAndSaveList = [
     {
@@ -104,37 +107,12 @@ export const formatText = () => {
     const str = mdUtils.textFormat(fileContent, item.mode)
     writeFile(item.targetFilePath, str)
   }
-} // 路由生成
+}
 
-export const generateRouter = () => {
-  const queryReg = /(?<tagInfo><(?<tag>title).*>)(?<tagContent>[\s\S]*?)<\/title>/
-  let result
-  const routes: RouteTemplate[] = []
-  fileInfoList
-    .filter((i) => i.extname === '.html')
-    .forEach((v) => {
-      const content = fs.readFileSync(v.filePath, 'utf-8')
-
-      if ((result = queryReg.exec(content))) {
-        const componentPath = path
-          .relative('./', path.resolve(v.dirname, `${v.filename}.vue`))
-          .replace(/\\/g, '/')
-          .replace('dist/src/', '@/')
-        routes.push({
-          component: `_(): Promise<typeof import('*.vue')> => import('${componentPath}')_`,
-          meta: {
-            keepAlive: true,
-            title: result.groups!.tagContent
-          },
-          name: `${v.filename}`,
-          path: `/${v.filename}`
-        })
-      }
-    })
-  const output = JSON.stringify(routes, null, 2).replace(/(['"]_|_['"])/g, '')
-  writeFile('dist/src/query/json/routes.json', output)
-} // 获取项目中拥有注释属性
-
+/**
+ * 获取项目中拥有注释属性
+ * @param targetPath
+ */
 export const getAttrsAndAnnotation = (targetPath?: string) => {
   const babelPluginPathList = ['../plugins/babel-plugins/extract-annotation']
   const plugins: BabelPlugin[] = babelPluginPathList.map((pluginPath) => {
@@ -145,16 +123,20 @@ export const getAttrsAndAnnotation = (targetPath?: string) => {
     }
 
     return result
-  }) // 所有属性描述对象
+  })
 
+  /** 所有属性描述对象 */
   const attrsCollectionTemp: AttrsCollection = {
     key: '',
     standingInitial: 'string',
     value: ''
-  } // 所有属性描述对象数组
-
-  const attrsCollectionGroup: AttrsCollection[] = [] // 根据首字母分类属性描述对象数组
-
+  }
+  /** 所有属性描述对象数组 */
+  const attrsCollectionGroup: AttrsCollection[] = []
+  /**
+   * 根据首字母分类属性描述对象数组
+   * @param filePath
+   */
   const handler = (filePath: string) => {
     try {
       const content = fs.readFileSync(filePath, 'utf-8')
@@ -230,8 +212,12 @@ export const getAttrsAndAnnotation = (targetPath?: string) => {
     storeTable.replace(/\{\{.*\}\}/g, '').replace(/<.*>/g, '')
   )
   writeFile('dist/src/query/json/attrs-collection.json', JSON.stringify(attrsCollectionTemp))
-} // 获取自定组件Props,Methods,Slot,Event
+}
 
+/**
+ * 获取自定组件Props,Methods,Slot,Event
+ * @returns
+ */
 export const getComponentDescription = () => {
   const writeFilePath = 'dist/src/query/md/component-description.md'
   const fsIntance = new fsUtils(path.join('dist/src/components/common'))
@@ -292,8 +278,15 @@ export const queryByReg = (reg: RegExp, isBatch = false, appointFilePath?: strin
   }
 
   writeFile(writeFilePath, result)
-} // 根据提供正则替换替换内容，直接传入内容，可能链式修改
+}
 
+/**
+ * 根据提供正则替换替换内容，直接传入内容，可能链式修改
+ * @param reg
+ * @param content
+ * @param matchContentHandle
+ * @returns
+ */
 export const replaceByReg = (
   reg: RegExp,
   content: string,
@@ -340,8 +333,12 @@ export const replaceByReg = (
     localContent
   }
 }
-export type ExecListType = Array<RegExec> // 根据正则表达式批量替换文件内容
-
+export type ExecListType = Array<RegExec>
+/**
+ * 根据正则表达式批量替换文件内容
+ * @param execList
+ * @param filterCondition
+ */
 export const batchReplaceByReg = (
   execList: ExecListType,
   filterCondition?: FilterConditionType
@@ -369,8 +366,14 @@ export const batchReplaceByReg = (
       writeFile(item.filePath, content)
     }
   })
-} // 使用babel插件
+}
 
+/**
+ * 使用babel插件
+ * @param babelPlugins
+ * @param targetPath
+ * @returns
+ */
 export const execBabelPlugin = (babelPlugins: BabelPlugin[], targetPath?: string) => {
   if (!babelPlugins.length) {
     return
@@ -407,8 +410,13 @@ export const execBabelPlugin = (babelPlugins: BabelPlugin[], targetPath?: string
       updateBar()
     }
   }
-} // 使用psthtml插件
+}
 
+/**
+ * 使用psthtml插件
+ * @param plugins
+ * @param targetPath
+ */
 export const execPosthtmlPlugin = async (
   plugins: PosthtmlPlugin<unknown>[],
   targetPath?: string
@@ -424,7 +432,7 @@ export const execPosthtmlPlugin = async (
         source: content
       }
       const result = await runPosthtmlPlugin(execFileInfo, plugins)
-      const newContent = result.replace(/=['"]_pzc_['"]/g, '')
+      const newContent = result.replace(/=["]_pzc_["]/g, '')
 
       for (const key in execFileInfo.extra) {
         globalExtra[key] = execFileInfo.extra[key]
@@ -495,6 +503,13 @@ export const execPostcssPlugin = async (plugins: PostcssPlugin[], targetPath?: s
     }
   }
 }
+
+/**
+ * 执行jscodemod模板
+ * @param codemodList
+ * @param targetPath
+ * @returns
+ */
 export const execCodemod = (codemodList: Transform[], targetPath?: string) => {
   if (!codemodList.length) {
     return

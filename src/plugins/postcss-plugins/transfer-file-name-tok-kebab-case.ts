@@ -1,3 +1,6 @@
+/**
+ * 驼峰命名转化
+ */
 import { AcceptedPlugin as PostcssPlugin, AtRule, Rule } from 'postcss'
 import { isPath, transferRef } from '../../utils/common'
 

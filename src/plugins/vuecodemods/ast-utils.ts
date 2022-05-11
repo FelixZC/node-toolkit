@@ -11,7 +11,7 @@ import type {
   ObjectMethod,
   ObjectProperty
 } from 'jscodeshift'
-import type { Context } from './wrap-ast-transformation'
+import type { Context } from '../wrap-ast-transformation'
 type VueOptionsType = ObjectExpression | ArrowFunctionExpression | FunctionExpression | ObjectMethod // TODO: for simplicity of implementation, we've skipped all `{ ...expr }` cases
 
 export function getVueOptions(context: Context): Collection<VueOptionsType> {

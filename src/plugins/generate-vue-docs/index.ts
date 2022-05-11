@@ -1,13 +1,9 @@
-const compiler = require('@vue/compiler-sfc')
-
-const parse = require('@babel/parser')
-
-const traverse = require('@babel/traverse')
-
-const types = require('@babel/types')
-
-const generate = require('@babel/generator')
-
+//@ts-nocheck
+import * as compiler from '@vue/compiler-sfc'
+// import * as parse from '@babel/parser'
+import * as traverse from '@babel/traverse'
+import * as t from '@babel/types'
+import * as generate from '@babel/generator'
 const { RenderMd } = require('./render') // 默认生成配置
 
 const baseConfig = {
@@ -42,11 +38,11 @@ const extractProps = (node) => {
   const props = {} // 获取Props类型
 
   function getPropType(node) {
-    if (types.isIdentifier(node)) {
+    if (t.isIdentifier(node)) {
       return node.name
     }
 
-    if (types.isArrayExpression(node)) {
+    if (t.isArrayExpression(node)) {
       return node.elements.map((item) => item.name).join('、')
     }
 
@@ -55,22 +51,22 @@ const extractProps = (node) => {
 
   function getDefaultVal(node) {
     if (
-      types.isRegExpLiteral(node) ||
-      types.isBooleanLiteral(node) ||
-      types.isNumericLiteral(node) ||
-      types.isStringLiteral(node)
+      t.isRegExpLiteral(node) ||
+      t.isBooleanLiteral(node) ||
+      t.isNumericLiteral(node) ||
+      t.isStringLiteral(node)
     ) {
       return node.value
     }
 
     if (
-      types.isFunctionExpression(node) ||
-      types.isArrowFunctionExpression(node) ||
-      types.isObjectMethod(node)
+      t.isFunctionExpression(node) ||
+      t.isArrowFunctionExpression(node) ||
+      t.isObjectMethod(node)
     ) {
       try {
-        const { code } = generate.default(types.isObjectMethod(node) ? node.body : node)
-        const fun = eval(`0,${types.isObjectMethod(node) ? 'function ()' : ''} ${code}`)
+        const { code } = generate.default(t.isObjectMethod(node) ? node.body : node)
+        const fun = eval(`0,${t.isObjectMethod(node) ? 'function ()' : ''} ${code}`)
         return JSON.stringify(fun())
       } catch (error) {}
     }
@@ -87,12 +83,12 @@ const extractProps = (node) => {
     }
     leadingComments && (props[name].desc = leadingComments[0].value.trim()) // 如果是标识或数组 说明只声明了类型
 
-    if (types.isIdentifier(value) || types.isArrayExpression(value)) {
+    if (t.isIdentifier(value) || t.isArrayExpression(value)) {
       props[name].type = getPropType(value)
-    } else if (types.isObjectExpression(value)) {
+    } else if (t.isObjectExpression(value)) {
       value.properties.map((item) => {
         let node = item
-        if (types.isObjectProperty(item)) node = item.value
+        if (t.isObjectProperty(item)) node = item.value
 
         if (item.key.name === 'type') {
           props[name].type = getPropType(item.value)
@@ -112,12 +108,12 @@ const extractProps = (node) => {
 const extractMethods = (node) => {
   const methods = {}
   node.value.properties.forEach((item) => {
-    if (types.isObjectMethod(item) && /^[^_]/.test(item.key.name)) {
+    if (t.isObjectMethod(item) && /^[^_]/.test(item.key.name)) {
       methods[item.key.name] = {
         async: item.async,
         name: item.key.name
       }
-    } else if (types.isObjectProperty(item) && types.isFunctionExpression(item.value)) {
+    } else if (t.isObjectProperty(item) && t.isFunctionExpression(item.value)) {
       methods[item.key.name] = {
         async: item.value.async,
         name: item.key.name
@@ -236,7 +232,7 @@ const extract = {
   props: extractProps
 } // 转换文档
 
-const parseDocs = (vueStr, config = {}) => {
+const parseDocs = (vueStr: string, config = {}) => {
   let localConfig = config
   localConfig = { ...baseConfig, ...localConfig }
   const componentInfo = {
@@ -249,14 +245,9 @@ const parseDocs = (vueStr, config = {}) => {
     slots: undefined
   }
   const vue = compiler.parse(vueStr)
-
-  if (vue.script) {
-    const jsAst = parse.parse(vue.script.content, {
-      allowImportExportEverywhere: true,
-      plugins: ['jsx']
-    }) // 遍历js抽象数
-
-    traverse.default(jsAst, {
+  if (vue.descriptor.script?.scriptAst || vue.descriptor.scriptSetup?.scriptAst) {
+    const jst = vue.descriptor.script?.scriptAst || vue.descriptor.scriptSetup?.scriptAst
+    traverse.default(jst, {
       ExportDefaultDeclaration(path) {
         // 组件描述
         if (path.node.leadingComments) {
@@ -273,10 +264,16 @@ const parseDocs = (vueStr, config = {}) => {
             })
             .toString()
         }
-
-        path.node.declaration.properties.forEach((item) => {
-          if (extract[item.key.name]) componentInfo[item.key.name] = extract[item.key.name](item)
-        })
+        if (t.isObjectExpression(path.node.declaration)) {
+          path.node.declaration.properties.forEach((item) => {
+            if (!t.isSpreadElement(item)) {
+              const key = (item.key as t.Identifier).name || (item.key as t.StringLiteral).value
+              if (extract[key]) {
+                componentInfo[key] = extract[key](item)
+              }
+            }
+          })
+        }
       },
 
       MemberExpression(path) {
@@ -298,13 +295,8 @@ const parseDocs = (vueStr, config = {}) => {
     isModelAndSync(componentInfo)
   }
 
-  if (vue.template) {
-    const template = compiler.compile(vue.template.content, {
-      comments: true,
-      preserveWhitespace: false
-    }) // 遍历模板抽象数
-
-    traverserTemplateAst(template.ast, {
+  if (vue.descriptor.template) {
+    traverserTemplateAst(vue.descriptor.template.ast, {
       slot(node, parent) {
         !componentInfo.slots && (componentInfo.slots = {})
         const index = parent.children.findIndex((item) => item === node)

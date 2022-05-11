@@ -1,3 +1,6 @@
+/**
+ * 执行postcss插件
+ */
 import * as exec from './index'
 import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
 const pluginsPathList: string[] = ['../plugins/postcss-plugins/transfer-file-name-tok-kebab-case']

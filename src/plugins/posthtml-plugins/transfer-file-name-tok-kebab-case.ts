@@ -1,3 +1,6 @@
+/**
+ * 驼峰命名转化
+ */
 import { isPath, transferRef } from '../../utils/common'
 import type PostHTML from 'posthtml'
 
