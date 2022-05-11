@@ -9,6 +9,7 @@ export default declare((babel) => {
           path.node.source.value = transferRef(path.node.source.value)
         }
       },
+
       StringLiteral(path) {
         if (isPath(path.node.value)) {
           path.node.value = transferRef(path.node.value)

@@ -76,6 +76,7 @@ try {
     )
     return transferRef(relativeDir, '\\')
   }
+
   setTimeout(() => {
     fsInstance.modifyFileName(customBaseName, null, null, null, customDirName)
     fsInstance.dirPathList.reverse().forEach((folderPath) => {

@@ -1,13 +1,13 @@
+import { fileTypeMap, getFileType, getSortTypeName } from './utils/map'
+import { writeFile } from '../common'
 import * as path from 'path'
 import * as xlsx from 'xlsx'
-import type { SheetType, OutputObj, ClassifyResult } from './typing/type'
-import { getSortTypeName, getFileType, fileTypeMap } from './utils/map'
-import { writeFile } from '../common'
-import type { ObjDeatil, FileTypeValue } from './typing/type'
-
+import type { ClassifyResult, OutputObj, SheetType } from './typing/type'
+import type { FileTypeValue, ObjDeatil } from './typing/type'
 /**
  * 默认初始值，导入导出时作类型校验用
  */
+
 export const defaultObjDeatil: ObjDeatil = {
   label: '默认值',
   prop: '',
@@ -30,6 +30,7 @@ export const defaultObjDeatil: ObjDeatil = {
  * @param jsonData
  * @returns
  */
+
 function classifyData(jsonData: SheetType[], sheetname: string) {
   const sortType = getSortTypeName(sheetname, true)
   const selectionObjectExpress: Partial<ObjDeatil> = {
@@ -46,12 +47,11 @@ function classifyData(jsonData: SheetType[], sheetname: string) {
     type: 'index'
   }
   const classifyResult: ClassifyResult = {
-    catalogList: [selectionObjectExpress, indexObjectExpress],
-    tomeList: [selectionObjectExpress, indexObjectExpress],
     annexList: [selectionObjectExpress, indexObjectExpress],
-    tomeCatalogList: [selectionObjectExpress, indexObjectExpress]
+    catalogList: [selectionObjectExpress, indexObjectExpress],
+    tomeCatalogList: [selectionObjectExpress, indexObjectExpress],
+    tomeList: [selectionObjectExpress, indexObjectExpress]
   }
-
   jsonData.forEach((item, index) => {
     // 先判断是那个表格的-并且是否显示（Tshow）为yes 或者是否增改（Fshow）未yes
     const fileType = getFileType(item['所属']) as FileTypeValue
@@ -82,43 +82,43 @@ function classifyData(jsonData: SheetType[], sheetname: string) {
   })
   return classifyResult
 }
-
 /**
  * 转化表格，输出转化结果
  */
+
 export default function runExcelToJson() {
   const sourcePath = path.format({
-    dir: __dirname,
-    base: './珠三角档案类别字段.xlsx'
+    base: './珠三角档案类别字段.xlsx',
+    dir: __dirname
   })
   const workBook = xlsx.readFile(sourcePath, {
-    cellStyles: true,
     cellFormula: true,
     cellHTML: true,
+    cellStyles: true,
     cellText: true
   })
   const SheetNames = workBook.SheetNames //获取表名
 
   const fileTypeList = Array.from(fileTypeMap.values())
   const outputMap: OutputObj[] = fileTypeList.map((fileType) => {
-    const filePath = `./output/${fileType}Form.js`
+    const filePath = `./output/${fileType}-form.js`
     return {
       fileType,
       outputPath: path.format({
-        dir: __dirname,
-        base: filePath //自行替换
+        base: filePath,
+        dir: __dirname
       })
     }
   })
   const cache = {
-    tomeResult: '',
-    catalogResult: '',
     annexResult: '',
-    tomeCatalogResult: ''
+    catalogResult: '',
+    tomeCatalogResult: '',
+    tomeResult: ''
   }
   SheetNames.forEach((sheetname: string) => {
     const sortType = getSortTypeName(sheetname, true)
-    const worksheet = workBook.Sheets[sheetname] //通过表名得到表对象
+    const worksheet = workBook.Sheets[sheetname]
     const jsonData = xlsx.utils.sheet_to_json<SheetType>(worksheet)
     const classifyResult = classifyData(jsonData, sheetname)
     console.log(sortType, sheetname)

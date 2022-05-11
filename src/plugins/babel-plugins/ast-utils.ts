@@ -1,6 +1,6 @@
-import * as t from '@babel/types'
 import { NodePath } from '@babel/core'
 import * as parser from '@babel/parser'
+import * as t from '@babel/types'
 export interface ImportObj {
   defaultImportName: string
   importNameList: string[]
@@ -13,6 +13,7 @@ export interface ImportObj {
  * @param importList
  * @returns
  */
+
 export const getImportObj = (importList: t.ImportDeclaration[]) => {
   const customImportObjList: ImportObj[] = []
 
@@ -58,33 +59,35 @@ export const getImportObj = (importList: t.ImportDeclaration[]) => {
 
   return customImportObjList
 }
-
 /**
  * 查找包含指定对象属性名的对象属性
  * @param target
  * @param key
  * @returns
  */
+
 export const findObjectPropertyWithKey = (target: t.ObjectExpression, key: string) => {
   if (!key) {
     return null
   }
+
   const result = target.properties.find((item) => {
     if (t.isObjectProperty(item)) {
       const taget = (item.key as t.Identifier).name || (item.key as t.StringLiteral).value
       return taget === key
     }
+
     return false
   })
   return result as t.ObjectProperty
 }
-
 /**
  * 添加新属性
  * @param elements
  * @param input
  * @returns
  */
+
 export const addObjectNewProperty = (
   element: t.ObjectExpression,
   input: Record<string, any> | string
@@ -93,12 +96,12 @@ export const addObjectNewProperty = (
   element.properties = [...element.properties, ...newObjectExpression.properties]
   return element
 }
-
 /**
  * 添加新对象
  * @param elements
  * @param input
  */
+
 export const addNewObject = (
   elements: t.ObjectExpression[],
   input: Record<string, any> | string
@@ -113,58 +116,71 @@ export const addNewObject = (
  * @param key
  * @returns
  */
+
 export const filterSameObject = (elements: t.ObjectExpression[], key = 'prop') => {
   const cache: Record<string, any> = {}
   const samePropItems: t.ObjectExpression[] = []
+
   for (const item of elements) {
     const target = findObjectPropertyWithKey(item, key)
+
     if (target) {
       const key = (target.key as t.Identifier).name || (target.key as t.StringLiteral).value
       const value = (target.value as t.StringLiteral).value
+
       if (key && value) {
         //移除重复key值旧对象
         if (Reflect.has(cache, key + value)) {
           samePropItems.push(cache[key + value])
         }
+
         cache[key + value] = item
       }
     }
   }
-  //移除相同prop的数组
+  /** 移除相同prop的数组 */
+
   for (const item of samePropItems) {
     elements.splice(elements.indexOf(item), 1)
   }
+
   return elements
 }
+/**  //过滤对象相同属性 */
 
-//过滤对象相同属性
 export const filterSameProperty = (element: t.ObjectExpression) => {
   const cache: Record<string, any> = {}
   const sameProperty: (t.ObjectMethod | t.ObjectProperty | t.SpreadElement)[] = []
+
   for (const property of element.properties) {
     if (t.isObjectProperty(property)) {
       const key = (property.key as t.Identifier).name || (property.key as t.StringLiteral).value
-      //移除旧属性值
+      /** 移除旧属性值 */
+
       if (Reflect.has(cache, key)) {
         sameProperty.push(cache[key])
       }
+
       cache[key] = property
     }
   }
-  //移除相同prop的数组
+  /** 移除相同prop的数组 */
+
   for (const property of sameProperty) {
     element.properties.splice(element.properties.indexOf(property), 1)
   }
+
   return element
 }
-
 /**
  * 获取节点方法名
  * @param path
  * @returns
  */
+
 export const getMethodName = (path: NodePath<t.Function>) => {
   let functionName: string | number = ''
+
   if (t.isArrowFunctionExpression(path.node)) {
     const definedNodePath = path.findParent((path) => t.isVariableDeclarator(path.node))
     definedNodePath &&
@@ -178,6 +194,7 @@ export const getMethodName = (path: NodePath<t.Function>) => {
       case 'Identifier':
         functionName = path.node.key.name
         break
+
       case 'NumericLiteral':
       case 'StringLiteral':
         functionName = path.node.key.value
@@ -186,15 +203,16 @@ export const getMethodName = (path: NodePath<t.Function>) => {
   } else {
     functionName = path.node.id!.name
   }
+
   return functionName
 }
-
 /**
  * 匹配对象表达式
  * @param target
  * @param key
  * @param value
  */
+
 export const matchObjectExpress = (
   elements: t.ObjectExpression[],
   key = 'label',
@@ -209,16 +227,18 @@ export const matchObjectExpress = (
     )
   })
 }
-
 /**
  * 创造模板节点
  * @param defaultOption
  * @returns
  */
+
 export const createObjectTemplateNode = (input: Record<string, any> | string) => {
   let newObjectExpression: t.ObjectExpression
+
   if (typeof input === 'string') {
     let astCode = parser.parseExpression(input)
+
     if (t.isObjectExpression(astCode)) {
       newObjectExpression = astCode
     } else {
@@ -228,26 +248,31 @@ export const createObjectTemplateNode = (input: Record<string, any> | string) =>
     newObjectExpression = t.objectExpression(
       Object.entries(input).map(([key, value]) => {
         let valueNode: t.Expression
+
         switch (typeof value) {
           case 'boolean':
             valueNode = t.booleanLiteral(value)
             break
+
           case 'string':
             valueNode = t.stringLiteral(value)
             break
+
           case 'number':
             valueNode = t.numericLiteral(value)
             break
+
           default:
             valueNode = t.nullLiteral()
         }
+
         return t.objectProperty(t.identifier(key), valueNode)
       })
     )
   }
+
   return newObjectExpression
 }
-
 /**
  * 新增对象属性值
  * @param elements
@@ -256,6 +281,7 @@ export const createObjectTemplateNode = (input: Record<string, any> | string) =>
  * @param newProperty
  * @returns
  */
+
 export const replaceExpressionProperty = (
   elements: t.ObjectExpression[],
   key: string = 'prop',
@@ -263,8 +289,10 @@ export const replaceExpressionProperty = (
   newProperty: string | Record<string, any>
 ) => {
   const matchObjIndex = matchObjectExpress(elements, key, value)
+
   if (matchObjIndex > -1) {
     elements[matchObjIndex] = addObjectNewProperty(elements[matchObjIndex], newProperty)
   }
+
   return elements
 }

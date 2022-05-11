@@ -13,6 +13,7 @@ const runPosthtmlPlugin = async (
     closingSingleTag: 'slash',
     recognizeSelfClosing: true
   } as MergeOptions)
+
   if (execFileInfo.extra) {
     for (const message of result.messages) {
       switch (typeof message) {
@@ -20,15 +21,20 @@ const runPosthtmlPlugin = async (
           for (const key in message) {
             execFileInfo.extra[key] = message[key]
           }
+
           break
+
         case 'string':
           execFileInfo.extra[message] = message
           break
+
         /**其他忽略 */
+
         default:
       }
     }
   }
+
   return result.html
 }
 

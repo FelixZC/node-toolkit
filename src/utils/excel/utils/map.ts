@@ -1,8 +1,8 @@
-import type { SheetType, FileTypeValue, FileTypeLabel } from '../typing/type'
-
+import type { FileTypeLabel, FileTypeValue, SheetType } from '../typing/type'
 /**
  * excel表格属性于名称对应字段，固定顺序，不要变更
  */
+
 export const keyValueMap: Record<string, keyof SheetType> = {
   label: '门类字段',
   prop: '后端字段',
@@ -16,13 +16,13 @@ export const keyValueMap: Record<string, keyof SheetType> = {
   resoure: '所属',
   refDocument: '参考文档'
 }
-
 export const getKeyByValue = (target: keyof SheetType) => {
   for (const [key, value] of Object.entries(keyValueMap)) {
     if (value === target) {
       return key
     }
   }
+
   return ''
 }
 export const getValueByKey = (target: string) => {
@@ -31,12 +31,13 @@ export const getValueByKey = (target: string) => {
       return value
     }
   }
+
   return ''
 }
-
 /**
  * 档案类型映射表，固定顺序，不要变更
  */
+
 export const sortTypeMap = new Map([
   ['103', '文书档案'],
   ['104', '合同档案'],
@@ -56,7 +57,13 @@ export const sortTypeMap = new Map([
   ['119', '实物档案'],
   ['120', '设备档案']
 ])
-//返回当前选中分类的名字
+/**
+ * 返回当前选中分类的名字
+ * @param sortType
+ * @param isReverse
+ * @returns
+ */
+
 export function getSortTypeName(sortType: string, isReverse = false) {
   if (isReverse) {
     const newArr = Array.from(sortTypeMap).map((item) => item.reverse()) as Iterable<
@@ -68,10 +75,10 @@ export function getSortTypeName(sortType: string, isReverse = false) {
 
   return sortTypeMap.get(sortType) || '通用档案'
 }
-
 /**
  * 档案级别映射表，固定顺序，不要变更
  */
+
 export const fileTypeMap = new Map<FileTypeLabel, FileTypeValue>([
   ['案卷目录级', 'tome'],
   ['卷内目录级', 'tomeCatalog'],
@@ -86,5 +93,6 @@ export function getFileType(value: FileTypeLabel | FileTypeValue, isReverse?: fa
     const reverseMap = new Map(newArr)
     return reverseMap.get(value as FileTypeValue)
   }
+
   return fileTypeMap.get(value as FileTypeLabel)
 }

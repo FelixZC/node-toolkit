@@ -1,5 +1,4 @@
 import { type } from 'os'
-
 export type FileTypeValue = 'tome' | 'tomeCatalog' | 'catalog' | 'annex'
 export type FileTypeLabel = '案卷目录级' | '卷内目录级' | '文件目录级' | '文件内容级'
 export interface SheetType {
@@ -32,7 +31,6 @@ export interface OutputObj {
   fileType: FileTypeValue
   outputPath: string
 }
-
 export interface ObjDeatil {
   label: string
   index: number
@@ -63,7 +61,6 @@ export interface ObjDeatil {
     | 'selection'
     | 'index'
 }
-
 export interface ClassifyResult {
   tomeList: (ObjDeatil | Partial<ObjDeatil>)[]
   catalogList: (ObjDeatil | Partial<ObjDeatil>)[]

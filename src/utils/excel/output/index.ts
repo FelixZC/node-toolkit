@@ -1,10 +1,10 @@
-import annexForm from './annexForm'
-import catalogForm from './catalogForm'
-import tomeForm from './tomeForm'
-import tomeCatalogForm from './tomeCatalogForm'
+import annexForm from './annex-form'
+import catalogForm from './catalog-form'
+import tomeCatalogForm from './tome-catalog-form'
+import tomeForm from './tome-form'
 export default {
   annexForm,
   catalogForm,
-  tomeForm,
-  tomeCatalogForm
+  tomeCatalogForm,
+  tomeForm
 }

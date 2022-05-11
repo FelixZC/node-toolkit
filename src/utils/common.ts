@@ -16,6 +16,7 @@ import * as path from 'path' //
    | 'Array'
    | 'Function'
  */
+
 export const getDataType = (obj: any) => {
   return Object.prototype.toString.call(obj).slice(8, -1)
 }
@@ -115,6 +116,7 @@ export function groupBy<T extends Record<string, any>>(arr: T[], groupKey: strin
 
   arr.forEach((element) => {
     const cacheKey = element[groupKey]
+
     if (cache[cacheKey]) {
       cache[cacheKey].group.push(element)
       cache[cacheKey].count++
@@ -139,7 +141,6 @@ export const kebabCase = function (str: string) {
   const hyphenateRE = /([^-])([A-Z])/g
   return str.replace(hyphenateRE, '$1-$2').replace(hyphenateRE, '$1-$2').toLowerCase()
 }
-
 export const easeUnline = function (str: string) {
   const easeReg2 = /^[_-]/g
   return str.replace(easeReg2, '')
@@ -161,7 +162,7 @@ export const capitalize = function (str: string) {
  */
 
 export const isPath = (str: string) => {
-  const startsWithList: string[] = ['@', 'src', 'images', 'img', 'styles', '~', '../', './']
+  const startsWithList: string[] = ['@', 'src', 'images', 'img', 'styles', '~', '../', './', 'dist']
 
   for (const tag of startsWithList) {
     if (str.startsWith(tag)) {
@@ -171,7 +172,6 @@ export const isPath = (str: string) => {
 
   return false
 }
-
 /**
  * 转化导入路径引用驼峰规则
  * @param str
@@ -192,29 +192,32 @@ export const transferRef = (str: string, seperator = '/') => {
         .replace(/(['"`/\\])-/g, '$1')
         .replace(/(\b\w\b)-(?=\b\w\b)/g, '$1')
       /** 当代码管理工具和window组合使用，会出现文件大小写同源问题 */
+
       /** to stupid to continue  */
+
       /** this is situation one  */
+
       if (!result.includes('-') && item !== result) {
         result = '_' + result
       }
       /** this is situation two,exec after one ，also you can skip them */
       // result = easeUnline(result)
+
       return result
     })
     .join(seperator)
 }
-
 export function strToJson(str: string) {
-  var json = eval('(' + str + ')')
+  const json = eval('(' + str + ')')
   return json
 }
-
 /**
  * 设置嵌套对象属性
  * @param target
  * @param keys
  * @param value
  */
+
 export const setValueByKeys = (
   target: Record<string, any> = {},
   keys: string[] | string,
@@ -223,6 +226,7 @@ export const setValueByKeys = (
   if (typeof keys === 'string') {
     keys = keys.split(',')
   }
+
   keys.reduce((previousValue, currentKey, currentIndex) => {
     if (currentIndex === keys.length - 1) {
       previousValue[currentKey] = value
@@ -236,16 +240,17 @@ export const setValueByKeys = (
     }
   }, target)
 }
-
 /**
  * 获取嵌套对象属性
  * @param target
  * @param keys
  */
+
 export const getValueByKeys = (target: Record<string, any> = {}, keys: string[] | string): any => {
   if (typeof keys === 'string') {
     keys = keys.split(',')
   }
+
   return keys.reduce((previousValue, currentKey) => {
     return previousValue?.[currentKey]
   }, target)

@@ -9,6 +9,7 @@ import runBabelPlugin from '../plugins/use-babel-plugin'
 import runCodemod from '../plugins/use-js-codemod'
 import runPostcssPlugin from '../plugins/use-postcss-plugin'
 import runPosthtmlPlugin from '../plugins/use-posthtml-plugin'
+import storeFile from '../query/js/stote-state'
 import type { Plugin as PosthtmlPlugin } from 'posthtml'
 import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
 import type { Transform } from 'jscodeshift'
@@ -16,8 +17,8 @@ import type { GroupCache } from '../utils/common'
 import type { FileInfo } from '../utils/fs'
 import type { ExecFileInfo } from '../plugins/common'
 import type { BabelPlugin } from '../plugins/use-babel-plugin'
-import storeFile from '../query/js/stote-state'
 const br = os.EOL // 换行符
+
 const rootPath = path.join('src-copy')
 const fsInstance = new fsUtils(rootPath)
 const fileInfoList = fsInstance.getFileInfoList()
@@ -62,8 +63,10 @@ export const classifyFilesGroup = (isQueryRepeat = false) => {
     writeFile('dist/src/query/json/files-group-repeat.json', JSON.stringify(newGroup, null, 2))
   }
   /** 查询同一类型文件 */
+
   const classifyNormalFilesGroup = () => {
     const group = groupBy(fileInfoList, 'extname') // 按文件类型分类
+
     writeFile('dist/src/query/json/files-group.json', JSON.stringify(group, null, 2))
   }
 
@@ -250,8 +253,12 @@ export const getComponentDescription = () => {
 
   writeFile(writeFilePath, str)
 }
-
-// 根据提供正则查询
+/**
+ * 根据提供正则查询
+ * @param reg
+ * @param isBatch
+ * @param appointFilePath
+ */
 
 export const queryByReg = (reg: RegExp, isBatch = false, appointFilePath?: string) => {
   const writeFilePath = 'dist/src/query/md/query.md'
@@ -360,7 +367,6 @@ export const batchReplaceByReg = (
 
     if (isChange) {
       writeFile(item.filePath, content)
-      modifyCount++
     }
   })
 } // 使用babel插件
@@ -408,23 +414,27 @@ export const execPosthtmlPlugin = async (
   targetPath?: string
 ) => {
   const globalExtra: Record<string, any> = {}
+
   const handler = async (filePath: string) => {
     try {
       const content = fs.readFileSync(filePath, 'utf-8')
       const execFileInfo: ExecFileInfo = {
+        extra: {},
         path: filePath,
-        source: content,
-        extra: {}
+        source: content
       }
       const result = await runPosthtmlPlugin(execFileInfo, plugins)
       const newContent = result.replace(/=['"]_pzc_['"]/g, '')
+
       for (const key in execFileInfo.extra) {
         globalExtra[key] = execFileInfo.extra[key]
       }
+
       if (newContent === content || !newContent.length) {
         return
       }
       /** 替换掉_pzc_填充位 */
+
       writeFile(filePath, newContent)
     } catch (e) {
       console.warn(e)
@@ -443,6 +453,7 @@ export const execPosthtmlPlugin = async (
       updateBar()
     }
   }
+
   writeFile('dist/src/query/json/global-extra.json', JSON.stringify(globalExtra))
 }
 /**
