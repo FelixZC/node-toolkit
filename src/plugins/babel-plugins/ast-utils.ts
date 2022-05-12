@@ -72,7 +72,7 @@ export const findObjectPropertyWithKey = (target: t.ObjectExpression, key: strin
   }
 
   const result = target.properties.find((item) => {
-    if (t.isObjectProperty(item)) {
+    if (t.isObjectProperty(item) || t.isObjectMethod(item)) {
       const taget = (item.key as t.Identifier).name || (item.key as t.StringLiteral).value
       return taget === key
     }

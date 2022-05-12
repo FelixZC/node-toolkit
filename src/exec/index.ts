@@ -368,16 +368,19 @@ export const execBabelPlugin = (babelPlugins: BabelPlugin[], targetPath?: string
   if (!babelPlugins.length) {
     return
   }
-
+  const globalExtra: Record<string, any> = {}
   const handler = (filePath: string) => {
     try {
       const content = fs.readFileSync(filePath, 'utf-8')
       const execFileInfo: ExecFileInfo = {
         path: filePath,
-        source: content
+        source: content,
+        extra: {}
       }
       const newContent = runBabelPlugin(execFileInfo, babelPlugins)
-
+      if (Object.keys(execFileInfo.extra!).length) {
+        globalExtra[filePath] = execFileInfo.extra
+      }
       if (newContent === content || !newContent.length) {
         return
       }
@@ -400,6 +403,8 @@ export const execBabelPlugin = (babelPlugins: BabelPlugin[], targetPath?: string
       updateBar()
     }
   }
+  /** 存储全局文件缓存信息 */
+  writeFile('dist/src/query/json/global-extra.json', JSON.stringify(globalExtra))
 }
 
 /**

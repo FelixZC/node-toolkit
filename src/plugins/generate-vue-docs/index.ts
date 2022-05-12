@@ -8,11 +8,13 @@ import * as traverse from '@babel/traverse'
 import * as t from '@babel/types'
 import * as generate from '@babel/generator'
 import type { ElementNode, TemplateChildNode, AttributeNode } from '@vue/compiler-core'
-const { RenderMd } = require('./render') // 默认生成配置
+const { RenderMd } = require('./render')
+/*  默认生成配置 */
 
 const baseConfig = {
   md: false
-} // md 生成配置
+}
+/*  md 生成配置 */
 
 export interface MdOption {
   desc: string
@@ -34,13 +36,14 @@ const mdOptions: MdOptions = {
   slots: { name: 'name', desc: '说明' },
   events: { name: '事件名称', desc: '说明' },
   methods: { name: '方法名', desc: '说明', params: '参数', res: '返回值' }
-} // 提取Props
-
-const extractProps = (node) => {
+}
+/*  提取Props */
+const extractProps = (node: t.ObjectMethod | t.ObjectProperty) => {
   const localNode = node
-  const props = {} // 获取Props类型
+  const props = {}
+  /*  获取Props类型 */
 
-  function getPropType(node) {
+  function getPropType(node: t.Identifier | t.ArrayExpression) {
     if (t.isIdentifier(node)) {
       return node.name
     }
@@ -50,9 +53,10 @@ const extractProps = (node) => {
     }
 
     return 'Any'
-  } // 获取Props默认值
+  }
+  /*  获取Props默认值 */
 
-  function getDefaultVal(node) {
+  function getDefaultVal(node: t.ObjectMethod | t.ObjectProperty | t.SpreadElement) {
     if (
       t.isRegExpLiteral(node) ||
       t.isBooleanLiteral(node) ||
@@ -73,7 +77,8 @@ const extractProps = (node) => {
         return JSON.stringify(fun())
       } catch (error) {}
     }
-  } // 遍历 Props
+  }
+  /*  遍历 Props */
 
   localNode.value.properties.forEach((prop) => {
     const {
@@ -84,7 +89,8 @@ const extractProps = (node) => {
     props[name] = {
       name
     }
-    leadingComments && (props[name].desc = leadingComments[0].value.trim()) // 如果是标识或数组 说明只声明了类型
+    leadingComments && (props[name].desc = leadingComments[0].value.trim())
+    /*  如果是标识或数组 说明只声明了类型 */
 
     if (t.isIdentifier(value) || t.isArrayExpression(value)) {
       props[name].type = getPropType(value)
@@ -106,9 +112,10 @@ const extractProps = (node) => {
     }
   })
   return props
-} // 提取方法信息
+}
+/*  提取方法信息 */
 
-const extractMethods = (node) => {
+const extractMethods = (node: t.ObjectMethod | t.ObjectProperty) => {
   const methods = {}
   node.value.properties.forEach((item) => {
     if (t.isObjectMethod(item) && /^[^_]/.test(item.key.name)) {
@@ -131,18 +138,20 @@ const extractMethods = (node) => {
       if (comment.type === 'CommentLine') {
         methods[item.key.name].desc = comment.value.trim()
       } else {
-        // 提取方法返回值
+        /*  提取方法返回值 */
         const res = comment.value.match(/(@returns)[\s]*(.*)/)
 
         if (res) {
           methods[item.key.name].res = res[2]
-        } // 提取方法说明
+        }
+        /*  提取方法说明 */
 
         const desc = comment.value.match(/\*\s*[^@]\s*(.*)/)
 
         if (desc) {
           methods[item.key.name].desc = desc[1]
-        } // 提取 参数说明
+        }
+        /*  提取 参数说明 */
 
         const matches = comment.value.matchAll(/(@param)[\s]*{([a-zA-Z]*)}[\s]*(\w*)(.*)/g)
 
@@ -158,19 +167,21 @@ const extractMethods = (node) => {
     }
   })
   return methods
-} // 提取事件
+}
+/*  提取事件 */
 
 const extractEvents = (path) => {
-  // 第一个元素是事件名称
+  /*  第一个元素是事件名称 */
   const eventName = path.parent.arguments[0]
   const comments = path.parentPath.parent.leadingComments
   return {
     desc: comments ? comments.map((item) => item.value.trim()).toString() : '——',
     name: eventName.value
   }
-} // 提取model
+}
+/*  提取model */
 
-const extractModel = (node) => {
+const extractModel = (node: t.ObjectMethod | t.ObjectProperty) => {
   const model = {}
   node.value.properties.forEach((item) => {
     const {
@@ -180,7 +191,8 @@ const extractModel = (node) => {
     model[name] = value
   })
   return model
-} // 处理是否支持 v-model 或者 .sync修饰
+}
+/*  处理是否支持 v-model 或者 .sync修饰 */
 
 const isModelAndSync = (comInfo) => {
   for (const key in comInfo.events) {
@@ -196,7 +208,8 @@ const isModelAndSync = (comInfo) => {
         delete comInfo.events[key]
       }
     }
-  } // 自定义v-mode
+  }
+  /*  自定义v-mode */
 
   if (comInfo.model) {
     const { event = 'update', prop = 'value' } = comInfo.model
@@ -209,7 +222,8 @@ const isModelAndSync = (comInfo) => {
       }
     }
   }
-} // 遍历模板抽象数
+}
+/*  遍历模板抽象数 */
 
 const traverserTemplateAst = (ast: ElementNode, visitor = {}) => {
   function traverseArray(array: TemplateChildNode[], parent: ElementNode) {
@@ -231,9 +245,10 @@ const traverserTemplateAst = (ast: ElementNode, visitor = {}) => {
 const extract = {
   methods: extractMethods,
   model: extractModel,
-  name: (item) => item.value.value,
+  name: (item: t.ObjectMethod | t.ObjectProperty) => item.value.value,
   props: extractProps
-} // 转换文档
+}
+/*  转换文档 */
 
 const parseDocs = (vueStr: string, config = {}) => {
   let localConfig = config
@@ -258,7 +273,7 @@ const parseDocs = (vueStr: string, config = {}) => {
       })
       traverse.default(jst, {
         ExportDefaultDeclaration(path) {
-          // 组件描述
+          /*  组件描述 */
           if (path.node.leadingComments) {
             componentInfo.desc = path.node.leadingComments
               .map((item) => {
@@ -286,7 +301,7 @@ const parseDocs = (vueStr: string, config = {}) => {
         },
 
         MemberExpression(path) {
-          // 判断是不是event
+          /*  判断是不是event */
           if (path.node.property.name === '$emit') {
             const event = extractEvents(path)
             !componentInfo.events && (componentInfo.events = {})
