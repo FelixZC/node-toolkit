@@ -20,20 +20,20 @@ interface CreateRequestTemplateExecListItem {
  * @param options
  */
 
-const tempPath = 'dist/src/node/temp/'
+const tempPath = 'src/node/temp/'
 export const invokeRequestTemplateGenerator = () => {
   const createRequestTemplateExecList: Array<CreateRequestTemplateExecListItem> = [
     {
       resource: EamsAmsprojService,
-      typingPath: 'dist/src/typings/interface/eams-amsproj-service'
+      typingPath: 'src/typings/interface/eams-amsproj-service'
     },
     {
       resource: SystemBaseService,
-      typingPath: 'dist/src/typings/interface/system-base-service'
+      typingPath: 'src/typings/interface/system-base-service'
     },
     {
       resource: BaseStatsService,
-      typingPath: 'dist/src/typings/interface/base-stats-service'
+      typingPath: 'src/typings/interface/base-stats-service'
     }
   ]
   /**

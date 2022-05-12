@@ -52,14 +52,14 @@ export const classifyFilesGroup = (isQueryRepeat = false) => {
 
     const newGroup = groupBy(filesGroupOfRepeat, 'extname') // 再按文件类型分类
 
-    writeFile('dist/src/query/json/files-group-repeat.json', JSON.stringify(newGroup, null, 2))
+    writeFile('src/query/json/files-group-repeat.json', JSON.stringify(newGroup, null, 2))
   }
   /** 查询同一类型文件 */
 
   const classifyNormalFilesGroup = () => {
     const group = groupBy(fileInfoList, 'extname') // 按文件类型分类
 
-    writeFile('dist/src/query/json/files-group.json', JSON.stringify(group, null, 2))
+    writeFile('src/query/json/files-group.json', JSON.stringify(group, null, 2))
   }
 
   if (isQueryRepeat) {
@@ -77,20 +77,20 @@ export const formatText = () => {
     {
       mode: 'md',
       // md文件去重
-      sourceFilePath: 'dist/src/query/md/query.md',
-      targetFilePath: 'dist/src/query/md/query.md'
+      sourceFilePath: 'src/query/md/query.md',
+      targetFilePath: 'src/query/md/query.md'
     },
     {
       mode: 'txtToTxt',
       // 每日n句去重
-      sourceFilePath: 'dist/src/query/txt/每日n句.txt',
-      targetFilePath: 'dist/src/query/txt/每日n句.txt'
+      sourceFilePath: 'src/query/txt/每日n句.txt',
+      targetFilePath: 'src/query/txt/每日n句.txt'
     },
     {
       mode: 'txtToMd',
       // 每日n句转md
-      sourceFilePath: 'dist/src/query/txt/每日n句.txt',
-      targetFilePath: 'dist/src/query/md/sentence.md'
+      sourceFilePath: 'src/query/txt/每日n句.txt',
+      targetFilePath: 'src/query/md/sentence.md'
     }
   ]
 
@@ -196,16 +196,16 @@ export const getAttrsAndAnnotation = (targetPath?: string) => {
   const attributesDescriptionTable = mdUtils.createdAttributesGroupTable(attrsGroup) // 获取项目使用属性描述
 
   writeFile(
-    'dist/src/query/md/attributes-description-table.md',
+    'src/query/md/attributes-description-table.md',
     attributesDescriptionTable.replace(/\{\{.*\}\}/g, '').replace(/<.*>/g, '')
   )
   const storeTable = mdUtils.createdStoreTable(storeFile, attrsCollectionTemp) // 获取store属性描述
 
   writeFile(
-    'dist/src/query/md/store-table.md',
+    'src/query/md/store-table.md',
     storeTable.replace(/\{\{.*\}\}/g, '').replace(/<.*>/g, '')
   )
-  writeFile('dist/src/query/json/attrs-collection.json', JSON.stringify(attrsCollectionTemp))
+  writeFile('src/query/json/attrs-collection.json', JSON.stringify(attrsCollectionTemp))
 }
 /**
  * 获取自定组件Props,Methods,Slot,Event
@@ -213,7 +213,7 @@ export const getAttrsAndAnnotation = (targetPath?: string) => {
  */
 
 export const getComponentDescription = () => {
-  const writeFilePath = 'dist/src/query/md/component-description.md'
+  const writeFilePath = 'src/query/md/component-description.md'
   const filePathList = fsInstance.filePathList.sort((filePath1, filePath2) => {
     return path.basename(filePath1).localeCompare(path.basename(filePath2))
   })
@@ -240,7 +240,7 @@ export const getComponentDescription = () => {
  */
 
 export const queryByReg = (reg: RegExp, isBatch = false, appointFilePath?: string) => {
-  const writeFilePath = 'dist/src/query/md/query.md'
+  const writeFilePath = 'src/query/md/query.md'
   let result = '' // 批量查询
 
   const batchQuery = (regExpression: RegExp) => {
@@ -253,7 +253,7 @@ export const queryByReg = (reg: RegExp, isBatch = false, appointFilePath?: strin
   } // 指定查询
 
   const pageQuery = (regExpression: RegExp) => {
-    const readFilePath = appointFilePath || 'dist/src/query/md/query.md'
+    const readFilePath = appointFilePath || 'src/query/md/query.md'
     const content = fs.readFileSync(readFilePath, 'utf-8')
     const result = mdUtils.queryContentByReg(content, regExpression)
 
@@ -413,7 +413,7 @@ export const execBabelPlugin = (babelPlugins: BabelPlugin[], targetPath?: string
   }
   /** 存储全局文件缓存信息 */
 
-  writeFile('dist/src/query/json/global-extra.json', JSON.stringify(globalExtra))
+  writeFile('src/query/json/global-extra.json', JSON.stringify(globalExtra))
 }
 /**
  * 使用psthtml插件
@@ -466,7 +466,7 @@ export const execPosthtmlPlugin = async (
     }
   }
 
-  writeFile('dist/src/query/json/global-extra.json', JSON.stringify(globalExtra))
+  writeFile('src/query/json/global-extra.json', JSON.stringify(globalExtra))
 }
 /**
  * 执行postcss插件

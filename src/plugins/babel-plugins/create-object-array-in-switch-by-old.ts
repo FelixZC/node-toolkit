@@ -286,9 +286,9 @@ export default declare((babel) => {
 
       Program: {
         exit(path) {
-          writeFile('dist/src/query/json/new-object-cache.json', JSON.stringify(newObjectCache))
-          writeFile('dist/src/query/json/same-object-cache.json', JSON.stringify(sameObjectCache))
-          writeFile('dist/src/query/json/excel-object-list.json', JSON.stringify(excelObjectList))
+          writeFile('src/query/json/new-object-cache.json', JSON.stringify(newObjectCache))
+          writeFile('src/query/json/same-object-cache.json', JSON.stringify(sameObjectCache))
+          writeFile('src/query/json/excel-object-list.json', JSON.stringify(excelObjectList))
         }
       }
     }

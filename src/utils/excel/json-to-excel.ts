@@ -61,7 +61,7 @@ const runJsonToExcel = () => {
     }
   }
 
-  xlsx.writeFileXLSX(workbook, './dist/src/query/excel/test.xlsx', {
+  xlsx.writeFileXLSX(workbook, 'src/query/excel/test.xlsx', {
     cellStyles: true
   })
 }
