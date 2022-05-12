@@ -207,17 +207,16 @@ export const transferRef = (str: string, seperator = '/') => {
     })
     .join(seperator)
 }
-
 /**
  * 执行string代码,存在无效引用则报错
  * @param str
  * @returns
  */
+
 export function strToJson(str: string) {
   const json = eval('(' + str + ')')
   return json
 }
-
 /**
  * 设置嵌套对象属性
  * @param target
@@ -230,12 +229,13 @@ export const setValueByKeys = (
   keys: string[] | string,
   value: any
 ) => {
-  if (typeof keys === 'string') {
-    keys = keys.split(',')
+  let localKeys = keys
+  if (typeof localKeys === 'string') {
+    localKeys = localKeys.split(',')
   }
 
-  keys.reduce((previousValue, currentKey, currentIndex) => {
-    if (currentIndex === keys.length - 1) {
+  localKeys.reduce((previousValue, currentKey, currentIndex) => {
+    if (currentIndex === localKeys.length - 1) {
       previousValue[currentKey] = value
     } else {
       return (
@@ -254,11 +254,12 @@ export const setValueByKeys = (
  */
 
 export const getValueByKeys = (target: Record<string, any> = {}, keys: string[] | string): any => {
-  if (typeof keys === 'string') {
-    keys = keys.split(',')
+  let localKeys = keys
+  if (typeof localKeys === 'string') {
+    localKeys = localKeys.split(',')
   }
 
-  return keys.reduce((previousValue, currentKey) => {
+  return localKeys.reduce((previousValue, currentKey) => {
     return previousValue?.[currentKey]
   }, target)
 }

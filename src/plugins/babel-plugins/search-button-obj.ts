@@ -2,13 +2,14 @@
  * 查找項目按钮名称
  */
 import { declare } from '@babel/helper-plugin-utils'
-import { findObjectPropertyWithKey, getMethodName } from './ast-utils'
-import generate from '@babel/generator'
-import * as t from '@babel/types'
+import { findObjectPropertyWithKey, getParentFunctionName } from './ast-utils'
 import { NodePath } from '@babel/core'
 import { cloneDeep } from 'lodash'
-import { strToJson } from '../../utils/common'
-// 返回权限串
+import { strToJson } from '../../utils/common' // 返回权限串
+
+import generate from '@babel/generator'
+import * as t from '@babel/types'
+
 const authorizationString = (
   isTome: boolean,
   tomeAuthorization: string,
@@ -23,17 +24,22 @@ const authorizationString = (
 
 export default declare((babel) => {
   const extra = {} as Record<string, any>
-  const saveBtnCache = (objPath: NodePath<t.ObjectExpression>, funcionName: string | number) => {
+
+  const saveBtnCache = (objPath: NodePath<t.ObjectExpression>, functionName: string | number) => {
     const outNode = cloneDeep(objPath.node)
     const menu = findObjectPropertyWithKey(outNode, 'clickHandle')
+
     if (menu) {
       const authorizationProperty = findObjectPropertyWithKey(outNode, 'authorization')
+
       if (authorizationProperty) {
         const authorizationPropertyValue = authorizationProperty.value
+
         if (t.isCallExpression(authorizationPropertyValue)) {
           objPath.traverse({
             MemberExpression(memberPath) {
               const property = memberPath.node.property
+
               if (t.isIdentifier(property)) {
                 if (property.name === 'authorizationString') {
                   const argus = authorizationPropertyValue.arguments
@@ -47,12 +53,13 @@ export default declare((babel) => {
                     t.stringLiteral(condition1),
                     t.stringLiteral(condition2)
                   )
-                  //后期自己在这里进行替换
+                  /** 后期自己在这里进行替换 */
                   // const propertyIndex = outNode.properties.indexOf(authorizationProperty)
                   // outNode.properties[propertyIndex] = t.objectProperty(
                   //   t.identifier('authorization'),
                   //   newNode
                   // )
+
                   outNode.properties.push(
                     t.objectProperty(t.identifier('authorizationNew'), newNode)
                   )
@@ -85,33 +92,42 @@ export default declare((babel) => {
           )
         }
       }
-      //确认数据无误就直接复写结果
+      /** 确认数据无误就直接复写结果 */
       // objPath.node = outNode
+
       const keys = ['name', 'title', 'icon', 'authorizationTome', 'authorizationCatalog']
       outNode.properties = outNode.properties.filter((property) => {
         if (!t.isSpreadElement(property)) {
           const key = (property.key as t.Identifier).name || (property.key as t.StringLiteral).value
           return keys.includes(key)
         }
+
         return false
       })
-      if (!extra[funcionName]) {
-        extra[funcionName] = []
+
+      if (!extra[functionName]) {
+        extra[functionName] = []
       }
+
       let code: string
+
       try {
         code = strToJson(generate(outNode).code)
       } catch {
         code = generate(outNode).code
       }
-      extra[funcionName].push(code)
+
+      extra[functionName].push(code)
     }
   }
+
   return {
     name: 'ast-transform',
+
     getExtra() {
       return extra
     },
+
     visitor: {
       ArrayExpression(arrPath) {
         /** 查找符合按钮组格式的数组 */
@@ -122,18 +138,10 @@ export default declare((babel) => {
                 findObjectPropertyWithKey(objPath.node, 'icon')) ||
               findObjectPropertyWithKey(objPath.node, 'clickHandle')
             ) {
-              let funcionName
-              let parentFunctionPath = arrPath.getFunctionParent()
-              while (!funcionName) {
-                if (parentFunctionPath) {
-                  funcionName = getMethodName(parentFunctionPath)
-                  parentFunctionPath = parentFunctionPath.getFunctionParent()
-                  /** 下面的可能不太好理解，多执行一次增加消耗吧 */
-                  // !funcionName && (parentFunctionPath = parentFunctionPath.getFunctionParent())
-                  saveBtnCache(objPath, funcionName)
-                } else {
-                  funcionName = 'none' //中断执行
-                }
+              const { functionName, parentFunctionPath } = getParentFunctionName(arrPath)
+
+              if (parentFunctionPath) {
+                saveBtnCache(objPath, functionName)
               }
             }
           }

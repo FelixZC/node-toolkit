@@ -24,6 +24,7 @@ const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
       sourceType: 'module'
     })
     /** 2,分析修改AST，第一个参数是AST，第二个参数是访问者对象 */
+
     for (const plugin of pluginsList) {
       const pluginObj = plugin(babel)
       traverse(codeAst, pluginObj.visitor)
@@ -33,6 +34,7 @@ const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
       }
     }
     /** 3，生成新的代码，第一个参数是AST，第二个是一些可选项，第三个参数是原始的code */
+
     const newCode = generator(
       codeAst,
       {
@@ -43,6 +45,7 @@ const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
       execFileInfo.source
     )
     /** 会返回一个对象，code就是生成后的新代码 */
+
     return `\n${newCode.code}\n`
   } catch (e) {
     return execFileInfo.source
@@ -69,6 +72,7 @@ const runBabelPlugin = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) 
     scriptBlock.content = out
   }
   /** 强制重新赋值 */
+
   descriptor.script = scriptBlock
   return stringifySFC(descriptor)
 }

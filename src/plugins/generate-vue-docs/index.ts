@@ -1,13 +1,15 @@
 //@ts-nocheck
+
 /**
  * 提取vue2组件信息，搬运自https://github.com/MaLuns/generate-vue-docs
  */
 import * as compiler from '@vue/compiler-sfc'
-import * as parser from '@babel/parser'
-import * as traverse from '@babel/traverse'
-import * as t from '@babel/types'
 import * as generate from '@babel/generator'
-import type { ElementNode, TemplateChildNode, AttributeNode } from '@vue/compiler-core'
+import * as parser from '@babel/parser'
+import * as t from '@babel/types'
+import * as traverse from '@babel/traverse'
+import type { AttributeNode, ElementNode, TemplateChildNode } from '@vue/compiler-core'
+
 const { RenderMd } = require('./render')
 /*  默认生成配置 */
 
@@ -30,14 +32,30 @@ export interface MdOptions {
   props: MdOption
   slots: MdOption
 }
-
 const mdOptions: MdOptions = {
-  props: { name: '参数', desc: '说明', type: '类型', default: '默认值' },
-  slots: { name: 'name', desc: '说明' },
-  events: { name: '事件名称', desc: '说明' },
-  methods: { name: '方法名', desc: '说明', params: '参数', res: '返回值' }
+  props: {
+    name: '参数',
+    desc: '说明',
+    type: '类型',
+    default: '默认值'
+  },
+  slots: {
+    name: 'name',
+    desc: '说明'
+  },
+  events: {
+    name: '事件名称',
+    desc: '说明'
+  },
+  methods: {
+    name: '方法名',
+    desc: '说明',
+    params: '参数',
+    res: '返回值'
+  }
 }
 /*  提取Props */
+
 const extractProps = (node: t.ObjectMethod | t.ObjectProperty) => {
   const localNode = node
   const props = {}
@@ -263,8 +281,10 @@ const parseDocs = (vueStr: string, config = {}) => {
     slots: undefined
   }
   const vue = compiler.parse(vueStr)
+
   if (vue.descriptor.script || vue.descriptor.scriptSetup) {
     const content = vue.descriptor.script?.content || vue.descriptor.scriptSetup?.content
+
     if (content) {
       const jst = parser.parse(content, {
         allowImportExportEverywhere: false,
@@ -288,10 +308,12 @@ const parseDocs = (vueStr: string, config = {}) => {
               })
               .toString()
           }
+
           if (t.isObjectExpression(path.node.declaration)) {
             path.node.declaration.properties.forEach((item) => {
               if (!t.isSpreadElement(item)) {
                 const key = (item.key as t.Identifier).name || (item.key as t.StringLiteral).value
+
                 if (extract[key]) {
                   componentInfo[key] = extract[key](item)
                 }
@@ -319,6 +341,7 @@ const parseDocs = (vueStr: string, config = {}) => {
       isModelAndSync(componentInfo)
     }
   }
+
   if (vue.descriptor.template) {
     traverserTemplateAst(vue.descriptor.template.ast, {
       slot(node: ElementNode, parent: ElementNode) {
@@ -337,10 +360,12 @@ const parseDocs = (vueStr: string, config = {}) => {
 
         if (node.tagType === 2) {
           const nameAttr = node.props.find((prop) => prop.name === 'name')
+
           if (nameAttr && Reflect.has(nameAttr, 'value')) {
             name = (nameAttr as AttributeNode).value?.content || name
           }
         }
+
         componentInfo.slots[name] = {
           desc,
           name

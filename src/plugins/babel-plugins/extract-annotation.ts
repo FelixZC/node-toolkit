@@ -2,6 +2,7 @@
  * 提取变量注释
  */
 import { declare } from '@babel/helper-plugin-utils'
+import * as t from '@babel/types'
 import type {
   FunctionDeclaration,
   ObjectMethod,
@@ -9,7 +10,6 @@ import type {
   TSPropertySignature,
   VariableDeclaration
 } from '@babel/types'
-import * as t from '@babel/types'
 import type { NodePath } from '@babel/traverse'
 export default declare((babel) => {
   const extra = {} as Record<string, any>
@@ -27,12 +27,15 @@ export default declare((babel) => {
     if (path.node.leadingComments?.length || path.node.trailingComments?.length) {
       const node = path.node
       let key: string = ''
+
       if (t.isObjectProperty(node) || t.isObjectMethod(node) || t.isTSPropertySignature(node)) {
         key = (node.key as t.Identifier).name || (node.key as t.StringLiteral).value
       }
+
       if (t.isFunctionDeclaration(node) && node.id) {
         key = node.id.name
       }
+
       if (t.isVariableDeclaration(node)) {
         key = (node.declarations[0].id as t.Identifier).name
       }

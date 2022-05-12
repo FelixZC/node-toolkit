@@ -173,18 +173,18 @@ export const filterSameProperty = (element: t.ObjectExpression) => {
   return element
 }
 /**
- * 获取节点方法名
+ * 查询方法定义位置
  * @param path
  * @returns
  */
 
-export const getMethodName = (path: NodePath<t.Function>) => {
-  let functionName: string | number = ''
+export const getFunctionName = (path: NodePath<t.Function>) => {
+  let result: string | number = ''
 
   if (t.isArrowFunctionExpression(path.node)) {
     const definedNodePath = path.findParent((path) => t.isVariableDeclarator(path.node))
     definedNodePath &&
-      (functionName = ((definedNodePath.node as t.VariableDeclarator).id as t.Identifier).name)
+      (result = ((definedNodePath.node as t.VariableDeclarator).id as t.Identifier).name)
   } else if (
     t.isClassMethod(path.node) ||
     t.isClassPrivateMethod(path.node) ||
@@ -192,19 +192,44 @@ export const getMethodName = (path: NodePath<t.Function>) => {
   ) {
     switch (path.node.key.type) {
       case 'Identifier':
-        functionName = path.node.key.name
+        result = path.node.key.name
         break
 
       case 'NumericLiteral':
       case 'StringLiteral':
-        functionName = path.node.key.value
+        result = path.node.key.value
         break
     }
   } else {
-    functionName = path.node.id!.name
+    result = path.node.id!.name
   }
 
-  return functionName
+  return result
+}
+/**
+ * 获取节点方法名
+ * @param path
+ * @returns
+ */
+
+export const getParentFunctionName = (startPath: NodePath) => {
+  let functionName: string | number = ''
+  let parentFunctionPath = startPath.getFunctionParent()
+  /**持续向上查找，直到不再存在方法体 */
+
+  while (!functionName) {
+    if (parentFunctionPath) {
+      functionName = getFunctionName(parentFunctionPath)
+      !functionName && (parentFunctionPath = parentFunctionPath.getFunctionParent())
+    } else {
+      functionName = 'none' //中断执行
+    }
+  }
+
+  return {
+    functionName,
+    parentFunctionPath
+  }
 }
 /**
  * 匹配对象表达式

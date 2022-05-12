@@ -1,6 +1,9 @@
 import { capitalize, writeFile } from './common'
+import * as BaseStatsService from '../api/base-stats-service.json'
+import * as EamsAmsprojService from '../api/eams-amsproj-service.json'
 import * as fs from 'fs'
 import * as path from 'path'
+import * as SystemBaseService from '../api/system-base-service.json'
 import type {
   Headers,
   OperationObject,
@@ -8,10 +11,6 @@ import type {
   PathItemObject,
   ResponseObject
 } from 'openapi-typescript'
-
-import * as EamsAmsprojService from '../api/eams-amsproj-service.json'
-import * as SystemBaseService from '../api/system-base-service.json'
-import * as BaseStatsService from '../api/base-stats-service.json'
 interface CreateRequestTemplateExecListItem {
   resource: typeof EamsAmsprojService | typeof SystemBaseService
   typingPath: string

@@ -1,4 +1,5 @@
 //@ts-nocheck
+
 /**
  * Simplifies object properties in object literals to use ES6 shorthand notation.
  *

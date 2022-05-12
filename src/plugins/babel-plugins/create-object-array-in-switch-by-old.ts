@@ -7,25 +7,30 @@ import {
   createObjectTemplateNode,
   filterSameObject,
   filterSameProperty,
-  findObjectPropertyWithKey, // replaceExpressionProperty,
+  findObjectPropertyWithKey, //
+  // replaceExpressionProperty,
   // addObjectNewProperty
-  getMethodName,
+  getFunctionName,
   matchObjectExpress
 } from './ast-utils'
 import { cloneDeep } from 'lodash' //@ts-ignore
 
 import { resetIndexObjectProperty } from './sort-object-array-by-index'
-import { NodePath } from '@babel/core'
 import { defaultObjDeatil } from '../../utils/excel/excel-to-json'
 import formRef from '../../utils/excel/output/index'
 import generator from '@babel/generator'
 import * as parser from '@babel/parser'
 import sameObjectCacheRef from '../../query/json/same-object-cache.json'
 import * as t from '@babel/types'
-import type { ObjDeatil } from '../../utils/excel/typing/type' // import { getFileType } from '../../utils/excel/utils/map'
+import type { ObjDeatil } from '../../utils/excel/typing/type' //
+// import { getFileType } from '../../utils/excel/utils/map'
 
-type FunctionName = 'annexForm' | 'tomeForm' | 'catalogForm' | 'tomeCatalogForm'
-const functionNameList: FunctionName[] = ['annexForm', 'tomeForm', 'catalogForm', 'tomeCatalogForm']
+const functionNameList: (string | number)[] = [
+  'annexForm',
+  'tomeForm',
+  'catalogForm',
+  'tomeCatalogForm'
+]
 const newObjectCache: Record<string, ObjDeatil> = {}
 const sameObjectCache: Record<string, ObjDeatil> = {}
 const excelObjectList: ObjDeatil[] = []
@@ -40,7 +45,7 @@ const excelObjectList: ObjDeatil[] = []
 const getNewExpressionArrayByExcel = (
   elements: t.ObjectExpression[],
   test: t.Expression | null | undefined,
-  functionName: FunctionName
+  functionName: string
 ) => {
   let switchCondition = (test as t.StringLiteral)?.value
   let outputSort = formRef[functionName](switchCondition) as ObjDeatil[]
@@ -79,7 +84,7 @@ const getNewExpressionArrayByExcel = (
 // const checkExpressionArrayWithExcel = (
 //   elements: t.ObjectExpression[],
 //   test: t.Expression | null | undefined,
-//   functionName: FunctionName
+//   functionName: string
 // ) => {
 //   let switchCondition = (test as t.StringLiteral)?.value
 //   let outputSort = formRef[functionName](switchCondition) as ObjDeatil[]
@@ -152,9 +157,10 @@ const saveObjectCache = (newObjectExpression: t.ObjectExpression, keys: string[]
  */
 
 const loadObjectCache = (newObjectExpression: t.ObjectExpression, keys: string[]) => {
+  let localNewObjectExpression = newObjectExpression
   /** 对新对象缺省值作同类项覆盖处理 */
-  let statusProperty = findObjectPropertyWithKey(newObjectExpression, '_status_')
-  let propProperty = findObjectPropertyWithKey(newObjectExpression, 'prop')
+  let statusProperty = findObjectPropertyWithKey(localNewObjectExpression, '_status_')
+  let propProperty = findObjectPropertyWithKey(localNewObjectExpression, 'prop')
   /** 查找新增对象标志，作为唯一标志，这里不允许prop属性不存在，但可以为空*/
 
   if (statusProperty && propProperty) {
@@ -171,20 +177,20 @@ const loadObjectCache = (newObjectExpression: t.ObjectExpression, keys: string[]
         const sameObject = getValueByKeys(sameObjectCacheRef, [...keys, propPropertyValue]) //复写同类项
 
         if (sameObject) {
-          newObjectExpression = parser.parseExpression(sameObject) as t.ObjectExpression
+          localNewObjectExpression = parser.parseExpression(sameObject) as t.ObjectExpression
         }
         /** 保存复写记录 */
 
         setValueByKeys(
           newObjectCache,
           [...keys, propPropertyValue],
-          generator(newObjectExpression).code
+          generator(localNewObjectExpression).code
         )
         break
     }
   }
 
-  return newObjectExpression
+  return localNewObjectExpression
 }
 /**
  * 对对象数组额外处理
@@ -197,18 +203,19 @@ const loadObjectCache = (newObjectExpression: t.ObjectExpression, keys: string[]
 const handleExpressionArray = (
   elements: t.ObjectExpression[],
   test: t.Expression | null | undefined,
-  functionName: FunctionName
+  functionName: string
 ) => {
+  let localElements = elements
   let switchCondition = (test as t.StringLiteral)?.value
   const nameType = functionName
   const sortType = switchCondition || 'common'
   const keys = [nameType, sortType]
-  elements = elements.map((objectExpression) => {
+  localElements = localElements.map((objectExpression) => {
     const localObjectExpression = loadObjectCache(objectExpression, keys)
     saveObjectCache(localObjectExpression, keys)
     return localObjectExpression
   })
-  return elements
+  return localElements
 }
 /**
  * 根据现有switchcase重组代码,此方法仍然不具备创建新的switchcase，需要重写
@@ -220,64 +227,8 @@ export default declare((babel) => {
   return {
     name: 'ast-transform',
     visitor: {
-      //先执行这个
-      SwitchStatement: {
-        enter(path) {
-          const cases: string[] = []
-          path.traverse({
-            SwitchCase(path) {
-              const test = path.node.test
-              /** 移除重复字符串条件case */
-
-              if (t.isLiteral(test)) {
-                if (cases.includes((test as t.StringLiteral).value)) {
-                  path.remove()
-                  return
-                } else {
-                  cases.push((test as t.StringLiteral).value)
-                }
-              }
-              /** 处理case穿透情况 */
-
-              if (!path.node.consequent.length) {
-                let next = path
-
-                while (!next.node.consequent.length) {
-                  next = next.getNextSibling() as NodePath<t.SwitchCase>
-                }
-                /** 强制添加break  */
-
-                const isHasBreakStatement = next.node.consequent.find((item) =>
-                  t.isBreakStatement(item)
-                )
-
-                if (!isHasBreakStatement) {
-                  next.node.consequent.push(t.breakStatement())
-                }
-
-                path.node.consequent = next.node.consequent
-              }
-            }
-          })
-        },
-
-        //离开SwitchStatement重排序cases排序
-        exit(path) {
-          path.node.cases.sort((case1, case2) => {
-            if (t.isLiteral(case1.test) && t.isLiteral(case2.test)) {
-              const case1Value: string = (case1.test as t.StringLiteral)?.value || 'a'
-              const case2Value: string = (case2.test as t.StringLiteral)?.value || 'a'
-              return case1Value.localeCompare(case2Value)
-            }
-
-            return 0
-          })
-        }
-      },
-
-      //再执行这个,或者直接执行两次
       Function(path) {
-        const functionName = getMethodName(path) //@ts-ignore
+        const functionName = getFunctionName(path)
 
         if (!functionNameList.includes(functionName)) {
           return
@@ -307,22 +258,23 @@ export default declare((babel) => {
 
                     let result = elements as t.ObjectExpression[]
                     /** 可与checkExpressionArrayWithExcel交换使用 */
-                    result = getNewExpressionArrayByExcel(
-                      result,
-                      test,
-                      functionName as FunctionName
-                    )
+
+                    result = getNewExpressionArrayByExcel(result, test, functionName as string)
                     /** 替换符合条件的对象属性 */
                     // result = replaceExpressionProperty(result, 'prop', 'mutualNum', {
                     //   Tshow: true,
                     //   Fshow: true
                     // })
+
                     /** 过滤指定相同属性对象 */
+
                     result = filterSameObject(result, 'prop')
                     /** 过滤相同属性 */
+
                     result = result.map((element) => filterSameProperty(element))
                     /** 添加缓存记录 */
-                    result = handleExpressionArray(result, test, functionName as FunctionName)
+
+                    result = handleExpressionArray(result, test, functionName as string)
                     path.node.elements = resetIndexObjectProperty(result)
                   }
                 })
