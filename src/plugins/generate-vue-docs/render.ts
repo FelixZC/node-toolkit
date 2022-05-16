@@ -1,27 +1,46 @@
-//@ts-nocheck
 /**
  * 构建成Markdown
  */
-class RenderMd {
-  constructor(parserResult, options = {}) {
+import type { ComponentInfo, MdOptions, MdOption } from './index'
+interface RenderMdType {
+  parserResult: ComponentInfo
+  options: MdOptions
+  render: any
+  propsRender: any
+  slotsRender: any
+  eventsRender: any
+  methodsRender: any
+  renderTabelHeader: any
+  renderTabelRow: any
+  renderTitle: any
+  _getKeysAndTitles: any
+  _funParam: any
+  _tag: any
+}
+class RenderMd implements RenderMdType {
+  parserResult
+  options
+  constructor(parserResult: ComponentInfo, options: MdOptions) {
     this.parserResult = parserResult
     this.options = options
   }
 
   render() {
-    const mdArr = []
+    const mdArr: string[] = []
 
     for (const key in this.parserResult) {
-      const element = this.parserResult[key]
+      const element = this.parserResult[key as keyof ComponentInfo]
 
       if (element) {
         switch (key) {
           case 'name':
-            mdArr.push(...this.renderTitle(element, false, 2))
+            const name = element as string
+            mdArr.push(...this.renderTitle(name, false, 2))
             break
 
           case 'desc':
-            mdArr.push(element)
+            const desc = element as string
+            mdArr.push(desc)
             break
 
           case 'props':
@@ -29,7 +48,7 @@ class RenderMd {
           case 'events':
           case 'methods':
             if (this.options[key]) {
-              mdArr.push(...this[`${key}Render`](element, this.options[key]))
+              mdArr.push(...this[`${key}Render`](element as Record<string, any>, this.options[key]))
             }
 
             break
@@ -49,7 +68,7 @@ class RenderMd {
    * @returns
    */
 
-  propsRender(propsRes, config) {
+  propsRender(propsRes: Record<string, any>, config: MdOption) {
     const kt = this._getKeysAndTitles(config, ['default', 'desc', 'name', 'type'])
 
     const mdArr = [...this.renderTitle('Attributes'), ...this.renderTabelHeader(kt.titles)]
@@ -57,7 +76,7 @@ class RenderMd {
     for (const key in propsRes) {
       if (Object.hasOwnProperty.call(propsRes, key)) {
         const element = propsRes[key]
-        const row = []
+        const row: string[] = []
         kt.keys.map((key) => {
           if (Object.keys(element).includes(key)) {
             if (key === 'name') {
@@ -82,7 +101,7 @@ class RenderMd {
    * @returns
    */
 
-  slotsRender(slotsRes, config) {
+  slotsRender(slotsRes: Record<string, any>, config: MdOption) {
     const kt = this._getKeysAndTitles(config, ['desc', 'name'])
 
     const mdArr = [...this.renderTitle('Slots'), ...this.renderTabelHeader(kt.titles)]
@@ -90,7 +109,7 @@ class RenderMd {
     for (const key in slotsRes) {
       if (Object.hasOwnProperty.call(slotsRes, key)) {
         const element = slotsRes[key]
-        const row = []
+        const row: string[] = []
         kt.keys.map((key) => {
           if (Object.keys(element).includes(key)) {
             row.push(element[key])
@@ -111,7 +130,7 @@ class RenderMd {
    * @returns
    */
 
-  eventsRender(propsRes, config) {
+  eventsRender(propsRes: Record<string, any>, config: MdOption) {
     const kt = this._getKeysAndTitles(config, ['desc', 'name'])
 
     const mdArr = [...this.renderTitle('Events'), ...this.renderTabelHeader(kt.titles)]
@@ -119,7 +138,7 @@ class RenderMd {
     for (const key in propsRes) {
       if (Object.hasOwnProperty.call(propsRes, key)) {
         const element = propsRes[key]
-        const row = []
+        const row: string[] = []
         kt.keys.map((key) => {
           if (Object.keys(element).includes(key)) {
             row.push(element[key])
@@ -140,7 +159,7 @@ class RenderMd {
    * @returns
    */
 
-  methodsRender(slotsRes, config) {
+  methodsRender(slotsRes: Record<string, any>, config: MdOption) {
     const kt = this._getKeysAndTitles(config, ['desc', 'name', 'params', 'res'])
 
     const mdArr = [...this.renderTitle('Methods'), ...this.renderTabelHeader(kt.titles)]
@@ -148,7 +167,7 @@ class RenderMd {
     for (const key in slotsRes) {
       if (Object.hasOwnProperty.call(slotsRes, key)) {
         const element = slotsRes[key]
-        const row = []
+        const row: string[] = []
         kt.keys.map((key) => {
           if (Object.keys(element).includes(key)) {
             if (key === 'name') {
@@ -174,7 +193,7 @@ class RenderMd {
    * @returns
    */
 
-  renderTabelHeader(header) {
+  renderTabelHeader(header: string[]) {
     return [this.renderTabelRow(header), `|${header.map(() => '------').join('|')}|`]
   }
   /**
@@ -183,7 +202,7 @@ class RenderMd {
    * @returns
    */
 
-  renderTabelRow(row) {
+  renderTabelRow(row: string[]) {
     return `|${row.join('|')}|`
   }
   /**
@@ -194,7 +213,7 @@ class RenderMd {
    * @returns
    */
 
-  renderTitle(title, br = true, num = 3) {
+  renderTitle(title: string, br = true, num = 3) {
     const h = ['#', '##', '###', '####', '#####', '######']
     return br ? ['', '', `${h[num - 1]} ${title}`] : [`${h[num - 1]} ${title}`]
   }
@@ -205,8 +224,9 @@ class RenderMd {
    * @returns
    */
 
-  _getKeysAndTitles(config, inKeys) {
+  _getKeysAndTitles(config: MdOption, inKeys: string[]) {
     const keys = Object.keys(config).filter((key) => inKeys.includes(key))
+    //@ts-ignore
     const titles = keys.map((key) => config[key])
     return {
       keys,
@@ -219,7 +239,7 @@ class RenderMd {
    * @returns
    */
 
-  _funParam(params) {
+  _funParam(params: MdOption[]) {
     if (!params) return '—'
     return params
       .map((item) => `${item.name}:${item.type}${item.desc ? `(${item.desc})` : ''}`)
@@ -232,11 +252,9 @@ class RenderMd {
    * @returns
    */
 
-  _tag(item, tag) {
+  _tag(item: Record<string, any>, tag: string) {
     return item[tag] ? ` \`${tag}\` ` : ''
   }
 }
 
-module.exports = {
-  RenderMd
-}
+export default RenderMd
