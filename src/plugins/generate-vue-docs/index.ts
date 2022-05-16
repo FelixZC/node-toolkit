@@ -1,5 +1,4 @@
 //@ts-nocheck
-
 /**
  * 提取vue2组件信息，搬运自https://github.com/MaLuns/generate-vue-docs
  */
@@ -9,7 +8,6 @@ import * as parser from '@babel/parser'
 import * as t from '@babel/types'
 import * as traverse from '@babel/traverse'
 import type { AttributeNode, ElementNode, TemplateChildNode } from '@vue/compiler-core'
-
 const { RenderMd } = require('./render')
 /*  默认生成配置 */
 
@@ -98,7 +96,7 @@ const extractProps = (node: t.ObjectMethod | t.ObjectProperty) => {
   }
   /*  遍历 Props */
 
-  localNode.value.properties.forEach((prop) => {
+  localNode.value?.properties?.forEach((prop) => {
     const {
       key: { name },
       leadingComments,
@@ -263,7 +261,7 @@ const traverserTemplateAst = (ast: ElementNode, visitor = {}) => {
 const extract = {
   methods: extractMethods,
   model: extractModel,
-  name: (item: t.ObjectMethod | t.ObjectProperty) => item.value.value,
+  // name: (item: t.ObjectMethod | t.ObjectProperty) => item.value.value,
   props: extractProps
 }
 /*  转换文档 */
@@ -272,74 +270,70 @@ const parseDocs = (vueStr: string, config = {}) => {
   let localConfig = config
   localConfig = { ...baseConfig, ...localConfig }
   const componentInfo = {
+    // name: undefined,
     desc: undefined,
-    events: undefined,
-    methods: undefined,
-    model: undefined,
-    name: undefined,
     props: undefined,
+    model: undefined,
+    methods: undefined,
+    events: undefined,
     slots: undefined
   }
   const vue = compiler.parse(vueStr)
-
-  if (vue.descriptor.script || vue.descriptor.scriptSetup) {
-    const content = vue.descriptor.script?.content || vue.descriptor.scriptSetup?.content
-
-    if (content) {
-      const jst = parser.parse(content, {
-        allowImportExportEverywhere: false,
-        plugins: ['decorators-legacy', 'jsx', 'typescript'],
-        sourceType: 'module'
-      })
-      traverse.default(jst, {
-        ExportDefaultDeclaration(path) {
-          /*  组件描述 */
-          if (path.node.leadingComments) {
-            componentInfo.desc = path.node.leadingComments
-              .map((item) => {
-                if (item.type === 'CommentLine') {
-                  return item.value.trim()
-                }
-
-                return item.value
-                  .split('\n')
-                  .map((item) => item.replace(/[\s\*]/g, ''))
-                  .filter(Boolean)
-              })
-              .toString()
-          }
-
-          if (t.isObjectExpression(path.node.declaration)) {
-            path.node.declaration.properties.forEach((item) => {
-              if (!t.isSpreadElement(item)) {
-                const key = (item.key as t.Identifier).name || (item.key as t.StringLiteral).value
-
-                if (extract[key]) {
-                  componentInfo[key] = extract[key](item)
-                }
+  const script = compiler.compileScript(vue.descriptor, { id: 'pzc' })
+  if (script.content.length) {
+    const jst = parser.parse(script.content, {
+      allowImportExportEverywhere: false,
+      plugins: ['decorators-legacy', 'jsx', 'typescript'],
+      sourceType: 'module'
+    })
+    traverse.default(jst, {
+      ExportDefaultDeclaration(path) {
+        /*  组件描述 */
+        if (path.node.leadingComments) {
+          componentInfo.desc = path.node.leadingComments
+            .map((item) => {
+              if (item.type === 'CommentLine') {
+                return item.value.trim()
               }
+
+              return item.value
+                .split('\n')
+                .map((item) => item.replace(/[\s\*]/g, ''))
+                .filter(Boolean)
             })
-          }
-        },
+            .toString()
+        }
 
-        MemberExpression(path) {
-          /*  判断是不是event */
-          if (path.node.property.name === '$emit') {
-            const event = extractEvents(path)
-            !componentInfo.events && (componentInfo.events = {})
+        if (t.isObjectExpression(path.node.declaration)) {
+          path.node.declaration.properties.forEach((item) => {
+            if (!t.isSpreadElement(item)) {
+              const key = (item.key as t.Identifier).name || (item.key as t.StringLiteral).value
 
-            if (componentInfo.events[event.name]) {
-              componentInfo.events[event.name].desc = event.desc
-                ? event.desc
-                : componentInfo.events[event.name].desc
-            } else {
-              componentInfo.events[event.name] = event
+              if (extract[key]) {
+                componentInfo[key] = extract[key](item)
+              }
             }
+          })
+        }
+      },
+
+      MemberExpression(path) {
+        /*  判断是不是event */
+        if (path.node.property.name === '$emit') {
+          const event = extractEvents(path)
+          !componentInfo.events && (componentInfo.events = {})
+
+          if (componentInfo.events[event.name]) {
+            componentInfo.events[event.name].desc = event.desc
+              ? event.desc
+              : componentInfo.events[event.name].desc
+          } else {
+            componentInfo.events[event.name] = event
           }
         }
-      })
-      isModelAndSync(componentInfo)
-    }
+      }
+    })
+    isModelAndSync(componentInfo)
   }
 
   if (vue.descriptor.template) {

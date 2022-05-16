@@ -218,12 +218,18 @@ export const getComponentDescription = () => {
     return path.basename(filePath1).localeCompare(path.basename(filePath2))
   })
   let str = ''
+  const { updateBar } = cliProgress.useCliProgress(filePathList.length)
   filePathList.forEach((filePath) => {
     const content = fs.readFileSync(filePath, 'utf-8')
-    str += `### ${path.relative('./', filePath)}${br}`
-    str += mdUtils.parseDocs(content, {
+    const mdContent = mdUtils.parseDocs(content, {
       md: true
     })
+    if (mdContent.length) {
+      str += `## ${path.relative('./', filePath)}` + br
+      str += mdContent + br
+    }
+
+    updateBar()
   })
 
   if (!str.length) {
