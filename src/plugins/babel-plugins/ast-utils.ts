@@ -1,64 +1,51 @@
 import { NodePath } from '@babel/core'
 import * as parser from '@babel/parser'
 import * as t from '@babel/types'
-export interface ImportObj {
-  defaultImportName: string
-  importNameList: string[]
-  namespace: string
+
+interface SpecifierInfo {
   source: string
-  kind?: string | null | undefined
+  type: 'ImportSpecifier' | 'ImportNamespaceSpecifier' | 'ImportDefaultSpecifier'
+  localName: string
+  importedName?: string
+  importKind?: 'type' | 'typeof' | 'value' | null
 }
+export type ImportInfo = Array<SpecifierInfo>
 /**
- * 获取导入对象
- * @param importList
- * @returns
+ * 获取导入信息
  */
+export const getImportInfo = (item: t.ImportDeclaration) => {
+  const importInfo: ImportInfo = []
 
-export const getImportObj = (importList: t.ImportDeclaration[]) => {
-  const customImportObjList: ImportObj[] = []
-
-  for (const item of importList) {
-    const importObj: ImportObj = {
-      defaultImportName: '',
-      importNameList: [],
-      kind: '',
-      namespace: '',
-      source: ''
+  for (const specifier of item.specifiers) {
+    const specifierInfo: SpecifierInfo = {
+      source: '',
+      type: 'ImportSpecifier',
+      localName: ''
     }
-
-    for (const specifier of item.specifiers) {
-      switch (specifier.type) {
-        case 'ImportDefaultSpecifier':
-          importObj.defaultImportName = specifier.local.name
-          break
-
-        case 'ImportSpecifier':
-          const importName =
-            specifier.imported.type === 'Identifier'
-              ? specifier.imported.name
-              : specifier.imported.value
-
-          if (importName === specifier.local.name) {
-            importObj.importNameList.push(importName)
-          } else {
-            importObj.importNameList.push(`${importName} as ${specifier.local.name}`)
-          }
-
-          break
-
-        case 'ImportNamespaceSpecifier':
-          importObj.namespace = specifier.local.name
-          break
+    if (t.isImportDefaultSpecifier(specifier)) {
+      specifierInfo.type = 'ImportDefaultSpecifier'
+    }
+    if (t.isImportSpecifier(specifier)) {
+      specifierInfo.type = 'ImportSpecifier'
+      if (t.isIdentifier(specifier.imported)) {
+        specifierInfo.importedName = specifier.imported.name
+      } else {
+        specifierInfo.importedName = specifier.imported.value
       }
     }
-
-    importObj.source = item.source.value
-    importObj.kind = item.importKind
-    customImportObjList.push(importObj)
+    if (t.isImportNamespaceSpecifier(specifier)) {
+      specifierInfo.type = 'ImportNamespaceSpecifier'
+    }
+    specifierInfo.localName = specifier.local.name
+    specifierInfo.source = item.source.value
+    if (item.importKind) {
+      specifierInfo.importKind = item.importKind
+    }
+    importInfo.push(specifierInfo)
   }
-
-  return customImportObjList
+  return importInfo
 }
+
 /**
  * 查找包含指定对象属性名的对象属性
  * @param target

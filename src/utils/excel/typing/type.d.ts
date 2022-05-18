@@ -42,7 +42,7 @@ export interface ObjDeatil {
   remark: string
   captureShape: string
   resoure: FileTypeLabel
-  refDocument: string
+  refDocument?: string
   fileType: FileTypeValue
   sortTypeValue: string
   sortTypeLabel: string

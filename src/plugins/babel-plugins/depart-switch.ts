@@ -5,7 +5,6 @@ export default declare((babel) => {
   return {
     name: 'ast-transform',
     visitor: {
-      //先执行这个
       SwitchStatement: {
         enter(path) {
           const cases: string[] = []

@@ -1,5 +1,5 @@
 import { fileTypeMap, getFileType, getSortTypeName } from './utils/map'
-import { writeFile } from '../common'
+import { writeFile, kebabCase } from '../common'
 import * as path from 'path'
 import * as xlsx from 'xlsx'
 import type { ClassifyResult, OutputObj, SheetType } from './typing/type'
@@ -101,7 +101,7 @@ export default function runExcelToJson() {
 
   const fileTypeList = Array.from(fileTypeMap.values())
   const outputMap: OutputObj[] = fileTypeList.map((fileType) => {
-    const filePath = `./output/${fileType}-form.js`
+    const filePath = `./output/${kebabCase(fileType)}-form.js`
     return {
       fileType,
       outputPath: path.format({

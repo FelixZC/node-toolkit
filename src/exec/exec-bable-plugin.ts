@@ -5,6 +5,7 @@
 import * as exec from './index'
 import type { BabelPlugin } from '../plugins/use-babel-plugin'
 const babelPluginPathList: string[] = [
+  // '../plugins/babel-plugins/add-variableDeclaration'
   // '../plugins/babel-plugins/search-button-obj'
   // '../plugins/babel-plugins/depart-switch'
   // '../plugins/babel-plugins/create-object-array-in-switch-by-old'
