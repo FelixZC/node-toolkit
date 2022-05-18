@@ -35,10 +35,6 @@ pzc 的工具箱，包含：
 
 npm i 安装依赖
 
-tsc -p ./ 编译转化
+ts-node xxx执行
 
-node dist/src/xxx 执行
-
-ps:将目标文件夹放到工程目录下，自行修改 new fsUtils(rootPath)
-
-待添加执行进度条和自动格式化...
+ps:自行在src/exec/index.ts修改new fsUtils(rootPath)，rootPath为预执行目标文件夹目录

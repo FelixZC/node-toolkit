@@ -97,15 +97,9 @@ function catchHandel() {
   }
 }
 /**
- * //基于node.js的文件操作类,自行执行tsc命令转化为js文件使用
+ * //基于node.js的文件操作类
  * @author pzc
  * @date 2021/07/12
- * @example 使用方法e.g.
-            let path = require('path')
-            let rootPath = path.join('src')
-            let fsUtils = require('../assets/js/fs.js')
-            let fsInstance = new fsUtils(rootPath)
-            fsInstance.xx()
  */
 
 class fsUtils implements FsInstance {
