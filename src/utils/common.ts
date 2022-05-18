@@ -230,6 +230,7 @@ export const setValueByKeys = (
   value: any
 ) => {
   let localKeys = keys
+
   if (typeof localKeys === 'string') {
     localKeys = localKeys.split(',')
   }
@@ -255,6 +256,7 @@ export const setValueByKeys = (
 
 export const getValueByKeys = (target: Record<string, any> = {}, keys: string[] | string): any => {
   let localKeys = keys
+
   if (typeof localKeys === 'string') {
     localKeys = localKeys.split(',')
   }

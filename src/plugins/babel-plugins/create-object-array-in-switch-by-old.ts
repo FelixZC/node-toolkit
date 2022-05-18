@@ -1,8 +1,8 @@
 /**
  * 操作指定函数，嵌套在switch中的对象数组
  */
-import { declare } from '@babel/helper-plugin-utils'
-import { getValueByKeys, setValueByKeys, strToJson, writeFile } from '../../utils/common'
+import { cloneDeep } from 'lodash' //@ts-ignore
+
 import {
   createObjectTemplateNode,
   filterSameObject,
@@ -13,13 +13,14 @@ import {
   getFunctionName,
   matchObjectExpress
 } from './ast-utils'
-import { cloneDeep } from 'lodash' //@ts-ignore
 
-import { resetIndexObjectProperty } from './sort-object-array-by-index'
+import { declare } from '@babel/helper-plugin-utils'
 import { defaultObjDeatil } from '../../utils/excel/excel-to-json'
 import formRef from '../../utils/excel/output/index'
 import generator from '@babel/generator'
+import { getValueByKeys, setValueByKeys, strToJson, writeFile } from '../../utils/common'
 import * as parser from '@babel/parser'
+import { resetIndexObjectProperty } from './sort-object-array-by-index'
 import sameObjectCacheRef from '../../query/json/same-object-cache.json'
 import * as t from '@babel/types'
 import type { ObjDeatil } from '../../utils/excel/typing/type' //
@@ -159,6 +160,7 @@ const saveObjectCache = (newObjectExpression: t.ObjectExpression, keys: string[]
 const loadObjectCache = (newObjectExpression: t.ObjectExpression, keys: string[]) => {
   let localNewObjectExpression = newObjectExpression
   /** 对新对象缺省值作同类项覆盖处理 */
+
   let statusProperty = findObjectPropertyWithKey(localNewObjectExpression, '_status_')
   let propProperty = findObjectPropertyWithKey(localNewObjectExpression, 'prop')
   /** 查找新增对象标志，作为唯一标志，这里不允许prop属性不存在，但可以为空*/

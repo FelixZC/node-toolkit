@@ -1,7 +1,6 @@
 import { NodePath } from '@babel/core'
 import * as parser from '@babel/parser'
 import * as t from '@babel/types'
-
 interface SpecifierInfo {
   source: string
   type: 'ImportSpecifier' | 'ImportNamespaceSpecifier' | 'ImportDefaultSpecifier'
@@ -13,6 +12,7 @@ export type ImportInfo = Array<SpecifierInfo>
 /**
  * 获取导入信息
  */
+
 export const getImportInfo = (item: t.ImportDeclaration) => {
   const importInfo: ImportInfo = []
 
@@ -22,30 +22,37 @@ export const getImportInfo = (item: t.ImportDeclaration) => {
       type: 'ImportSpecifier',
       localName: ''
     }
+
     if (t.isImportDefaultSpecifier(specifier)) {
       specifierInfo.type = 'ImportDefaultSpecifier'
     }
+
     if (t.isImportSpecifier(specifier)) {
       specifierInfo.type = 'ImportSpecifier'
+
       if (t.isIdentifier(specifier.imported)) {
         specifierInfo.importedName = specifier.imported.name
       } else {
         specifierInfo.importedName = specifier.imported.value
       }
     }
+
     if (t.isImportNamespaceSpecifier(specifier)) {
       specifierInfo.type = 'ImportNamespaceSpecifier'
     }
+
     specifierInfo.localName = specifier.local.name
     specifierInfo.source = item.source.value
+
     if (item.importKind) {
       specifierInfo.importKind = item.importKind
     }
+
     importInfo.push(specifierInfo)
   }
+
   return importInfo
 }
-
 /**
  * 查找包含指定对象属性名的对象属性
  * @param target

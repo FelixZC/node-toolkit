@@ -1,11 +1,11 @@
-import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
 import * as babel from '@babel/core'
 import generator from '@babel/generator'
 import * as parser from '@babel/parser'
+import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
 import traverse from '@babel/traverse'
-import type { ExecFileInfo } from './common'
 import type * as Babel from '@babel/core'
 import type { PluginObj, Visitor } from '@babel/core'
+import type { ExecFileInfo } from './common'
 export type BabelAPI = typeof Babel
 export interface CustomPluginObj extends PluginObj {
   getExtra?: () => Record<string, any>

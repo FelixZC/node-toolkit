@@ -10,8 +10,7 @@ import {
   SourceLocation,
   TextModes
 } from '@vue/compiler-core'
-import { RawSourceMap, SourceMapGenerator } from 'source-map'
-import { Statement } from '@babel/types'
+
 /**
  * The following function is adapted from https://github.com/psalaets/vue-sfc-descriptor-to-string/blob/master/index.js
  */
@@ -37,8 +36,9 @@ import { Statement } from '@babel/types'
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 import * as CompilerDom from '@vue/compiler-dom'
+import { RawSourceMap, SourceMapGenerator } from 'source-map'
+import { Statement } from '@babel/types'
 export function stringify(sfcDescriptor: SFCDescriptor) {
   const { customBlocks, script, styles, template } = sfcDescriptor
   return (

@@ -1,7 +1,7 @@
 /**
  * 构建成Markdown
  */
-import type { ComponentInfo, MdOptions, MdOption } from './index'
+import type { ComponentInfo, MdOption, MdOptions } from './index'
 interface RenderMdType {
   parserResult: ComponentInfo
   options: MdOptions
@@ -17,9 +17,11 @@ interface RenderMdType {
   _funParam: any
   _tag: any
 }
+
 class RenderMd implements RenderMdType {
   parserResult
   options
+
   constructor(parserResult: ComponentInfo, options: MdOptions) {
     this.parserResult = parserResult
     this.options = options
@@ -225,8 +227,8 @@ class RenderMd implements RenderMdType {
    */
 
   _getKeysAndTitles(config: MdOption, inKeys: string[]) {
-    const keys = Object.keys(config).filter((key) => inKeys.includes(key))
-    //@ts-ignore
+    const keys = Object.keys(config).filter((key) => inKeys.includes(key)) //@ts-ignore
+
     const titles = keys.map((key) => config[key])
     return {
       keys,

@@ -1,13 +1,13 @@
 /**
  * 查找項目按钮名称
  */
+import { cloneDeep } from 'lodash'
 import { declare } from '@babel/helper-plugin-utils'
 import { findObjectPropertyWithKey, getParentFunctionName } from './ast-utils'
-import { NodePath } from '@babel/core'
-import { cloneDeep } from 'lodash'
-import { strToJson } from '../../utils/common' // 返回权限串
-
+// 返回权限串
 import generate from '@babel/generator'
+import { NodePath } from '@babel/core'
+import { strToJson } from '../../utils/common'
 import * as t from '@babel/types'
 
 const authorizationString = (

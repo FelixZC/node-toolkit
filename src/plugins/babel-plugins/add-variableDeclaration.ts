@@ -5,7 +5,6 @@
 import { declare } from '@babel/helper-plugin-utils'
 import { getImportInfo } from './ast-utils'
 import * as t from '@babel/types'
-
 export default declare((babel) => {
   const importLocalNameList: string[] = []
   const refNameList: string[] = []
@@ -19,6 +18,7 @@ export default declare((babel) => {
           path.traverse({
             ImportDeclaration(path) {
               const importInfo = getImportInfo(path.node)
+
               for (const item of importInfo) {
                 if (!importLocalNameList.includes(item.localName)) {
                   importLocalNameList.push(item.localName)
@@ -27,12 +27,14 @@ export default declare((babel) => {
             }
           })
           /** 查找定义声明 */
+
           path.traverse({
             VariableDeclaration(path) {
               const declarations = path.node.declarations
               declarations.find((declaration) => {
                 if (t.isIdentifier(declaration.id)) {
                   const declarationName = declaration.id.name
+
                   if (!declarationNameList.includes(declarationName)) {
                     declarationNameList.push(declarationName)
                   }
@@ -41,13 +43,16 @@ export default declare((babel) => {
             }
           })
           /**查找赋值表达 */
+
           path.traverse({
             AssignmentExpression(path) {
               const left = path.node.left
+
               if (t.isMemberExpression(left)) {
                 if (t.isIdentifier(left.object)) {
                   const refName = left.object.name
                   const functionParent = path.getFunctionParent()
+
                   if (functionParent) {
                     // const params = functionParent.node.params
                     // const paramNameList: string = []
@@ -71,6 +76,7 @@ export default declare((babel) => {
             }
           })
         },
+
         exit(path) {
           /** 对为未定义表达式参数重新定义为空对象 */
           const declarations: t.VariableDeclarator[] = refNameList.map((name) => {
@@ -78,6 +84,7 @@ export default declare((babel) => {
           })
           const variableDeclaration = t.variableDeclaration('const', declarations)
           const body = path.node.body
+
           for (let index = body.length - 1; index >= 0; index--) {
             if (t.isImportDeclaration(body[index])) {
               body.splice(index + 1, 0, variableDeclaration)

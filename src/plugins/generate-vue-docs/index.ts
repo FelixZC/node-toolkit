@@ -4,13 +4,13 @@
 import * as compiler from '@vue/compiler-sfc'
 import * as generate from '@babel/generator'
 import * as parser from '@babel/parser'
+import RenderMd from './render'
+/*  默认生成配置 */
+
 import * as t from '@babel/types'
 import * as traverse from '@babel/traverse'
 import { NodePath } from '@babel/traverse'
 import type { AttributeNode, ElementNode, TemplateChildNode } from '@vue/compiler-core'
-import RenderMd from './render'
-/*  默认生成配置 */
-
 const baseConfig = {
   md: false
 }
@@ -56,6 +56,7 @@ const mdOptions: MdOptions = {
 
 const extractProps = (node: t.ObjectProperty | t.ObjectMethod) => {
   const props: Record<string, any> = {}
+
   if (t.isObjectMethod(node)) {
     return props
   }
@@ -78,9 +79,11 @@ const extractProps = (node: t.ObjectProperty | t.ObjectMethod) => {
     if (t.isBooleanLiteral(node) || t.isNumericLiteral(node) || t.isStringLiteral(node)) {
       return node.value
     }
+
     if (t.isRegExpLiteral(node)) {
       return node.pattern
     }
+
     if (t.isFunction(node)) {
       try {
         const { code } = generate.default(node.body)
@@ -90,6 +93,7 @@ const extractProps = (node: t.ObjectProperty | t.ObjectMethod) => {
     }
   }
   /*  遍历 Props */
+
   ;(node.value as t.ObjectExpression)?.properties?.forEach((property) => {
     if (t.isObjectProperty(property)) {
       const key = (property.key as t.Identifier).name || (property.key as t.StringLiteral).value
@@ -99,12 +103,14 @@ const extractProps = (node: t.ObjectProperty | t.ObjectMethod) => {
       }
       leadingComments && (props[key].desc = leadingComments[0].value.trim())
       /*  如果是标识或数组 说明只声明了类型 */
+
       if (t.isIdentifier(value) || t.isArrayExpression(value)) {
         props[key].type = getPropType(value)
       } else if (t.isObjectExpression(value)) {
         value.properties.map((item) => {
           if (t.isObjectProperty(item)) {
             const subKey = (item.key as t.Identifier).name || (item.key as t.StringLiteral).value
+
             if (subKey === 'type' && t.isObjectProperty(item)) {
               props[key].type = getPropType(item.value)
             } else if (subKey === 'default') {
@@ -125,13 +131,16 @@ const extractProps = (node: t.ObjectProperty | t.ObjectMethod) => {
 
 const extractMethods = (node: t.ObjectProperty | t.ObjectMethod) => {
   const methods: Record<string, any> = {}
+
   if (t.isObjectMethod(node)) {
     return methods
   }
+
   if (t.isObjectExpression(node.value)) {
     node.value.properties.forEach((property) => {
       if (!t.isSpreadElement(property)) {
         const key = (property.key as t.Identifier).name || (property.key as t.StringLiteral).value
+
         if (t.isObjectMethod(property) && /^[^_]/.test(key)) {
           methods[key] = {
             async: property.async,
@@ -167,9 +176,8 @@ const extractMethods = (node: t.ObjectProperty | t.ObjectMethod) => {
             }
             /*  提取 参数说明 */
 
-            const matches = comment.value.matchAll(/(@param)[\s]*{([a-zA-Z]*)}[\s]*(\w*)(.*)/g)
+            const matches = comment.value.matchAll(/(@param)[\s]*{([a-zA-Z]*)}[\s]*(\w*)(.*)/g) //@ts-ignore
 
-            //@ts-ignore
             for (const matche of matches) {
               !methods[key].params && (methods[key].params = [])
               methods[key].params.push({
@@ -187,6 +195,7 @@ const extractMethods = (node: t.ObjectProperty | t.ObjectMethod) => {
   return methods
 }
 /*  提取事件 */
+
 const extractEvents = (path: NodePath<t.MemberExpression>) => {
   /*  第一个元素是事件名称 */
   const parentPath = path.findParent((item) =>
@@ -194,6 +203,7 @@ const extractEvents = (path: NodePath<t.MemberExpression>) => {
   ) as NodePath<t.CallExpression>
   const eventName = parentPath.node.arguments[0] as t.StringLiteral
   const comments = parentPath.parent.leadingComments //ExpressionStatement
+
   return {
     desc: comments ? comments.map((item) => item.value.trim()).toString() : '——',
     name: eventName.value
@@ -203,9 +213,11 @@ const extractEvents = (path: NodePath<t.MemberExpression>) => {
 
 const extractModel = (node: t.ObjectProperty | t.ObjectMethod) => {
   const model: Record<string, any> = {}
+
   if (t.isObjectMethod(node)) {
     return model
   }
+
   if (t.isObjectExpression(node.value)) {
     node.value.properties.forEach((property) => {
       if (t.isObjectProperty(property)) {
@@ -219,6 +231,7 @@ const extractModel = (node: t.ObjectProperty | t.ObjectMethod) => {
   return model
 }
 /*  处理是否支持 v-model 或者 .sync修饰 */
+
 const isModelAndSync = (comInfo: ComponentInfo) => {
   for (const key in comInfo.events as Record<string, any>) {
     if (Object.hasOwnProperty.call(comInfo.events, key)) {
@@ -248,6 +261,7 @@ const isModelAndSync = (comInfo: ComponentInfo) => {
     }
   }
 }
+
 interface TemplateVisitor {
   [tag: string]: (node: ElementNode, parent?: ElementNode) => ElementNode | undefined
 }
@@ -274,10 +288,12 @@ const getComponentName = (node: t.ObjectProperty | t.ObjectMethod) => {
   if (t.isObjectMethod(node)) {
     return
   }
+
   if (t.isStringLiteral(node.value)) {
     return node.value.value
   }
 }
+
 interface Extract {
   methods: typeof extractMethods
   model: typeof extractModel
@@ -290,7 +306,6 @@ const extract: Extract = {
   name: getComponentName,
   props: extractProps
 }
-
 export interface ComponentInfo {
   name?: string
   desc: string
@@ -305,7 +320,6 @@ export interface ComponentInfo {
 const parseDocs = (vueStr: string, config: Record<string, any> = {}) => {
   let localConfig = config
   localConfig = { ...baseConfig, ...localConfig }
-
   const componentInfo: ComponentInfo = {
     desc: '',
     props: {},
@@ -315,7 +329,10 @@ const parseDocs = (vueStr: string, config: Record<string, any> = {}) => {
     slots: {}
   }
   const vue = compiler.parse(vueStr)
-  const script = compiler.compileScript(vue.descriptor, { id: 'pzc' })
+  const script = compiler.compileScript(vue.descriptor, {
+    id: 'pzc'
+  })
+
   if (script.content.length) {
     const jst = parser.parse(script.content, {
       allowImportExportEverywhere: false,
@@ -344,6 +361,7 @@ const parseDocs = (vueStr: string, config: Record<string, any> = {}) => {
           path.node.declaration.properties.forEach((item) => {
             if (!t.isSpreadElement(item)) {
               const key = (item.key as t.Identifier).name || (item.key as t.StringLiteral).value
+
               if (Reflect.has(extract, key)) {
                 //@ts-ignore
                 componentInfo[key] = extract[key](item)
@@ -402,6 +420,7 @@ const parseDocs = (vueStr: string, config: Record<string, any> = {}) => {
             name
           }
         }
+
         return node
       }
     })

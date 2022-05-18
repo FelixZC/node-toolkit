@@ -1,6 +1,6 @@
 import runVueCodemod from '../plugins/use-vue-codemod'
-import type { Transform } from 'jscodeshift'
 import type { ExecFileInfo } from './common'
+import type { Transform } from 'jscodeshift'
 
 const runCodemod = (fileInfo: ExecFileInfo, codemodList: Transform[]) => {
   codemodList.reduce((previousFileInfo, currentCodemode) => {

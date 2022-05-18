@@ -1,5 +1,5 @@
 import { fileTypeMap, getFileType, getSortTypeName } from './utils/map'
-import { writeFile, kebabCase } from '../common'
+import { kebabCase, writeFile } from '../common'
 import * as path from 'path'
 import * as xlsx from 'xlsx'
 import type { ClassifyResult, OutputObj, SheetType } from './typing/type'

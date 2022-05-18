@@ -1,7 +1,7 @@
 import wrap from '../wrap-ast-transformation'
-import type { ImportDefaultSpecifier, ImportNamespaceSpecifier, ImportSpecifier } from 'jscodeshift'
-import type { Collection } from 'jscodeshift/src/Collection'
 import type { ASTTransformation } from '../wrap-ast-transformation'
+import type { Collection } from 'jscodeshift/src/Collection'
+import type { ImportDefaultSpecifier, ImportNamespaceSpecifier, ImportSpecifier } from 'jscodeshift'
 type Params = {
   localBinding: string
 }

@@ -1,8 +1,8 @@
 /**
  * 驼峰命名转化
  */
-import { AcceptedPlugin as PostcssPlugin, AtRule, Rule } from 'postcss'
 import { isPath, transferRef } from '../../utils/common'
+import { AcceptedPlugin as PostcssPlugin, AtRule, Rule } from 'postcss'
 
 const transferHandler = (rule: Rule | AtRule) => {
   rule.walkDecls((decl) => {

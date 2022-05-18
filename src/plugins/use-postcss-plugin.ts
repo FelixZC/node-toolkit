@@ -1,7 +1,7 @@
 import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
 import postcss from 'postcss'
-import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
 import type { ExecFileInfo } from './common'
+import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
 
 const syntax = require('postcss-syntax')({
   // custom parser for CSS (using `postcss-safe-parser`)

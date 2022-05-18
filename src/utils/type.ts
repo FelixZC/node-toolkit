@@ -1,5 +1,5 @@
-import { capitalize, writeFile } from './common'
 import * as BaseStatsService from '../api/base-stats-service.json'
+import { capitalize, writeFile } from './common'
 import * as EamsAmsprojService from '../api/eams-amsproj-service.json'
 import * as fs from 'fs'
 import * as path from 'path'

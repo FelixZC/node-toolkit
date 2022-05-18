@@ -1,4 +1,3 @@
-import { parseDocs } from '../plugins/generate-vue-docs'
 import { getDataType, sortArray, sortObjAttr } from './common'
 /**
  * md文件生成工具类，完善中...
@@ -8,6 +7,7 @@ import { getDataType, sortArray, sortObjAttr } from './common'
  */
 
 import * as os from 'os'
+import { parseDocs } from '../plugins/generate-vue-docs'
 const br = os.EOL // 换行符
 
 /**

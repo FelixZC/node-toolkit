@@ -1,7 +1,7 @@
-import { groupBy, writeFile } from '../utils/common'
 import * as cliProgress from '../utils/cli-progress'
 import * as fs from 'fs'
 import fsUtils from '../utils/fs'
+import { groupBy, writeFile } from '../utils/common'
 import mdUtils from '../utils/md'
 import * as os from 'os'
 import * as path from 'path'
@@ -10,12 +10,12 @@ import runCodemod from '../plugins/use-js-codemod'
 import runPostcssPlugin from '../plugins/use-postcss-plugin'
 import runPosthtmlPlugin from '../plugins/use-posthtml-plugin'
 import storeFile from '../query/js/stote-state'
-import type { Plugin as PosthtmlPlugin } from 'posthtml'
-import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
-import type { Transform } from 'jscodeshift'
-import type { FileInfo } from '../utils/fs'
-import type { ExecFileInfo } from '../plugins/common'
 import type { BabelPlugin } from '../plugins/use-babel-plugin'
+import type { ExecFileInfo } from '../plugins/common'
+import type { FileInfo } from '../utils/fs'
+import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
+import type { Plugin as PosthtmlPlugin } from 'posthtml'
+import type { Transform } from 'jscodeshift'
 const br = os.EOL // 换行符
 
 /** 项目根目录，在此变更执行目录 */
@@ -224,6 +224,7 @@ export const getComponentDescription = () => {
     const mdContent = mdUtils.parseDocs(content, {
       md: true
     })
+
     if (mdContent.length) {
       str += `## ${path.relative('./', filePath)}` + br
       str += mdContent + br
