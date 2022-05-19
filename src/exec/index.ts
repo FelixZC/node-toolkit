@@ -20,7 +20,7 @@ const br = os.EOL // 换行符
 
 /** 项目根目录，在此变更执行目录 */
 
-const rootPath = path.join('src-copy')
+const rootPath = path.join('src copy')
 const fsInstance = new fsUtils(rootPath)
 const fileInfoList = fsInstance.getFileInfoList()
 interface AttrsCollection {

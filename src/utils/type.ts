@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as BaseStatsService from '../api/base-stats-service.json'
 import { capitalize, writeFile } from './common'
 import * as EamsAmsprojService from '../api/eams-amsproj-service.json'
@@ -12,7 +13,7 @@ import type {
   ResponseObject
 } from 'openapi-typescript'
 interface CreateRequestTemplateExecListItem {
-  resource: typeof EamsAmsprojService | typeof SystemBaseService
+  resource: typeof EamsAmsprojService | typeof SystemBaseService | typeof BaseStatsService
   typingPath: string
 }
 /**
