@@ -79,18 +79,6 @@ export const formatText = () => {
       // md文件去重
       sourceFilePath: 'src/query/md/query.md',
       targetFilePath: 'src/query/md/query.md'
-    },
-    {
-      mode: 'txtToTxt',
-      // 每日n句去重
-      sourceFilePath: 'src/query/txt/每日n句.txt',
-      targetFilePath: 'src/query/txt/每日n句.txt'
-    },
-    {
-      mode: 'txtToMd',
-      // 每日n句转md
-      sourceFilePath: 'src/query/txt/每日n句.txt',
-      targetFilePath: 'src/query/md/sentence.md'
     }
   ]
 

@@ -1,12 +1,8 @@
 import * as cliProgress from 'cli-progress'
 export const useCliProgress = (total: number = 0) => {
-  let count = 0 // if (!total) {
-  //   throw new Error('cli-progress缺少总数')
-  // }
+  let count = 0
 
   const bar1 = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic)
-  bar1.start(total, count)
-
   const updateBar = () => {
     count++
     bar1.update(count)
@@ -15,6 +11,10 @@ export const useCliProgress = (total: number = 0) => {
       bar1.stop()
       count = 0
     }
+  }
+
+  if (total > 0) {
+    bar1.start(total, count)
   }
 
   return {

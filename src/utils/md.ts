@@ -84,7 +84,7 @@ function textFormat(content: string, mode = 'md') {
 
         return `> ${(index + 2) / 2}. **${localItem}**  `
       })
-      title = `## 摘自百度翻译(good good study,day day up)${br}`
+      title = `## (good good study,day day up)${br}`
       str = title + result.join(br)
       break
 
