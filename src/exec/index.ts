@@ -67,6 +67,7 @@ export const classifyFilesGroup = (isQueryRepeat = false) => {
   } else {
     classifyNormalFilesGroup()
   }
+  writeFile('src/query/json/file-list.json', JSON.stringify(fileInfoList, null, 2))
 }
 /**
  * 文本转化并格式

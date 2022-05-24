@@ -195,7 +195,7 @@ export const getFunctionName = (path: NodePath<t.Function>) => {
         break
     }
   } else {
-    result = path.node.id!.name
+    result = path.node.id?.name || ''
   }
 
   return result

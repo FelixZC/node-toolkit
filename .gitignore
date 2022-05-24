@@ -6,7 +6,7 @@ dist
 .local
 .history
 /src-copy
-/src/api
+/src copy
 # local env files
 .env.local
 .env.*.local

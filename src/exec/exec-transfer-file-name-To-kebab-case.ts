@@ -71,7 +71,7 @@ try {
     const oldDirName = path.dirname(filePath) // 文件扩展名
 
     const relativeDir = path.relative(
-      'C:/Users/ZC/Documents/project/node-project/pzc-toolbox',
+      'C:/Users/ZC/Documents/project/node-project/toolbox',
       oldDirName
     )
     return transferRef(relativeDir, '\\')
