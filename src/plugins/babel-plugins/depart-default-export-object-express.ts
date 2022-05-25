@@ -10,6 +10,8 @@ export default declare((babel) => {
   const objectMethodList: t.ObjectMethod[] = []
   /** 重定义方法变量记录 */
   const tranferExportList: string[] = []
+  /** 已经导出的方法和变量 */
+  const alreadyExportList: string[] = []
   return {
     name: 'ast-transform',
     visitor: {
@@ -33,6 +35,7 @@ export default declare((babel) => {
           /** 方法和变量重置导出，并记录 */
           for (let index = 0; index < path.node.body.length; index++) {
             const element = path.node.body[index]
+            /** 方法定义 */
             if (t.isFunctionDeclaration(element)) {
               if (element.id) {
                 const node = t.exportNamedDeclaration(
@@ -50,6 +53,7 @@ export default declare((babel) => {
                 tranferExportList.push(element.id.name)
               }
             }
+            /** 变量定义 */
             if (t.isVariableDeclaration(element)) {
               const node = t.exportNamedDeclaration(
                 t.variableDeclaration(element.kind, element.declarations)
@@ -62,6 +66,23 @@ export default declare((babel) => {
                   tranferExportList.push(item.id.name)
                 }
               })
+            }
+            /** 查找已导出方法和变量记录 */
+            if (t.isExportNamedDeclaration(element)) {
+              /** 已导出变量定义 */
+              if (t.isVariableDeclaration(element.declaration)) {
+                element.declaration.declarations.forEach((item) => {
+                  if (t.isIdentifier(item.id)) {
+                    alreadyExportList.push(item.id.name)
+                  }
+                })
+              }
+              /** 已导出方法定义 */
+              if (t.isFunctionDeclaration(element.declaration)) {
+                if (element.declaration.id) {
+                  alreadyExportList.push(element.declaration.id.name)
+                }
+              }
             }
           }
         },
@@ -84,6 +105,10 @@ export default declare((babel) => {
           })
           path.node.body = [...departObjectMethod, ...path.node.body]
           /** 重新写入默认导出属性 */
+          const allExportList = [...tranferExportList, ...alreadyExportList]
+          if (!allExportList.length) {
+            return
+          }
           const target = path.node.body.find((item) =>
             t.isExportDefaultDeclaration(item)
           ) as t.ExportDefaultDeclaration
@@ -98,7 +123,7 @@ export default declare((babel) => {
                   existPropertyList.push(key)
                 }
               })
-              const newProperties = tranferExportList
+              const newProperties = allExportList
                 .filter((item) => !existPropertyList.includes(item))
                 .map((item) =>
                   t.objectProperty(t.identifier(item), t.identifier(item), false, true)
@@ -111,7 +136,7 @@ export default declare((babel) => {
           } else {
             const newDefaultExport = t.exportDefaultDeclaration(
               t.objectExpression(
-                tranferExportList.map((item) =>
+                allExportList.map((item) =>
                   t.objectProperty(t.identifier(item), t.identifier(item), false, true)
                 )
               )
