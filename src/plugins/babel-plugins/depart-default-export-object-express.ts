@@ -35,7 +35,7 @@ export default declare((babel) => {
             const element = path.node.body[index]
             if (t.isFunctionDeclaration(element)) {
               if (element.id) {
-                path.node.body[index] = t.exportNamedDeclaration(
+                const node = t.exportNamedDeclaration(
                   t.functionDeclaration(
                     element.id,
                     element.params,
@@ -44,13 +44,19 @@ export default declare((babel) => {
                     element.async
                   )
                 )
+                node.leadingComments = element.leadingComments
+                node.trailingComments = element.trailingComments
+                path.node.body[index] = node
                 tranferExportList.push(element.id.name)
               }
             }
             if (t.isVariableDeclaration(element)) {
-              path.node.body[index] = t.exportNamedDeclaration(
+              const node = t.exportNamedDeclaration(
                 t.variableDeclaration(element.kind, element.declarations)
               )
+              node.leadingComments = element.leadingComments
+              node.trailingComments = element.trailingComments
+              path.node.body[index] = node
               element.declarations.forEach((item) => {
                 if (t.isIdentifier(item.id)) {
                   tranferExportList.push(item.id.name)
@@ -63,7 +69,7 @@ export default declare((babel) => {
           /** 重新定义默认导出对象方法 */
           const departObjectMethod = objectMethodList.map((item) => {
             const key = (item.key as t.Identifier).name || (item.key as t.StringLiteral).value
-            const exportNamedDeclaration = t.exportNamedDeclaration(
+            const node = t.exportNamedDeclaration(
               t.functionDeclaration(
                 t.identifier(key),
                 item.params,
@@ -72,9 +78,9 @@ export default declare((babel) => {
                 item.async
               )
             )
-            exportNamedDeclaration.leadingComments = item.leadingComments
-            exportNamedDeclaration.trailingComments = item.trailingComments
-            return exportNamedDeclaration
+            node.leadingComments = item.leadingComments
+            node.trailingComments = item.trailingComments
+            return node
           })
           path.node.body = [...departObjectMethod, ...path.node.body]
           /** 重新写入默认导出属性 */
