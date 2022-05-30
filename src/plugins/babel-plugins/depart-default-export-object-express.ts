@@ -63,7 +63,10 @@ export default declare((babel) => {
               path.node.body[index] = node
               element.declarations.forEach((item) => {
                 if (t.isIdentifier(item.id)) {
-                  tranferExportList.push(item.id.name)
+                  /** 只对函数变量做处理 */
+                  if (t.isFunctionExpression(item.init) || t.isArrowFunctionExpression(item.init)) {
+                    tranferExportList.push(item.id.name)
+                  }
                 }
               })
             }
