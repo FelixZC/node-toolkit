@@ -11,6 +11,7 @@ import {
   // replaceExpressionProperty,
   // addObjectNewProperty
   getFunctionName,
+  getGeneratorOption,
   matchObjectExpress
 } from './ast-utils'
 
@@ -25,7 +26,7 @@ import sameObjectCacheRef from '../../query/json/same-object-cache.json'
 import * as t from '@babel/types'
 import type { ObjDeatil } from '../../utils/excel/typing/type' //
 // import { getFileType } from '../../utils/excel/utils/map'
-
+const options = getGeneratorOption()
 const functionNameList: (string | number)[] = [
   'annexForm',
   'tomeForm',
@@ -140,13 +141,13 @@ const saveObjectCache = (newObjectExpression: t.ObjectExpression, keys: string[]
     })
     /** 存储输出转化excel对象 */
 
-    excelObjectList.push(strToJson(generator(temp).code))
+    excelObjectList.push(strToJson(generator(temp, options).code))
     /** 存储同类项 */
 
     setValueByKeys(
       sameObjectCache,
       [...keys, propPropertyValue],
-      generator(newObjectExpression).code
+      generator(newObjectExpression, options).code
     )
   }
 }
@@ -186,7 +187,7 @@ const loadObjectCache = (newObjectExpression: t.ObjectExpression, keys: string[]
         setValueByKeys(
           newObjectCache,
           [...keys, propPropertyValue],
-          generator(localNewObjectExpression).code
+          generator(localNewObjectExpression, options).code
         )
         break
     }

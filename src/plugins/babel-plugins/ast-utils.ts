@@ -1,6 +1,7 @@
 import { NodePath } from '@babel/core'
 import * as parser from '@babel/parser'
 import * as t from '@babel/types'
+import type { GeneratorOptions } from '@babel/core'
 interface SpecifierInfo {
   source: string
   type: 'ImportSpecifier' | 'ImportNamespaceSpecifier' | 'ImportDefaultSpecifier'
@@ -314,4 +315,14 @@ export const replaceExpressionProperty = (
   }
 
   return elements
+}
+
+export const getGeneratorOption = (): GeneratorOptions => {
+  let options: GeneratorOptions = {
+    compact: 'auto',
+    concise: false,
+    retainLines: false,
+    jsescOption: { minimal: true }
+  }
+  return options
 }

@@ -2,10 +2,11 @@
  * 查询文件包含方法名，临时用
  */
 import { declare } from '@babel/helper-plugin-utils'
-import { getFunctionName } from './ast-utils'
+import { getFunctionName, getGeneratorOption } from './ast-utils'
 import { writeFile, strToJson } from '../../utils/common'
 import * as t from '@babel/types'
 import generator from '@babel/generator'
+const options = getGeneratorOption()
 // import { NodePath } from '@babel/core'
 export default declare((babel) => {
   const functionNameList: (string | number)[] = []
@@ -30,7 +31,7 @@ export default declare((babel) => {
               t.objectProperty(t.identifier(String(name)), t.identifier(String(name)), false, true)
             )
           )
-          const outputOjb = strToJson(generator(objectExpression).code)
+          const outputOjb = strToJson(generator(objectExpression, options).code)
           writeFile('src/query/json/function-name.json', JSON.stringify(outputOjb, null, 2))
         }
       }
