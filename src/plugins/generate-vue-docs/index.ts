@@ -2,7 +2,7 @@
  * 提取vue2组件信息，搬运自https://github.com/MaLuns/generate-vue-docs
  */
 import * as compiler from '@vue/compiler-sfc'
-import * as generate from '@babel/generator'
+import * as generator from '@babel/generator'
 import * as parser from '@babel/parser'
 import RenderMd from './render'
 /*  默认生成配置 */
@@ -86,7 +86,7 @@ const extractProps = (node: t.ObjectProperty | t.ObjectMethod) => {
 
     if (t.isFunction(node)) {
       try {
-        const { code } = generate.default(node.body)
+        const { code } = generator.default(node.body)
         const fun = eval(`0,function ()${code}`)
         return JSON.stringify(fun())
       } catch (error) {}
@@ -116,7 +116,7 @@ const extractProps = (node: t.ObjectProperty | t.ObjectMethod) => {
             } else if (subKey === 'default') {
               props[key][subKey] = getDefaultVal(item.value)
             } else if (subKey === 'validator') {
-              props[key][key] = generate.default(item).code
+              props[key][key] = generator.default(item).code
             } else if (subKey === 'required' && t.isBooleanLiteral(item.value)) {
               props[key][subKey] = item.value.value
             }

@@ -3,6 +3,7 @@ import generator from '@babel/generator'
 import * as parser from '@babel/parser'
 import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
 import traverse from '@babel/traverse'
+import { getGeneratorOption } from './babel-plugins/ast-utils'
 import type * as Babel from '@babel/core'
 import type { PluginObj, Visitor } from '@babel/core'
 import type { ExecFileInfo } from './common'
@@ -14,7 +15,7 @@ export interface CustomPluginObj extends PluginObj {
 export interface BabelPlugin {
   (babel: BabelAPI): CustomPluginObj
 }
-
+const options = getGeneratorOption()
 const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
   try {
     /** 1，先将代码转换成ast */
@@ -34,16 +35,7 @@ const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
       }
     }
     /** 3，生成新的代码，第一个参数是AST，第二个是一些可选项，第三个参数是原始的code */
-
-    const newCode = generator(
-      codeAst,
-      {
-        compact: 'auto',
-        concise: false,
-        retainLines: false
-      },
-      execFileInfo.source
-    )
+    const newCode = generator(codeAst, options, execFileInfo.source)
     /** 会返回一个对象，code就是生成后的新代码 */
 
     return `\n${newCode.code}\n`

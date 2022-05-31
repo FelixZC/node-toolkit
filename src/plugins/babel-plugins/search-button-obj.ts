@@ -3,12 +3,13 @@
  */
 import { cloneDeep } from 'lodash'
 import { declare } from '@babel/helper-plugin-utils'
-import { findObjectPropertyWithKey, getParentFunctionName } from './ast-utils'
+import { findObjectPropertyWithKey, getGeneratorOption, getParentFunctionName } from './ast-utils'
 // 返回权限串
-import generate from '@babel/generator'
+import generator from '@babel/generator'
 import { NodePath } from '@babel/core'
 import { strToJson } from '../../utils/common'
 import * as t from '@babel/types'
+const options = getGeneratorOption()
 
 const authorizationString = (
   isTome: boolean,
@@ -112,9 +113,9 @@ export default declare((babel) => {
       let code: string
 
       try {
-        code = strToJson(generate(outNode).code)
+        code = strToJson(generator(outNode, options).code)
       } catch {
-        code = generate(outNode).code
+        code = generator(outNode, options).code
       }
 
       extra[functionName].push(code)
