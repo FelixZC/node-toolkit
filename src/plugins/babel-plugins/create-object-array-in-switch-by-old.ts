@@ -26,7 +26,6 @@ import sameObjectCacheRef from '../../query/json/same-object-cache.json'
 import * as t from '@babel/types'
 import type { ObjDeatil } from '../../utils/excel/typing/type' //
 // import { getFileType } from '../../utils/excel/utils/map'
-const options = getGeneratorOption()
 const functionNameList: (string | number)[] = [
   'annexForm',
   'tomeForm',
@@ -141,13 +140,13 @@ const saveObjectCache = (newObjectExpression: t.ObjectExpression, keys: string[]
     })
     /** 存储输出转化excel对象 */
 
-    excelObjectList.push(strToJson(generator(temp, options).code))
+    excelObjectList.push(strToJson(generator(temp, getGeneratorOption()).code))
     /** 存储同类项 */
 
     setValueByKeys(
       sameObjectCache,
       [...keys, propPropertyValue],
-      generator(newObjectExpression, options).code
+      generator(newObjectExpression, getGeneratorOption()).code
     )
   }
 }
@@ -187,7 +186,7 @@ const loadObjectCache = (newObjectExpression: t.ObjectExpression, keys: string[]
         setValueByKeys(
           newObjectCache,
           [...keys, propPropertyValue],
-          generator(localNewObjectExpression, options).code
+          generator(localNewObjectExpression, getGeneratorOption()).code
         )
         break
     }

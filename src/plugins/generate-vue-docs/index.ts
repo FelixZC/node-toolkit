@@ -11,6 +11,7 @@ import * as t from '@babel/types'
 import * as traverse from '@babel/traverse'
 import { NodePath } from '@babel/traverse'
 import type { AttributeNode, ElementNode, TemplateChildNode } from '@vue/compiler-core'
+import { getParserOption } from '../babel-plugins/ast-utils'
 const baseConfig = {
   md: false
 }
@@ -334,11 +335,7 @@ const parseDocs = (vueStr: string, config: Record<string, any> = {}) => {
   })
 
   if (script.content.length) {
-    const jst = parser.parse(script.content, {
-      allowImportExportEverywhere: false,
-      plugins: ['decorators-legacy', 'jsx', 'typescript'],
-      sourceType: 'module'
-    })
+    const jst = parser.parse(script.content, getParserOption())
     traverse.default(jst, {
       ExportDefaultDeclaration(path) {
         /*  组件描述 */

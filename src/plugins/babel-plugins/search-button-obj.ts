@@ -9,8 +9,6 @@ import generator from '@babel/generator'
 import { NodePath } from '@babel/core'
 import { strToJson } from '../../utils/common'
 import * as t from '@babel/types'
-const options = getGeneratorOption()
-
 const authorizationString = (
   isTome: boolean,
   tomeAuthorization: string,
@@ -113,9 +111,9 @@ export default declare((babel) => {
       let code: string
 
       try {
-        code = strToJson(generator(outNode, options).code)
+        code = strToJson(generator(outNode, getGeneratorOption()).code)
       } catch {
-        code = generator(outNode, options).code
+        code = generator(outNode, getGeneratorOption()).code
       }
 
       extra[functionName].push(code)

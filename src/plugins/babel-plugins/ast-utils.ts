@@ -1,7 +1,7 @@
 import { NodePath } from '@babel/core'
 import * as parser from '@babel/parser'
 import * as t from '@babel/types'
-import type { GeneratorOptions } from '@babel/core'
+import type { GeneratorOptions, ParserOptions } from '@babel/core'
 interface SpecifierInfo {
   source: string
   type: 'ImportSpecifier' | 'ImportNamespaceSpecifier' | 'ImportDefaultSpecifier'
@@ -323,6 +323,15 @@ export const getGeneratorOption = (): GeneratorOptions => {
     concise: false,
     retainLines: false,
     jsescOption: { minimal: true }
+  }
+  return options
+}
+
+export const getParserOption = (): ParserOptions => {
+  const options: ParserOptions = {
+    allowImportExportEverywhere: false,
+    plugins: ['decorators-legacy', 'jsx', 'typescript'],
+    sourceType: 'module'
   }
   return options
 }
