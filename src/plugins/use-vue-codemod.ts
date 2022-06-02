@@ -1,14 +1,15 @@
-import createDebug from 'debug' // @ts-ignore
-
+import createDebug from 'debug'
+//@ts-ignore
 import getParser from 'jscodeshift/src/getParser'
 import jscodeshift, { Parser, Transform } from 'jscodeshift'
+import * as compiler from '@vue/compiler-sfc'
 import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
 import VueTransformation from './vuecodemods/vue-transformation'
 /**
  * The following file is adapted from https://github.com/vuejs/vue-codemod.git
  */
 
-import type { SFCDescriptor } from './sfc-utils'
+import type { SFCDescriptor, SFCScriptBlock } from '@vue/compiler-sfc'
 const debug = createDebug('vue-codemod')
 type FileInfo = {
   path: string
@@ -34,8 +35,8 @@ export default function runTransformation(
   transformationModule: TransformationModule,
   params: object = {}
 ) {
-  let transformation: VueTransformation | JSTransformation // @ts-ignore
-
+  let transformation: VueTransformation | JSTransformation
+  // @ts-ignore
   if (typeof transformationModule.default !== 'undefined') {
     // @ts-ignore
     transformation = transformationModule.default
@@ -52,16 +53,16 @@ export default function runTransformation(
   const { path, source } = fileInfo
   const extension = (/\.([^.]*)$/.exec(path) || [])[0]
   let lang = extension.slice(1)
-  let descriptor: SFCDescriptor
-
+  let descriptor!: SFCDescriptor
+  let scriptBlock!: SFCScriptBlock
   if (extension === '.vue') {
-    descriptor = parseSFC(source, {
-      filename: path
-    }).descriptor // skip .vue files without script block
-
-    const scriptBlock = descriptor.script || descriptor.scriptSetup
-
-    if (!scriptBlock) {
+    const sfcParseResult = parseSFC(source, { filename: path })
+    descriptor = sfcParseResult.descriptor
+    scriptBlock = compiler.compileScript(descriptor, {
+      id: 'pzc'
+    })
+    /** skip vue files without script block */
+    if (!scriptBlock?.content) {
       return source
     }
 
@@ -92,19 +93,16 @@ export default function runTransformation(
   const out = transformation(fileInfo, api, params)
 
   if (!out) {
-    return source // skipped
-  } // need to reconstruct the .vue file from descriptor blocks
+    return source
+  }
 
   if (extension === '.vue') {
-    const scriptBlock = descriptor!.script || descriptor!.scriptSetup
-
-    if (out === scriptBlock?.content) {
-      return source // skipped, don't bother re-stringifying
+    if (out === scriptBlock.content) {
+      return source
     }
-
-    scriptBlock!.content = out
-    descriptor!.script = scriptBlock
-    return stringifySFC(descriptor!)
+    scriptBlock.content = out
+    descriptor.script = scriptBlock
+    return stringifySFC(descriptor)
   }
 
   return out

@@ -1,15 +1,4 @@
-import {
-  BindingMetadata,
-  CodegenResult,
-  CompilerError,
-  CompilerOptions,
-  ElementNode,
-  NodeTypes,
-  ParserOptions,
-  RootNode,
-  SourceLocation,
-  TextModes
-} from '@vue/compiler-core'
+import { CompilerError, ElementNode, NodeTypes, TextModes } from '@vue/compiler-core'
 
 /**
  * The following function is adapted from https://github.com/psalaets/vue-sfc-descriptor-to-string/blob/master/index.js
@@ -37,8 +26,16 @@ import {
  * THE SOFTWARE.
  */
 import * as CompilerDom from '@vue/compiler-dom'
+import type {
+  SFCParseOptions,
+  SFCBlock,
+  SFCTemplateBlock,
+  SFCScriptBlock,
+  SFCStyleBlock,
+  SFCDescriptor,
+  SFCParseResult
+} from '@vue/compiler-sfc'
 import { RawSourceMap, SourceMapGenerator } from 'source-map'
-import { Statement } from '@babel/types'
 export function stringify(sfcDescriptor: SFCDescriptor) {
   const { customBlocks, script, styles, template } = sfcDescriptor
   return (
@@ -99,56 +96,6 @@ function makeCloseTag(block: SFCBlock) {
 /**
  * The following content are modifed from https://github.com/vuejs/vue-next/blob/master/packages/compiler-sfc/src/parse.ts
  */
-
-export interface TemplateCompiler {
-  compile(template: string, options: CompilerOptions): CodegenResult
-  parse(template: string, options: ParserOptions): RootNode
-}
-export interface SFCParseOptions {
-  filename?: string
-  sourceMap?: boolean
-  sourceRoot?: string
-  pad?: boolean | 'line' | 'space'
-  compiler?: TemplateCompiler
-}
-export interface SFCBlock {
-  type: string
-  content: string
-  attrs: Record<string, string | true>
-  loc: SourceLocation
-  map?: RawSourceMap
-  lang?: string
-  src?: string
-}
-export interface SFCTemplateBlock extends SFCBlock {
-  type: 'template'
-  ast: ElementNode
-}
-export interface SFCScriptBlock extends SFCBlock {
-  type: 'script'
-  setup?: string | boolean
-  bindings?: BindingMetadata
-  scriptAst?: Statement[]
-  scriptSetupAst?: Statement[]
-}
-export interface SFCStyleBlock extends SFCBlock {
-  type: 'style'
-  scoped?: boolean
-  module?: string | boolean
-}
-export interface SFCDescriptor {
-  filename: string
-  source: string
-  template: SFCTemplateBlock | null
-  script: SFCScriptBlock | null
-  scriptSetup: SFCScriptBlock | null
-  styles: SFCStyleBlock[]
-  customBlocks: SFCBlock[]
-}
-export interface SFCParseResult {
-  descriptor: SFCDescriptor
-  errors: (CompilerError | SyntaxError)[]
-}
 const SFC_CACHE_MAX_SIZE = 500
 const sourceToSFC = new (require('lru-cache'))(SFC_CACHE_MAX_SIZE) as Map<string, SFCParseResult>
 export function parse(
@@ -175,7 +122,10 @@ export function parse(
     scriptSetup: null,
     source,
     styles: [],
-    template: null
+    template: null,
+    cssVars: [],
+    slotted: false,
+    shouldForceReload: () => false
   }
   const errors: (CompilerError | SyntaxError)[] = []
   const ast = compiler.parse(source, {

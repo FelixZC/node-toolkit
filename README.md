@@ -77,13 +77,15 @@ pzc-toolbox                                             //
 │  │  ├─ babel-plugins                                  //babel插件
 │  │  │  ├─ ast-utils.ts                                //babel工具方法集合
 │  │  │  ├─ create-object-array-in-switch-by-old.ts     //操作switch中对象数组
-│  │  │  ├─ czl.ts                                      //
+│  │  │  ├─ czl.ts                                      //czl练习
 │  │  │  ├─ depart-default-export-object-express.ts     //重置导出
 │  │  │  ├─ depart-switch.ts                            //分离switch
 │  │  │  ├─ extract-annotation.ts                       //提取注释
 │  │  │  ├─ get-all-function-name.ts                    //获取单一文件方法名
 │  │  │  ├─ import-sort.ts                              //导入排序
 │  │  │  ├─ move-default-export-to-last.ts              //移动默认导出
+│  │  │  ├─ remove-invalid-comment.ts                   //移除包含this的无效注释
+│  │  │  ├─ replace-memberExpress-object-or-property.ts //替换表达式的调用对象或者调用属性
 │  │  │  ├─ remove-invalid-comment.ts                   //移除包含this的无效注释
 │  │  │  ├─ search-button-obj.ts                        //查询按钮对象
 │  │  │  ├─ sort-object-array-by-index.ts               //对象数组按index排序

@@ -13,7 +13,7 @@ const babelPluginPathList: string[] = [
   // '../plugins/babel-plugins/search-button-obj'
   // '../plugins/babel-plugins/create-object-array-in-switch-by-old'
   // '../plugins/babel-plugins/depart-default-export-object-express'
-  // '../plugins/babel-plugins/replace-callee-object'
+  // '../plugins/babel-plugins/replace-memberExpress-object-or-property'
 ]
 
 try {

@@ -61,7 +61,7 @@
     "posthtml-parser": "^0.11.0",
     "posthtml-render": "^3.0.0",
     "prettier": "^2.6.2",
-    "source-map": "^0.7.3",
+    "source-map": "^0.6.1",
     "sugarss": "^4.0.1",
     "ts-jest": "^28.0.2",
     "typescript": "^4.6.4",
