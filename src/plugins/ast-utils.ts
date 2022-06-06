@@ -1,5 +1,4 @@
 import type { ElementNode, TemplateChildNode } from '@vue/compiler-core'
-
 export interface TemplateVisitor {
   [tag: string]: (node: ElementNode, parent?: ElementNode) => ElementNode | undefined
 }

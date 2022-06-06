@@ -3,12 +3,13 @@
  */
 import { cloneDeep } from 'lodash'
 import { declare } from '@babel/helper-plugin-utils'
-import { findObjectPropertyWithKey, getGeneratorOption, getParentFunctionName } from './ast-utils'
-// 返回权限串
+import { findObjectPropertyWithKey, getGeneratorOption, getParentFunctionName } from './ast-utils' // 返回权限串
+
 import generator from '@babel/generator'
 import { NodePath } from '@babel/core'
 import { strToJson } from '../../utils/common'
 import * as t from '@babel/types'
+
 const authorizationString = (
   isTome: boolean,
   tomeAuthorization: string,

@@ -37,14 +37,14 @@ const syntax = require('postcss-syntax')({
 
 const getSyntax = (stypeType: string | undefined) => {
   switch (stypeType) {
+    case 'less':
+      return require('postcss-less')
+
     case 'sass':
       return require('postcss-sass')
 
     case 'scss':
       return require('postcss-scss')
-
-    case 'less':
-      return require('postcss-less')
 
     case 'unknown':
       return undefined

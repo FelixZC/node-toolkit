@@ -110,6 +110,7 @@ function textFormat(content: string, mode = 'md') {
         return localItem
       })
       str = title + result.join(br)
+      break
   }
 
   return str

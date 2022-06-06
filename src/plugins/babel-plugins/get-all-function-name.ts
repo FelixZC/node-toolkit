@@ -2,11 +2,11 @@
  * 查询文件包含方法名，临时用
  */
 import { declare } from '@babel/helper-plugin-utils'
+import generator from '@babel/generator' // import { NodePath } from '@babel/core'
+
 import { getFunctionName, getGeneratorOption } from './ast-utils'
-import { writeFile, strToJson } from '../../utils/common'
+import { strToJson, writeFile } from '../../utils/common'
 import * as t from '@babel/types'
-import generator from '@babel/generator'
-// import { NodePath } from '@babel/core'
 export default declare((babel) => {
   const functionNameList: (string | number)[] = []
   return {
@@ -15,6 +15,7 @@ export default declare((babel) => {
       Function(path) {
         try {
           const functionName = getFunctionName(path)
+
           if (functionName && !functionNameList.includes(functionName)) {
             functionNameList.push(functionName)
           }
@@ -23,6 +24,7 @@ export default declare((babel) => {
           console.log(path.node)
         }
       },
+
       Program: {
         exit(path) {
           const objectExpression = t.objectExpression(

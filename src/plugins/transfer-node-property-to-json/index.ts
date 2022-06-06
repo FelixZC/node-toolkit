@@ -1,13 +1,12 @@
 import * as compiler from '@vue/compiler-sfc'
-import type { ExecFileInfo } from '../common'
-// import * as generator from '@babel/generator'
+import { writeFile } from '../../utils/common'
+import type { ExecFileInfo } from '../common' // import * as generator from '@babel/generator'
 // import * as parser from '@babel/parser'
 // import * as t from '@babel/types'
 // import * as traverse from '@babel/traverse'
 // import { NodePath } from '@babel/traverse'
 // import type { AttributeNode, ElementNode, TemplateChildNode } from '@vue/compiler-core'
 // import { getParserOption } from '../babel-plugins/ast-utils'
-
 // export declare const enum NodeTypes {
 //   ROOT = 0,
 //   ELEMENT = 1,
@@ -39,7 +38,7 @@ import type { ExecFileInfo } from '../common'
 // }
 
 import type { SFCParseOptions } from '@vue/compiler-sfc'
-import { writeFile } from '../../utils/common'
+
 const transferNodePropertyToJson = (fileInfo: ExecFileInfo, option?: SFCParseOptions) => {
   const vue = compiler.parse(fileInfo.source, option)
   const styles = vue.descriptor.styles
@@ -48,7 +47,9 @@ const transferNodePropertyToJson = (fileInfo: ExecFileInfo, option?: SFCParseOpt
     filename: vue.descriptor.filename,
     id: 'pzc'
   })
-  const compileScriptResult = compiler.compileScript(vue.descriptor, { id: 'pzc' })
+  const compileScriptResult = compiler.compileScript(vue.descriptor, {
+    id: 'pzc'
+  })
   const compileStyleResult = styles.map((style) => {
     return compiler.compileStyle({
       source: style.content,
@@ -67,7 +68,7 @@ const transferNodePropertyToJson = (fileInfo: ExecFileInfo, option?: SFCParseOpt
   )
   writeFile('src/query/sfc/compileScriptResult.json', JSON.stringify(compileScriptResult, null, 2))
   writeFile('src/query/sfc/compileStyleResult.json', JSON.stringify(compileStyleResult, null, 2))
-
   return ''
 }
+
 export default transferNodePropertyToJson

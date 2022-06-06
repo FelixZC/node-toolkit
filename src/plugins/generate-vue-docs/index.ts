@@ -3,6 +3,7 @@
  */
 import * as compiler from '@vue/compiler-sfc'
 import * as generator from '@babel/generator'
+import { getParserOption } from '../babel-plugins/ast-utils'
 import * as parser from '@babel/parser'
 import RenderMd from './render'
 /*  默认生成配置 */
@@ -10,9 +11,8 @@ import RenderMd from './render'
 import * as t from '@babel/types'
 import * as traverse from '@babel/traverse'
 import { NodePath } from '@babel/traverse'
-import type { AttributeNode } from '@vue/compiler-core'
-import { getParserOption } from '../babel-plugins/ast-utils'
 import { traverserTemplateAst } from '../ast-utils'
+import type { AttributeNode } from '@vue/compiler-core'
 const baseConfig = {
   md: false
 }

@@ -22,6 +22,7 @@ export default declare((babel) => {
                 }
               }
               /** 处理case穿透情况 */
+
               if (!path.node.consequent.length) {
                 let next = path
 
@@ -47,6 +48,7 @@ export default declare((babel) => {
                 const returnTarget = path.node.consequent.find((element) =>
                   t.isReturnStatement(element)
                 )
+
                 if (!breakTarget && !returnTarget) {
                   path.node.consequent.push(t.breakStatement())
                 }

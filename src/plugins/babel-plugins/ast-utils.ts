@@ -191,6 +191,9 @@ export const getFunctionName = (path: NodePath<t.Function>) => {
         break
 
       case 'NumericLiteral':
+        result = path.node.key.value
+        break
+
       case 'StringLiteral':
         result = path.node.key.value
         break
@@ -274,16 +277,17 @@ export const createObjectTemplateNode = (input: Record<string, any> | string) =>
             valueNode = t.booleanLiteral(value)
             break
 
-          case 'string':
-            valueNode = t.stringLiteral(value)
-            break
-
           case 'number':
             valueNode = t.numericLiteral(value)
             break
 
+          case 'string':
+            valueNode = t.stringLiteral(value)
+            break
+
           default:
             valueNode = t.nullLiteral()
+            break
         }
 
         return t.objectProperty(t.identifier(key), valueNode)
@@ -316,17 +320,17 @@ export const replaceExpressionProperty = (
 
   return elements
 }
-
 export const getGeneratorOption = (): GeneratorOptions => {
   let options: GeneratorOptions = {
     compact: 'auto',
     concise: false,
     retainLines: false,
-    jsescOption: { minimal: true }
+    jsescOption: {
+      minimal: true
+    }
   }
   return options
 }
-
 export const getParserOption = (): ParserOptions => {
   const options: ParserOptions = {
     allowImportExportEverywhere: false,

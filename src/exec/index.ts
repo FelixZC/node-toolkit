@@ -68,6 +68,7 @@ export const classifyFilesGroup = (isQueryRepeat = false) => {
   } else {
     classifyNormalFilesGroup()
   }
+
   writeFile('src/query/json/file-list.json', JSON.stringify(fileInfoList, null, 2))
 }
 /**
@@ -216,7 +217,7 @@ export const getComponentDescription = () => {
     })
 
     if (mdContent.length) {
-      str += `## ${path.relative('./', filePath)}` + br
+      str += `## ${path.relative('./', filePath)}${br}`
       str += mdContent + br
     }
 
@@ -548,7 +549,6 @@ export const execCodemod = (codemodList: Transform[], targetPath?: string) => {
     }
   }
 }
-
 export const execTransferNodePropertyToJson = () => {
   const handler = (filePath: string) => {
     try {
@@ -568,9 +568,11 @@ export const execTransferNodePropertyToJson = () => {
       console.warn(e)
     }
   }
+
   const vaildList = ['.vue']
   const targetList = fileInfoList.filter((fileInfo) => vaildList.includes(fileInfo.extname))
   const { updateBar } = cliProgress.useCliProgress(targetList.length)
+
   for (const item of targetList) {
     handler(item.filePath)
     updateBar()

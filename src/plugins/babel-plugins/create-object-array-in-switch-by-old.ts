@@ -14,7 +14,6 @@ import {
   getGeneratorOption,
   matchObjectExpress
 } from './ast-utils'
-
 import { declare } from '@babel/helper-plugin-utils'
 import { defaultObjDeatil } from '../../utils/excel/excel-to-json'
 import formRef from '../../utils/excel/output/index'
@@ -26,6 +25,7 @@ import sameObjectCacheRef from '../../query/json/same-object-cache.json'
 import * as t from '@babel/types'
 import type { ObjDeatil } from '../../utils/excel/typing/type' //
 // import { getFileType } from '../../utils/excel/utils/map'
+
 const functionNameList: (string | number)[] = [
   'annexForm',
   'tomeForm',
@@ -168,20 +168,33 @@ const loadObjectCache = (newObjectExpression: t.ObjectExpression, keys: string[]
   if (statusProperty && propProperty) {
     const statusPropertyValue = (statusProperty.value as t.StringLiteral).value
     const propPropertyValue = (propProperty.value as t.StringLiteral).value
-
+    let sameObject
     switch (true) {
       /**存在新增标志， prop值为空*/
       case statusPropertyValue === 'newAdd' && !propPropertyValue:
-      /**存在重置标志,自己在代码里批量指定添加 */
-
-      case statusPropertyValue === 'reset':
         //获取同类项
-        const sameObject = getValueByKeys(sameObjectCacheRef, [...keys, propPropertyValue]) //复写同类项
+        sameObject = getValueByKeys(sameObjectCacheRef, [...keys, propPropertyValue]) //复写同类项
 
         if (sameObject) {
           localNewObjectExpression = parser.parseExpression(sameObject) as t.ObjectExpression
         }
         /** 保存复写记录 */
+
+        setValueByKeys(
+          newObjectCache,
+          [...keys, propPropertyValue],
+          generator(localNewObjectExpression, getGeneratorOption()).code
+        )
+        break
+
+      /**存在重置标志,自己在代码里批量指定添加 */
+
+      case statusPropertyValue === 'reset':
+        sameObject = getValueByKeys(sameObjectCacheRef, [...keys, propPropertyValue])
+
+        if (sameObject) {
+          localNewObjectExpression = parser.parseExpression(sameObject) as t.ObjectExpression
+        }
 
         setValueByKeys(
           newObjectCache,
