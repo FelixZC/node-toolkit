@@ -35,6 +35,7 @@ const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
 
     return `\n${newCode.code}\n`
   } catch (e) {
+    console.error(e)
     return execFileInfo.source
   }
 }
@@ -43,24 +44,25 @@ const runBabelPlugin = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) 
   if (!pluginsList.length) {
     return execFileInfo.source
   }
+  const { path, source } = execFileInfo
 
-  if (!execFileInfo.path.endsWith('.vue')) {
+  if (!path.endsWith('.vue')) {
     return transform(execFileInfo, pluginsList)
   }
-
-  const { descriptor } = parseSFC(execFileInfo.source, {
-    filename: execFileInfo.path
+  const { descriptor } = parseSFC(source, {
+    filename: path
   })
-  const scriptBlock = descriptor.script || descriptor.scriptSetup
-
-  if (scriptBlock) {
-    execFileInfo.source = scriptBlock.content
-    const out = transform(execFileInfo, pluginsList)
-    scriptBlock.content = out
+  if (!descriptor.script?.content && !descriptor.scriptSetup?.content) {
+    return source
   }
-  /** 强制重新赋值 */
-
-  descriptor.script = scriptBlock
+  if (descriptor.script && descriptor.script.content) {
+    execFileInfo.source = descriptor.script.content
+    descriptor.script.content = transform(execFileInfo, pluginsList)
+  }
+  if (descriptor.scriptSetup && descriptor.scriptSetup.content) {
+    execFileInfo.source = descriptor.scriptSetup.content
+    descriptor.scriptSetup.content = transform(execFileInfo, pluginsList)
+  }
   return stringifySFC(descriptor)
 }
 

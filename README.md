@@ -113,33 +113,9 @@ pzc-toolbox                                             //
 │  │  │  └─ transfer-file-name-tok-kebab-case.ts        //驼峰转化
 │  │  ├─ sfc-utils.ts                                   //@vue/compiler-sfc封装方法集合
 │  │  ├─ use-babel-plugin.ts                            //Babel插件使用包装
-│  │  ├─ use-js-codemod.ts                              //codemod使用包装
+│  │  ├─ use-codemod.ts                                 //codemod使用包装
 │  │  ├─ use-postcss-plugin.ts                          //postcss使用包装
 │  │  ├─ use-posthtml-plugin.ts                         //posthtml使用包装
-│  │  ├─ use-vue-codemod.ts                             //vue-codemod使用包装
-│  │  ├─ vuecodemods                                    //codemode-vue集合
-│  │  │  ├─ add-import.ts                               //
-│  │  │  ├─ ast-utils.ts                                //jscodemod工具方法集合
-│  │  │  ├─ define-component.ts                         //
-│  │  │  ├─ import-composition-api-from-vue.ts          //
-│  │  │  ├─ index.ts                                    //
-│  │  │  ├─ new-directive-api.ts                        //
-│  │  │  ├─ new-global-api.ts                           //
-│  │  │  ├─ new-vue-to-create-app.ts                    //
-│  │  │  ├─ noop.ts                                     //
-│  │  │  ├─ remove-contextualh-from-render.ts           //
-│  │  │  ├─ remove-extraneous-import.ts                 //
-│  │  │  ├─ remove-production-tip.ts                    //
-│  │  │  ├─ remove-trivial-root.ts                      //
-│  │  │  ├─ remove-vue-use.ts                           //
-│  │  │  ├─ root-prop-to-use.ts                         //
-│  │  │  ├─ scoped-slots-to-slots.ts                    //
-│  │  │  ├─ vue-as-namespace-import.ts                  //
-│  │  │  ├─ vue-class-component-v8.ts                   //
-│  │  │  ├─ vue-router-v4.ts                            //
-│  │  │  ├─ vue-transformation.ts                       //
-│  │  │  └─ vuex-v4.ts                                  //
-│  │  └─ wrap-ast-transformation.ts                     //
 │  ├─ query                                             //查询结果和文件输出
 │  │  ├─ excel                                          //
 │  │  │  └─ test.json                                   //

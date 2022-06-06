@@ -6,10 +6,11 @@ import mdUtils from '../utils/md'
 import * as os from 'os'
 import * as path from 'path'
 import runBabelPlugin from '../plugins/use-babel-plugin'
-import runCodemod from '../plugins/use-js-codemod'
+import runCodemod from '../plugins/use-codemod'
 import runPostcssPlugin from '../plugins/use-postcss-plugin'
 import runPosthtmlPlugin from '../plugins/use-posthtml-plugin'
 import storeFile from '../query/js/stote-state'
+import transferNodePropertyToJson from '../plugins/transfer-node-property-to-json'
 import type { BabelPlugin } from '../plugins/use-babel-plugin'
 import type { ExecFileInfo } from '../plugins/common'
 import type { FileInfo } from '../utils/fs'
@@ -522,7 +523,7 @@ export const execCodemod = (codemodList: Transform[], targetPath?: string) => {
         path: filePath,
         source: content
       }
-      const newContent = runCodemod(execFileInfo, codemodList)
+      const newContent = runCodemod(execFileInfo, codemodList, {})
 
       if (newContent === content || !newContent.length) {
         return
@@ -545,5 +546,33 @@ export const execCodemod = (codemodList: Transform[], targetPath?: string) => {
       handler(item.filePath)
       updateBar()
     }
+  }
+}
+
+export const execTransferNodePropertyToJson = () => {
+  const handler = (filePath: string) => {
+    try {
+      const content = fs.readFileSync(filePath, 'utf-8')
+      const execFileInfo: ExecFileInfo = {
+        path: filePath,
+        source: content
+      }
+      const newContent = transferNodePropertyToJson(execFileInfo)
+
+      if (newContent === content || !newContent.length) {
+        return
+      }
+
+      writeFile(filePath, newContent)
+    } catch (e) {
+      console.warn(e)
+    }
+  }
+  const vaildList = ['.vue']
+  const targetList = fileInfoList.filter((fileInfo) => vaildList.includes(fileInfo.extname))
+  const { updateBar } = cliProgress.useCliProgress(targetList.length)
+  for (const item of targetList) {
+    handler(item.filePath)
+    updateBar()
   }
 }
