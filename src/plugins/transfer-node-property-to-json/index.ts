@@ -1,6 +1,9 @@
 import * as compiler from '@vue/compiler-sfc'
 import { writeFile } from '../../utils/common'
-import type { ExecFileInfo } from '../common' // import * as generator from '@babel/generator'
+import type { ExecFileInfo } from '../common'
+import { generate, createRoot } from '@vue/compiler-core'
+// import { RootNode, NodeTypes, createSimpleExpression, locStub } from '@vue/compiler-core'
+// import * as generator from '@babel/generator'
 // import * as parser from '@babel/parser'
 // import * as t from '@babel/types'
 // import * as traverse from '@babel/traverse'
@@ -36,39 +39,36 @@ import type { ExecFileInfo } from '../common' // import * as generator from '@ba
 //   JS_SEQUENCE_EXPRESSION = 25,
 //   JS_RETURN_STATEMENT = 26
 // }
+// function createRoot(options: Partial<RootNode> = {}): RootNode {
+//   return {
+//     type: NodeTypes.ROOT,
+//     children: [],
+//     helpers: [],
+//     components: [],
+//     directives: [],
+//     imports: [],
+//     hoists: [],
+//     cached: 0,
+//     temps: 0,
+//     codegenNode: createSimpleExpression(`null`, false),
+//     loc: locStub,
+//     ...options
+//   }
+// }
 
 import type { SFCParseOptions } from '@vue/compiler-sfc'
-
+import { stringify } from '../sfc-utils'
 const transferNodePropertyToJson = (fileInfo: ExecFileInfo, option?: SFCParseOptions) => {
   const vue = compiler.parse(fileInfo.source, option)
-  const styles = vue.descriptor.styles
-  const compileTemplateResult = compiler.compileTemplate({
-    source: vue.descriptor.template?.content || '',
-    filename: vue.descriptor.filename,
-    id: 'pzc'
-  })
-  const compileScriptResult = compiler.compileScript(vue.descriptor, {
-    id: 'pzc'
-  })
-  const compileStyleResult = styles.map((style) => {
-    return compiler.compileStyle({
-      source: style.content,
-      filename: vue.descriptor.filename,
-      id: 'pzc'
-    })
-  })
+  if (vue.descriptor.template) {
+    const rootNode = createRoot([vue.descriptor.template.ast])
+    const generateResult = generate(rootNode)
+    writeFile('src/query/sfc/rootNode.json', JSON.stringify(rootNode, null, 2))
+    writeFile('src/query/sfc/generateResult.json', JSON.stringify(generateResult, null, 2))
+  }
   writeFile('src/query/sfc/vue.json', JSON.stringify(vue, null, 2))
-  writeFile('src/query/sfc/template.json', JSON.stringify(vue.descriptor.template, null, 2))
-  writeFile('src/query/sfc/script.json', JSON.stringify(vue.descriptor.script, null, 2))
-  writeFile('src/query/sfc/scriptSetup.json', JSON.stringify(vue.descriptor.scriptSetup, null, 2))
-  writeFile('src/query/sfc/styles.json', JSON.stringify(vue.descriptor.styles, null, 2))
-  writeFile(
-    'src/query/sfc/compileTemplateResult.json',
-    JSON.stringify(compileTemplateResult, null, 2)
-  )
-  writeFile('src/query/sfc/compileScriptResult.json', JSON.stringify(compileScriptResult, null, 2))
-  writeFile('src/query/sfc/compileStyleResult.json', JSON.stringify(compileStyleResult, null, 2))
-  return ''
+  //TODO 遍历template.ast，修改ast，修改对应script代码， 转化为posthtml-render可输入ast?，输出新template
+  return stringify(vue.descriptor)
 }
 
 export default transferNodePropertyToJson

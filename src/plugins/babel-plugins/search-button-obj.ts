@@ -108,13 +108,11 @@ export default declare((babel) => {
       if (!extra[functionName]) {
         extra[functionName] = []
       }
-
       let code: string
-
       try {
-        code = strToJson(generator(outNode, getGeneratorOption()).code)
+        code = strToJson(generator(outNode, getGeneratorOption(), '').code)
       } catch {
-        code = generator(outNode, getGeneratorOption()).code
+        code = generator(outNode, getGeneratorOption(), '').code
       }
 
       extra[functionName].push(code)

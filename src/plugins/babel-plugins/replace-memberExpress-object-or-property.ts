@@ -2,7 +2,7 @@
  * 替换表达式的调用对象或者调用属性
  */
 import { declare } from '@babel/helper-plugin-utils'
-import generate from '@babel/generator'
+import generator from '@babel/generator'
 import { getImportInfo } from './ast-utils'
 import * as t from '@babel/types'
 import { template } from '@babel/core'
@@ -45,7 +45,7 @@ export default declare((babel) => {
    */
 
   const replaceMemberExpressionObject = (path: NodePath<t.MemberExpression>) => {
-    let ref = generate(path.node.property).code
+    let ref = generator(path.node.property).code
     /** 是否为匹配属性 */
 
     const replaceObj = replaceObjectList.find((item) => item.property === ref)
@@ -57,7 +57,7 @@ export default declare((babel) => {
         t.isMemberExpression(parentPath.node) &&
         t.isMemberExpression(path.node.object) &&
         replaceObj.upLevelObjectType === 'MemberExpression' &&
-        replaceObj.upLevelObjectName === generate(path.node.object.property).code
+        replaceObj.upLevelObjectName === generator(path.node.object.property).code
       ) {
         parentPath.node.object = t.identifier(replaceObj.newObjectName)
         !refList.includes(ref) && refList.push(ref)
@@ -78,14 +78,14 @@ export default declare((babel) => {
    */
 
   const replaceMemberExpressionProperty = (path: NodePath<t.MemberExpression>) => {
-    let ref = generate(path.node.property).code
+    let ref = generator(path.node.property).code
     const replaceObj = replacePropertyList.find((item) => item.property === ref)
 
     if (replaceObj) {
       if (
         t.isMemberExpression(path.node.object) &&
         replaceObj.upLevelObjectType === 'MemberExpression' &&
-        replaceObj.upLevelObjectName === generate(path.node.object.property).code
+        replaceObj.upLevelObjectName === generator(path.node.object.property).code
       ) {
         path.node.property = t.identifier(replaceObj.newProperty)
       }

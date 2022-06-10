@@ -8,7 +8,7 @@
       "type": "node",
       "request": "launch",
       "name": "server",
-      "args": ["${workspaceRoot}/src/exec/exec-transfer-node-property-to-json.ts"],
+      "args": ["${workspaceRoot}/src/exec/exec-bable-plugin.ts"],
       "runtimeArgs": ["-r", "ts-node/register", "--inspect"],
       "cwd": "${workspaceFolder}",
       "protocol": "inspector",

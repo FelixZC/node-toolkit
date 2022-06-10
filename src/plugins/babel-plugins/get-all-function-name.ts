@@ -32,7 +32,7 @@ export default declare((babel) => {
               t.objectProperty(t.identifier(String(name)), t.identifier(String(name)), false, true)
             )
           )
-          const outputOjb = strToJson(generator(objectExpression, getGeneratorOption()).code)
+          const outputOjb = strToJson(generator(objectExpression, getGeneratorOption(), '').code)
           writeFile('src/query/json/function-name.json', JSON.stringify(outputOjb, null, 2))
         }
       }

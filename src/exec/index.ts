@@ -555,7 +555,8 @@ export const execTransferNodePropertyToJson = () => {
       const content = fs.readFileSync(filePath, 'utf-8')
       const execFileInfo: ExecFileInfo = {
         path: filePath,
-        source: content
+        source: content,
+        extra: {}
       }
       const newContent = transferNodePropertyToJson(execFileInfo)
 

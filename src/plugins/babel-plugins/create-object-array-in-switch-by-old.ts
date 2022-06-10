@@ -140,13 +140,13 @@ const saveObjectCache = (newObjectExpression: t.ObjectExpression, keys: string[]
     })
     /** 存储输出转化excel对象 */
 
-    excelObjectList.push(strToJson(generator(temp, getGeneratorOption()).code))
+    excelObjectList.push(strToJson(generator(temp, getGeneratorOption(), '').code))
     /** 存储同类项 */
 
     setValueByKeys(
       sameObjectCache,
       [...keys, propPropertyValue],
-      generator(newObjectExpression, getGeneratorOption()).code
+      generator(newObjectExpression, getGeneratorOption(), '').code
     )
   }
 }
@@ -183,7 +183,7 @@ const loadObjectCache = (newObjectExpression: t.ObjectExpression, keys: string[]
         setValueByKeys(
           newObjectCache,
           [...keys, propPropertyValue],
-          generator(localNewObjectExpression, getGeneratorOption()).code
+          generator(localNewObjectExpression, getGeneratorOption(), '').code
         )
         break
 
@@ -199,7 +199,7 @@ const loadObjectCache = (newObjectExpression: t.ObjectExpression, keys: string[]
         setValueByKeys(
           newObjectCache,
           [...keys, propPropertyValue],
-          generator(localNewObjectExpression, getGeneratorOption()).code
+          generator(localNewObjectExpression, getGeneratorOption(), '').code
         )
         break
     }
