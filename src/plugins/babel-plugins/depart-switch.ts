@@ -1,6 +1,6 @@
 import { declare } from '@babel/helper-plugin-utils'
-import { NodePath } from '@babel/core'
 import * as t from '@babel/types'
+import type { NodePath } from '@babel/traverse'
 export default declare((babel) => {
   return {
     name: 'ast-transform',

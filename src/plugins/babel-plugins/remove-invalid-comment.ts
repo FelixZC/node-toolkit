@@ -5,7 +5,6 @@ import { declare } from '@babel/helper-plugin-utils'
 export default declare((babel) => {
   return {
     name: 'ast-transform',
-    // not required
     visitor: {
       BlockStatement(path, state) {
         if (path.node.leadingComments && path.node.leadingComments.length) {

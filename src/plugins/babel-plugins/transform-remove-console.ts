@@ -2,11 +2,9 @@
  * 移除console打印
  */
 import { declare } from '@babel/helper-plugin-utils'
-import type { Expression, MemberExpression, PrivateName } from '@babel/types'
+import * as t from '@babel/types'
 import type { NodePath } from '@babel/traverse'
 export default declare((babel) => {
-  const { types: t } = babel
-
   function isGlobalConsoleId(id: NodePath) {
     const name = 'console'
     return (
@@ -18,7 +16,10 @@ export default declare((babel) => {
     )
   }
 
-  function isExcluded(property: NodePath<PrivateName | Expression>, excludeArray: string[] = []) {
+  function isExcluded(
+    property: NodePath<t.PrivateName | t.Expression>,
+    excludeArray: string[] = []
+  ) {
     return (
       excludeArray &&
       excludeArray.some((name) =>
@@ -29,7 +30,10 @@ export default declare((babel) => {
     )
   }
 
-  function isIncludedConsole(memberExpr: NodePath<MemberExpression>, excludeArray: string[] = []) {
+  function isIncludedConsole(
+    memberExpr: NodePath<t.MemberExpression>,
+    excludeArray: string[] = []
+  ) {
     const object = memberExpr.get('object')
     const property = memberExpr.get('property')
     if (isExcluded(property, excludeArray)) return false

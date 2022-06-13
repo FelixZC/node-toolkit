@@ -6,23 +6,22 @@ import { declare } from '@babel/helper-plugin-utils'
 import { findObjectPropertyWithKey, getGeneratorOption, getParentFunctionName } from './ast-utils' // 返回权限串
 
 import generator from '@babel/generator'
-import { NodePath } from '@babel/core'
+import { NodePath } from '@babel/traverse'
 import { strToJson } from '../../utils/common'
 import * as t from '@babel/types'
-
-const authorizationString = (
-  isTome: boolean,
-  tomeAuthorization: string,
-  catalogAuthorization: string
-) => {
-  if (isTome) {
-    return `AMSTome:${tomeAuthorization}`
-  } else {
-    return `AMSCatalog:${catalogAuthorization}`
-  }
-}
-
 export default declare((babel) => {
+  const authorizationString = (
+    isTome: boolean,
+    tomeAuthorization: string,
+    catalogAuthorization: string
+  ) => {
+    if (isTome) {
+      return `AMSTome:${tomeAuthorization}`
+    } else {
+      return `AMSCatalog:${catalogAuthorization}`
+    }
+  }
+
   const extra = {} as Record<string, any>
 
   const saveBtnCache = (objPath: NodePath<t.ObjectExpression>, functionName: string | number) => {
@@ -108,7 +107,9 @@ export default declare((babel) => {
       if (!extra[functionName]) {
         extra[functionName] = []
       }
+
       let code: string
+
       try {
         code = strToJson(generator(outNode, getGeneratorOption(), '').code)
       } catch {

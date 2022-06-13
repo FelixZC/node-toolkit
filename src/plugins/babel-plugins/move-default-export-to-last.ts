@@ -2,8 +2,7 @@
  * 移动默认导出到最后
  */
 import { declare } from '@babel/helper-plugin-utils'
-import * as t from '@babel/types' // import { NodePath } from '@babel/core'
-
+import * as t from '@babel/types'
 export default declare((babel) => {
   return {
     name: 'ast-transform',
