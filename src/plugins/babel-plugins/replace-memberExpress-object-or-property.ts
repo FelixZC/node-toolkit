@@ -4,9 +4,9 @@
 import { declare } from '@babel/helper-plugin-utils'
 import generator from '@babel/generator'
 import { getImportInfo } from './ast-utils'
-import * as t from '@babel/types'
+import type { NodePath } from '@babel/traverse'
 import { template } from '@babel/core'
-import { NodePath } from '@babel/core'
+import * as t from '@babel/types'
 interface ReplaceObjectInfo {
   property: string
   upLevelObjectName: string
@@ -20,24 +20,25 @@ interface ReplacePropertyInfo {
   upLevelObjectType: 'MemberExpression' | 'ThisExpression'
   newProperty: string
 }
-const replaceObjectList: ReplaceObjectInfo[] = [
-  {
-    property: 'getStatus',
-    newObjectName: 'czp',
-    upLevelObjectName: 'pzc',
-    upLevelObjectType: 'MemberExpression',
-    express: `import czp from '@/utils/czp'`
-  }
-]
-const replacePropertyList: ReplacePropertyInfo[] = [
-  {
-    property: 'PublicFormatter',
-    newProperty: 'pzc',
-    upLevelObjectName: 'this',
-    upLevelObjectType: 'ThisExpression'
-  }
-]
+
 export default declare((babel) => {
+  const replaceObjectList: ReplaceObjectInfo[] = [
+    {
+      property: 'getStatus',
+      newObjectName: 'czp',
+      upLevelObjectName: 'pzc',
+      upLevelObjectType: 'MemberExpression',
+      express: `import czp from '@/utils/czp'`
+    }
+  ]
+  const replacePropertyList: ReplacePropertyInfo[] = [
+    {
+      property: 'PublicFormatter',
+      newProperty: 'pzc',
+      upLevelObjectName: 'this',
+      upLevelObjectType: 'ThisExpression'
+    }
+  ]
   let refList: string[] = []
   /**
    * 代替目标表达式对象

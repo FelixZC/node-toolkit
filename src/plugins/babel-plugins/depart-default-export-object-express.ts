@@ -9,10 +9,8 @@ export default declare((babel) => {
   /** 默认导出拆分记录记录 */
   const objectMethodList: t.ObjectMethod[] = []
   /** 重定义方法变量记录 */
-
   const tranferExportList: string[] = []
   /** 已经导出的方法和变量 */
-
   const alreadyExportList: string[] = []
   return {
     name: 'ast-transform',

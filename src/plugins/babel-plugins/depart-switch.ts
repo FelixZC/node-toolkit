@@ -1,5 +1,5 @@
 import { declare } from '@babel/helper-plugin-utils'
-import { NodePath } from '@babel/core'
+import type { NodePath } from '@babel/traverse'
 import * as t from '@babel/types'
 export default declare((babel) => {
   return {
