@@ -1,9 +1,9 @@
-node
 node_modules
 dist
 .npmrc
 .cache
 .local
+.git
 .history
 /src-copy
 /src copy

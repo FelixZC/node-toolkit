@@ -3,9 +3,9 @@
  */
 import { cloneDeep } from 'lodash'
 import { declare } from '@babel/helper-plugin-utils'
-import { findObjectPropertyWithKey, getParentFunctionName } from './ast-utils'
-// 返回权限串
-import generate from '@babel/generator'
+import { findObjectPropertyWithKey, getGeneratorOption, getParentFunctionName } from './ast-utils' // 返回权限串
+
+import generator from '@babel/generator'
 import { NodePath } from '@babel/core'
 import { strToJson } from '../../utils/common'
 import * as t from '@babel/types'
@@ -108,13 +108,11 @@ export default declare((babel) => {
       if (!extra[functionName]) {
         extra[functionName] = []
       }
-
       let code: string
-
       try {
-        code = strToJson(generate(outNode).code)
+        code = strToJson(generator(outNode, getGeneratorOption(), '').code)
       } catch {
-        code = generate(outNode).code
+        code = generator(outNode, getGeneratorOption(), '').code
       }
 
       extra[functionName].push(code)

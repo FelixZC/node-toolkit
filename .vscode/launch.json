@@ -8,7 +8,7 @@
       "type": "node",
       "request": "launch",
       "name": "server",
-      "args": ["${workspaceRoot}/src/utils/excel/exec/run-json-to-excel.ts"],
+      "args": ["${workspaceRoot}/src/exec/exec-bable-plugin.ts"],
       "runtimeArgs": ["-r", "ts-node/register", "--inspect"],
       "cwd": "${workspaceFolder}",
       "protocol": "inspector",

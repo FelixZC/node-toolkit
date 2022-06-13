@@ -22,6 +22,7 @@ export default declare((babel) => {
                 }
               }
               /** 处理case穿透情况 */
+
               if (!path.node.consequent.length) {
                 let next = path
 
@@ -41,8 +42,14 @@ export default declare((babel) => {
                 path.node.consequent = next.node.consequent
               } else {
                 /** 处理break缺失问题 */
-                const target = path.node.consequent.find((element) => t.isBreakStatement(element))
-                if (!target) {
+                const breakTarget = path.node.consequent.find((element) =>
+                  t.isBreakStatement(element)
+                )
+                const returnTarget = path.node.consequent.find((element) =>
+                  t.isReturnStatement(element)
+                )
+
+                if (!breakTarget && !returnTarget) {
                   path.node.consequent.push(t.breakStatement())
                 }
               }

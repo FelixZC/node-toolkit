@@ -37,15 +37,15 @@ const runJsonToExcel = () => {
 
         for (const key of header) {
           switch (key) {
+            case '是否增改':
+              cell[key] = cell[key] ? 'Y' : 'N'
+              break
+
             case '是否必填':
               cell[key] = cell[key] ? 'Y' : 'N'
               break
 
             case '是否显示':
-              cell[key] = cell[key] ? 'Y' : 'N'
-              break
-
-            case '是否增改':
               cell[key] = cell[key] ? 'Y' : 'N'
               break
           }

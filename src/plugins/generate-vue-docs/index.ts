@@ -2,7 +2,8 @@
  * 提取vue2组件信息，搬运自https://github.com/MaLuns/generate-vue-docs
  */
 import * as compiler from '@vue/compiler-sfc'
-import * as generate from '@babel/generator'
+import * as generator from '@babel/generator'
+import { getParserOption } from '../babel-plugins/ast-utils'
 import * as parser from '@babel/parser'
 import RenderMd from './render'
 /*  默认生成配置 */
@@ -10,7 +11,8 @@ import RenderMd from './render'
 import * as t from '@babel/types'
 import * as traverse from '@babel/traverse'
 import { NodePath } from '@babel/traverse'
-import type { AttributeNode, ElementNode, TemplateChildNode } from '@vue/compiler-core'
+import { traverserTemplateAst } from '../ast-utils'
+import type { AttributeNode } from '@vue/compiler-core'
 const baseConfig = {
   md: false
 }
@@ -86,7 +88,7 @@ const extractProps = (node: t.ObjectProperty | t.ObjectMethod) => {
 
     if (t.isFunction(node)) {
       try {
-        const { code } = generate.default(node.body)
+        const { code } = generator.default(node.body)
         const fun = eval(`0,function ()${code}`)
         return JSON.stringify(fun())
       } catch (error) {}
@@ -116,7 +118,7 @@ const extractProps = (node: t.ObjectProperty | t.ObjectMethod) => {
             } else if (subKey === 'default') {
               props[key][subKey] = getDefaultVal(item.value)
             } else if (subKey === 'validator') {
-              props[key][key] = generate.default(item).code
+              props[key][key] = generator.default(item).code
             } else if (subKey === 'required' && t.isBooleanLiteral(item.value)) {
               props[key][subKey] = item.value.value
             }
@@ -262,28 +264,6 @@ const isModelAndSync = (comInfo: ComponentInfo) => {
   }
 }
 
-interface TemplateVisitor {
-  [tag: string]: (node: ElementNode, parent?: ElementNode) => ElementNode | undefined
-}
-/*  遍历模板抽象数 */
-
-const traverserTemplateAst = (ast: ElementNode, visitor: TemplateVisitor) => {
-  function traverseArray(array: TemplateChildNode[], parent: ElementNode) {
-    array.forEach((child) => {
-      traverseNode(child as ElementNode, parent)
-    })
-  }
-
-  function traverseNode(node: ElementNode, parent?: ElementNode) {
-    visitor.enter && visitor.enter(node, parent)
-    visitor[node.tag] && visitor[node.tag](node, parent)
-    node.children && traverseArray(node.children, node)
-    visitor.exit && visitor.exit(node, parent)
-  }
-
-  traverseNode(ast)
-}
-
 const getComponentName = (node: t.ObjectProperty | t.ObjectMethod) => {
   if (t.isObjectMethod(node)) {
     return
@@ -334,11 +314,7 @@ const parseDocs = (vueStr: string, config: Record<string, any> = {}) => {
   })
 
   if (script.content.length) {
-    const jst = parser.parse(script.content, {
-      allowImportExportEverywhere: false,
-      plugins: ['decorators-legacy', 'jsx', 'typescript'],
-      sourceType: 'module'
-    })
+    const jst = parser.parse(script.content, getParserOption())
     traverse.default(jst, {
       ExportDefaultDeclaration(path) {
         /*  组件描述 */

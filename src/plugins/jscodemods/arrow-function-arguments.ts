@@ -33,11 +33,21 @@ const transformer: Transform = (file, api, options) => {
 
           return true
 
-        case 'FunctionExpression':
-        case 'MethodDeclaration':
         case 'Function':
+          return false
+          break
+
         case 'FunctionDeclaration':
           return false
+          break
+
+        case 'FunctionExpression':
+          return false
+          break
+
+        case 'MethodDeclaration':
+          return false
+          break
 
         default:
           break

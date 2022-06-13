@@ -36,6 +36,7 @@ const propertySort: PostHTML.Plugin<unknown> = (tree) => {
 
           default:
             normalAttrs[key] = value
+            break
         }
       }
 

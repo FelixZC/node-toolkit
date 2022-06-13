@@ -71,6 +71,7 @@ export const invokeRequestTemplateGenerator = () => {
         const parameters = module.parameters || ([] as ParameterObject[]) //
         // const responses = module.responses as Record<string, ResponseObject>
         //@ts-ignore
+
         const annotation = module.tags?.join('-') + module!.summary?.replace(/\//g, '')
         const methodName = module.operationId
         const parametersPath = `operations['${module.operationId}']['parameters']`

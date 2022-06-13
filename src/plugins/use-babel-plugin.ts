@@ -1,5 +1,6 @@
 import * as babel from '@babel/core'
 import generator from '@babel/generator'
+import { getGeneratorOption, getParserOption } from './babel-plugins/ast-utils'
 import * as parser from '@babel/parser'
 import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
 import traverse from '@babel/traverse'
@@ -18,11 +19,7 @@ export interface BabelPlugin {
 const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
   try {
     /** 1，先将代码转换成ast */
-    const codeAst = parser.parse(execFileInfo.source, {
-      allowImportExportEverywhere: false,
-      plugins: ['decorators-legacy', 'jsx', 'typescript'],
-      sourceType: 'module'
-    })
+    const codeAst = parser.parse(execFileInfo.source, getParserOption())
     /** 2,分析修改AST，第一个参数是AST，第二个参数是访问者对象 */
 
     for (const plugin of pluginsList) {
@@ -35,19 +32,12 @@ const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
     }
     /** 3，生成新的代码，第一个参数是AST，第二个是一些可选项，第三个参数是原始的code */
 
-    const newCode = generator(
-      codeAst,
-      {
-        compact: 'auto',
-        concise: false,
-        retainLines: false
-      },
-      execFileInfo.source
-    )
+    const newCode = generator(codeAst, getGeneratorOption(), execFileInfo.source)
     /** 会返回一个对象，code就是生成后的新代码 */
 
     return `\n${newCode.code}\n`
   } catch (e) {
+    console.error(e)
     return execFileInfo.source
   }
 }
@@ -57,23 +47,30 @@ const runBabelPlugin = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) 
     return execFileInfo.source
   }
 
-  if (!execFileInfo.path.endsWith('.vue')) {
+  const { path, source } = execFileInfo
+
+  if (!path.endsWith('.vue')) {
     return transform(execFileInfo, pluginsList)
   }
 
-  const { descriptor } = parseSFC(execFileInfo.source, {
-    filename: execFileInfo.path
+  const { descriptor } = parseSFC(source, {
+    filename: path
   })
-  const scriptBlock = descriptor.script || descriptor.scriptSetup
 
-  if (scriptBlock) {
-    execFileInfo.source = scriptBlock.content
-    const out = transform(execFileInfo, pluginsList)
-    scriptBlock.content = out
+  if (!descriptor.script?.content && !descriptor.scriptSetup?.content) {
+    return source
   }
-  /** 强制重新赋值 */
 
-  descriptor.script = scriptBlock
+  if (descriptor.script && descriptor.script.content) {
+    execFileInfo.source = descriptor.script.content
+    descriptor.script.content = transform(execFileInfo, pluginsList)
+  }
+
+  if (descriptor.scriptSetup && descriptor.scriptSetup.content) {
+    execFileInfo.source = descriptor.scriptSetup.content
+    descriptor.scriptSetup.content = transform(execFileInfo, pluginsList)
+  }
+
   return stringifySFC(descriptor)
 }
 

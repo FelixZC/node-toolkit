@@ -35,20 +35,38 @@ class RenderMd implements RenderMdType {
 
       if (element) {
         switch (key) {
-          case 'name':
-            const name = element as string
-            mdArr.push(...this.renderTitle(name, false, 2))
-            break
-
           case 'desc':
             const desc = element as string
             mdArr.push(desc)
             break
 
-          case 'props':
-          case 'slots':
           case 'events':
+            if (this.options[key]) {
+              mdArr.push(...this[`${key}Render`](element as Record<string, any>, this.options[key]))
+            }
+
+            break
+
           case 'methods':
+            if (this.options[key]) {
+              mdArr.push(...this[`${key}Render`](element as Record<string, any>, this.options[key]))
+            }
+
+            break
+
+          case 'name':
+            const name = element as string
+            mdArr.push(...this.renderTitle(name, false, 2))
+            break
+
+          case 'props':
+            if (this.options[key]) {
+              mdArr.push(...this[`${key}Render`](element as Record<string, any>, this.options[key]))
+            }
+
+            break
+
+          case 'slots':
             if (this.options[key]) {
               mdArr.push(...this[`${key}Render`](element as Record<string, any>, this.options[key]))
             }
