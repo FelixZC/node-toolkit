@@ -8,7 +8,7 @@ import * as t from '@babel/types'
 import generator from '@babel/generator'
 import type { NodePath } from '@babel/core'
 import { publicMapList } from './typing/mapList'
-import type { otherObjDeatil, otherSheetType } from './typing/type'
+import type { OtherObjDeatil, OtherSheetType } from './typing/type'
 const filePath = './output/json-list.js'
 /**
  * 这里需要自己去完善，比如需要几个表,并创建表
@@ -28,14 +28,14 @@ const downType = '移交文件（下表）'
 /*处理数据
 
 **/
-function setData(jsonData: otherSheetType[]) {
-  const selectionObjectExpress: otherObjDeatil = {
+function setData(jsonData: OtherSheetType[]) {
+  const selectionObjectExpress: OtherObjDeatil = {
     Fshow: false,
     index: 0,
     Tshow: true,
     type: 'selection'
   }
-  const indexObjectExpress: otherObjDeatil = {
+  const indexObjectExpress: OtherObjDeatil = {
     Fshow: false,
     index: 1,
     label: '序号',
@@ -47,7 +47,7 @@ function setData(jsonData: otherSheetType[]) {
 
   jsonData.forEach((v, index) => {
     if (v['字段名称'] !== '序号') {
-      let obj: otherObjDeatil = {
+      let obj: OtherObjDeatil = {
         label: v['字段名称'] || '',
         prop: v['后端字段'] || '',
         Fshow: v['是否增改'] === 'true',
@@ -162,7 +162,7 @@ function runOtherExcelToJson() {
   })
   const SheetNames = workBook.SheetNames //获取表名
   const worksheet = workBook.Sheets[SheetNames[0]] //默认只有一张表
-  const jsonData = xlsx.utils.sheet_to_json<otherSheetType>(worksheet)
+  const jsonData = xlsx.utils.sheet_to_json<OtherSheetType>(worksheet)
   setData(jsonData)
   writeFile(filePath, JSON.stringify(jsonData))
 }
