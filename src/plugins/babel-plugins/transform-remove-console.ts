@@ -2,8 +2,8 @@
  * 移除console打印
  */
 import { declare } from '@babel/helper-plugin-utils'
-import type { NodePath } from '@babel/traverse'
 import * as t from '@babel/types'
+import type { NodePath } from '@babel/traverse'
 export default declare((babel) => {
   function isGlobalConsoleId(id: NodePath) {
     const name = 'console'

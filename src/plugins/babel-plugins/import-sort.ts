@@ -3,7 +3,6 @@
  */
 import { declare } from '@babel/helper-plugin-utils'
 import { getImportInfo } from './ast-utils'
-
 import * as t from '@babel/types'
 export default declare((babel) => {
   const sortImport = (importList: t.ImportDeclaration[]) => {

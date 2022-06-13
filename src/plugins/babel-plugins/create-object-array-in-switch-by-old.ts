@@ -22,14 +22,16 @@ import generator from '@babel/generator'
 import { getValueByKeys, setValueByKeys, strToJson, writeFile } from '../../utils/common'
 import * as parser from '@babel/parser'
 import sameObjectCacheRef from '../../query/json/same-object-cache.json'
-import type { ObjDeatil } from '../../utils/excel/typing/type' //
+//
 // import { getFileType } from '../../utils/excel/utils/map'
+import * as t from '@babel/types'
+import type { ObjDeatil } from '../../utils/excel/typing/type'
+
 /**
  * 根据现有switchcase重组代码,此方法仍然不具备创建新的switchcase，需要重写
  * @param elements
  * @param test
  */
-import * as t from '@babel/types'
 export default declare((babel) => {
   const functionNameList: (string | number)[] = [
     'annexForm',
@@ -174,6 +176,7 @@ export default declare((babel) => {
       const statusPropertyValue = (statusProperty.value as t.StringLiteral).value
       const propPropertyValue = (propProperty.value as t.StringLiteral).value
       let sameObject
+
       switch (true) {
         /**存在新增标志， prop值为空*/
         case statusPropertyValue === 'newAdd' && !propPropertyValue:
@@ -237,6 +240,7 @@ export default declare((babel) => {
     })
     return localElements
   }
+
   return {
     name: 'ast-transform',
     visitor: {

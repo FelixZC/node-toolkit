@@ -9,7 +9,6 @@ export default declare((babel) => {
    * 获取根据index进行排序的排序方法
    * @returns
    */
-
   const getSortMethod = () => {
     /**
      * 排序对象数组
@@ -46,6 +45,7 @@ export default declare((babel) => {
     elements.sort(sortMethod)
     return elements
   }
+
   return {
     name: 'ast-transform',
     visitor: {

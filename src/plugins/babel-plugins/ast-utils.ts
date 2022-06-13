@@ -320,11 +320,11 @@ export const replaceExpressionProperty = (
 
   return elements
 }
-
 /**
  * 获取generator配置对象
  * @returns
  */
+
 export const getGeneratorOption = (): GeneratorOptions => {
   let options: GeneratorOptions = {
     compact: 'auto',
@@ -336,11 +336,11 @@ export const getGeneratorOption = (): GeneratorOptions => {
   }
   return options
 }
-
 /**
  * 获取parser.parse配置对象
  * @returns
  */
+
 export const getParserOption = (): ParserOptions => {
   const options: ParserOptions = {
     allowImportExportEverywhere: false,
@@ -349,11 +349,11 @@ export const getParserOption = (): ParserOptions => {
   }
   return options
 }
-
 /**
  * 重置Index
  * @param elements
  */
+
 export const resetIndexObjectProperty = (elements: t.ObjectExpression[]) => {
   let count = 0
 

@@ -3,14 +3,17 @@ import { cloneDeep } from 'lodash' // import { NodePath } from '@babel/core'
 /**
  * 分离默认导出对象方法，添加单独引用，聚合默认导出
  */
+
 import { declare } from '@babel/helper-plugin-utils'
 import * as t from '@babel/types'
 export default declare((babel) => {
   /** 默认导出拆分记录记录 */
   const objectMethodList: t.ObjectMethod[] = []
   /** 重定义方法变量记录 */
+
   const tranferExportList: string[] = []
   /** 已经导出的方法和变量 */
+
   const alreadyExportList: string[] = []
   return {
     name: 'ast-transform',

@@ -4,9 +4,9 @@
 import { declare } from '@babel/helper-plugin-utils'
 import generator from '@babel/generator'
 import { getImportInfo } from './ast-utils'
-import type { NodePath } from '@babel/traverse'
-import { template } from '@babel/core'
 import * as t from '@babel/types'
+import { template } from '@babel/core'
+import type { NodePath } from '@babel/traverse'
 interface ReplaceObjectInfo {
   property: string
   upLevelObjectName: string
@@ -20,7 +20,6 @@ interface ReplacePropertyInfo {
   upLevelObjectType: 'MemberExpression' | 'ThisExpression'
   newProperty: string
 }
-
 export default declare((babel) => {
   const replaceObjectList: ReplaceObjectInfo[] = [
     {

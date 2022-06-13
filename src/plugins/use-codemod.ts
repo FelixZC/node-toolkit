@@ -1,6 +1,5 @@
-import { ExecFileInfo } from './common'
+import { ExecFileInfo } from './common' //@ts-ignore
 
-//@ts-ignore
 import getParser from 'jscodeshift/src/getParser'
 import jscodeshift, { Options, Parser, Transform } from 'jscodeshift'
 import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
@@ -8,6 +7,7 @@ import type { SFCDescriptor } from '@vue/compiler-sfc'
 /**
  * parser可传的值有 babylon、flow、ts、tsx、babel,会去获取对应的解析器
  */
+
 export type Codemod = Transform & {
   parser?: string | Parser
 }

@@ -4,10 +4,10 @@
 import { cloneDeep } from 'lodash'
 import { declare } from '@babel/helper-plugin-utils'
 import { findObjectPropertyWithKey, getGeneratorOption, getParentFunctionName } from './ast-utils' // 返回权限串
+
 import generator from '@babel/generator'
 import { NodePath } from '@babel/traverse'
 import { strToJson } from '../../utils/common'
-
 import * as t from '@babel/types'
 export default declare((babel) => {
   const authorizationString = (
@@ -107,7 +107,9 @@ export default declare((babel) => {
       if (!extra[functionName]) {
         extra[functionName] = []
       }
+
       let code: string
+
       try {
         code = strToJson(generator(outNode, getGeneratorOption(), '').code)
       } catch {
