@@ -1,4 +1,5 @@
-import { cloneDeep } from 'lodash' // import { NodePath } from '@babel/core'
+import { cloneDeep } from 'lodash'
+import { NodePath } from '@babel/traverse'
 
 /**
  * 分离默认导出对象方法，添加单独引用，聚合默认导出
@@ -23,6 +24,13 @@ export default declare((babel) => {
         if (t.isObjectExpression(path.node.declaration)) {
           path.traverse({
             ObjectMethod(path) {
+              // this指向变了，先移除this引用
+              path.traverse({
+                ThisExpression(thisExpressionPath) {
+                  const parent = thisExpressionPath.parentPath as NodePath<t.MemberExpression>
+                  parent.replaceWith(parent.node.property)
+                }
+              })
               objectMethodList.push(cloneDeep(path.node))
               const key =
                 (path.node.key as t.Identifier).name || (path.node.key as t.StringLiteral).value
