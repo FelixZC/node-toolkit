@@ -13,7 +13,7 @@ export interface CustomPluginObj extends PluginObj {
   visitor: Visitor
 }
 export interface BabelPlugin {
-  (babel: BabelAPI): CustomPluginObj
+  (babel: BabelAPI, options?: Record<string, any>, dirname?: string): CustomPluginObj
 }
 
 const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
@@ -23,7 +23,7 @@ const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
     /** 2,分析修改AST，第一个参数是AST，第二个参数是访问者对象 */
 
     for (const plugin of pluginsList) {
-      const pluginObj = plugin(babel)
+      const pluginObj = plugin(babel, {}, execFileInfo.path)
       traverse(codeAst, pluginObj.visitor)
 
       if (typeof pluginObj.getExtra === 'function') {

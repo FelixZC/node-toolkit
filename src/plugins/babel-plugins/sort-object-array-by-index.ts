@@ -6,16 +6,10 @@ import { findObjectPropertyWithKey, resetIndexObjectProperty } from './ast-utils
 import * as t from '@babel/types'
 export default declare((babel) => {
   /**
-   * 获取根据index进行排序的排序方法
-   * @returns
+   * 排序对象数组表达式
+   * @param elements
    */
-  const getSortMethod = () => {
-    /**
-     * 排序对象数组
-     * @param v1
-     * @param v2
-     * @returns
-     */
+  const sortObjectArrayExpression = (elements: t.ObjectExpression[]) => {
     const sortHandle = (v1: t.ObjectExpression, v2: t.ObjectExpression) => {
       const v1IndexProperty = findObjectPropertyWithKey(v1, 'index')
       const v2IndexProperty = findObjectPropertyWithKey(v2, 'index')
@@ -32,17 +26,7 @@ export default declare((babel) => {
       const v2Index = (v2IndexProperty.value as any).value
       return v1Index - v2Index
     }
-
-    return sortHandle
-  }
-  /**
-   * 排序对象数组表达式
-   * @param elements
-   */
-
-  const sortObjectArrayExpression = (elements: t.ObjectExpression[]) => {
-    const sortMethod = getSortMethod()
-    elements.sort(sortMethod)
+    elements.sort(sortHandle)
     return elements
   }
 
