@@ -1,5 +1,5 @@
 /**
- * 执行文本格式化
+ * 执行文本去重
  */
 import * as exec from './index'
 exec.formatText()
