@@ -25,9 +25,16 @@ interface Cache {
     index: number
   }
 }
-interface CustomNameFunction {
-  (filePath: string): string
+interface CustomFilenameFunction {
+  (oldFilename: string): string
 }
+interface CustomExtnameFunction {
+  (oldExtname: string): string
+}
+interface CustomDirnameFunction {
+  (oldDirname: string): string
+}
+
 interface FsInstance {
   rootPath: string
   folderPath: string
@@ -37,12 +44,12 @@ interface FsInstance {
   saveOperateLog(message: string): void
   getFilePathList(folderPath: string): void
   getFileInfoList(): FileInfo[]
-  modifyFileName(
-    customBaseName: string | CustomNameFunction,
-    customExtensionName?: string | CustomNameFunction,
-    filterKeyword?: string,
-    filterExtensionName?: string,
-    customDirName?: string | CustomNameFunction
+  modifyFilename(
+    customFilename: string | CustomFilenameFunction | null,
+    customExtname?: string | CustomExtnameFunction | null,
+    customDirname?: string | CustomDirnameFunction | null,
+    filterFilename?: string,
+    filterExtensionName?: string
   ): void
   renameFile(oldFilePath: string, newFilePath: string): boolean
   copyFile(filePath: string): void
@@ -149,8 +156,8 @@ class fsUtils implements FsInstance {
   @catchHandel()
   getFilePathList(folderPath: string) {
     fs.accessSync(folderPath, fs.constants.F_OK)
-    fs.readdirSync(folderPath).forEach((fileName: string) => {
-      const filePath = path.resolve(folderPath, fileName) // 连接路径的两个或多个部分：
+    fs.readdirSync(folderPath).forEach((filename: string) => {
+      const filePath = path.resolve(folderPath, filename) // 连接路径的两个或多个部分：
       // 判断是否为文件
 
       if (fs.lstatSync(filePath).isFile()) {
@@ -164,8 +171,6 @@ class fsUtils implements FsInstance {
   /**
    * 获取文件详细信息列表
    */
-  // @catchHandel()
-
   getFileInfoList() {
     const fileInfoList = this.filePathList.map((filePath) => {
       return {
@@ -181,34 +186,23 @@ class fsUtils implements FsInstance {
   }
   /**
    * 修改文件名
-   * @param {string|funcion} customBaseName 新文件名不包含后缀,为空则使用旧文件名
-   * @param {string|funcion} customExtensionName //新后缀名，为空则使用旧后缀名
-   * @param {string} filterKeyword 限定过滤关键字
+   * @param {string|funcion} customFilename 新文件名不包含后缀,为空则使用旧文件名
+   * @param {string|funcion} customExtname //新后缀名，为空则使用旧后缀名
+   * @param {string} filterFilename 限定过滤关键字
    * @param {string} filterExtensionName 限定过滤后缀名
    * @example // 自定义新文件名规则（不包含后缀名）
-              const customBaseNameGenerateFunction = (oldFile) => {
-                let source = require('./source.js')
-                let oldExtensionName = path.extname(oldFile) // 文件扩展名
-                let oldBaseName = path.basename(oldFile, oldExtensionName) //文件名
-                source.commonList.find((item) => item.fileName.split(oldExtensionName)[0] === oldBaseName)
-                  ?.target || oldBaseName
+              const customBasenameGenerateFunction = (oldFilename) => {
+                return oldFilename
               }
-              // 自定义新文件名规则（不包含后缀名）
-              const customBaseNameReplaceFunction = (oldFile) => {
-                let oldExtensionName = path.extname(oldFile)
-                let oldBaseName = path.basename(oldFile, oldExtensionName)
-                return oldBaseName.replace(/xx/g, 'pzc')
-              }
-              fsInstance.modifyFileName(customBaseNameGenerateFunction, null, null, '.png') //批量处理
-              fsInstance.modifyFileName(null, '.test', null, '.txt') //批量处理
+              fsInstance.modifyFilename(customBasenameGenerateFunction)
    */
-
-  modifyFileName(
-    customBaseName: string | CustomNameFunction | null,
-    customExtensionName?: string | CustomNameFunction | null,
-    filterKeyword?: string | null,
-    filterExtensionName?: string | null,
-    customDirName?: string | CustomNameFunction | null
+  @log()
+  modifyFilename(
+    customFilename: string | CustomFilenameFunction | null,
+    customExtname?: string | CustomExtnameFunction | null,
+    customDirname?: string | CustomDirnameFunction | null,
+    filterFilename?: string | null,
+    filterExtensionName?: string | null
   ) {
     if (!this.filePathList.length) {
       throw new Error('指定路径不存在文件')
@@ -224,9 +218,9 @@ class fsUtils implements FsInstance {
       }
     }
 
-    if (filterKeyword) {
+    if (filterFilename) {
       filePathListBackup = this.filePathList.filter(
-        (filePath) => path.basename(filePath).indexOf(filterKeyword) > -1
+        (filePath) => path.basename(filePath, path.extname(filePath)).indexOf(filterFilename) > -1
       )
     }
 
@@ -237,57 +231,52 @@ class fsUtils implements FsInstance {
     }
 
     filePathListBackup.forEach((filePath) => {
-      const oldDirName = path.dirname(filePath)
-      const oldExtensionName = path.extname(filePath) // 文件扩展名
+      const oldDirname = path.dirname(filePath)
+      const oldExtname = path.extname(filePath) // 文件扩展名
+      const oldBaseName = path.basename(filePath)
+      const oldFilename = path.basename(filePath, oldExtname) // 文件名
 
-      const oldFileName = path.basename(filePath)
-      const oldBaseName = path.basename(filePath, oldExtensionName) // 文件名
-
-      let newBaseName // 获取新文件名称，不包含后缀名
+      let newFilename // 获取新文件名称，不包含后缀名
 
       let newExtensionName
-      let newDirName
+      let newDirname
 
-      if (typeof customBaseName === 'function') {
-        newBaseName = customBaseName(filePath)
+      if (typeof customFilename === 'function') {
+        newFilename = customFilename(oldFilename) || oldFilename
       } else {
-        newBaseName = customBaseName || oldBaseName
+        newFilename = customFilename || oldFilename
       } // 获取新文件后缀名
 
-      if (typeof customExtensionName === 'function') {
-        newExtensionName = customExtensionName(filePath)
+      if (typeof customExtname === 'function') {
+        newExtensionName = customExtname(oldExtname) || oldExtname
       } else {
-        newExtensionName = customExtensionName || oldExtensionName
+        newExtensionName = customExtname || oldExtname
       }
 
-      let newFileName = `${newBaseName}${newExtensionName}` // 新旧路径重复，跳过本次循环
+      let newBaseName = `${newFilename}${newExtensionName}` // 新旧路径重复，跳过本次循环
 
-      if (typeof customDirName === 'function') {
-        newDirName = customDirName(filePath)
+      if (typeof customDirname === 'function') {
+        newDirname = customDirname(oldDirname) || oldDirname
       } else {
-        newDirName = customDirName || oldDirName
+        newDirname = customDirname || oldDirname
       }
 
-      if (
-        newFileName === oldFileName &&
-        newExtensionName === oldExtensionName &&
-        newDirName === oldDirName
-      ) {
+      if (newBaseName === oldBaseName && newDirname === oldDirname) {
         return
       }
 
-      let cacheKey = path.join(newDirName, newFileName) // 命名冲突处理，添加计数
+      let cacheKey = path.join(newDirname, newBaseName) // 命名冲突处理，添加计数
 
       let index = 0
 
       while (cache[cacheKey]) {
-        newFileName = `${newBaseName}(${index++})${newExtensionName}` // 重命名
+        newBaseName = `${newFilename}(${index++})${newExtensionName}` // 重命名
 
-        cacheKey = path.join(newDirName, newFileName)
+        cacheKey = path.join(newDirname, newBaseName)
       } // 使用rename方法进行重命名
 
-      const oldFilePath = path.resolve(oldDirName, oldFileName)
-      const newFilePath = path.resolve(newDirName, newFileName)
+      const oldFilePath = path.resolve(oldDirname, oldBaseName)
+      const newFilePath = path.resolve(newDirname, newBaseName)
       const operateResult = this.renameFile(oldFilePath, newFilePath)
 
       if (operateResult) {
@@ -329,18 +318,18 @@ class fsUtils implements FsInstance {
   @catchHandel()
   @log()
   copyFile(filePath: string) {
-    const dirName = path.dirname(filePath)
+    const dirname = path.dirname(filePath)
     const extensionName = path.extname(filePath) // 文件扩展名
 
-    const baseName = path.basename(filePath, extensionName).split('copy')[0].trim()
-    let newFileName = `${baseName} copy${extensionName}`
-    let newFilePath = path.resolve(dirName, newFileName)
+    const filename = path.basename(filePath, extensionName).split('copy')[0].trim()
+    let newBaseName = `${filename} copy${extensionName}`
+    let newFilePath = path.resolve(dirname, newBaseName)
     let renameCount = 1 // 文件已存在
 
     while (this.filePathList.includes(newFilePath)) {
       renameCount++
-      newFileName = `${baseName} copy ${renameCount}${extensionName}`
-      newFilePath = path.resolve(dirName, newFileName)
+      newBaseName = `${filename} copy ${renameCount}${extensionName}`
+      newFilePath = path.resolve(dirname, newBaseName)
     }
 
     fs.copyFileSync(filePath, newFilePath)

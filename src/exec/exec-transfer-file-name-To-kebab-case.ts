@@ -58,26 +58,20 @@ try {
 
   const fsInstance = exec.getFsInstance()
 
-  const customBaseName = (filePath: string) => {
-    const oldExtensionName = path.extname(filePath) // 文件扩展名
-
-    const oldBaseName = path.basename(filePath, oldExtensionName) // 文件名
-
-    return transferRef(oldBaseName, '\\')
+  const customFilename = (oldFilename: string) => {
+    return transferRef(oldFilename, '\\')
   }
 
-  const customDirName = (filePath: string) => {
-    const oldDirName = path.dirname(filePath) // 文件扩展名
-
+  const customDirname = (oldDirname: string) => {
     const relativeDir = path.relative(
       'C:/Users/ZC/Documents/project/node-project/toolbox',
-      oldDirName
+      oldDirname
     )
     return transferRef(relativeDir, '\\')
   }
 
   setTimeout(() => {
-    fsInstance.modifyFileName(customBaseName, null, null, null, customDirName)
+    fsInstance.modifyFilename(customFilename, null, customDirname)
     fsInstance.dirPathList.reverse().forEach((folderPath) => {
       const result = fs.readdirSync(folderPath)
 
