@@ -1,9 +1,11 @@
+// 引入 Node.js 中的文件系统模块（fs），用于操作文件和目录
 import * as fs from 'fs'
-import * as path from 'path' //
+// 引入 Node.js 中的路径模块（path），用于处理文件和目录路径
+import * as path from 'path'
 
 /**
  * 获取数据类型
- * @param {any} obj
+ * @param {any} obj - 任意待检测的数据
  * @returns {String} 数据构造器对应字符串
  * | 'Undefined'
    | 'Null'
@@ -16,41 +18,42 @@ import * as path from 'path' //
    | 'Array'
    | 'Function'
  */
-
 export const getDataType = (obj: any) => {
   return Object.prototype.toString.call(obj).slice(8, -1)
 }
+
 /**
  * 检查路径有效性
- * @param filePath
+ * @param filePath - 要检查的文件路径
  */
-
 export const checkPathVaild = (filePath: string) => {
   try {
+    // 尝试访问文件，如果存在则无异常抛出
     fs.accessSync(filePath, fs.constants.F_OK)
   } catch {
+    // 若访问失败，获取父级目录路径，并递归创建缺失的目录结构
     const dirPath = path.dirname(filePath)
-    fs.mkdirSync(dirPath, {
-      recursive: true
-    })
+    fs.mkdirSync(dirPath, { recursive: true })
   }
 }
+
 /**
  * 写入文件内容
- * @param filePath
- * @param content
+ * @param filePath - 目标文件路径
+ * @param content - 要写入文件的文本内容
  */
-
 export const writeFile = (filePath: string, content: string) => {
+  // 先检查路径有效性，确保文件能被正确写入
   checkPathVaild(filePath)
+  // 使用同步方式写入文件，编码为 UTF-8
   fs.writeFileSync(filePath, content, 'utf-8')
 }
+
 /**
  * 对对象内部属性排序
- * @param {Object} target
- * @returns {Object} 属性排序后对象
+ * @param {Object} target - 待排序的对象
+ * @returns {Object} 属性排序后的新对象
  */
-
 export function sortObjAttr(target: Record<string, any>) {
   const dataType = getDataType(target)
 
@@ -67,13 +70,13 @@ export function sortObjAttr(target: Record<string, any>) {
   })
   return newObj
 }
+
 /**
  * 数组排序
- * @param {Array} arr 原数组
- * @param {Function|string} customSort 自定义排序规则
- * @returns {Array} 排序后数组
+ * @param {Array} arr - 原数组
+ * @param {Function|string} customSort - 自定义排序规则，可以是比较函数或基于对象属性的字符串键名
+ * @returns {Array} 排序后的新数组
  */
-
 export function sortArray(arr: Array<Record<string, any>>, customSort: Function | string) {
   const dataType = getDataType(arr)
 
@@ -90,8 +93,9 @@ export function sortArray(arr: Array<Record<string, any>>, customSort: Function 
       return a[customSort].localeCompare(b[customSort])
     }
   })
-} // 分组缓存
+}
 
+// 定义分组缓存接口
 export interface GroupCache<T> {
   [cacheKey: string]: {
     groupKey: string
@@ -100,13 +104,13 @@ export interface GroupCache<T> {
     [key: string]: any
   }
 }
-/**
- * 根据指定属性分类
- * @param {Array} arr 指定数组
- * @param {String} groupKey //分类依据
- * @returns {Object} 分类结果
- */
 
+/**
+ * 根据指定属性对数组元素进行分类
+ * @param {Array} arr - 指定数组
+ * @param {String} groupKey - 分类依据的属性名
+ * @returns {Object} 分类结果对象
+ */
 export function groupBy<T extends Record<string, any>>(arr: T[], groupKey: string) {
   const cache = {} as GroupCache<T>
 
@@ -129,38 +133,45 @@ export function groupBy<T extends Record<string, any>>(arr: T[], groupKey: strin
       }
     }
   })
+
   return cache
 }
-/**
- * 驼峰转化-
- * @param str
- * @returns
- */
 
+/**
+ * 驼峰式字符串转短横线分隔
+ * @param {string} str - 驼峰式字符串
+ * @returns {string} 短横线分隔的字符串
+ */
 export const kebabCase = function (str: string) {
   const hyphenateRE = /([^-])([A-Z])/g
   return str.replace(hyphenateRE, '$1-$2').replace(hyphenateRE, '$1-$2').toLowerCase()
 }
+
+/**
+ * 移除字符串开头的下划线和连字符
+ * @param {string} str - 输入字符串
+ * @returns {string} 处理后的字符串
+ */
 export const easeUnline = function (str: string) {
   const easeReg2 = /^[_-]/g
   return str.replace(easeReg2, '')
 }
+
 /**
  * 首字母大写
- * @param str
- * @returns
+ * @param {string} str - 输入字符串
+ * @returns {string} 首字母大写的字符串
  */
-
 export const capitalize = function (str: string) {
   if (typeof str !== 'string') return str
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
-/**
- * 判断是否为引用路径
- * @param str
- * @returns
- */
 
+/**
+ * 判断是否为引用路径（如 '@', 'src', 'images', 'img', 'styles', '~', '../', './', 'dist' 开头的字符串）
+ * @param {string} str - 待判断的字符串
+ * @returns {boolean} 是否为引用路径
+ */
 export const isPath = (str: string) => {
   const startsWithList: string[] = ['@', 'src', 'images', 'img', 'styles', '~', '../', './', 'dist']
 
@@ -172,13 +183,13 @@ export const isPath = (str: string) => {
 
   return false
 }
-/**
- * 转化导入路径引用驼峰规则
- * @param str
- * @param seperator
- * @returns
- */
 
+/**
+ * 转化导入路径引用为驼峰规则，使用指定分隔符
+ * @param {string} str - 输入字符串
+ * @param {string} seperator - 分隔符，默认为 '/'
+ * @returns {string} 转化后的字符串
+ */
 export const transferRef = (str: string, seperator = '/') => {
   if (!str) {
     return str
@@ -191,39 +202,39 @@ export const transferRef = (str: string, seperator = '/') => {
         .replace(/[_-]{2}/g, '-')
         .replace(/(['"`/\\])-/g, '$1')
         .replace(/(\b\w\b)-(?=\b\w\b)/g, '$1')
+
       /** 当代码管理工具和window组合使用，会出现文件大小写同源问题 */
-
       /** to stupid to continue  */
-
       /** this is situation one  */
 
       if (!result.includes('-') && item !== result) {
         result = '_' + result
       }
+
       /** this is situation two,exec after one ，also you can skip them */
-      // result = easeUnline(result)
+      // result = easeUnline(result);
 
       return result
     })
     .join(seperator)
 }
-/**
- * 执行string代码,存在无效引用则报错
- * @param str
- * @returns
- */
 
+/**
+ * 执行字符串形式的 JavaScript 代码，存在无效引用时会报错
+ * @param {string} str - 要执行的 JavaScript 代码字符串
+ * @returns {any} 代码执行结果
+ */
 export function strToJson(str: string) {
   const json = eval('(' + str + ')')
   return json
 }
-/**
- * 设置嵌套对象属性
- * @param target
- * @param keys
- * @param value
- */
 
+/**
+ * 设置嵌套对象属性值
+ * @param {Record<string, any>} target - 目标对象
+ * @param {string[] | string} keys - 属性路径，可以是逗号分隔的字符串或键名数组
+ * @param {any} value - 要设置的属性值
+ */
 export const setValueByKeys = (
   target: Record<string, any> = {},
   keys: string[] | string,
@@ -248,15 +259,15 @@ export const setValueByKeys = (
     }
   }, target)
 }
-/**
- * 获取嵌套对象属性
- * @param target
- * @param keys
- */
 
+/**
+ * 获取嵌套对象属性值
+ * @param {Record<string, any>} target - 目标对象
+ * @param {string[] | string} keys - 属性路径，可以是逗号分隔的字符串或键名数组
+ * @returns {any} 指定路径的属性值，若不存在则返回 undefined
+ */
 export const getValueByKeys = (target: Record<string, any> = {}, keys: string[] | string): any => {
   let localKeys = keys
-
   if (typeof localKeys === 'string') {
     localKeys = localKeys.split(',')
   }

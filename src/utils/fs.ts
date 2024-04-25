@@ -2,16 +2,19 @@ import { checkPathVaild } from '../utils/common'
 import * as fs from 'fs'
 import * as os from 'os'
 import * as path from 'path'
-const userInfo = os.userInfo() // 用户信息
 
+const userInfo = os.userInfo() // 用户信息
 const eol = os.EOL // 换行符
 
+// 定义记录类型
 interface Record {
   name: string
   type: string
   arguments: IArguments
   error?: Error | unknown
 }
+
+// 定义文件信息接口
 export interface FileInfo {
   filePath: string
   dirname: string
@@ -20,11 +23,15 @@ export interface FileInfo {
   filename: string
   stats: fs.Stats
 }
+
+// 定义缓存接口
 interface Cache {
   [cacheKey: string]: {
     index: number
   }
 }
+
+// 定义自定义文件名、扩展名、目录名函数接口
 interface CustomFilenameFunction {
   (oldFilename: string): string
 }
@@ -35,15 +42,24 @@ interface CustomDirnameFunction {
   (oldDirname: string): string
 }
 
+// 定义FsInstance接口
 interface FsInstance {
   rootPath: string
   folderPath: string
   logPath: string
   filePathList: Array<string>
   dirPathList: string[]
+
+  // 操作日志记录方法
   saveOperateLog(message: string): void
+
+  // 获取指定路径文件列表方法
   getFilePathList(folderPath: string): void
+
+  // 获取文件详细信息列表方法
   getFileInfoList(): FileInfo[]
+
+  // 修改文件名方法
   modifyFilename(
     customFilename: string | CustomFilenameFunction | null,
     customExtname?: string | CustomExtnameFunction | null,
@@ -51,14 +67,18 @@ interface FsInstance {
     filterFilename?: string,
     filterExtensionName?: string
   ): void
-  renameFile(oldFilePath: string, newFilePath: string): boolean
-  copyFile(filePath: string): void
-}
-/**
- * 操作日志打印记录
- * @returns
- */
 
+  // 重命名文件方法
+  renameFile(oldFilePath: string, newFilePath: string): boolean
+
+  // 复制文件方法
+  copyFile(filePath: string): void
+
+  // 删除文件方法
+  deleteFile(filePath: string): void
+}
+
+// 操作日志打印记录装饰器
 function log() {
   return function (target: FsInstance, name: string, descriptor: PropertyDescriptor) {
     const fn = descriptor.value
@@ -76,11 +96,8 @@ function log() {
     return descriptor
   }
 }
-/**
- * 异常处理装饰器与异常日志记录
- * @returns
- */
 
+// 异常处理装饰器与异常日志记录
 function catchHandel() {
   return function (target: FsInstance, name: string, descriptor: PropertyDescriptor) {
     const fn = descriptor.value
@@ -103,12 +120,12 @@ function catchHandel() {
     return descriptor
   }
 }
+
 /**
- * //基于node.js的文件操作类
+ * 基于Node.js的文件操作类
  * @author pzc
  * @date 2021/07/12
  */
-
 class fsUtils implements FsInstance {
   folderPath: string
   logPath: string
@@ -119,16 +136,15 @@ class fsUtils implements FsInstance {
     this.folderPath = path.join(rootPath)
     this.logPath = path.join(rootPath, 'fsUtils.log')
     this.filePathList = [] // 指定目录所有文件集合
-
     this.dirPathList = [] // 指定目录所有文件夹集合
-
     this.getFilePathList(this.folderPath) // 直接使用构造器
   }
+
   /**
    * 简易日志记录
-   * @param {string} message //消息记录
+   * @param {string} message - 消息记录
    */
-
+  @catchHandel()
   saveOperateLog(message: string) {
     const baseInfo = {
       // 操作内容记录
@@ -147,19 +163,19 @@ class fsUtils implements FsInstance {
       fs.appendFileSync(this.logPath, content)
     } catch (err) {}
   }
+
   /**
    * 获取指定路径所有文件列表
-   * @param {string} folderPath //指定路径
+   * @param {string} folderPath - 指定路径
    * @returns {Object} 返回文件路径/文件夹路径/文件错误路径列表
    */
-
   @catchHandel()
   getFilePathList(folderPath: string) {
     fs.accessSync(folderPath, fs.constants.F_OK)
     fs.readdirSync(folderPath).forEach((filename: string) => {
       const filePath = path.resolve(folderPath, filename) // 连接路径的两个或多个部分：
-      // 判断是否为文件
 
+      // 判断是否为文件
       if (fs.lstatSync(filePath).isFile()) {
         this.filePathList.push(filePath)
       } else {
@@ -168,6 +184,7 @@ class fsUtils implements FsInstance {
       }
     })
   }
+
   /**
    * 获取文件详细信息列表
    */
@@ -184,17 +201,18 @@ class fsUtils implements FsInstance {
     })
     return fileInfoList
   }
+
   /**
    * 修改文件名
-   * @param {string|funcion} customFilename 新文件名不包含后缀,为空则使用旧文件名
-   * @param {string|funcion} customExtname //新后缀名，为空则使用旧后缀名
-   * @param {string} filterFilename 限定过滤关键字
-   * @param {string} filterExtensionName 限定过滤后缀名
+   * @param {string|funcion} customFilename - 新文件名不包含后缀,为空则使用旧文件名
+   * @param {string|funcion} customExtname - 新后缀名，为空则使用旧后缀名
+   * @param {string} filterFilename - 限定过滤关键字
+   * @param {string} filterExtensionName - 限定过滤后缀名
    * @example // 自定义新文件名规则（不包含后缀名）
               const customBasenameGenerateFunction = (oldFilename) => {
-                return oldFilename
+                return oldFilename;
               }
-              fsInstance.modifyFilename(customBasenameGenerateFunction)
+              fsInstance.modifyFilename(customBasenameGenerateFunction);
    */
   @log()
   modifyFilename(
@@ -219,14 +237,14 @@ class fsUtils implements FsInstance {
     }
 
     if (filterFilename) {
-      filePathListBackup = this.filePathList.filter(
-        (filePath) => path.basename(filePath, path.extname(filePath)).indexOf(filterFilename) > -1
+      filePathListBackup = this.filePathList.filter((filePath) =>
+        path.basename(filePath, path.extname(filePath)).includes(filterFilename)
       )
     }
 
     if (filterExtensionName) {
-      filePathListBackup = this.filePathList.filter(
-        (filePath) => path.extname(filePath).indexOf(filterExtensionName) > -1
+      filePathListBackup = this.filePathList.filter((filePath) =>
+        path.extname(filePath).includes(filterExtensionName)
       )
     }
 
@@ -273,7 +291,7 @@ class fsUtils implements FsInstance {
         newBaseName = `${newFilename}(${index++})${newExtensionName}` // 重命名
 
         cacheKey = path.join(newDirname, newBaseName)
-      } // 使用rename方法进行重命名
+      }
 
       const oldFilePath = path.resolve(oldDirname, oldBaseName)
       const newFilePath = path.resolve(newDirname, newBaseName)
@@ -288,14 +306,15 @@ class fsUtils implements FsInstance {
         modifyCount++
       }
     })
+
     console.log(`批量修改完毕，共${modifyCount}个文件产生变化`)
   }
+
   /**
    * 重命名文件名，存在资源抢占问题，需要二次执行rename，或者记录oldFilePath执行fs.rm
    * @param {string} oldFilePath
    * @param {string} newFilePath
    */
-
   @catchHandel()
   @log()
   renameFile(oldFilePath: string, newFilePath: string) {
@@ -310,11 +329,11 @@ class fsUtils implements FsInstance {
     this.filePathList.splice(filePathIndex, 1)
     return true
   }
+
   /**
    * 复制指定路径原文件
    * @param {string} filePath
    */
-
   @catchHandel()
   @log()
   copyFile(filePath: string) {
@@ -335,12 +354,12 @@ class fsUtils implements FsInstance {
     fs.copyFileSync(filePath, newFilePath)
     this.filePathList.push(newFilePath)
   }
+
   /**
    * 删除指定路径文件
    * @param {string} filePath
    * @returns
    */
-
   @catchHandel()
   @log()
   deleteFile(filePath: string) {
@@ -349,5 +368,4 @@ class fsUtils implements FsInstance {
     this.filePathList.splice(filePathIndex, 1)
   }
 }
-
 export default fsUtils

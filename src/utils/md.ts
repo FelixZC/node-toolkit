@@ -1,24 +1,23 @@
-import { getDataType, sortArray, sortObjAttr } from './common'
 /**
- * md文件生成工具类，完善中...
+ * Markdown 文件生成工具类，持续完善中...
  * @author pzc
  * @date 2021/08/23
- *
  */
 
 import * as os from 'os'
 import { parseDocs } from '../plugins/generate-vue-docs'
-const br = os.EOL // 换行符
+import { getDataType, sortArray, sortObjAttr } from './common'
+
+const br = os.EOL // 行分隔符
 
 /**
- * 根据指定正则查找内容
- * @param {String} content 查找内容
- * @param {RegExp} queryReg 正则表达式
- * @param {Number} matchIndex 指定匹配子项
- * @param {Number} customHandel 自定义返回子项结果
- * @returns
+ * 使用指定正则表达式在给定内容中查找匹配项
+ * @param {string} content - 要搜索的文本内容
+ * @param {RegExp} queryReg - 用于搜索的正则表达式
+ * @param {number} [matchIndex=0] - 要返回的匹配项索引（默认：0）
+ * @param {Function} [customHandel] - 可选的自定义处理函数，用于处理匹配结果
+ * @returns {string} 提取或处理后的文本内容
  */
-
 function queryContentByReg(
   content: string,
   queryReg: RegExp,
@@ -52,12 +51,12 @@ function queryContentByReg(
 
   return str
 }
-/**
- * 文本去重格式化
- * @param {String} content
- * @param {String} mode 去重模式，txt转Md并格式化/txt格式Txt/default纯粹去重
- */
 
+/**
+ * 对文本进行去重和格式化处理
+ * @param {string} content - 待处理的文本
+ * @param {string} mode - 处理模式，可选值：'txtToMd'（转换为Markdown并格式化）、'txtToTxt'（仅格式化纯文本）、'default'（纯粹去重）
+ */
 function textFormat(content: string, mode = 'md') {
   const reg = /.*/g
   const match = content.match(reg)
@@ -67,7 +66,7 @@ function textFormat(content: string, mode = 'md') {
   }
 
   let result = Array.from(new Set(match))
-  result = result.filter((item) => item.match(/[\S]/)) // 去除空白行
+  result = result.filter((item) => item.match(/[\S]/)) // 移除空白行
 
   let str = ''
   let title = ''
@@ -79,7 +78,7 @@ function textFormat(content: string, mode = 'md') {
         localItem = localItem.trim()
 
         if ((index + 1) % 2 === 0) {
-          return `${localItem}${br}` // 额外添加行间距
+          return `${localItem}${br}` // 添加额外行间距
         }
 
         return `> ${(index + 2) / 2}. **${localItem}**  `
@@ -94,7 +93,7 @@ function textFormat(content: string, mode = 'md') {
         localItem = localItem.trim()
 
         if ((index + 1) % 2 === 0) {
-          return `${localItem}${br}` // 额外添加行间距
+          return `${localItem}${br}` // 添加额外行间距
         }
 
         return localItem
@@ -115,12 +114,12 @@ function textFormat(content: string, mode = 'md') {
 
   return str
 }
+
 /**
  * 创建属性描述表格
- * @param {*} attrGroup //属性描述分组后对象
- * @returns {String} 带首字母索引的属性描述表格字符串
+ * @param {*} attrGroup - 属性描述分组后的对象
+ * @returns {string} 包含首字母索引的属性描述表格字符串
  */
-
 function createdAttributesGroupTable(attrGroup: Record<string, any>) {
   let localAttrGroup = attrGroup
   const dataType = getDataType(localAttrGroup)
@@ -148,15 +147,15 @@ function createdAttributesGroupTable(attrGroup: Record<string, any>) {
 
   return attributesDescriptionTable
 }
-/**
- * 创建store对应字段表述表格,需要创建包含store所有模块初始化数据的文件
- * @param {Object} stateInStore store初始对象
- * @param {Object} annotationObj 属性注释
- * @param {Number} leavl 模块层数
- * @param {Array} cache 模块属性缓存数组
- * @returns {String} 带索引的store对应字段表述表格
- */
 
+/**
+ * 创建与 Store 中字段相对应的表述表格，需要预先创建包含 Store 所有模块初始数据的文件
+ * @param {Object} stateInStore - Store 的初始对象
+ * @param {Object} annotationObj - 字段注释对象
+ * @param {Number} [leavl=1] - 模块层级数
+ * @param {Array} [cache=[]] - 模块属性缓存数组
+ * @returns {string} 带索引的 Store 对应字段表述表格
+ */
 function createdStoreTable(
   stateInStore: Record<string, any>,
   annotationObj: Record<string, any>,
