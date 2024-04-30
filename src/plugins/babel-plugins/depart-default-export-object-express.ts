@@ -1,21 +1,24 @@
 import { cloneDeep } from 'lodash'
 import { NodePath } from '@babel/traverse'
+import { declare } from '@babel/helper-plugin-utils'
+import * as t from '@babel/types'
 
 /**
  * 分离默认导出对象方法，添加单独引用，聚合默认导出
+ * AST转换插件，主要用于拆分和重定义默认导出的对象方法、函数和变量。
+ * @param babel Babel传递给插件的上下文对象，可用于访问Babel的API和配置。
+ * @returns 返回一个包含插件名称和访问器对象的对象。
  */
-
-import { declare } from '@babel/helper-plugin-utils'
-import * as t from '@babel/types'
 export default declare((babel) => {
   /** 默认导出拆分记录记录 */
   const objectMethodList: t.ObjectMethod[] = []
+
   /** 重定义方法变量记录 */
-
   const tranferExportList: string[] = []
-  /** 已经导出的方法和变量 */
 
+  /** 已经导出的方法和变量 */
   const alreadyExportList: string[] = []
+
   return {
     name: 'ast-transform',
     visitor: {
@@ -24,7 +27,7 @@ export default declare((babel) => {
         if (t.isObjectExpression(path.node.declaration)) {
           path.traverse({
             ObjectMethod(path) {
-              // this指向变了，先移除this引用
+              // 移除ThisExpression引用
               path.traverse({
                 ThisExpression(thisExpressionPath) {
                   const parent = thisExpressionPath.parentPath as NodePath<t.MemberExpression>
@@ -47,8 +50,8 @@ export default declare((babel) => {
           /** 方法和变量重置导出，并记录 */
           for (let index = 0; index < path.node.body.length; index++) {
             const element = path.node.body[index]
-            /** 方法定义 */
 
+            /** 方法定义 */
             if (t.isFunctionDeclaration(element)) {
               if (element.id) {
                 const node = t.exportNamedDeclaration(
@@ -66,8 +69,8 @@ export default declare((babel) => {
                 tranferExportList.push(element.id.name)
               }
             }
-            /** 变量定义 */
 
+            /** 变量定义 */
             if (t.isVariableDeclaration(element)) {
               const node = t.exportNamedDeclaration(
                 t.variableDeclaration(element.kind, element.declarations)
@@ -84,8 +87,8 @@ export default declare((babel) => {
                 }
               })
             }
-            /** 查找已导出方法和变量记录 */
 
+            /** 查找已导出方法和变量记录 */
             if (t.isExportNamedDeclaration(element)) {
               /** 已导出变量定义 */
               if (t.isVariableDeclaration(element.declaration)) {
@@ -95,8 +98,8 @@ export default declare((babel) => {
                   }
                 })
               }
-              /** 已导出方法定义 */
 
+              /** 已导出方法定义 */
               if (t.isFunctionDeclaration(element.declaration)) {
                 if (element.declaration.id) {
                   alreadyExportList.push(element.declaration.id.name)
@@ -124,8 +127,8 @@ export default declare((babel) => {
             return node
           })
           path.node.body = [...departObjectMethod, ...path.node.body]
-          /** 重新写入默认导出属性 */
 
+          /** 重新写入默认导出属性 */
           const allExportList = [...tranferExportList, ...alreadyExportList]
 
           if (!allExportList.length) {
@@ -135,8 +138,8 @@ export default declare((babel) => {
           const target = path.node.body.find((item) =>
             t.isExportDefaultDeclaration(item)
           ) as t.ExportDefaultDeclaration
-          /** 存在默认导出 */
 
+          /** 存在默认导出 */
           if (target) {
             /** 默认导出是对象 */
             if (t.isObjectExpression(target.declaration)) {

@@ -10,8 +10,6 @@ const babelPluginPathList: string[] = [
   '../plugins/babel-plugins/depart-switch'
   // '../plugins/babel-plugins/remove-invalid-comment'
   // '../plugins/babel-plugins/transform-remove-console'
-  // '../plugins/babel-plugins/search-button-obj'
-  // '../plugins/babel-plugins/create-object-array-in-switch-by-old'
   // '../plugins/babel-plugins/depart-default-export-object-express'
   // '../plugins/babel-plugins/replace-memberExpress-object-or-property'
 ]
