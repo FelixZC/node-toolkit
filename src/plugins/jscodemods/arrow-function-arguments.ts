@@ -1,6 +1,12 @@
 //@ts-nocheck
 import { Transform } from 'jscodeshift'
-
+/**
+ * 主要转换函数：将箭头函数中的 'arguments' 替换为 'args'。
+ * @param {object} file - 待转换的文件对象。
+ * @param {object} api - jscodeshift 提供的转换工具对象。
+ * @param {object} options - 转换选项。
+ * @returns {string|null} 如果有转换发生，则返回转换后的代码字符串；否则返回 null。
+ */
 const transformer: Transform = (file, api, options) => {
   const j = api.jscodeshift
   const printOptions = options.printOptions || {
@@ -10,11 +16,14 @@ const transformer: Transform = (file, api, options) => {
   const ARGUMENTS = 'arguments'
   const ARGS = 'args'
 
+  // 创建一个新的箭头函数表达式，将给定的参数合并到函数中。
   const createArrowFunctionExpression = (fn, args) =>
     j.arrowFunctionExpression((fn.params || []).concat(j.restElement(args)), fn.body, fn.generator)
 
+  // 过滤成员表达式，排除它们的转换。
   const filterMemberExpressions = (path) => path.parent.value.type !== 'MemberExpression'
 
+  // 判断箭头函数是否应该被转换，基于其上下文和内容。
   const filterArrowFunctions = (path) => {
     let localPath = path
 
@@ -35,19 +44,15 @@ const transformer: Transform = (file, api, options) => {
 
         case 'Function':
           return false
-          break
 
         case 'FunctionDeclaration':
           return false
-          break
 
         case 'FunctionExpression':
           return false
-          break
 
         case 'MethodDeclaration':
           return false
-          break
 
         default:
           break
@@ -59,6 +64,7 @@ const transformer: Transform = (file, api, options) => {
     return false
   }
 
+  // 更新函数调用中的 'arguments' 使用 'args'，并更新相应的箭头函数表达式以接受 'args'。
   const updateArgumentsCalls = (path) => {
     let afPath = path
 
@@ -91,6 +97,7 @@ const transformer: Transform = (file, api, options) => {
     }
   }
 
+  // 在代码中应用转换，识别并更新使用 'arguments' 的箭头函数。
   const didTransform =
     root
       .find(j.Identifier, {
@@ -100,6 +107,7 @@ const transformer: Transform = (file, api, options) => {
       .filter(filterArrowFunctions)
       .forEach(updateArgumentsCalls)
       .size() > 0
+  // 如果有转换发生，则返回转换后的代码；否则返回 null。
   return didTransform ? root.toSource(printOptions) : null
 }
 

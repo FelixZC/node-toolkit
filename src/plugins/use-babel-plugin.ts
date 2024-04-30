@@ -7,60 +7,84 @@ import traverse from '@babel/traverse'
 import type * as Babel from '@babel/core'
 import type { PluginObj, Visitor } from '@babel/core'
 import type { ExecFileInfo } from './common'
+// 导出 Babel 核心 API 类型
 export type BabelAPI = typeof Babel
+// 定义一个自定义插件对象接口，扩展 Babel 插件对象，添加 getExtra 方法和 visitor
 export interface CustomPluginObj extends PluginObj {
   getExtra?: () => Record<string, any>
   visitor: Visitor
 }
+// 定义一个 Babel 插件类型，接受 Babel API、选项和目录名，返回自定义插件对象
 export interface BabelPlugin {
   (babel: BabelAPI, options?: Record<string, any>, dirname?: string): CustomPluginObj
 }
 
+/**
+ * 使用提供的 Babel 插件列表对给定的代码进行转换。
+ * @param execFileInfo - 包含执行时文件信息的对象，如源代码、文件路径等。
+ * @param pluginsList - 一个 Babel 插件函数列表。
+ * @returns 转换后的代码字符串。
+ */
 const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
   try {
-    /** 1，先将代码转换成ast */
+    // 将代码解析为抽象语法树 (AST)
     const codeAst = parser.parse(execFileInfo.source, getParserOption())
-    /** 2,分析修改AST，第一个参数是AST，第二个参数是访问者对象 */
 
+    // 遍历插件列表，使用每个插件修改 AST
     for (const plugin of pluginsList) {
       const pluginObj = plugin(babel, {}, execFileInfo.path)
       traverse(codeAst, pluginObj.visitor)
 
+      // 如果插件定义了 getExtra 方法，则调用并合并返回的额外信息到 execFileInfo.extra
       if (typeof pluginObj.getExtra === 'function') {
         execFileInfo.extra = { ...execFileInfo.extra, ...pluginObj.getExtra() }
       }
     }
-    /** 3，生成新的代码，第一个参数是AST，第二个是一些可选项，第三个参数是原始的code */
 
+    // 使用修改后的 AST 生成新的代码
     const newCode = generator(codeAst, getGeneratorOption(), execFileInfo.source)
-    /** 会返回一个对象，code就是生成后的新代码 */
 
+    // 返回转换后的代码
     return `\n${newCode.code}\n`
   } catch (e) {
     console.error(e)
+    // 如果转换过程中出错，则返回原始代码
     return execFileInfo.source
   }
 }
 
+/**
+ * 运行 Babel 插件。
+ * 对于非 .vue 文件，直接使用 transform 函数转换代码。
+ * 对于 .vue 文件，解析 SFC（Single File Component），并对 script 和 scriptSetup 部分应用转换。
+ * @param execFileInfo - 包含执行时文件信息的对象，如源代码、文件路径等。
+ * @param pluginsList - 一个 Babel 插件函数列表。
+ * @returns 转换后的代码字符串。
+ */
 const runBabelPlugin = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
+  // 如果没有插件需要运行，则直接返回原始源代码
   if (!pluginsList.length) {
     return execFileInfo.source
   }
 
+  // 检查文件路径是否以 .vue 结尾
   const { path, source } = execFileInfo
-
   if (!path.endsWith('.vue')) {
+    // 对非 .vue 文件应用插件列表并返回转换后的代码
     return transform(execFileInfo, pluginsList)
   }
 
+  // 解析 Vue 单文件组件
   const { descriptor } = parseSFC(source, {
     filename: path
   })
 
+  // 如果组件没有 script 或 scriptSetup 部分，则直接返回原始源代码
   if (!descriptor.script?.content && !descriptor.scriptSetup?.content) {
     return source
   }
 
+  // 对 script 和 scriptSetup 部分分别应用插件列表，并更新对应的内容
   if (descriptor.script && descriptor.script.content) {
     execFileInfo.source = descriptor.script.content
     descriptor.script.content = transform(execFileInfo, pluginsList)
@@ -71,6 +95,7 @@ const runBabelPlugin = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) 
     descriptor.scriptSetup.content = transform(execFileInfo, pluginsList)
   }
 
+  // 将更新后的 descriptor 字符串化并返回
   return stringifySFC(descriptor)
 }
 

@@ -1,5 +1,6 @@
 import * as compiler from '@vue/compiler-sfc'
-import { createRoot, generate } from '@vue/compiler-core' // import { RootNode, NodeTypes, createSimpleExpression, locStub } from '@vue/compiler-core'
+import { createRoot, generate } from '@vue/compiler-core'
+// import { RootNode, NodeTypes, createSimpleExpression, locStub } from '@vue/compiler-core'
 // import * as generator from '@babel/generator'
 // import * as parser from '@babel/parser'
 // import * as t from '@babel/types'
@@ -58,18 +59,29 @@ import { writeFile } from '../../utils/common'
 import type { ExecFileInfo } from '../common'
 import type { SFCParseOptions } from '@vue/compiler-sfc'
 
+/**
+ * 将Vue单文件组件的信息转换为JSON格式字符串。
+ * @param fileInfo 包含组件源码信息的对象。
+ * @param option 解析Vue文件时的选项（可选）。
+ * @returns 返回转换后的Vue组件描述信息的JSON字符串。
+ */
 const transferNodePropertyToJson = (fileInfo: ExecFileInfo, option?: SFCParseOptions) => {
+  // 使用Vue编译器解析组件文件
   const vue = compiler.parse(fileInfo.source, option)
 
+  // 如果存在模板部分，则将其AST转换为JSON，并写入文件
   if (vue.descriptor.template) {
     const rootNode = createRoot([vue.descriptor.template.ast])
     const generateResult = generate(rootNode)
+    // 将模板AST和生成的结果写入文件以供查看
     writeFile('src/query/sfc/rootNode.json', JSON.stringify(rootNode, null, 2))
     writeFile('src/query/sfc/generateResult.json', JSON.stringify(generateResult, null, 2))
   }
 
+  // 将完整的Vue解析结果写入JSON文件
   writeFile('src/query/sfc/vue.json', JSON.stringify(vue, null, 2)) //TODO 遍历template.ast，修改ast，修改对应script代码， 转化为posthtml-render可输入ast?，输出新template
 
+  // 返回Vue组件的字符串描述
   return stringify(vue.descriptor)
 }
 

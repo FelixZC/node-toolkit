@@ -1,17 +1,27 @@
-import { ExecFileInfo } from './common' //@ts-ignore
-
+import { ExecFileInfo } from './common'
+//@ts-ignore
 import getParser from 'jscodeshift/src/getParser'
 import jscodeshift, { Options, Parser, Transform } from 'jscodeshift'
 import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
 import type { SFCDescriptor } from '@vue/compiler-sfc'
+
 /**
  * parser可传的值有 babylon、flow、ts、tsx、babel,会去获取对应的解析器
+ * 定义一个代码转换器的类型，它扩展了jscodeshift的Transform类型，并可选地包含一个parser属性。
  */
-
 export type Codemod = Transform & {
   parser?: string | Parser
 }
 
+/**
+ * 对给定的文件信息执行一系列的代码转换操作。
+ *
+ * @param execFileInfo - 包含文件路径和源代码信息的对象。
+ * @param codemodList - 一个代码转换器列表，每个转换器都是一个函数，可选地接受一个parser参数。
+ * @param options - jscodeshift转换选项。
+ * @param lang - 可选参数，指定源代码的语言，默认为'js'。
+ * @returns 经过所有转换器处理后的源代码字符串。
+ */
 const transform = (
   execFileInfo: ExecFileInfo,
   codemodList: Codemod[],
@@ -19,10 +29,12 @@ const transform = (
   lang = 'js'
 ) => {
   try {
+    // 遍历每个转换器，应用它们到源代码上
     for (const codemod of codemodList) {
       let parser = getParser()
       let parserOption = codemod.parser
 
+      // 根据源代码语言选择合适的parser
       if (typeof parserOption !== 'object') {
         if (lang.startsWith('ts')) {
           parserOption = 'ts'
@@ -33,6 +45,7 @@ const transform = (
         }
       }
 
+      // 获取或指定parser
       if (parserOption) {
         parser = typeof parserOption === 'string' ? getParser(parserOption) : parserOption
       }
@@ -44,6 +57,7 @@ const transform = (
         stats: () => {},
         report: () => {}
       }
+      // 执行转换器，并在有返回值时更新源代码
       const out = codemod(execFileInfo, api, options)
 
       if (out) {
@@ -58,28 +72,40 @@ const transform = (
   }
 }
 
+/**
+ * 主函数，用于运行代码转换。
+ *
+ * @param execFileInfo - 包含文件路径和源代码信息的对象。
+ * @param codemodList - 要应用的代码转换器列表。
+ * @param options - jscodeshift转换选项。
+ * @returns 经过所有指定转换器处理后的源代码字符串。
+ */
 export default function runCodemod(
   execFileInfo: ExecFileInfo,
   codemodList: Codemod[],
   options: Options
 ) {
+  // 如果没有转换器，则直接返回源代码
   if (!codemodList.length) {
     return execFileInfo.source
   }
 
   const { path, source } = execFileInfo
   const extension = (/\.([^.]*)$/.exec(path) || [])[0]
-  let lang = extension.slice(1)
+  let lang = extension?.slice(1)
   let descriptor: SFCDescriptor
 
+  // 针对非.vue文件的处理逻辑
   if (extension !== '.vue') {
     return transform(execFileInfo, codemodList, options, lang)
   }
 
+  // 解析.vue文件
   descriptor = parseSFC(source, {
     filename: path
   }).descriptor
 
+  // 针对<script>和<script setup>块的处理
   if (!descriptor.script?.content && !descriptor.scriptSetup?.content) {
     return source
   }
@@ -96,5 +122,6 @@ export default function runCodemod(
     descriptor.scriptSetup.content = transform(execFileInfo, codemodList, options, lang)
   }
 
+  // 将处理后的.vue文件组件重新字符串化
   return stringifySFC(descriptor)
 }
