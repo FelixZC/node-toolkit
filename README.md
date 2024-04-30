@@ -117,12 +117,9 @@ pzc-toolbox                                             //
 │  │  ├─ use-postcss-plugin.ts                          //postcss使用包装
 │  │  ├─ use-posthtml-plugin.ts                         //posthtml使用包装
 │  ├─ query                                             //查询结果和文件输出
-│  │  ├─ excel                                          //
-│  │  │  └─ test.json                                   //
 │  │  ├─ js                                             //
 │  │  │  └─ stote-state.js                              //
 │  │  ├─ json                                           //
-│  │  │  ├─ excel-object-list.json                      //
 │  │  │  ├─ file-list.json                              //
 │  │  │  ├─ files-group.json                            //
 │  │  │  ├─ function-name.json                          //
@@ -133,18 +130,6 @@ pzc-toolbox                                             //
 │  └─ utils                                             //工具集合
 │     ├─ cli-progress.ts                                //进度条
 │     ├─ common.ts                                      //通用方法
-│     ├─ excel                                          //excel相关
-│     │  ├─ excel-to-json.ts                            //
-│     │  ├─ exec                                        //
-│     │  │  ├─ run-excel-to-json.ts                     //
-│     │  │  └─ run-json-to-excel.ts                     //
-│     │  ├─ json-to-excel.ts                            //
-│     │  ├─ output                                      //
-│     │  │  └─ index.ts                                 //
-│     │  ├─ typing                                      //
-│     │  │  └─ type.d.ts                                //
-│     │  └─ utils                                       //
-│     │     └─ map.ts                                   //
 │     ├─ fs.ts                                          //文件系统相关
 │     ├─ md.ts                                          //文档相关
 │     └─ type.ts                                        //接口模板相关
