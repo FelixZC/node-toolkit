@@ -39,27 +39,26 @@ ts-node xxx执行
 
 ps:自行在src/exec/index.ts修改new fsUtils(rootPath)，rootPath为预执行目标文件夹目录
 
-#### 项目目录结构说明
+#### 项目配置及源代码目录结构概览
 ```
-pzc-toolbox                                             //
-├─ .cz-config.js                                        //
-├─ .editorconfig                                        //
-├─ .eslintignore                                        //
-├─ .eslintrc.js                                         //
-├─ .husky                                               //
-│  ├─ commit-msg                                        //
-│  ├─ pre-commit                                        //
-│  └─ _                                                 //
-│     └─ husky.sh                                       //
-├─ .vscode                                              //
-│  └─ launch.json                                       //
-├─ commitlint.config.js                                 //
-├─ LICENSE                                              //
-├─ package-lock.json                                    //
-├─ package.json                                         //
-├─ prettier.config.js                                   //
-├─ README.md                                            //
-├─ src                                                  //
+├─ .cz-config.js        // Commitizen 配置文件，用于自定义提交信息的格式，提升Git提交信息的规范性。
+├─ .editorconfig        // 编辑器配置文件，帮助开发者在不同编辑器和IDE之间保持一致的代码风格。
+├─ .eslintignore        // ESLint 忽略规则文件，指定ESLint在代码检查时应忽略的文件或目录。
+├─ .eslintrc.js         // ESLint 配置文件，定义了代码质量检查的规则集，用于统一代码风格和规范。
+├─ .husky               // Husky 目录，存放Git钩子脚本的配置。
+│  ├─ commit-msg        // Git钩子脚本之一，用于在提交信息被提交前进行校验或修改，常与commitlint配合使用以规范提交信
+│  ├─ pre-commit        // Git钩子脚本，在Git预提交阶段执行，常用于自动格式化代码、运行测试等，确保提交前代码符合团队规
+│  └─ _                 // （此目录命名不太常见，可能是误写或特有配置）
+│     └─ husky.sh       // Husky的Shell脚本入口，可能用于跨平台兼容性处理或自定义钩子逻辑。
+├─ .vscode              // Visual Studio Code工作区配置目录。
+│  └─ launch.json       // VSCode调试配置文件，定义了如何启动和配置调试会话，适用于Node.js或其他语言环境。
+├─ commitlint.config.js // CommitLint配置文件，用于定义提交信息的验证规则，与Husky的commit-msg钩子配合使用。
+├─ LICENSE              // 许可证文件，声明了项目使用的开源许可证类型，明确了用户使用、修改和分发代码的权利与义务。
+├─ package-lock.json    // npm生成的锁定文件，记录了项目依赖的具体版本号，确保安装时的一致性和复现性。
+├─ package.json         // Node.js项目的元数据文件，包含了项目名称、版本、依赖、脚本等信息。
+├─ prettier.config.js   // Prettier配置文件，规定了代码格式化的规则，帮助保持团队间的代码风格统一。
+├─ README.md            // 项目自述文件，通常包含项目简介、安装步骤、使用方法、贡献指南等重要信息。
+└─ src                  // 源代码目录。
 │  ├─ exec                                              //执行器集合
 │  │  ├─ classify-files-group.ts                        //文件信息统计
 │  │  ├─ exec-bable-plugin.ts                           //执行babel插件
@@ -76,8 +75,6 @@ pzc-toolbox                                             //
 │  ├─ plugins                                           //插件集合
 │  │  ├─ babel-plugins                                  //babel插件
 │  │  │  ├─ ast-utils.ts                                //babel工具方法集合
-│  │  │  ├─ create-object-array-in-switch-by-old.ts     //操作switch中对象数组
-│  │  │  ├─ czl.ts                                      //czl练习
 │  │  │  ├─ depart-default-export-object-express.ts     //重置导出
 │  │  │  ├─ depart-switch.ts                            //分离switch
 │  │  │  ├─ extract-annotation.ts                       //提取注释
@@ -86,8 +83,6 @@ pzc-toolbox                                             //
 │  │  │  ├─ move-default-export-to-last.ts              //移动默认导出
 │  │  │  ├─ remove-invalid-comment.ts                   //移除包含this的无效注释
 │  │  │  ├─ replace-memberExpress-object-or-property.ts //替换表达式的调用对象或者调用属性
-│  │  │  ├─ remove-invalid-comment.ts                   //移除包含this的无效注释
-│  │  │  ├─ search-button-obj.ts                        //查询按钮对象
 │  │  │  ├─ sort-object-array-by-index.ts               //对象数组按index排序
 │  │  │  ├─ transfer-file-name-tok-kebab-case.ts        //驼峰转化
 │  │  │  └─ transform-remove-console.ts                 //移除打印
@@ -134,5 +129,4 @@ pzc-toolbox                                             //
 │     ├─ md.ts                                          //文档相关
 │     └─ type.ts                                        //接口模板相关
 └─ tsconfig.json                                        //
-
 ```
