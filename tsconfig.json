@@ -3,7 +3,7 @@
     "target": "ES5",
     "module": "commonjs",
     "strict": true,
-    "jsx": "preserve",
+    "jsx": "react",
     "allowJs": true,
     "importHelpers": true,
     "moduleResolution": "node",
@@ -15,7 +15,7 @@
     "baseUrl": ".",
     "types": ["jest", "jscodeshift", "node"],
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"],
-    "outDir": "./",
+    "outDir": "./dist",
     "declaration": true,
     "noUnusedLocals": true,
     "strictNullChecks": true,
@@ -25,6 +25,6 @@
     "removeComments": false,
     "rootDir": "."
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["dist", "node_modules", ".hisroty"]
+  "include": ["src", "app.tsx"],
+  "exclude": ["dist", "node_modules", ".history"]
 }

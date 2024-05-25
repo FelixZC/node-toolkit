@@ -201,7 +201,7 @@ const extractMethods = (node: t.ObjectProperty | t.ObjectMethod) => {
 const extractEvents = (path: NodePath<t.MemberExpression>) => {
   /*  第一个元素是事件名称 */
   const parentPath = path.findParent((item) =>
-    t.isCallExpression(item)
+    t.isCallExpression(item as t.Node | null | undefined)
   ) as NodePath<t.CallExpression>
   const eventName = parentPath.node.arguments[0] as t.StringLiteral
   const comments = parentPath.parent.leadingComments //ExpressionStatement

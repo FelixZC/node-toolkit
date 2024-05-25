@@ -82,7 +82,7 @@ export default declare((babel) => {
    * @return 如果成员表达式表示全局console的bind调用且不在排除数组中，则返回true；否则返回false。
    */
   function isIncludedConsoleBind(
-    memberExpr: NodePath<MemberExpression>,
+    memberExpr: NodePath<t.MemberExpression>,
     excludeArray: string[] = []
   ) {
     const object = memberExpr.get('object')
