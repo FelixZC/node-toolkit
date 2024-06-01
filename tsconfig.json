@@ -23,8 +23,23 @@
     "noImplicitThis": true,
     "resolveJsonModule": true,
     "removeComments": false,
-    "rootDir": "."
+    "rootDir": ".",
+    "paths": {
+      "@src/*": ["src/*"],
+      "@app/*": ["src/app/*"],
+      "@assets/*": ["src/assets/*"],
+      "@common/*": ["src/common/*"],
+      "@components/*": ["src/components/*"],
+      "@pages/*": ["src/pages/*"],
+      "@language/*": ["src/language/*"],
+      "@redux/*": ["src/redux/*"],
+      "@router/*": ["src/router/*"]
+    }
   },
-  "include": ["src", "app.tsx"],
+  "include": [
+    "src/**/*",
+    "types/*.d.ts",
+    "desktop/**/*",
+  ],
   "exclude": ["dist", "node_modules", ".history"]
 }

@@ -128,7 +128,5 @@ pzc-toolbox                                             //
 │     ├─ common.ts                                      //通用方法
 │     ├─ fs.ts                                          //文件系统相关
 │     ├─ md.ts                                          //文档相关
-│     └─ type.ts                                        //接口模板相关
 └─ tsconfig.json                                        //
-
 ```

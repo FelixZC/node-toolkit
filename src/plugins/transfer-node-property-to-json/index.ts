@@ -55,7 +55,7 @@ import { createRoot, generate } from '@vue/compiler-core'
 // }
 
 import { stringify } from '../sfc-utils'
-import { writeFile } from '../../utils/common'
+import { writeFile } from '../../utils/fs'
 import type { ExecFileInfo } from '../common'
 import type { SFCParseOptions } from '@vue/compiler-sfc'
 

@@ -1,4 +1,3 @@
-import { checkPathVaild } from '../utils/common'
 import * as fs from 'fs'
 import * as os from 'os'
 import * as path from 'path'
@@ -12,6 +11,33 @@ interface Record {
   type: string
   arguments: IArguments
   error?: Error | unknown
+}
+
+/**
+ * 检查路径有效性
+ * @param filePath - 要检查的文件路径
+ */
+export const checkPathVaild = (filePath: string) => {
+  try {
+    // 尝试访问文件，如果存在则无异常抛出
+    fs.accessSync(filePath, fs.constants.F_OK)
+  } catch {
+    // 若访问失败，获取父级目录路径，并递归创建缺失的目录结构
+    const dirPath = path.dirname(filePath)
+    fs.mkdirSync(dirPath, { recursive: true })
+  }
+}
+
+/**
+ * 写入文件内容
+ * @param filePath - 目标文件路径
+ * @param content - 要写入文件的文本内容
+ */
+export const writeFile = (filePath: string, content: string) => {
+  // 先检查路径有效性，确保文件能被正确写入
+  checkPathVaild(filePath)
+  // 使用同步方式写入文件，编码为 UTF-8
+  fs.writeFileSync(filePath, content, 'utf-8')
 }
 
 // 定义文件信息接口

@@ -1,7 +1,8 @@
 import { declare } from '@babel/helper-plugin-utils'
 import generator from '@babel/generator' // import { NodePath } from '@babel/core'
 import { getFunctionName, getGeneratorOption } from './ast-utils'
-import { strToJson, writeFile } from '../../utils/common'
+import { writeFile } from '../../utils/fs'
+import { strToJson } from '../../utils/common'
 import * as t from '@babel/types'
 
 /**
