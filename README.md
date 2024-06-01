@@ -1,4 +1,4 @@
-# pzc 的工具箱
+## pzc 的工具箱
 
 #### 介绍
 
@@ -37,28 +37,12 @@ npm i 安装依赖
 
 ts-node xxx执行
 
-ps:自行在src/exec/index.ts修改new fsUtils(rootPath)，rootPath为预执行目标文件夹目录
+ps:自行在src/exec/index.ts修改new fsUtils(rootPath)，rootPath为预执行目标文件夹目录，操作界面待完善
 
-#### 项目目录结构说明
+
+#### 目录结构部分说明
 ```
 pzc-toolbox                                             //
-├─ .cz-config.js                                        //
-├─ .editorconfig                                        //
-├─ .eslintignore                                        //
-├─ .eslintrc.js                                         //
-├─ .husky                                               //
-│  ├─ commit-msg                                        //
-│  ├─ pre-commit                                        //
-│  └─ _                                                 //
-│     └─ husky.sh                                       //
-├─ .vscode                                              //
-│  └─ launch.json                                       //
-├─ commitlint.config.js                                 //
-├─ LICENSE                                              //
-├─ package-lock.json                                    //
-├─ package.json                                         //
-├─ prettier.config.js                                   //
-├─ README.md                                            //
 ├─ src                                                  //
 │  ├─ exec                                              //执行器集合
 │  │  ├─ classify-files-group.ts                        //文件信息统计
@@ -79,7 +63,7 @@ pzc-toolbox                                             //
 │  │  │  ├─ depart-default-export-object-express.ts     //重置导出
 │  │  │  ├─ depart-switch.ts                            //分离switch
 │  │  │  ├─ extract-annotation.ts                       //提取注释
-│  │  │  ├─ **get**-all-function-name.ts                    //获取单一文件方法名
+│  │  │  ├─ **get**-all-function-name.ts                //获取单一文件方法名
 │  │  │  ├─ import-sort.ts                              //导入排序
 │  │  │  ├─ move-default-export-to-last.ts              //移动默认导出
 │  │  │  ├─ remove-invalid-comment.ts                   //移除包含this的无效注释
@@ -113,20 +97,10 @@ pzc-toolbox                                             //
 │  │  ├─ use-postcss-plugin.ts                          //postcss使用包装
 │  │  ├─ use-posthtml-plugin.ts                         //posthtml使用包装
 │  ├─ query                                             //查询结果和文件输出
-│  │  ├─ js                                             //
-│  │  │  └─ stote-state.js                              //
-│  │  ├─ json                                           //
-│  │  │  ├─ file-list.json                              //
-│  │  │  ├─ files-group.json                            //
-│  │  │  ├─ function-name.json                          //
-│  │  │  ├─ global-extra.json                           //
-│  │  │  ├─ new-object-cache.json                       //
-│  │  │  └─ same-object-cache.json                      //
-│  │  └─ md                                             //
 │  └─ utils                                             //工具集合
 │     ├─ cli-progress.ts                                //进度条
 │     ├─ common.ts                                      //通用方法
-│     ├─ fs.ts                                          //文件系统相关
+│     ├─ fs.ts                       ****               //文件系统相关
 │     ├─ md.ts                                          //文档相关
-└─ tsconfig.json                                        //
+└─ tsconfig.json                                        //ts配置
 ```
