@@ -39,7 +39,6 @@
   "include": [
     "src/**/*",
     "types/*.d.ts",
-    "desktop/**/*",
   ],
   "exclude": ["dist", "node_modules", ".history"]
 }

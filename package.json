@@ -2,7 +2,7 @@
   "name": "toolkit",
   "version": "1.0.0",
   "description": "node-toolkid",
-  "main": "index.tsx",
+  "main": "desktop/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint:lint-staged": "lint-staged",
@@ -10,8 +10,11 @@
     "lint:prettier": "prettier --write \"src copy/**/*.{js,jsx,ts,tsx}\"",
     "prepare": "husky install",
     "compile": "tsc",
-    "serve": "cross-env NODE_ENV=development webpack server --config ./config/webpack.config.js",
-    "build": "cross-env NODE_ENV=production webpack --config ./config/webpack.config.js"
+    "dev": "cross-env NODE_ENV=development webpack server --config ./config/webpack.config.js",
+    "build": "cross-env NODE_ENV=production webpack --config ./config/webpack.config.js",
+    "dev-electron": "cross-env NODE_ENV=development electron ./src/desktop/index.js",
+    "prod-electron": "cross-env NODE_ENV=production electron ./src/desktop/index.js",
+    "build-electron-win64": "electron-builder -w --x64"
   },
   "author": "pzc",
   "license": "ISC",
@@ -89,7 +92,9 @@
     "webpack": "^5.88.1",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1",
-    "webpackbar": "^5.0.2"
+    "webpackbar": "^5.0.2",
+    "electron": "^26.6.10",
+    "electron-builder": "^24.6.3"
   },
   "dependencies": {
     "antd": "^5.17.3",
@@ -132,5 +137,33 @@
       "react-app",
       "react-app/jest"
     ]
+  },
+  "build": {
+    "productName": "Harbour",
+    "appId": "harbour.electron.app",
+    "files": [
+      "build/**/*",
+      "main/**/*"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "./main/assets/logo.ico",
+      "uninstallerIcon": "./main/assets/logo.ico",
+      "installerHeaderIcon": "./main/assets/logo.png",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Harbour"
+    },
+    "win": {
+      "icon": "./main/assets/logo.ico",
+      "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+      "target": "nsis"
+    },
+    "electronDist": "./electron"
   }
 }

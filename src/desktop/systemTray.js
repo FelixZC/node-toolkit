@@ -6,14 +6,14 @@ const path = require('path')
 /*
  * 引入自定义的窗口管理器模块
  */
-const { getMainWindow, mainWindowIsExist } = require('./windows/mainWindow')
+const { getMainWindow, mainWindowIsExist } = require('./mainWindow')
 
 // 全局Tray实例变量
 let tray = null
 /*
  * 定义Tray图标的路径
  */
-const iconPath = path.resolve(__dirname, './assets/logo.png')
+const iconPath = path.resolve(__dirname, '../assets/images/logo.png')
 
 /*
  * 初始化Tray菜单

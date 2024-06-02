@@ -18,6 +18,11 @@ module.exports = {
   cache: false,
   // 配置模块解析规则
   resolve: {
+    //仅在eletron中使用
+    fallback: {
+      path: false,
+      fs: false
+    },
     // 指定模块解析时应尝试的文件扩展名
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
     // 设置模块别名，简化路径引用
@@ -34,7 +39,7 @@ module.exports = {
     }
   },
   // 定义入口文件
-  entry: './index.tsx',
+  entry: './src/web/index.tsx',
   // 配置输出选项
   output: {
     // 根据是否为生产环境设置输出路径
@@ -267,7 +272,7 @@ module.exports = {
     historyApiFallback: true, // 支持 HTML5 的历史模式路由
     compress: true, // 启用 gzip 压缩
     host: '0.0.0.0', // 监听的主机地址
-    port: 8080, // 监听的端口号
+    port: 8888, // 监听的端口号
     hot: true // 启用热更新
   },
 

@@ -1,5 +1,5 @@
 const { app } = require('electron')
-const { createMainWindow } = require('./windows/mainWindow')
+const { createMainWindow } = require('./mainWindow')
 const { initTray, getTray } = require('./systemTray')
 
 app.on('ready', () => {

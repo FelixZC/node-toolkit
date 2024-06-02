@@ -28,12 +28,12 @@ function createMainWindow() {
       nodeIntegration: true, // 启用Node.js集成
       preload: path.resolve(__dirname, '../utils/contextBridge.js') // 预加载脚本路径
     },
-    icon: path.resolve(__dirname, '../assets/logo.png') // 窗口图标路径
+    icon: path.resolve(__dirname, '../assets/images/logo.png') // 窗口图标路径
   })
 
   // 根据环境加载不同的页面
   if (isDevelopment) {
-    mainWindow.loadURL('http://localhost:8080/')
+    mainWindow.loadURL('http://localhost:8888/')
   } else {
     const entryPath = path.resolve(__dirname, '../../build/index.html')
     mainWindow.loadFile(entryPath)
@@ -46,6 +46,7 @@ function createMainWindow() {
 
   // 初始化窗口事件监听
   mainWindowListenEvents()
+  mainWindowHandleEvent()
 }
 /**
  * 监听主窗口的事件，包括最小化、最大化、恢复、关闭和打开开发者工具。
@@ -81,6 +82,16 @@ function mainWindowListenEvents() {
   // 监听打开开发者工具事件
   ipcMain.on('mainWindow-open-devtool', () => {
     mainWindowIsExist() && mainWindow.webContents.openDevTools()
+  })
+}
+
+function mainWindowHandleEvent() {
+  ipcMain.handle('choose-directory', async () => {
+    const { dialog } = require('electron')
+    const result = await dialog.showOpenDialog({
+      properties: ['openDirectory']
+    })
+    return result.filePaths // 返回选择的目录路径数组
   })
 }
 
