@@ -1,9 +1,9 @@
 /**
  * 按指定规则批量修改文件名
  */
-import * as exec from './index'
-
-const fsInstance = exec.getFsInstance()
+import { Exec } from './index'
+const exec = new Exec()
+const fsInstance = exec.fsInstance
 const filenameReg = /([ _]\d{2,}|\d{2,}[ _])/
 const customFilename = (oldFilename: string) => {
   if (filenameReg.exec(oldFilename)) {
@@ -12,11 +12,5 @@ const customFilename = (oldFilename: string) => {
     return oldFilename
   }
 }
-//先看下结果
-//763587_计算机网络自顶向下方法第8版=>计算机网络自顶向下方法第8版
-// const fileInfoList = fsInstance.getFileInfoList()
-// fileInfoList.forEach((item) => {
-//   const result = customFilename(item.filename)
-//   console.log(result)
-// })
+//TODO 添加预览结果
 fsInstance.modifyFilename(customFilename)

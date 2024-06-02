@@ -1,5 +1,6 @@
 /**
  * 获取项目属性注释
  */
-import * as exec from './index'
+import { Exec } from './index'
+const exec = new Exec()
 exec.getAttrsAndAnnotation()

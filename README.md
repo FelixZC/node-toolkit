@@ -8,12 +8,10 @@ pzc 的工具箱，包含：
 2. jscodemod 插件以及执行器
 3. posthtml 插件以及执行器
 4. postcss 插件以及执行器
-5. swigger 转 ts 声明文件以及请求模板生成
-6. 项目注释提取和文档生成
-7. 文件夹信息统计和分类
-8. 文件内容正则匹配、替换和去重
-9. 文本去重
-10. 文件批量重命名和复制粘贴移动
+5. 项目注释提取和文档生成
+6. 文件夹信息统计和分类
+7. 文件内容正则匹配、替换和去重
+8. 文件批量重命名和复制粘贴移动
 
 未完待续...
 
@@ -47,15 +45,13 @@ pzc-toolbox                                             //
 │  ├─ exec                                              //执行器集合
 │  │  ├─ classify-files-group.ts                        //文件信息统计
 │  │  ├─ exec-bable-plugin.ts                           //执行babel插件
-│  │  ├─ exec-create-request-template.ts                //创建请求模板
 │  │  ├─ exec-get-attrs-and-annotation.ts               //获取项目注释
-│  │  ├─ exec-get-component-description.ts              //获取组件描述
 │  │  ├─ exec-jscodemod.ts                              //执行jscodemode
 │  │  ├─ exec-postcss-plugin.ts                         //执行postcss
 │  │  ├─ exec-posthtml-plugin.ts                        //posthtml
-│  │  ├─ exec-reg-query.ts                              //执行正则查询
+│  │  ├─ exec-reg-query.ts                              //执行正则指定内容查询
+│  │  ├─ exec-reg-query-batch.ts                        //执行正则批量查询
 │  │  ├─ exec-transfer-file-name-To-kebab-case.ts       //文件名驼峰转化
-│  │  ├─ exec-update-document.ts                        //更新查询结果
 │  │  └─ index.ts                                       //方法集合
 │  ├─ plugins                                           //插件集合
 │  │  ├─ babel-plugins                                  //babel插件
@@ -63,7 +59,7 @@ pzc-toolbox                                             //
 │  │  │  ├─ depart-default-export-object-express.ts     //重置导出
 │  │  │  ├─ depart-switch.ts                            //分离switch
 │  │  │  ├─ extract-annotation.ts                       //提取注释
-│  │  │  ├─ **get**-all-function-name.ts                //获取单一文件方法名
+│  │  │  ├─ get-all-function-name.ts                    //获取单一文件方法名
 │  │  │  ├─ import-sort.ts                              //导入排序
 │  │  │  ├─ move-default-export-to-last.ts              //移动默认导出
 │  │  │  ├─ remove-invalid-comment.ts                   //移除包含this的无效注释

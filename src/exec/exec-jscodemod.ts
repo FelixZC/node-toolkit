@@ -1,8 +1,9 @@
 /**
  * 执行jscodemode模板
  */
-import * as exec from './index'
+import { Exec } from './index'
 import type { Transform } from 'jscodeshift'
+const exec = new Exec()
 const jscodemodeList = [
   '../plugins/jscodemods/arrow-function-arguments',
   '../plugins/jscodemods/arrow-function',

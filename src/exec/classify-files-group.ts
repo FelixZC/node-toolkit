@@ -1,5 +1,7 @@
 /**
  * 文件分类
  */
-import * as exec from './index'
+import { Exec } from './index'
+const exec = new Exec()
+
 exec.classifyFilesGroup()

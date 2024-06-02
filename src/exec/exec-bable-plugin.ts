@@ -2,8 +2,9 @@
  * 执行babel插件，执行前，请将注释单行注释更改为多行注释，以防错位
  * ^//(.*) => /**$1 *\/
  */
-import * as exec from './index'
+import { Exec } from './index'
 import type { BabelPlugin } from '../plugins/use-babel-plugin'
+const exec = new Exec()
 const babelPluginPathList: string[] = [
   '../plugins/babel-plugins/import-sort',
   '../plugins/babel-plugins/move-default-export-to-last',

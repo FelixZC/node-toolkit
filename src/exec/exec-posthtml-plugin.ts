@@ -1,9 +1,10 @@
 /**
  * 执行posthtml插件
  */
-import * as exec from './index'
+import { Exec } from './index'
 import type { Plugin as PosthtmlPlugin } from 'posthtml'
 const pluginsPathList: string[] = ['../plugins/posthtml-plugins/property-sort']
+const exec = new Exec()
 
 try {
   const plugins: PosthtmlPlugin<unknown>[] = pluginsPathList.map((pluginPath) => {

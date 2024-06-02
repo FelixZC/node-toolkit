@@ -24,14 +24,6 @@ function queryContentByReg(
   matchIndex = 0,
   customHandel?: Function
 ) {
-  if (!queryReg?.exec) {
-    return
-  }
-
-  if (typeof content !== 'string') {
-    return
-  }
-
   let queryResult
   let str = ''
 
@@ -47,69 +39,6 @@ function queryContentByReg(
       customHandel && typeof customHandel === 'function'
         ? customHandel(queryResult)
         : queryResult[matchIndex] + br
-  }
-
-  return str
-}
-
-/**
- * 对文本进行去重和格式化处理
- * @param {string} content - 待处理的文本
- * @param {string} mode - 处理模式，可选值：'txtToMd'（转换为Markdown并格式化）、'txtToTxt'（仅格式化纯文本）、'default'（纯粹去重）
- */
-function textFormat(content: string, mode = 'md') {
-  const reg = /.*/g
-  const match = content.match(reg)
-
-  if (!match) {
-    return content
-  }
-
-  let result = Array.from(new Set(match))
-  result = result.filter((item) => item.match(/[\S]/)) // 移除空白行
-
-  let str = ''
-  let title = ''
-
-  switch (mode) {
-    case 'txtToMd':
-      result = result.map((item, index) => {
-        let localItem = item
-        localItem = localItem.trim()
-
-        if ((index + 1) % 2 === 0) {
-          return `${localItem}${br}` // 添加额外行间距
-        }
-
-        return `> ${(index + 2) / 2}. **${localItem}**  `
-      })
-      title = `## (good good study,day day up)${br}`
-      str = title + result.join(br)
-      break
-
-    case 'txtToTxt':
-      result = result.map((item, index) => {
-        let localItem = item
-        localItem = localItem.trim()
-
-        if ((index + 1) % 2 === 0) {
-          return `${localItem}${br}` // 添加额外行间距
-        }
-
-        return localItem
-      })
-      str = result.join(br)
-      break
-
-    default:
-      // 输出行结果
-      result = result.map((item) => {
-        let localItem = item
-        localItem = localItem.trim()
-        return localItem
-      })
-      str = title + result.join(br)
-      break
   }
 
   return str
@@ -218,6 +147,5 @@ export default {
   createdAttributesGroupTable,
   createdStoreTable,
   parseDocs,
-  queryContentByReg,
-  textFormat
+  queryContentByReg
 }

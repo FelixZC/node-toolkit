@@ -1,9 +1,10 @@
 /**
  * 执行postcss插件
  */
-import * as exec from './index'
+import { Exec } from './index'
 import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
 const pluginsPathList: string[] = ['../plugins/postcss-plugins/transfer-file-name-tok-kebab-case']
+const exec = new Exec()
 
 try {
   const plugins: PostcssPlugin[] = pluginsPathList.map((pluginPath) => {

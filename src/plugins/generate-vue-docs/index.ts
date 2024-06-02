@@ -6,8 +6,8 @@ import * as generator from '@babel/generator'
 import { getParserOption } from '../babel-plugins/ast-utils'
 import * as parser from '@babel/parser'
 import RenderMd from './render'
-/*  默认生成配置 */
 
+/*  默认生成配置 */
 import * as t from '@babel/types'
 import * as traverse from '@babel/traverse'
 import { NodePath } from '@babel/traverse'
@@ -17,7 +17,6 @@ const baseConfig = {
   md: false
 }
 /*  md 生成配置 */
-
 export interface MdOption {
   desc: string
   name: string
@@ -296,7 +295,6 @@ export interface ComponentInfo {
   slots: Record<string, any>
 }
 /*  转换文档 */
-
 const parseDocs = (vueStr: string, config: Record<string, any> = {}) => {
   let localConfig = config
   localConfig = { ...baseConfig, ...localConfig }
