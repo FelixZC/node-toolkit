@@ -28,8 +28,8 @@ function DesktopHeader() {
   return (
     <div className="desktop-header">
       <div className="header-logo-box">
-        <img src={logoImage} alt="Harbour" />
-        <span>Harbour</span>
+        <img src={logoImage} alt="pzc tookit" />
+        <span>pzc tookit</span>
       </div>
       <div className="header-handle-box">
         <div className="handle-icon-box" onClick={() => handleWindowOperation('min')}>

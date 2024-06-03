@@ -45,7 +45,7 @@ function initTray(): void {
   ])
 
   // 设置Tray的提示文字和上下文菜单
-  tray.setToolTip('Harbour')
+  tray.setToolTip('pzc tookit')
   tray.setContextMenu(contextMenu)
 
   // 绑定Tray点击事件，如果主窗口存在，则显示主窗口

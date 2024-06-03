@@ -24,7 +24,7 @@ function createMainWindow(): void {
     minWidth: 960,
     show: false,
     frame: false,
-    title: 'Harbour',
+    title: 'pzc tookit',
     webPreferences: {
       nodeIntegration: true,
       preload: path.resolve(__dirname, '../utils/context-bridge.js')
@@ -33,7 +33,7 @@ function createMainWindow(): void {
   })
 
   if (isDevelopment === 'development') {
-    mainWindow.loadURL('http://localhost:8888/')
+    mainWindow.loadURL('http://localhost:8888/home')
   } else {
     const entryPath = path.resolve(__dirname, 'public/index.html')
     mainWindow.loadFile(entryPath)
