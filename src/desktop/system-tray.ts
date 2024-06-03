@@ -7,7 +7,7 @@ import * as path from 'path'
 /*
  * 引入自定义的窗口管理器模块
  */
-import { getMainWindow, mainWindowIsExist } from './mainWindow'
+import { getMainWindow, mainWindowIsExist } from './main-window'
 
 // 全局Tray实例变量
 let tray: Tray | null = null

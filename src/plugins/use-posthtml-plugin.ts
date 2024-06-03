@@ -1,5 +1,5 @@
 import posthtml from 'posthtml'
-import type { ExecFileInfo } from './common'
+import type { ExecFileInfo } from '../../types/common'
 import type { Options, Plugin as PosthtmlPlugin } from 'posthtml'
 import type { Options as parserOptions } from 'posthtml-parser'
 import type { Options as renderOptions } from 'posthtml-render'

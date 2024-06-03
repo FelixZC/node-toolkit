@@ -1,4 +1,4 @@
-import { ExecFileInfo } from './common'
+import { ExecFileInfo } from '../../types/common'
 //@ts-ignore
 import getParser from 'jscodeshift/src/getParser'
 import jscodeshift, { Options, Parser, Transform } from 'jscodeshift'

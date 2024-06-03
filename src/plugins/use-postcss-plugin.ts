@@ -1,6 +1,6 @@
 import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
 import postcss from 'postcss'
-import type { ExecFileInfo } from './common'
+import type { ExecFileInfo } from '../../types/common'
 import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
 // 导入 `postcss-syntax` 模块并配置自定义解析器
 const syntax = require('postcss-syntax')({

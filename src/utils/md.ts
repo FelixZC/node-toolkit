@@ -5,7 +5,6 @@
  */
 
 import * as os from 'os'
-import { parseDocs } from '../plugins/generate-vue-docs'
 import { getDataType, sortArray, sortObjAttr } from './common'
 
 const br = os.EOL // 行分隔符
@@ -146,6 +145,5 @@ function createdStoreTable(
 export default {
   createdAttributesGroupTable,
   createdStoreTable,
-  parseDocs,
   queryContentByReg
 }

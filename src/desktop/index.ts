@@ -1,6 +1,6 @@
 import { app, Event as ElectronEvent, WebContents, Certificate } from 'electron'
-import { createMainWindow } from './mainWindow'
-import { initTray, getTray } from './systemTray'
+import { createMainWindow } from './main-window'
+import { initTray, getTray } from './system-tray'
 
 app.on('ready', () => {
   createMainWindow()

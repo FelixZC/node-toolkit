@@ -67,10 +67,6 @@ pzc-toolbox                                             //
 │  │  │  ├─ sort-object-array-by-index.ts               //对象数组按index排序
 │  │  │  ├─ transfer-file-name-tok-kebab-case.ts        //驼峰转化
 │  │  │  └─ transform-remove-console.ts                 //移除打印
-│  │  ├─ common.d.ts                                    //通用插件类型定义
-│  │  ├─ generate-vue-docs                              //文档生成
-│  │  │  ├─ index.ts                                    //提取信息
-│  │  │  └─ render.ts                                   //生成文档
 │  │  ├─ jscodemods                                     //codemode集合
 │  │  │  ├─ arrow-function-arguments.ts                 //简化箭头参数
 │  │  │  ├─ arrow-function.ts                           //转化箭头函数
@@ -93,7 +89,7 @@ pzc-toolbox                                             //
 │  │  ├─ use-postcss-plugin.ts                          //postcss使用包装
 │  │  ├─ use-posthtml-plugin.ts                         //posthtml使用包装
 │  ├─ query                                             //查询结果和文件输出
-│  └─ utils                                             //工具集合
+│  └─ utils                                             //查询结果
 │     ├─ cli-progress.ts                                //进度条
 │     ├─ common.ts                                      //通用方法
 │     ├─ fs.ts                       ****               //文件系统相关

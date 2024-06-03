@@ -26,7 +26,7 @@ function createMainWindow(): void {
     title: 'Harbour',
     webPreferences: {
       nodeIntegration: true,
-      preload: path.resolve(__dirname, '../utils/contextBridge.js')
+      preload: path.resolve(__dirname, '../utils/context-bridge.js')
     },
     icon: path.resolve(__dirname, '../assets/images/logo.png')
   })
@@ -34,7 +34,7 @@ function createMainWindow(): void {
   if (isDevelopment === 'development') {
     mainWindow.loadURL('http://localhost:8888/')
   } else {
-    const entryPath = path.resolve(__dirname, '../../build/index.html')
+    const entryPath = path.resolve(__dirname, 'public/index.html')
     mainWindow.loadFile(entryPath)
   }
 
