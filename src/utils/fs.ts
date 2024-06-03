@@ -5,19 +5,29 @@ import * as path from 'path'
 const userInfo = os.userInfo() // 用户信息
 const eol = os.EOL // 换行符
 
-// 定义记录类型
-interface Record {
-  name: string
-  type: string
-  arguments: IArguments
-  error?: Error | unknown
+// 定义操作日志记录的结构
+interface LogRecord {
+  methodName: string
+  arguments: unknown[]
+  timestamp: Date
+}
+
+// 定义异常日志记录的结构
+interface ErrorRecord {
+  methodName: string
+  arguments: unknown[]
+  error: {
+    message: string
+    stack?: string
+  }
+  timestamp: Date
 }
 
 /**
  * 检查路径有效性
  * @param filePath - 要检查的文件路径
  */
-export const checkPathVaild = (filePath: string) => {
+export const checkPathValid = (filePath: string) => {
   try {
     // 尝试访问文件，如果存在则无异常抛出
     fs.accessSync(filePath, fs.constants.F_OK)
@@ -35,7 +45,7 @@ export const checkPathVaild = (filePath: string) => {
  */
 export const writeFile = (filePath: string, content: string) => {
   // 先检查路径有效性，确保文件能被正确写入
-  checkPathVaild(filePath)
+  checkPathValid(filePath)
   // 使用同步方式写入文件，编码为 UTF-8
   fs.writeFileSync(filePath, content, 'utf-8')
 }
@@ -68,12 +78,12 @@ interface CustomDirnameFunction {
   (oldDirname: string): string
 }
 
-// 定义FsInstance接口
+// 定义FsInstance接口// 定义 FsInstance 接口
 interface FsInstance {
   rootPath: string
   folderPath: string
   logPath: string
-  filePathList: Array<string>
+  filePathList: string[] // 使用项目根目录
   dirPathList: string[]
 
   // 操作日志记录方法
@@ -105,40 +115,59 @@ interface FsInstance {
 }
 
 // 操作日志打印记录装饰器
-function log() {
+function logDecorator() {
   return function (target: FsInstance, name: string, descriptor: PropertyDescriptor) {
-    const fn = descriptor.value
+    const originalMethod = descriptor.value // 保存原始方法引用
 
-    descriptor.value = function () {
-      const record: Record = {
-        arguments,
-        name,
-        type: 'log'
+    // 增强方法，添加日志记录功能
+    descriptor.value = function (...args: unknown[]) {
+      const record: LogRecord = {
+        methodName: name, // 使用更明确的属性名
+        arguments: args,
+        timestamp: new Date() // 记录日志的时间戳
       }
-      target.saveOperateLog.call(this, JSON.stringify(record))
-      return fn.apply(this, arguments)
+
+      // 执行原始方法之前记录日志
+      target.saveOperateLog(JSON.stringify(record))
+
+      try {
+        // 执行原始方法
+        const result = originalMethod.apply(this, args)
+        return result
+      } catch (error) {
+        // 如果原始方法抛出异常，可以在这里处理（例如记录额外的错误日志）
+        throw error // 重新抛出异常，让调用者处理
+      }
     }
 
     return descriptor
   }
 }
-
 // 异常处理装饰器与异常日志记录
-function catchHandel() {
+function catchHandlerDecorator() {
   return function (target: FsInstance, name: string, descriptor: PropertyDescriptor) {
-    const fn = descriptor.value
+    const originalMethod = descriptor.value
 
-    descriptor.value = function () {
+    descriptor.value = function (...args: unknown[]) {
       try {
-        return fn.apply(this, arguments)
+        // 尝试执行原始方法
+        return originalMethod.apply(this, args)
       } catch (error) {
-        const record: Record = {
-          arguments,
-          error,
-          name,
-          type: 'catch'
+        // 捕获到错误时，创建错误记录
+        const record: ErrorRecord = {
+          arguments: args,
+          error: {
+            message: (error as Error).message,
+            stack: (error as Error).stack
+          },
+          methodName: name, // 使用更明确的属性名
+          timestamp: new Date() // 记录日志的时间戳
         }
-        target.saveOperateLog.call(this, JSON.stringify(record))
+
+        // 调用 saveOperateLog 方法记录异常信息
+        target.saveOperateLog(JSON.stringify(record))
+
+        // 根据业务需求，可以选择重新抛出错误或者返回特定的值
         return null
       }
     }
@@ -155,39 +184,50 @@ function catchHandel() {
 class fsUtils implements FsInstance {
   folderPath: string
   logPath: string
-  filePathList: Array<string>
-  dirPathList: string[] // 使用项目根目录
+  filePathList: string[]
+  dirPathList: string[]
 
   constructor(public rootPath: string) {
     this.folderPath = path.join(rootPath)
     this.logPath = path.join(rootPath, 'fsUtils.log')
-    this.filePathList = [] // 指定目录所有文件集合
-    this.dirPathList = [] // 指定目录所有文件夹集合
-    this.getFilePathList(this.folderPath) // 直接使用构造器
+    this.filePathList = []
+    this.dirPathList = []
+    this.getFilePathList(this.folderPath)
   }
 
   /**
    * 简易日志记录
    * @param {string} message - 消息记录
    */
-  @catchHandel()
+  @catchHandlerDecorator()
   saveOperateLog(message: string) {
+    // 确保 logPath 是有效的
+    if (!this.logPath) {
+      console.error('Log path is not defined.')
+      return
+    }
+
+    // 创建日志记录的基础信息
     const baseInfo = {
-      // 操作内容记录
-      message,
-      // 操作时间
+      message: message,
       time: new Date().toLocaleString(),
-      // 操作用户
       user: userInfo.username
     }
-    let content = JSON.stringify(baseInfo) + eol
-    const divideLine = new Array(100).fill('-').join('-') + eol // 添加分割线
 
-    content += divideLine
+    // 构建日志内容
+    let content = `${JSON.stringify(baseInfo)}${eol}`
+    content += `${new Array(100).fill('-').join('-')}${eol}`
 
     try {
+      // 确保日志文件的目录存在
+      checkPathValid(path.dirname(this.logPath))
+
+      // 将日志内容追加到日志文件
       fs.appendFileSync(this.logPath, content)
-    } catch (err) {}
+    } catch (err) {
+      // 如果写入日志失败，输出错误信息到控制台
+      console.error(`Failed to write to log file: ${err}`)
+    }
   }
 
   /**
@@ -195,7 +235,7 @@ class fsUtils implements FsInstance {
    * @param {string} folderPath - 指定路径
    * @returns {Object} 返回文件路径/文件夹路径/文件错误路径列表
    */
-  @catchHandel()
+  @catchHandlerDecorator()
   getFilePathList(folderPath: string) {
     fs.accessSync(folderPath, fs.constants.F_OK)
     fs.readdirSync(folderPath).forEach((filename: string) => {
@@ -240,7 +280,7 @@ class fsUtils implements FsInstance {
               }
               fsInstance.modifyFilename(customBasenameGenerateFunction);
    */
-  @log()
+  @logDecorator()
   modifyFilename(
     customFilename: string | CustomFilenameFunction | null,
     customExtname?: string | CustomExtnameFunction | null,
@@ -262,73 +302,55 @@ class fsUtils implements FsInstance {
       }
     }
 
-    if (filterFilename) {
-      filePathListBackup = this.filePathList.filter((filePath) =>
-        path.basename(filePath, path.extname(filePath)).includes(filterFilename)
+    // 应用文件名和扩展名过滤器
+    const filteredFiles = filePathListBackup.filter((filePath) => {
+      const baseName = path.basename(filePath, path.extname(filePath))
+      const extName = path.extname(filePath)
+      return (
+        (!filterFilename || baseName.includes(filterFilename)) &&
+        (!filterExtensionName || extName.includes(filterExtensionName))
       )
-    }
+    })
 
-    if (filterExtensionName) {
-      filePathListBackup = this.filePathList.filter((filePath) =>
-        path.extname(filePath).includes(filterExtensionName)
-      )
-    }
-
-    filePathListBackup.forEach((filePath) => {
+    // 批量修改文件名
+    filteredFiles.forEach((filePath) => {
       const oldDirname = path.dirname(filePath)
-      const oldExtname = path.extname(filePath) // 文件扩展名
+      const oldExtname = path.extname(filePath)
       const oldBaseName = path.basename(filePath)
-      const oldFilename = path.basename(filePath, oldExtname) // 文件名
+      const oldFilename = path.basename(filePath, oldExtname)
 
-      let newFilename // 获取新文件名称，不包含后缀名
+      let newFilename =
+        typeof customFilename === 'function' ? customFilename(oldFilename) : customFilename
+      let newExtensionName =
+        typeof customExtname === 'function' ? customExtname(oldExtname) : customExtname
+      let newDirname =
+        typeof customDirname === 'function' ? customDirname(oldDirname) : customDirname
 
-      let newExtensionName
-      let newDirname
+      newFilename = newFilename || oldFilename
+      newExtensionName = newExtensionName || oldExtname
+      newDirname = newDirname || oldDirname
 
-      if (typeof customFilename === 'function') {
-        newFilename = customFilename(oldFilename) || oldFilename
-      } else {
-        newFilename = customFilename || oldFilename
-      } // 获取新文件后缀名
-
-      if (typeof customExtname === 'function') {
-        newExtensionName = customExtname(oldExtname) || oldExtname
-      } else {
-        newExtensionName = customExtname || oldExtname
-      }
-
-      let newBaseName = `${newFilename}${newExtensionName}` // 新旧路径重复，跳过本次循环
-
-      if (typeof customDirname === 'function') {
-        newDirname = customDirname(oldDirname) || oldDirname
-      } else {
-        newDirname = customDirname || oldDirname
-      }
-
-      if (newBaseName === oldBaseName && newDirname === oldDirname) {
-        return
-      }
-
-      let cacheKey = path.join(newDirname, newBaseName) // 命名冲突处理，添加计数
-
-      let index = 0
-
-      while (cache[cacheKey]) {
-        newBaseName = `${newFilename}(${index++})${newExtensionName}` // 重命名
-
-        cacheKey = path.join(newDirname, newBaseName)
-      }
-
-      const oldFilePath = path.resolve(oldDirname, oldBaseName)
+      const newBaseName = `${newFilename}${newExtensionName}`
       const newFilePath = path.resolve(newDirname, newBaseName)
-      const operateResult = this.renameFile(oldFilePath, newFilePath)
 
+      if (filePath === newFilePath) {
+        return // 如果新旧文件路径相同，跳过
+      }
+
+      // 检查并解决命名冲突
+      let cacheKey = newFilePath
+      if (cache[cacheKey]) {
+        let index = cache[cacheKey].index
+        do {
+          const numberedBaseName = `${newFilename}(${++index})${newExtensionName}`
+          cacheKey = path.resolve(newDirname, numberedBaseName)
+        } while (cache[cacheKey])
+      }
+
+      // 重命名文件
+      const operateResult = this.renameFile(filePath, cacheKey)
       if (operateResult) {
-        Reflect.deleteProperty(cache, oldFilePath) // 删除旧缓存
-
-        Reflect.set(cache, newFilePath, {
-          index
-        })
+        cache[cacheKey] = { index: 0 } // 更新缓存
         modifyCount++
       }
     })
@@ -341,14 +363,14 @@ class fsUtils implements FsInstance {
    * @param {string} oldFilePath
    * @param {string} newFilePath
    */
-  @catchHandel()
-  @log()
+  @catchHandlerDecorator()
+  @logDecorator()
   renameFile(oldFilePath: string, newFilePath: string) {
     if (oldFilePath === newFilePath) {
       return false
     }
 
-    checkPathVaild(newFilePath)
+    checkPathValid(newFilePath)
     fs.renameSync(oldFilePath, newFilePath)
     this.filePathList.push(newFilePath)
     const filePathIndex = this.filePathList.findIndex((i) => i === oldFilePath)
@@ -360,8 +382,8 @@ class fsUtils implements FsInstance {
    * 复制指定路径原文件
    * @param {string} filePath
    */
-  @catchHandel()
-  @log()
+  @catchHandlerDecorator()
+  @logDecorator()
   copyFile(filePath: string) {
     const dirname = path.dirname(filePath)
     const extensionName = path.extname(filePath) // 文件扩展名
@@ -386,8 +408,8 @@ class fsUtils implements FsInstance {
    * @param {string} filePath
    * @returns
    */
-  @catchHandel()
-  @log()
+  @catchHandlerDecorator()
+  @logDecorator()
   deleteFile(filePath: string) {
     fs.unlinkSync(filePath)
     const filePathIndex = this.filePathList.findIndex((i) => i === filePath)

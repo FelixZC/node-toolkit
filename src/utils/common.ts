@@ -136,20 +136,34 @@ export const capitalize = function (str: string) {
 }
 
 /**
- * 判断是否为引用路径（如 '@', 'src', 'images', 'img', 'styles', '~', '../', './', 'dist' 开头的字符串）
+ * 判断给定的字符串是否为引用路径。
+ * 引用路径是那些以特定前缀（如 '@', 'src', 'images', 'img', 'styles', '~', '../', './', 'dist' 等）开头的字符串。
  * @param {string} str - 待判断的字符串
  * @returns {boolean} 是否为引用路径
  */
-export const isPath = (str: string) => {
-  const startsWithList: string[] = ['@', 'src', 'images', 'img', 'styles', '~', '../', './', 'dist']
+export const isPath = (str: string): boolean => {
+  const startsWithList: string[] = [
+    '@',
+    'src',
+    'images',
+    'img',
+    'styles',
+    '~',
+    '../',
+    './',
+    'dist',
+    'node_modules',
+    'assets',
+    'components',
+    'utils',
+    'scripts',
+    'lib',
+    'public'
+    // 其他可能的引用路径前缀...
+  ]
 
-  for (const tag of startsWithList) {
-    if (str.startsWith(tag)) {
-      return true
-    }
-  }
-
-  return false
+  // 检查 str 是否以 startsWithList 中的任何一个字符串开头
+  return startsWithList.some((prefix) => str.startsWith(prefix))
 }
 
 /**
@@ -174,11 +188,9 @@ export const transferRef = (str: string, seperator = '/') => {
       /** 当代码管理工具和window组合使用，会出现文件大小写同源问题 */
       /** to stupid to continue  */
       /** this is situation one  */
-
-      if (!result.includes('-') && item !== result) {
-        result = '_' + result
-      }
-
+      // if (!result.includes('-') && item !== result) {
+      //   result = '_' + result
+      // }
       /** this is situation two,exec after one ，also you can skip them */
       // result = easeUnline(result);
 
