@@ -86,10 +86,7 @@ try {
 
   // 定义目录名转换函数，将目录名从其他格式转换为驼峰式
   const customDirname = (oldDirname: string) => {
-    const relativeDir = path.relative(
-      'C:/Users/ZC/Documents/project/node-project/toolbox',
-      oldDirname
-    )
+    const relativeDir = path.relative(process.cwd(), oldDirname)
     return transferRef(relativeDir, '\\')
   }
 

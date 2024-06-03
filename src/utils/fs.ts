@@ -78,6 +78,18 @@ interface CustomDirnameFunction {
   (oldDirname: string): string
 }
 
+// 修改文件名的结果类型
+interface ModifyResult {
+  oldName: string
+  newName: string
+}
+
+// modifyFilename 方法的返回类型
+type ModifyFilenameReturnType = {
+  modifyCount: number
+  changeRecords: ModifyResult[]
+}
+
 // 定义FsInstance接口// 定义 FsInstance 接口
 interface FsInstance {
   rootPath: string
@@ -102,7 +114,7 @@ interface FsInstance {
     customDirname?: string | CustomDirnameFunction | null,
     filterFilename?: string,
     filterExtensionName?: string
-  ): void
+  ): ModifyFilenameReturnType
 
   // 重命名文件方法
   renameFile(oldFilePath: string, newFilePath: string): boolean
@@ -280,6 +292,7 @@ class fsUtils implements FsInstance {
               }
               fsInstance.modifyFilename(customBasenameGenerateFunction);
    */
+  @catchHandlerDecorator()
   @logDecorator()
   modifyFilename(
     customFilename: string | CustomFilenameFunction | null,
@@ -291,7 +304,7 @@ class fsUtils implements FsInstance {
     if (!this.filePathList.length) {
       throw new Error('指定路径不存在文件')
     }
-
+    const changeRecords: { oldName: string; newName: string }[] = [] // 变更
     let modifyCount = 0
     let filePathListBackup = [...this.filePathList]
     const cache: Cache = {} // 添置所有已有文件缓存
@@ -350,13 +363,18 @@ class fsUtils implements FsInstance {
       // 重命名文件
       const operateResult = this.renameFile(filePath, cacheKey)
       if (operateResult) {
+        // 更新变更记录数组
+        changeRecords.push({
+          oldName: filePath,
+          newName: cacheKey
+        })
         cache[cacheKey] = { index: 0 } // 更新缓存
         modifyCount++
       }
     })
 
     console.log(`批量修改完毕，共${modifyCount}个文件产生变化`)
-    return modifyCount
+    return { modifyCount, changeRecords }
   }
 
   /**

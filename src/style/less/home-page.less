@@ -1,0 +1,24 @@
+/* HomePage.css */
+.home-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(to right, #6dd5ed, #2193b0); /* 漂亮的背景渐变 */
+  overflow: hidden;
+}
+
+.welcome-title {
+  font-size: 3rem; /* 增大标题字体 */
+  color: white; /* 白色文字 */
+  opacity: 0; /* 初始时透明度为0 */
+  animation: fadeInDown 2s ease forwards; /* 应用动画 */
+}
+
+/* 动画关键帧 */
+@keyframes fadeInDown {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

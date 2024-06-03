@@ -3,6 +3,7 @@
  * 使用Electron框架，配置窗口属性，并处理窗口事件。
  */
 import { BrowserWindow, ipcMain } from 'electron'
+import { executeBabelPlugins } from '../exec/exec-babel-plugin'
 import * as path from 'path'
 
 // 判断是否为开发环境
@@ -90,6 +91,10 @@ function mainWindowHandleEvent(): void {
       properties: ['openDirectory']
     })
     return result.filePaths
+  })
+
+  ipcMain.handle('exec-babel', (event, dir: string, babelPluginPathList: string[]) => {
+    executeBabelPlugins(dir, babelPluginPathList)
   })
 }
 

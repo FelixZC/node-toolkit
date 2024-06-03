@@ -58,10 +58,10 @@ export default declare((babel) => {
     // 对导入声明列表整体进行排序
     importList.sort((v1, v2) => {
       const v1ImportInfo = importInfoList.find(
-        (importObjList) => importObjList[0].source === v1.source.value
+        (importObjList) => importObjList[0]?.source === v1?.source?.value
       )
       const v2ImportInfo = importInfoList.find(
-        (importObjList) => importObjList[0].source === v2.source.value
+        (importObjList) => importObjList[0]?.source === v2?.source?.value
       )
 
       if (!v1ImportInfo || !v2ImportInfo) {

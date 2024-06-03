@@ -1,17 +1,62 @@
 import React, { useState } from 'react'
 import { List, Input, Button, Switch, message } from 'antd'
-import { ipcRendererInvoke } from '@src/utils/desktop-utils'
-
+import { ipcRendererInvoke } from '../../utils/desktop-utils'
 interface Feature {
   id: number
   name: string
   isSelected: boolean
+  path: string
 }
 
 const initialFeatures: Feature[] = [
-  { id: 1, name: 'Feature 1', isSelected: false },
-  { id: 2, name: 'Feature 2', isSelected: false }
-  // ... 其他功能
+  {
+    id: 1,
+    name: 'depart-default-export-object-express',
+    isSelected: false,
+    path: '../plugins/babel-plugins/depart-default-export-object-express'
+  },
+  {
+    id: 2,
+    name: 'depart-switch',
+    isSelected: false,
+    path: '../plugins/babel-plugins/depart-switch'
+  },
+  {
+    id: 4,
+    name: 'import-sort',
+    isSelected: false,
+    path: '../plugins/babel-plugins/import-sort'
+  },
+  {
+    id: 5,
+    name: 'move-default-export-to-last',
+    isSelected: false,
+    path: '../plugins/babel-plugins/move-default-export-to-last'
+  },
+  {
+    id: 6,
+    name: 'remove-invalid-comment',
+    isSelected: false,
+    path: '../plugins/babel-plugins/remove-invalid-comment'
+  },
+  {
+    id: 7,
+    name: 'replace-memberExpress-object-or-property',
+    isSelected: false,
+    path: '../plugins/babel-plugins/replace-memberExpress-object-or-property'
+  },
+  {
+    id: 8,
+    name: 'sort-object-array-by-index',
+    isSelected: false,
+    path: '../plugins/babel-plugins/sort-object-array-by-index'
+  },
+  {
+    id: 10,
+    name: 'transform-remove-console',
+    isSelected: false,
+    path: '../plugins/babel-plugins/transform-remove-console'
+  }
 ]
 
 const FeatureListPage: React.FC = () => {
@@ -40,13 +85,22 @@ const FeatureListPage: React.FC = () => {
 
   // 执行选中的功能
   const handleExecute = () => {
+    if (!directoryPath.length) {
+      message.warning('Please select a exec derecroty.')
+      return
+    }
     const selectedFeatures = features.filter((f) => f.isSelected)
     if (selectedFeatures.length === 0) {
       message.warning('Please select at least one feature to execute.')
       return
     }
-    // 这里模拟执行操作，实际中可能需要调用API或执行其他逻辑
-    message.success(`Executing: ${selectedFeatures.map((f) => f.name).join(', ')}`)
+    const babelPathList = selectedFeatures.map((f) => f.path)
+    try {
+      ipcRendererInvoke('exec-babel', directoryPath, babelPathList)
+      message.success(`Executing: ${selectedFeatures.map((f) => f.name).join(', ')}`)
+    } catch (error) {
+      message.error('Failed to execute: ' + error)
+    }
   }
 
   // 选择目录

@@ -21,7 +21,11 @@ module.exports = {
     //仅在eletron中使用
     fallback: {
       path: false,
-      fs: false
+      fs: false,
+      os: false,
+      assert: false,
+      constants: false,
+      readline: false
     },
     // 指定模块解析时应尝试的文件扩展名
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
@@ -169,7 +173,14 @@ module.exports = {
                   cacheCompression: false, // 不压缩缓存
                   plugins: [
                     !isProduction && 'react-refresh/babel', // 开发环境下使用React Refresh
-                    '@babel/plugin-transform-runtime' // 支持运行时转换
+                    '@babel/plugin-transform-runtime', // 支持运行时转换,
+                    [
+                      '@babel/plugin-proposal-decorators',
+                      {
+                        decoratorsBeforeExport: true
+                      }
+                    ],
+                    '@babel/plugin-proposal-class-properties'
                   ].filter(Boolean) // 过滤掉未启用的插件
                 }
               }

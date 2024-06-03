@@ -30,7 +30,6 @@ export default declare((babel) => {
                   cases.push((test as t.StringLiteral).value) // 如果未发现重复，则记录该case的值。
                 }
               }
-
               // 处理case穿透情况，即没有break导致的多个case连续执行问题。
               if (!path.node.consequent.length) {
                 let next = path
@@ -38,6 +37,7 @@ export default declare((babel) => {
                 // 查找下一个非空的consequent，即下一个实际会执行的case。
                 while (!next.node.consequent.length) {
                   next = next.getNextSibling() as NodePath<t.SwitchCase>
+                  if (!next.node) return
                 }
 
                 // 如果下一个case没有break语句，则添加一个break。
@@ -76,7 +76,11 @@ export default declare((babel) => {
             if (t.isLiteral(case1.test) && t.isLiteral(case2.test)) {
               const case1Value: string = (case1.test as t.StringLiteral)?.value || 'a'
               const case2Value: string = (case2.test as t.StringLiteral)?.value || 'a'
-              return case1Value.localeCompare(case2Value)
+              if (case1Value && case2Value) {
+                return String(case1Value).localeCompare(String(case2Value))
+              } else {
+                return 0
+              }
             }
 
             return 0

@@ -1,9 +1,34 @@
-/**
- * 执行jscodemode模板
- */
 import { Exec } from './index'
+import path from 'path'
 import type { Transform } from 'jscodeshift'
-const exec = new Exec()
+
+/**
+ * 执行 JSCodeMod 模板的公共方法。
+ * @param jscodemodeList 需要执行的 JSCodeMod 模板路径列表。
+ */
+export const executeJSCodemods = (dir: string, jscodemodeList: string[]): void => {
+  const exec = new Exec()
+
+  try {
+    // 将模板路径列表映射为具体的 Transform 函数数组
+    const codemodList: Transform[] = jscodemodeList.map((filePath) => {
+      const result = require(filePath)
+
+      // 确保 result.default 或 result 本身是 JSCodeMod 转换函数
+      if (result.default && typeof result.default === 'function') {
+        return result.default
+      }
+      return result
+    })
+
+    // 执行 JSCodeMod 模板
+    exec.execCodemod(codemodList)
+  } catch (e) {
+    console.warn('执行 JSCodeMod 模板时发生错误:', e)
+  }
+}
+
+// 示例用法：
 const jscodemodeList = [
   '../plugins/jscodemods/arrow-function-arguments',
   '../plugins/jscodemods/arrow-function',
@@ -16,17 +41,5 @@ const jscodemodeList = [
   '../plugins/jscodemods/unchain-variables'
 ]
 
-try {
-  const codemodList: Transform[] = jscodemodeList.map((filePath) => {
-    const result = require(filePath)
-
-    if (result.default) {
-      return result.default
-    }
-
-    return result
-  })
-  exec.execCodemod(codemodList)
-} catch (e) {
-  console.warn(e)
-}
+// 调用公共方法执行 JSCodeMod 模板
+executeJSCodemods(path.join('src copy'), jscodemodeList)

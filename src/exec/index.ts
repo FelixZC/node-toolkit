@@ -43,14 +43,18 @@ interface ExecInterface {
   fileInfoList: FileInfo[]
   classifyFilesGroup(): string
   classifyFilesGroupByRepeat(): string
-  getAttrsAndAnnotation(targetPath?: string): string
+  getAttrsAndAnnotation(): string
   batchRegQuery(regExpression: RegExp): string
   pageRegQuery(regExpression: RegExp, content: string): string
   batchReplaceByReg(execList: ExecListType, filterCondition?: FilterConditionType): void
-  execBabelPlugin(babelPlugins: BabelPlugin[], targetPath?: string): void
-  execPosthtmlPlugin(plugins: PosthtmlPlugin<unknown>[], targetPath?: string): Promise<void>
-  execPostcssPlugin(plugins: PostcssPlugin[], targetPath?: string): Promise<void>
-  execCodemod(codemodList: Transform[], targetPath?: string): void
+  execBabelPlugin(babelPlugins: BabelPlugin[]): { successList: string[]; errorList: string[] }
+  execPosthtmlPlugin(
+    plugins: PosthtmlPlugin<unknown>[]
+  ): Promise<{ successList: string[]; errorList: string[] }>
+  execPostcssPlugin(
+    plugins: PostcssPlugin[]
+  ): Promise<{ successList: string[]; errorList: string[] }>
+  execCodemod(codemodList: Transform[]): { successList: string[]; errorList: string[] }
   // 可能还需要添加其他方法...
 }
 
@@ -86,11 +90,11 @@ export class Exec implements ExecInterface {
 
   /**
    * 获取项目中拥有注释属性的组件信息。
-   * @param targetPath 可选参数，指定要扫描的文件路径。
    */
-  getAttrsAndAnnotation = (targetPath?: string) => {
+  getAttrsAndAnnotation = () => {
     // 定义使用到的babel插件列表
     const babelPluginPathList = ['../plugins/babel-plugins/extract-annotation']
+
     // 将插件路径列表转换为插件对象列表
     const plugins: BabelPlugin[] = babelPluginPathList.map((pluginPath) => {
       const result = require(pluginPath)
@@ -101,6 +105,9 @@ export class Exec implements ExecInterface {
 
       return result
     })
+
+    const successList: string[] = [] // 执行成功列表
+    const errorList: string[] = [] // 执行错误列表
 
     // 初始化存储属性信息的对象和数组
     const attrsCollectionTemp: AttrsCollection = {
@@ -158,25 +165,19 @@ export class Exec implements ExecInterface {
             }
           }
         }
+        successList.push(filePath)
       } catch (e) {
         console.warn(e)
+        errorList.push(filePath)
       }
     }
-
-    // 根据是否指定了targetPath来决定处理单个文件还是项目中所有文件
-    if (targetPath) {
-      handler(targetPath)
-    } else {
-      const vaildList = ['.js', '.jsx', '.ts', '.tsx', '.vue']
-      const targetList = this.fileInfoList.filter((fileInfo) =>
-        vaildList.includes(fileInfo.extname)
-      )
-      const { updateBar } = cliProgress.useCliProgress(targetList.length)
-      targetList.forEach((item: FileInfo) => {
-        handler(item.filePath)
-        updateBar()
-      })
-    }
+    const vaildList = ['.js', '.jsx', '.ts', '.tsx', '.vue']
+    const targetList = this.fileInfoList.filter((fileInfo) => vaildList.includes(fileInfo.extname))
+    const { updateBar } = cliProgress.useCliProgress(targetList.length)
+    targetList.forEach((item: FileInfo) => {
+      handler(item.filePath)
+      updateBar()
+    })
 
     // 根据首字母对收集到的属性信息进行分组，并生成属性描述表格
     const attrsGroup = groupBy(attrsCollectionGroup, 'standingInitial') // 根据首字母排序
@@ -310,15 +311,11 @@ export class Exec implements ExecInterface {
   /**
    * 执行Babel插件处理给定的文件或文件集。
    * @param babelPlugins Babel插件数组，将对目标文件应用这些插件。
-   * @param targetPath 可选；单个文件的目标路径，如果提供，则只处理这个文件；如果未提供，则处理所有匹配的文件。
    */
-  execBabelPlugin = (babelPlugins: BabelPlugin[], targetPath?: string) => {
-    if (!babelPlugins.length) {
-      return // 当没有提供Babel插件时，直接返回不做任何处理。
-    }
-
+  execBabelPlugin = (babelPlugins: BabelPlugin[]) => {
     const globalExtra: Record<string, any> = {} // 用于存储全局额外信息的字典。
-
+    const successList: string[] = [] // 执行成功列表
+    const errorList: string[] = [] // 执行错误列表
     /**
      * 处理单个文件，应用Babel插件并更新文件内容。
      * @param filePath 文件路径。
@@ -344,38 +341,35 @@ export class Exec implements ExecInterface {
         }
 
         writeFile(filePath, newContent) // 写入处理后的新内容。
+        successList.push(filePath) // 添加到执行成功列表
       } catch (e) {
         console.warn(e) // 捕获并警告处理过程中的任何错误。
+        errorList.push(filePath) // 添加到执行错误列表
       }
     }
 
-    if (targetPath) {
-      handler(targetPath) // 如果提供了目标路径，只处理这个文件。
-    } else {
-      const vaildList = ['.js', '.jsx', '.ts', '.tsx', '.vue'] // 定义有效文件扩展名列表。
-      const targetList = this.fileInfoList.filter((fileInfo) =>
-        vaildList.includes(fileInfo.extname)
-      ) // 筛选出需要处理的文件列表。
-      const { updateBar } = cliProgress.useCliProgress(targetList.length) // 初始化进度条。
+    const vaildList = ['.js', '.jsx', '.ts', '.tsx', '.vue'] // 定义有效文件扩展名列表。
+    const targetList = this.fileInfoList.filter((fileInfo) => vaildList.includes(fileInfo.extname)) // 筛选出需要处理的文件列表。
+    const { updateBar } = cliProgress.useCliProgress(targetList.length) // 初始化进度条。
 
-      // 遍历文件列表，处理每个文件并更新进度条。
-      for (const item of targetList) {
-        handler(item.filePath)
-        updateBar()
-      }
+    // 遍历文件列表，处理每个文件并更新进度条。
+    for (const item of targetList) {
+      handler(item.filePath)
+      updateBar()
     }
+    return { successList, errorList }
   }
 
   /**
    * 执行PostHTML插件处理
    * @param plugins PostHTML插件数组，每个插件都是一个函数，接收一个对象作为参数，并返回处理后的结果
-   * @param targetPath 可选参数，指定要处理的单个文件路径。如果未提供，则处理整个项目中的所有.html,.htm,.vue和.xml文件
    * @returns 返回Promise，异步执行插件处理
    */
-  execPosthtmlPlugin = async (plugins: PosthtmlPlugin<unknown>[], targetPath?: string) => {
+  execPosthtmlPlugin = async (plugins: PosthtmlPlugin<unknown>[]) => {
     // 用于存储所有文件处理过程中产生的额外全局信息
     const globalExtra: Record<string, any> = {}
-
+    const successList: string[] = [] // 执行成功列表
+    const errorList: string[] = [] // 执行错误列表
     // 处理单个文件的函数
     const handler = async (filePath: string) => {
       try {
@@ -404,39 +398,35 @@ export class Exec implements ExecInterface {
 
         // 写入处理后的内容到文件
         writeFile(filePath, newContent)
+        successList.push(filePath)
       } catch (e) {
         // 打印错误警告
         console.warn(e)
+        errorList.push(filePath)
       }
     }
+    // 否则，处理项目中所有指定扩展名的文件
+    const vaildList = ['.htm', '.html', '.vue', '.xml']
+    // 筛选出所有有效文件
+    const targetList = this.fileInfoList.filter((fileInfo) => vaildList.includes(fileInfo.extname))
+    // 初始化进度条，用于显示处理进度
+    const { updateBar } = cliProgress.useCliProgress(targetList.length)
 
-    // 如果提供了targetPath，则只处理这个文件
-    if (targetPath) {
-      await handler(targetPath)
-    } else {
-      // 否则，处理项目中所有指定扩展名的文件
-      const vaildList = ['.htm', '.html', '.vue', '.xml']
-      // 筛选出所有有效文件
-      const targetList = this.fileInfoList.filter((fileInfo) =>
-        vaildList.includes(fileInfo.extname)
-      )
-      // 初始化进度条，用于显示处理进度
-      const { updateBar } = cliProgress.useCliProgress(targetList.length)
-
-      // 遍历所有有效文件，逐一处理，并更新进度条
-      for (const item of targetList) {
-        await handler(item.filePath)
-        updateBar()
-      }
+    // 遍历所有有效文件，逐一处理，并更新进度条
+    for (const item of targetList) {
+      await handler(item.filePath)
+      updateBar()
     }
+    return { successList, errorList }
   }
 
   /**
    * 执行PostCSS插件处理文件。
    * @param plugins PostCSS插件数组，将按顺序对文件内容进行处理。
-   * @param targetPath 可选，指定要处理的单个文件路径。如果未提供，则处理工作目录中所有指定扩展名的文件。
    */
-  execPostcssPlugin = async (plugins: PostcssPlugin[], targetPath?: string) => {
+  execPostcssPlugin = async (plugins: PostcssPlugin[]) => {
+    const successList: string[] = [] // 执行成功列表
+    const errorList: string[] = [] // 执行错误列表
     // 定义一个处理单个文件的异步函数。
     const handler = async (filePath: string) => {
       try {
@@ -457,44 +447,36 @@ export class Exec implements ExecInterface {
 
         // 将处理后的内容写回文件。
         writeFile(filePath, result)
+        successList.push(filePath)
       } catch (e) {
         // 捕获并警告处理过程中可能出现的错误。
         console.warn(e)
+        errorList.push(filePath)
       }
     }
 
-    // 如果提供了targetPath，则只处理这个文件。
-    if (targetPath) {
-      await handler(targetPath)
-    } else {
-      // 定义有效文件扩展名列表。
-      const vaildList = ['.css', '.scss', '.sass', '.less', '.styl', '.vue', '.sugarss']
-      // 筛选出需要处理的文件列表。
-      const targetList = this.fileInfoList.filter((fileInfo) =>
-        vaildList.includes(fileInfo.extname)
-      )
-      // 初始化进度条，用于批量处理文件时的进度显示。
-      const { updateBar } = cliProgress.useCliProgress(targetList.length)
+    // 定义有效文件扩展名列表。
+    const vaildList = ['.css', '.scss', '.sass', '.less', '.styl', '.vue', '.sugarss']
+    // 筛选出需要处理的文件列表。
+    const targetList = this.fileInfoList.filter((fileInfo) => vaildList.includes(fileInfo.extname))
+    // 初始化进度条，用于批量处理文件时的进度显示。
+    const { updateBar } = cliProgress.useCliProgress(targetList.length)
 
-      // 遍历文件列表，处理每个文件，并更新进度条。
-      for (const item of targetList) {
-        await handler(item.filePath)
-        updateBar()
-      }
+    // 遍历文件列表，处理每个文件，并更新进度条。
+    for (const item of targetList) {
+      await handler(item.filePath)
+      updateBar()
     }
+    return { successList, errorList }
   }
 
   /**
    * 使用jscodemod模板，执行一系列的代码转换操作。
    * @param codemodList 要执行的转换操作列表，每个转换操作是一个Transform类型的函数。
-   * @param targetPath 可选参数，指定要转换的单个文件路径。如果未提供，则转换指定目录下所有符合后缀名的文件。
    */
-  execCodemod = (codemodList: Transform[], targetPath?: string) => {
-    // 如果转换操作列表为空，则直接返回，不执行任何操作
-    if (!codemodList.length) {
-      return
-    }
-
+  execCodemod = (codemodList: Transform[]) => {
+    const successList: string[] = [] // 执行成功列表
+    const errorList: string[] = [] // 执行错误列表
     // 定义一个处理函数，用于处理单个文件的转换
     const handler = (filePath: string) => {
       try {
@@ -515,30 +497,24 @@ export class Exec implements ExecInterface {
 
         // 将转换后的内容写入文件
         writeFile(filePath, newContent)
+        successList.push(filePath)
       } catch (e) {
         // 捕获并打印转换过程中可能出现的错误
         console.warn(e)
+        errorList.push(filePath)
       }
     }
+    const vaildList = ['.js', '.jsx', '.ts', '.tsx', '.vue']
+    // 筛选出符合后缀名条件的文件信息列表
+    const targetList = this.fileInfoList.filter((fileInfo) => vaildList.includes(fileInfo.extname))
+    // 初始化进度条，用于显示转换进度
+    const { updateBar } = cliProgress.useCliProgress(targetList.length)
 
-    // 如果提供了targetPath，则只处理这个文件
-    if (targetPath) {
-      handler(targetPath)
-    } else {
-      // 否则，处理指定目录下所有符合特定后缀名的文件
-      const vaildList = ['.js', '.jsx', '.ts', '.tsx', '.vue']
-      // 筛选出符合后缀名条件的文件信息列表
-      const targetList = this.fileInfoList.filter((fileInfo) =>
-        vaildList.includes(fileInfo.extname)
-      )
-      // 初始化进度条，用于显示转换进度
-      const { updateBar } = cliProgress.useCliProgress(targetList.length)
-
-      // 遍历文件列表，对每个文件执行转换操作，并更新进度条
-      for (const item of targetList) {
-        handler(item.filePath)
-        updateBar()
-      }
+    // 遍历文件列表，对每个文件执行转换操作，并更新进度条
+    for (const item of targetList) {
+      handler(item.filePath)
+      updateBar()
     }
+    return { successList, errorList }
   }
 }

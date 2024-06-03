@@ -372,7 +372,7 @@ export const getParserOption = (): ParserOptions => {
   // 解析器配置项
   const options: ParserOptions = {
     allowImportExportEverywhere: false,
-    plugins: ['decorators-legacy', 'jsx', 'typescript'],
+    plugins: ['jsx', 'typescript', 'asyncGenerators', 'classProperties', 'decorators-legacy'],
     sourceType: 'module'
   }
   return options
