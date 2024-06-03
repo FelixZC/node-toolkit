@@ -30,13 +30,20 @@ pzc 的工具箱，包含：
 [react-codemod 模板来源](https://github.com/reactjs/react-codemod)
 
 #### 使用
-
 npm i 安装依赖
 
-ts-node xxx执行
+- cmd方式
+  - 自行修改src/exec/xxx.ts下的new Exec('your dir')
+  - 通过注释添加插件
+  - ts-node src/exec/xxx.ts，执行插件
 
-ps:自行在src/exec/index.ts修改new fsUtils(rootPath)，rootPath为预执行目标文件夹目录，操作界面待完善
+- 控制界面方式
+  - npm run dev
+  - npm run dev-electron
+  - 选择目录和插件执行
 
+操作界面待完善
+<img src="src\assets\images\desktop.png" alt="这是图片的描述">
 
 #### 目录结构部分说明
 ```
