@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useCallback, ChangeEvent } from 'react'
 import DesktopHeader from '@src/components/desktop-header'
 import { isDesktop, getProcessNodeEnv, ipcRendererSend } from '@src/utils/desktop-utils'
 import MineLayout from '@src/layout/index'
+
 /**
  * 主应用组件
  * 本组件实现了根据环境不同打开开发者工具的功能，

@@ -356,6 +356,7 @@ class fsUtils implements FsInstance {
     })
 
     console.log(`批量修改完毕，共${modifyCount}个文件产生变化`)
+    return modifyCount
   }
 
   /**

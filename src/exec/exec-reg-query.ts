@@ -11,5 +11,4 @@ const reg = /(\w+)?(Date|Term)\b/gi
 const filePath = 'src/query/md/query.md'
 const content = fs.readFileSync(filePath, 'utf-8')
 const result = exec.pageRegQuery(reg, content)
-const writeFilePath = 'src/query/md/query-result.md'
-writeFile(writeFilePath, result)
+writeFile('src/query/md/query-result.md', result)

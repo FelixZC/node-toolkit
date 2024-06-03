@@ -59,7 +59,6 @@ pzc-toolbox                                             //
 │  │  │  ├─ depart-default-export-object-express.ts     //重置导出
 │  │  │  ├─ depart-switch.ts                            //分离switch
 │  │  │  ├─ extract-annotation.ts                       //提取注释
-│  │  │  ├─ get-all-function-name.ts                    //获取单一文件方法名
 │  │  │  ├─ import-sort.ts                              //导入排序
 │  │  │  ├─ move-default-export-to-last.ts              //移动默认导出
 │  │  │  ├─ remove-invalid-comment.ts                   //移除包含this的无效注释

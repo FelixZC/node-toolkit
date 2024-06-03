@@ -9,7 +9,6 @@ import runBabelPlugin from '../plugins/use-babel-plugin'
 import runCodemod from '../plugins/use-codemod'
 import runPostcssPlugin from '../plugins/use-postcss-plugin'
 import runPosthtmlPlugin from '../plugins/use-posthtml-plugin'
-import storeFile from '../query/js/stote-state'
 import type { BabelPlugin } from '../plugins/use-babel-plugin'
 import type { ExecFileInfo } from '../../types/common'
 import type { FileInfo } from '../utils/fs'
@@ -37,12 +36,14 @@ export interface FilterConditionType {
 export type ExecListType = Array<RegExec>
 
 // Exec类定义
+// 重写ExecInterface接口，去除具体实现，使其成为一个纯接口定义
 interface ExecInterface {
   br: string
   fsInstance: fsUtils
   fileInfoList: FileInfo[]
-  classifyFilesGroup(isQueryRepeat?: boolean): void
-  getAttrsAndAnnotation(targetPath?: string): void
+  classifyFilesGroup(): string
+  classifyFilesGroupByRepeat(): string
+  getAttrsAndAnnotation(targetPath?: string): string
   batchRegQuery(regExpression: RegExp): string
   pageRegQuery(regExpression: RegExp, content: string): string
   batchReplaceByReg(execList: ExecListType, filterCondition?: FilterConditionType): void
@@ -50,6 +51,7 @@ interface ExecInterface {
   execPosthtmlPlugin(plugins: PosthtmlPlugin<unknown>[], targetPath?: string): Promise<void>
   execPostcssPlugin(plugins: PostcssPlugin[], targetPath?: string): Promise<void>
   execCodemod(codemodList: Transform[], targetPath?: string): void
+  // 可能还需要添加其他方法...
 }
 
 export class Exec implements ExecInterface {
@@ -62,49 +64,24 @@ export class Exec implements ExecInterface {
     this.fsInstance = new fsUtils(rootPath)
     this.fileInfoList = this.fsInstance.getFileInfoList()
   }
+  /**
+   * 对文件信息列表进行分类分组，根据文件的扩展名进行分组。
+   * @returns {string} 返回分类分组后的文件信息的JSON字符串。
+   */
+  classifyFilesGroup = (): string => {
+    const group = groupBy(this.fileInfoList, 'extname')
+    return JSON.stringify(group, null, 2)
+  }
 
   /**
-   * 对文件进行分类分组
-   * @param isQueryRepeat 是否查询重复文件
+   * 查询并分类重复命名的文件，首先根据文件名进行分组，然后筛选出包含多个文件的组，最后对这些重复命名的文件组再次根据扩展名进行分类。
+   * @returns {string} 返回包含重复命名文件的分类分组后的文件信息的JSON字符串。
    */
-  classifyFilesGroup = (isQueryRepeat = false) => {
-    /**
-     * 查询并分类重复命名的文件
-     */
-    const classifyRepeatFileGroup = () => {
-      // 按文件名分类
-      const group = groupBy(this.fileInfoList, 'basename')
-
-      // 过滤出重复命名的文件数组
-      const filesGroupOfRepeat = Object.values(group).filter((item) => item.group.length > 1)
-
-      // 按文件类型对重复的文件进行二次分类
-      const newGroup = groupBy(filesGroupOfRepeat, 'extname')
-
-      // 将结果写入文件
-      writeFile('src/query/json/files-group-repeat.json', JSON.stringify(newGroup, null, 2))
-    }
-
-    /**
-     * 查询并分类同一类型的文件
-     */
-    const classifyNormalFilesGroup = () => {
-      // 按文件类型分类
-      const group = groupBy(this.fileInfoList, 'extname')
-
-      // 将结果写入文件
-      writeFile('src/query/json/files-group.json', JSON.stringify(group, null, 2))
-    }
-
-    // 根据参数决定是查询重复文件还是同一类型的文件
-    if (isQueryRepeat) {
-      classifyRepeatFileGroup()
-    } else {
-      classifyNormalFilesGroup()
-    }
-
-    // 将所有文件的信息写入文件
-    writeFile('src/query/json/file-list.json', JSON.stringify(this.fileInfoList, null, 2))
+  classifyFilesGroupByRepeat = () => {
+    const group = groupBy(this.fileInfoList, 'basename')
+    const filesGroupOfRepeat = Object.values(group).filter((item) => item.group.length > 1)
+    const newGroup = groupBy(filesGroupOfRepeat, 'extname')
+    return JSON.stringify(newGroup, null, 2)
   }
 
   /**
@@ -204,19 +181,12 @@ export class Exec implements ExecInterface {
     // 根据首字母对收集到的属性信息进行分组，并生成属性描述表格
     const attrsGroup = groupBy(attrsCollectionGroup, 'standingInitial') // 根据首字母排序
 
-    const attributesDescriptionTable = mdUtils.createdAttributesGroupTable(attrsGroup) // 获取项目使用属性描述
+    let attributesDescriptionTable = mdUtils.createdAttributesGroupTable(attrsGroup) // 获取项目使用属性描述
+    attributesDescriptionTable = attributesDescriptionTable
+      .replace(/\{\{.*\}\}/g, '')
+      .replace(/<.*>/g, '')
 
-    writeFile(
-      'src/query/md/attributes-description-table.md',
-      attributesDescriptionTable.replace(/\{\{.*\}\}/g, '').replace(/<.*>/g, '')
-    )
-    const storeTable = mdUtils.createdStoreTable(storeFile, attrsCollectionTemp) // 获取store属性描述
-
-    writeFile(
-      'src/query/md/store-table.md',
-      storeTable.replace(/\{\{.*\}\}/g, '').replace(/<.*>/g, '')
-    )
-    writeFile('src/query/json/attrs-collection.json', JSON.stringify(attrsCollectionTemp))
+    return attributesDescriptionTable
   }
 
   /**
@@ -394,9 +364,6 @@ export class Exec implements ExecInterface {
         updateBar()
       }
     }
-
-    // 最后，将全局额外信息写入到json文件中。
-    writeFile('src/query/json/global-extra.json', JSON.stringify(globalExtra))
   }
 
   /**
@@ -462,9 +429,6 @@ export class Exec implements ExecInterface {
         updateBar()
       }
     }
-
-    // 将全局额外信息写入到指定文件
-    writeFile('src/query/json/global-extra.json', JSON.stringify(globalExtra))
   }
 
   /**
