@@ -2,7 +2,7 @@
   "name": "toolkit",
   "version": "1.0.0",
   "description": "node-toolkid",
-  "main": "desktop/index.js",
+  "main": "desktop/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint:lint-staged": "lint-staged",
@@ -12,11 +12,12 @@
     "compile": "tsc",
     "dev": "cross-env NODE_ENV=development webpack server --config ./config/webpack.config.js",
     "build": "cross-env NODE_ENV=production webpack --config ./config/webpack.config.js",
-    "dev-electron": "cross-env NODE_ENV=development electron ./src/desktop/index.js",
-    "prod-electron": "cross-env NODE_ENV=production electron ./src/desktop/index.js",
+    "dev-electron": "npm run compile && cross-env NODE_ENV=development electron ./dist/src/desktop/index.js",
+    "prod-electron": "npm run compile && cross-env NODE_ENV=production electron ./dist/src/desktop/index.js",
     "build-electron-win64": "electron-builder -w --x64"
   },
   "author": "pzc",
+
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.18.2",
@@ -50,6 +51,8 @@
     "css-minimizer-webpack-plugin": "^5.0.1",
     "cz-conventional-changelog": "^3.3.0",
     "cz-customizable": "^6.3.0",
+    "electron": "^26.6.10",
+    "electron-builder": "^24.6.3",
     "eslint": "^8.17.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^8.5.0",
@@ -91,9 +94,7 @@
     "webpack": "^5.88.1",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1",
-    "webpackbar": "^5.0.2",
-    "electron": "^26.6.10",
-    "electron-builder": "^24.6.3"
+    "webpackbar": "^5.0.2"
   },
   "dependencies": {
     "antd": "^5.17.3",

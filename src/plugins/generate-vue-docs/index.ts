@@ -6,7 +6,7 @@ import * as generator from '@babel/generator'
 import { getParserOption } from '../babel-plugins/ast-utils'
 import * as parser from '@babel/parser'
 import RenderMd from './render'
-
+import type { ElementNode } from '@vue/compiler-core'
 /*  默认生成配置 */
 import * as t from '@babel/types'
 import * as traverse from '@babel/traverse'
@@ -364,8 +364,8 @@ const parseDocs = (vueStr: string, config: Record<string, any> = {}) => {
     isModelAndSync(componentInfo)
   }
 
-  if (vue.descriptor.template) {
-    traverserTemplateAst(vue.descriptor.template.ast, {
+  if (vue.descriptor.template && vue.descriptor.template.ast) {
+    traverserTemplateAst(vue.descriptor.template.ast as unknown as ElementNode, {
       slot(node, parent) {
         if (parent) {
           !componentInfo.slots && (componentInfo.slots = {})

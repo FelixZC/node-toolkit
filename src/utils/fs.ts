@@ -316,7 +316,7 @@ class fsUtils implements FsInstance {
     filteredFiles.forEach((filePath) => {
       const oldDirname = path.dirname(filePath)
       const oldExtname = path.extname(filePath)
-      const oldBaseName = path.basename(filePath)
+      // const oldBaseName = path.basename(filePath)
       const oldFilename = path.basename(filePath, oldExtname)
 
       let newFilename =
