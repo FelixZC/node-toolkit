@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { List, Input, Button, Switch, message } from 'antd'
 import { ipcRendererInvoke } from '../../utils/desktop-utils'
 interface Feature {
@@ -110,11 +110,17 @@ const FeatureListPage: React.FC = () => {
       if (filePaths && filePaths.length > 0) {
         setDirectoryPath(filePaths[0]) // 设置目录路径到状态
         message.success('Directory chosen: ' + filePaths[0])
+        sessionStorage.setItem('directoryPath', filePaths[0])
       }
     } catch (error) {
       message.error('Failed to choose directory: ' + error)
     }
   }
+
+  // 组件加载完毕后执行的方法
+  useEffect(() => {
+    setDirectoryPath(sessionStorage.getItem('directoryPath') || '')
+  }, []) // 空依赖数组表示这个effect只在挂载时运行一次
 
   return (
     <div style={{ padding: '20px' }}>

@@ -22,7 +22,8 @@ const lazyLoad = (Component: React.ComponentType) => (
 
 // 以下组件懒加载定义
 const HomePage = lazy(() => import('@src/components/home-page'))
-const BabelExec = lazy(() => import('@src/components/exec/babel-exec'))
+const ExecBabel = lazy(() => import('@src/components/exec/exec-babel'))
+const ExecJscodemod = lazy(() => import('@src/components/exec/exec-jscodemod'))
 const Exception403 = lazy(() => import('@src/components/exception/exception403'))
 const NoMatch = lazy(() => import('@src/components/no-match'))
 // 路由配置
@@ -45,11 +46,19 @@ const rootRouter: RouteObject[] = [
     children: [
       {
         index: true,
-        path: '/exec/babelExec',
+        path: '/exec/ExecBabel',
         name: 'babel',
-        key: '/exec/babelExec',
+        key: '/exec/ExecBabel',
         auth: true,
-        element: lazyLoad(BabelExec)
+        element: lazyLoad(ExecBabel)
+      },
+      {
+        index: true,
+        path: '/exec/ExecJscodemod',
+        name: 'jscodemod',
+        key: '/exec/ExecJscodemod',
+        auth: true,
+        element: lazyLoad(ExecJscodemod)
       }
     ]
   },

@@ -4,6 +4,7 @@
  */
 import { BrowserWindow, ipcMain } from 'electron'
 import { executeBabelPlugins } from '../exec/exec-babel-plugin'
+import { executeJSCodemods } from '../exec/exec-jscodemod'
 import * as path from 'path'
 
 // 判断是否为开发环境
@@ -95,6 +96,10 @@ function mainWindowHandleEvent(): void {
 
   ipcMain.handle('exec-babel', (event, dir: string, babelPluginPathList: string[]) => {
     executeBabelPlugins(dir, babelPluginPathList)
+  })
+
+  ipcMain.handle('exec-jscodemod', (event, dir: string, jscodemodeList: string[]) => {
+    executeJSCodemods(dir, jscodemodeList)
   })
 }
 

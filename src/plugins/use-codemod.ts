@@ -31,7 +31,18 @@ const transform = (
   try {
     // 遍历每个转换器，应用它们到源代码上
     for (const codemod of codemodList) {
-      let parser = getParser()
+      //与prettier保持一致代码格式
+      const formatOptions = {
+        useTabs: false,
+        tabWidth: 2,
+        printWidth: 100,
+        singleQuote: true,
+        trailingComma: 'none',
+        bracketSpacing: true,
+        semi: false
+      }
+      //使用默认解析器babel
+      let parser = getParser('babel', formatOptions)
       let parserOption = codemod.parser
 
       // 根据源代码语言选择合适的parser
@@ -47,7 +58,8 @@ const transform = (
 
       // 获取或指定parser
       if (parserOption) {
-        parser = typeof parserOption === 'string' ? getParser(parserOption) : parserOption
+        parser =
+          typeof parserOption === 'string' ? getParser(parserOption, formatOptions) : parserOption
       }
 
       const j = jscodeshift.withParser(parser)
