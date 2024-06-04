@@ -84,7 +84,7 @@ const FeatureListPage: React.FC = () => {
   }
 
   // 执行选中的功能
-  const handleExecute = () => {
+  const handleExecute = async () => {
     if (!directoryPath.length) {
       message.warning('Please select a exec derecroty.')
       return
@@ -96,7 +96,7 @@ const FeatureListPage: React.FC = () => {
     }
     const babelPathList = selectedFeatures.map((f) => f.path)
     try {
-      ipcRendererInvoke('exec-babel', directoryPath, babelPathList)
+      await ipcRendererInvoke('exec-babel', directoryPath, babelPathList)
       message.success(`Executing: ${selectedFeatures.map((f) => f.name).join(', ')}`)
     } catch (error) {
       message.error('Failed to execute: ' + error)

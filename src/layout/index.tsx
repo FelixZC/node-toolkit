@@ -3,6 +3,7 @@ import { Routes, Route, useNavigate } from 'react-router-dom' // 引入 useNavig
 import { Layout, Menu } from 'antd'
 import rootRouter from '@src/routers'
 import type { RouteObject } from '@src/routers'
+
 const { Content, Sider } = Layout
 
 function filterMenuItems(routes: RouteObject[]) {
@@ -54,7 +55,7 @@ const Lay: React.FC = () => {
           onClick={onMenuItemClick}
         />
       </Sider>
-      <Layout style={{ padding: '0 24px 24px' }}>
+      <Layout>
         <Content>
           <Routes>
             {rootRouterFlattenArray.map((route, index) => (

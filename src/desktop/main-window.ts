@@ -2,9 +2,9 @@
  * 主窗口模块，负责创建和管理应用程序的主要窗口。
  * 使用Electron框架，配置窗口属性，并处理窗口事件。
  */
-import { BrowserWindow, ipcMain } from 'electron'
-import { executeBabelPlugins } from '../exec/exec-babel-plugin'
-import { executeJSCodemods } from '../exec/exec-jscodemod'
+import { BrowserWindow } from 'electron'
+import mainWindowHandleEvents from './handle'
+import mainWindowListenEvents from './listen'
 import * as path from 'path'
 
 // 判断是否为开发环境
@@ -43,64 +43,8 @@ function createMainWindow(): void {
   mainWindow.once('ready-to-show', () => {
     mainWindow!.show()
   })
-
-  mainWindowListenEvents()
-  mainWindowHandleEvent()
-}
-
-/**
- * 监听主窗口的事件，包括最小化、最大化、恢复、关闭和打开开发者工具。
- */
-function mainWindowListenEvents(): void {
-  ipcMain.on('mainWindow-min', () => {
-    if (mainWindowIsExist()) {
-      mainWindow!.minimize()
-    }
-  })
-
-  ipcMain.on('mainWindow-max', () => {
-    if (mainWindowIsExist()) {
-      mainWindow!.maximize()
-      mainWindow!.webContents.send('mainWindowIsMax', true)
-    }
-  })
-
-  ipcMain.on('mainWindow-restore', () => {
-    if (mainWindowIsExist()) {
-      mainWindow!.unmaximize()
-      mainWindow!.webContents.send('mainWindowIsMax', false)
-    }
-  })
-
-  ipcMain.on('mainWindow-close', () => {
-    if (mainWindowIsExist()) {
-      mainWindow!.hide()
-    }
-  })
-
-  ipcMain.on('mainWindow-open-devtool', () => {
-    if (mainWindowIsExist()) {
-      mainWindow!.webContents.openDevTools()
-    }
-  })
-}
-
-function mainWindowHandleEvent(): void {
-  ipcMain.handle('choose-directory', async () => {
-    const { dialog } = require('electron')
-    const result = await dialog.showOpenDialog({
-      properties: ['openDirectory']
-    })
-    return result.filePaths
-  })
-
-  ipcMain.handle('exec-babel', (event, dir: string, babelPluginPathList: string[]) => {
-    executeBabelPlugins(dir, babelPluginPathList)
-  })
-
-  ipcMain.handle('exec-jscodemod', (event, dir: string, jscodemodeList: string[]) => {
-    executeJSCodemods(dir, jscodemodeList)
-  })
+  mainWindowListenEvents(mainWindow)
+  mainWindowHandleEvents()
 }
 
 /**

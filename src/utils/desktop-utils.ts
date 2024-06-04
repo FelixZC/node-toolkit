@@ -41,6 +41,7 @@ export const getProcessNodeEnv = () => {
  * @param {...any[]} args - 传递给事件的参数。
  */
 export const ipcRendererSend = (eventName: string, ...args: any[]) => {
+  console.log(eventName, args)
   window.ipcRenderer?.send(eventName, ...args)
 }
 

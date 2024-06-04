@@ -9,6 +9,7 @@ import runBabelPlugin from '../plugins/use-babel-plugin'
 import runCodemod from '../plugins/use-codemod'
 import runPostcssPlugin from '../plugins/use-postcss-plugin'
 import runPosthtmlPlugin from '../plugins/use-posthtml-plugin'
+import { getMainWindow } from '../desktop/main-window'
 import type { BabelPlugin } from '../plugins/use-babel-plugin'
 import type { ExecFileInfo } from '../../types/common'
 import type { FileInfo } from '../utils/fs'
@@ -351,11 +352,13 @@ export class Exec implements ExecInterface {
     const vaildList = ['.js', '.jsx', '.ts', '.tsx', '.vue'] // 定义有效文件扩展名列表。
     const targetList = this.fileInfoList.filter((fileInfo) => vaildList.includes(fileInfo.extname)) // 筛选出需要处理的文件列表。
     const { updateBar } = cliProgress.useCliProgress(targetList.length) // 初始化进度条。
-
-    // 遍历文件列表，处理每个文件并更新进度条。
+    // 遍历所有有效文件，逐一处理，并更新进度条
+    let count = 1
+    const mainWindow = getMainWindow()
     for (const item of targetList) {
       handler(item.filePath)
       updateBar()
+      mainWindow && mainWindow.setProgressBar(count++ / targetList.length)
     }
     return { successList, errorList }
   }
@@ -411,7 +414,6 @@ export class Exec implements ExecInterface {
     const targetList = this.fileInfoList.filter((fileInfo) => vaildList.includes(fileInfo.extname))
     // 初始化进度条，用于显示处理进度
     const { updateBar } = cliProgress.useCliProgress(targetList.length)
-
     // 遍历所有有效文件，逐一处理，并更新进度条
     for (const item of targetList) {
       await handler(item.filePath)
@@ -509,11 +511,13 @@ export class Exec implements ExecInterface {
     const targetList = this.fileInfoList.filter((fileInfo) => vaildList.includes(fileInfo.extname))
     // 初始化进度条，用于显示转换进度
     const { updateBar } = cliProgress.useCliProgress(targetList.length)
-
-    // 遍历文件列表，对每个文件执行转换操作，并更新进度条
+    // 遍历所有有效文件，逐一处理，并更新进度条
+    let count = 1
+    const mainWindow = getMainWindow()
     for (const item of targetList) {
       handler(item.filePath)
       updateBar()
+      mainWindow && mainWindow.setProgressBar(count++ / targetList.length)
     }
     return { successList, errorList }
   }

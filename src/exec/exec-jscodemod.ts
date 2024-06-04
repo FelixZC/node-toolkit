@@ -7,7 +7,7 @@ import type { Transform } from 'jscodeshift'
  * @param jscodemodeList 需要执行的 JSCodeMod 模板路径列表。
  */
 export const executeJSCodemods = (dir: string, jscodemodeList: string[]): void => {
-  const exec = new Exec()
+  const exec = new Exec(dir)
 
   try {
     // 将模板路径列表映射为具体的 Transform 函数数组
