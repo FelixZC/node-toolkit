@@ -1,35 +1,33 @@
 import { Exec } from './index'
 import path from 'path'
-import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
-
+import type { Plugin as PosthtmlPlugin } from 'posthtml'
 /**
- * 执行 PostCSS 插件的公共方法。
- * @param pluginsPathList 需要执行的 PostCSS 插件路径列表。
+ * 在给定目录下执行PostHTML插件。
+ * 此函数负责加载并执行一系列PostHTML插件，这些插件由插件路径列表指定。
+ * @param dir {string} - 工作目录的路径，插件将在该目录下执行。
+ * @param pluginsPathList {string[]} - PostHTML插件的路径列表，每个路径都是一个Node.js模块的路径。
  */
-export const executePostcssPlugins = (dir: string, pluginsPathList: string[]): void => {
+function executePosthtmlPlugins(dir: string, pluginsPathList: string[]): void {
   const exec = new Exec(dir)
 
   try {
-    // 将插件路径列表映射为具体的 PostCSS 插件实例数组
-    const plugins: PostcssPlugin[] = pluginsPathList.map((pluginPath) => {
+    const plugins: PosthtmlPlugin<unknown>[] = pluginsPathList.map((pluginPath) => {
       const result = require(pluginPath)
 
-      // 确保 result.default 或 result 本身是 PostCSS 插件
-      if (result.default && typeof result.default === 'function') {
+      if (result.default) {
         return result.default
       }
+
       return result
     })
 
-    // 执行 PostCSS 插件
-    exec.execPostcssPlugin(plugins)
+    exec.execPosthtmlPlugin(plugins)
   } catch (e) {
-    console.warn('执行 PostCSS 插件时发生错误:', e)
+    // 可以在这里添加更详细的错误处理逻辑
+    console.error('Error executing PostHTML plugins:', e)
   }
 }
 
-// 示例用法：
+// 使用示例
 const pluginsPathList: string[] = ['../plugins/posthtml-plugins/property-sort']
-
-// 调用公共方法执行 PostCSS 插件
-executePostcssPlugins(path.join('src copy'), pluginsPathList)
+executePosthtmlPlugins(path.join('src copy'), pluginsPathList)
