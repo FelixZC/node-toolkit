@@ -11,57 +11,9 @@ interface Feature {
 const initialFeatures: Feature[] = [
   {
     id: 0,
-    name: 'arrow-function-arguments',
+    name: 'property-sort',
     isSelected: false,
-    path: '../plugins/jscodemods/arrow-function-arguments'
-  },
-  {
-    id: 1,
-    name: 'arrow-function',
-    isSelected: false,
-    path: '../plugins/jscodemods/arrow-function'
-  },
-  {
-    id: 2,
-    name: 'no-reassign-params',
-    isSelected: false,
-    path: '../plugins/jscodemods/no-reassign-params'
-  },
-  {
-    id: 3,
-    name: 'no-vars',
-    isSelected: false,
-    path: '../plugins/jscodemods/no-vars'
-  },
-  {
-    id: 4,
-    name: 'object-shorthand',
-    isSelected: false,
-    path: '../plugins/jscodemods/object-shorthand'
-  },
-  {
-    id: 5,
-    name: 'rm-object-assign',
-    isSelected: false,
-    path: '../plugins/jscodemods/rm-object-assign'
-  },
-  {
-    id: 6,
-    name: 'rm-requires',
-    isSelected: false,
-    path: '../plugins/jscodemods/rm-requires'
-  },
-  {
-    id: 7,
-    name: 'template-literals',
-    isSelected: false,
-    path: '../plugins/jscodemods/template-literals'
-  },
-  {
-    id: 8,
-    name: 'unchain-variables',
-    isSelected: false,
-    path: '../plugins/jscodemods/unchain-variables'
+    path: '../plugins/posthtml-plugins/property-sort'
   }
 ]
 
@@ -100,9 +52,9 @@ const FeatureListPage: React.FC = () => {
       message.warning('Please select at least one feature to execute.')
       return
     }
-    const jscodemodList = selectedFeatures.map((f) => f.path)
+    const posthtmlList = selectedFeatures.map((f) => f.path)
     try {
-      await ipcRendererInvoke('exec-jscodemod', directoryPath, jscodemodList)
+      await ipcRendererInvoke('exec-posthtml', directoryPath, posthtmlList)
       message.success(`Executing: ${selectedFeatures.map((f) => f.name).join(', ')}`)
     } catch (error) {
       message.error('Failed to execute: ' + error)

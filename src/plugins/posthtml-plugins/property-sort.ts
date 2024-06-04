@@ -18,7 +18,7 @@ const propertySort: PostHTML.Plugin<unknown> = (tree) => {
       const directiveAttrs: typeof node.attrs = {}
       const refAttrs: typeof node.attrs = {}
       const methodAttrs: typeof node.attrs = {}
-      const normalAttrs: typeof node.attrs = {} // ps:记得移除="_pzc_"
+      const normalAttrs: typeof node.attrs = {}
 
       // 为确保每个属性值非空，空值用特殊标识符'_pzc_'替代
       for (const key in node.attrs) {

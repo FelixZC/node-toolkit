@@ -24,6 +24,8 @@ const lazyLoad = (Component: React.ComponentType) => (
 const HomePage = lazy(() => import('@src/components/home-page'))
 const ExecBabel = lazy(() => import('@src/components/exec/exec-babel'))
 const ExecJscodemod = lazy(() => import('@src/components/exec/exec-jscodemod'))
+const ExecPostcss = lazy(() => import('@src/components/exec/exec-postcss'))
+const ExecPosthtml = lazy(() => import('@src/components/exec/exec-posthtml'))
 const Exception403 = lazy(() => import('@src/components/exception/exception403'))
 const NoMatch = lazy(() => import('@src/components/no-match'))
 // 路由配置
@@ -59,6 +61,22 @@ const rootRouter: RouteObject[] = [
         key: '/exec/ExecJscodemod',
         auth: true,
         element: lazyLoad(ExecJscodemod)
+      },
+      {
+        index: true,
+        path: '/exec/ExecPostcss',
+        name: 'postcss',
+        key: '/exec/ExecPostcss',
+        auth: true,
+        element: lazyLoad(ExecPostcss)
+      },
+      {
+        index: true,
+        path: '/exec/ExecPosthtml',
+        name: 'posthtml',
+        key: '/exec/ExecPosthtml',
+        auth: true,
+        element: lazyLoad(ExecPosthtml)
       }
     ]
   },

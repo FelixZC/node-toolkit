@@ -7,7 +7,7 @@ import type { Plugin as PosthtmlPlugin } from 'posthtml'
  * @param dir {string} - 工作目录的路径，插件将在该目录下执行。
  * @param pluginsPathList {string[]} - PostHTML插件的路径列表，每个路径都是一个Node.js模块的路径。
  */
-function executePosthtmlPlugins(dir: string, pluginsPathList: string[]): void {
+export function executePosthtmlPlugins(dir: string, pluginsPathList: string[]): void {
   const exec = new Exec(dir)
 
   try {

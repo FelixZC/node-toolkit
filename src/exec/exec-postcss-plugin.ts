@@ -11,7 +11,7 @@ import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
  * @param {string[]} dir - 工作目录，用于执行插件。
  * @param {string[]} pluginsPathList - PostCSS插件的路径列表。
  */
-function executePostcssPlugins(dir: string, pluginsPathList: string[]) {
+export function executePostcssPlugins(dir: string, pluginsPathList: string[]) {
   const exec = new Exec(dir)
 
   try {
@@ -33,5 +33,5 @@ function executePostcssPlugins(dir: string, pluginsPathList: string[]) {
 
 // 示例：指定插件路径列表，并调用函数执行这些插件。
 // 这里的插件路径是相对路径，示例中假设项目结构和插件位置。
-const pluginsPathList = ['../plugins/postcss-plugins/transfer-file-name-tok-kebab-case']
+const pluginsPathList = ['../plugins/postcss-plugins/property-sort']
 executePostcssPlugins(path.join('src copy'), pluginsPathList)

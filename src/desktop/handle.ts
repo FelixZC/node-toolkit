@@ -19,4 +19,14 @@ export default function mainWindowHandleEvents() {
     const { executeJSCodemods } = require('../exec/exec-jscodemod')
     executeJSCodemods(dir, jscodemodeList)
   })
+
+  ipcMain.handle('exec-posthtml', async (event, dir, posthtmlPluginPathList) => {
+    const { executePosthtmlPlugins } = require('../exec/exec-posthtml-plugin')
+    executePosthtmlPlugins(dir, posthtmlPluginPathList)
+  })
+
+  ipcMain.handle('exec-postcss', async (event, dir, postcssPluginPathList) => {
+    const { executePostcssPlugins } = require('../exec/exec-postcss-plugin')
+    executePostcssPlugins(dir, postcssPluginPathList)
+  })
 }
