@@ -43,8 +43,8 @@ npm i 安装依赖
   - 选择目录和插件执行
 
 操作界面待完善
-<img src="src\assets\images\desktop.png" alt="这是图片的描述">
-<img src="src\assets\images\desktop2.png" alt="这是图片的描述2">
+<img src="docs/images/desktop.png" alt="这是图片的描述">
+<img src="docs/images/desktop2.png" alt="这是图片的描述2">
 
 #### 目录结构部分说明
 ```
