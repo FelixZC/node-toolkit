@@ -26,6 +26,7 @@ const ExecBabel = lazy(() => import('@src/components/exec/exec-babel'))
 const ExecJscodemod = lazy(() => import('@src/components/exec/exec-jscodemod'))
 const ExecPostcss = lazy(() => import('@src/components/exec/exec-postcss'))
 const ExecPosthtml = lazy(() => import('@src/components/exec/exec-posthtml'))
+const ClassifyFilesGroup = lazy(() => import('@src/components/exec/classify-files-group'))
 const Exception403 = lazy(() => import('@src/components/exception/exception403'))
 const NoMatch = lazy(() => import('@src/components/no-match'))
 // 路由配置
@@ -77,6 +78,14 @@ const rootRouter: RouteObject[] = [
         key: '/exec/ExecPosthtml',
         auth: true,
         element: lazyLoad(ExecPosthtml)
+      },
+      {
+        index: true,
+        path: '/exec/ClassifyFilesGroup',
+        name: 'classifyFilesGroup',
+        key: '/exec/ClassifyFilesGroup',
+        auth: true,
+        element: lazyLoad(ClassifyFilesGroup)
       }
     ]
   },

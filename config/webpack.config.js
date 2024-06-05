@@ -283,7 +283,7 @@ module.exports = {
     historyApiFallback: true, // 支持 HTML5 的历史模式路由
     compress: true, // 启用 gzip 压缩
     host: '0.0.0.0', // 监听的主机地址
-    port: 8888, // 监听的端口号
+    port: 8848, // 监听的端口号
     hot: true // 启用热更新
   },
 

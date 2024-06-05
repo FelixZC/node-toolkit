@@ -34,7 +34,7 @@ function createMainWindow(): void {
   })
 
   if (isDevelopment === 'development') {
-    mainWindow.loadURL('http://localhost:8888/home')
+    mainWindow.loadURL('http://localhost:8848/home')
   } else {
     const entryPath = path.resolve(__dirname, 'public/index.html')
     mainWindow.loadFile(entryPath)
