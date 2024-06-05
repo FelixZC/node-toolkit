@@ -132,6 +132,12 @@ const FeatureListPage: React.FC = () => {
         readOnly
         onSearch={handleChooseDirectory}
       />
+      <div style={{ marginTop: '20px' }}>
+        <Button onClick={handleSelectRevert}>Toggle Select Revert</Button>
+        <Button onClick={handleSelectAll}>Toggle Select on </Button>
+        <Button onClick={handleSelectNone}>Toggle Select off</Button>
+        <Button onClick={handleExecute}>Exec</Button>
+      </div>
       {/* 功能列表 */}
       <List
         bordered
@@ -156,12 +162,6 @@ const FeatureListPage: React.FC = () => {
           </List.Item>
         )}
       />
-      <div style={{ marginTop: '20px' }}>
-        <Button onClick={handleSelectRevert}>Toggle Select Revert</Button>
-        <Button onClick={handleSelectAll}>Toggle Select on </Button>
-        <Button onClick={handleSelectNone}>Toggle Select off</Button>
-        <Button onClick={handleExecute}>Exec</Button>
-      </div>
     </div>
   )
 }

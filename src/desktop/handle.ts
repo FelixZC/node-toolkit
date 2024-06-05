@@ -35,4 +35,10 @@ export default function mainWindowHandleEvents() {
     const result = classifyFiles(dir)
     return result
   })
+
+  ipcMain.handle('exec-get-attrs-and-annotation', async (event, dir: string) => {
+    const { getAttributesDescriptionTable } = require('../exec/exec-get-attrs-and-annotation')
+    const result = getAttributesDescriptionTable(dir)
+    return result
+  })
 }

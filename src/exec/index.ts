@@ -174,12 +174,15 @@ export class Exec implements ExecInterface {
     }
     const vaildList = ['.js', '.jsx', '.ts', '.tsx', '.vue']
     const targetList = this.fileInfoList.filter((fileInfo) => vaildList.includes(fileInfo.extname))
-    const { updateBar } = cliProgress.useCliProgress(targetList.length)
-    targetList.forEach((item: FileInfo) => {
+    const { updateBar } = cliProgress.useCliProgress(targetList.length) // 初始化进度条。
+    // 遍历所有有效文件，逐一处理，并更新进度条
+    let count = 1
+    const mainWindow = getMainWindow()
+    for (const item of targetList) {
       handler(item.filePath)
       updateBar()
-    })
-
+      mainWindow && mainWindow.setProgressBar(count++ / targetList.length)
+    }
     // 根据首字母对收集到的属性信息进行分组，并生成属性描述表格
     const attrsGroup = groupBy(attrsCollectionGroup, 'standingInitial') // 根据首字母排序
 
@@ -413,11 +416,14 @@ export class Exec implements ExecInterface {
     // 筛选出所有有效文件
     const targetList = this.fileInfoList.filter((fileInfo) => vaildList.includes(fileInfo.extname))
     // 初始化进度条，用于显示处理进度
-    const { updateBar } = cliProgress.useCliProgress(targetList.length)
+    const { updateBar } = cliProgress.useCliProgress(targetList.length) // 初始化进度条。
     // 遍历所有有效文件，逐一处理，并更新进度条
+    let count = 1
+    const mainWindow = getMainWindow()
     for (const item of targetList) {
-      await handler(item.filePath)
+      handler(item.filePath)
       updateBar()
+      mainWindow && mainWindow.setProgressBar(count++ / targetList.length)
     }
     return { successList, errorList }
   }
@@ -462,12 +468,14 @@ export class Exec implements ExecInterface {
     // 筛选出需要处理的文件列表。
     const targetList = this.fileInfoList.filter((fileInfo) => vaildList.includes(fileInfo.extname))
     // 初始化进度条，用于批量处理文件时的进度显示。
-    const { updateBar } = cliProgress.useCliProgress(targetList.length)
-
-    // 遍历文件列表，处理每个文件，并更新进度条。
+    const { updateBar } = cliProgress.useCliProgress(targetList.length) // 初始化进度条。
+    // 遍历所有有效文件，逐一处理，并更新进度条
+    let count = 1
+    const mainWindow = getMainWindow()
     for (const item of targetList) {
-      await handler(item.filePath)
+      handler(item.filePath)
       updateBar()
+      mainWindow && mainWindow.setProgressBar(count++ / targetList.length)
     }
     return { successList, errorList }
   }

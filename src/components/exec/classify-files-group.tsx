@@ -69,20 +69,41 @@ const FeatureListPage: React.FC = () => {
         theme="vs" // 编辑器主题
         value={output}
         options={{
-          readOnly: true, // 如果你希望编辑器是只读的
+          readOnly: true, // 使编辑器只读
           minimap: { enabled: true }, // 禁用迷你地图
           folding: true, // 启用代码折叠
-          showFoldingControls: 'mouseover', // 总是显示折叠控件
-          foldingStrategy: 'indentation', // 根据缩进进行折叠
-          scrollBeyondLastLine: false
+          showFoldingControls: 'always', // 总是显示折叠控件
+          foldingStrategy: 'auto', // 根据缩进进行折叠策略
+          scrollBeyondLastLine: false, // 禁用滚动到文档末尾之后
+          overviewRulerLanes: 3, // 预览标尺的行数
+          overviewRulerBorder: false, // 预览标尺的边框
+          glyphMargin: true, // 启用字形边距，用于显示断点等
+          lineDecorationsWidth: 10, // 行装饰的宽度
+          lineNumbers: 'on', // 行号显示
+          lineNumbersMinChars: 4, // 行号最少字符数
+          fixedOverflowWidgets: true, // 溢出的部件（如缩进线）固定
+          renderLineHighlight: 'all', // 整行高亮显示
+          scrollbar: {
+            // 滚动条的配置
+            vertical: 'auto', // 垂直滚动条为自动
+            horizontal: 'auto', // 水平滚动条为自动
+            useShadows: true, // 滚动条阴影
+            verticalHasArrows: false, // 垂直滚动条箭头
+            horizontalHasArrows: false, // 水平滚动条箭头
+            alwaysConsumeMouseWheel: false // 总是响应鼠标滚轮
+          },
+          mouseWheelZoom: false, // 禁用鼠标滚轮缩放
+          quickSuggestions: false, // 禁用快速建议
+          formatOnType: false, // 输入时不自动格式化
+          formatOnPaste: false, // 粘贴时不自动格式化
+          autoClosingBrackets: 'always', // 自动补全括号
+          autoIndent: 'full', // 自动缩进
+          dragAndDrop: true // 启用拖放功能
         }}
         onChange={(editorValue) => {
           // 编辑器内容变化时的回调，这里我们不需要它，因为设置为只读
         }}
       />
-
-      {/* 功能列表 */}
-      {/* 你的功能列表代码放在这里 */}
     </div>
   )
 }
