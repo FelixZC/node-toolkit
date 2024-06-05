@@ -1,53 +1,66 @@
-## pzc 的工具箱
+## **PZC 工具箱概览：**
 
-#### 介绍
+工具箱是一个前端开发辅助工具集，它包含了以下组件：
 
-pzc 的工具箱，包含：
+1. **Babel 插件及其执行器：** 用于JavaScript代码转换的插件和执行工具。
+2. **JSCodemod 插件及其执行器：** 用于自动化重构JavaScript代码的插件和执行工具。
+3. **PostHTML 插件及其执行器：** 用于HTML文档处理和转换的插件和执行工具。
+4. **PostCSS 插件及其执行器：** 用于CSS样式表转换和优化的插件和执行工具。
+5. **项目注释提取与文档生成：** 自动从代码注释中提取信息并生成文档。
+6. **文件夹信息统计与分类：** 对文件夹内容进行统计和分类。
+7. **文件内容的正则匹配、替换与去重：** 使用正则表达式进行文件内容的搜索、替换和去重。
+8. **文件批量重命名、复制、粘贴和移动：** 提供文件批量操作功能。
 
-1. babel 插件以及执行器
-2. jscodemod 插件以及执行器
-3. posthtml 插件以及执行器
-4. postcss 插件以及执行器
-5. 项目注释提取和文档生成
-6. 文件夹信息统计和分类
-7. 文件内容正则匹配、替换和去重
-8. 文件批量重命名和复制粘贴移动
+**持续更新中...**
 
-未完待续...
+## **核心原理：**
 
-#### 收集的插件模板:
+- **抽象语法树转换编译原理**：[AST 转换编译原理](https://github.com/jamiebuilds/the-super-tiny-compiler) 提供了编译原理的基础知识。
+- **语法树格式化工具**：[AST Explorer](https://astexplorer.net/) 是一个在线工具，用于格式化和探索抽象语法树。
 
-[ast 转化编译原理](https://github.com/jamiebuilds/the-super-tiny-compiler)
+**插件编写指南：**
 
-[astexplorer 语法树格式化网站](https://astexplorer.net/)
+- **Babel 插件手册**：[Babel 插件编写手册](https://github.com/jamiebuilds/babel-handbook) 提供了编写Babel插件的详细指导。
 
-[babel 插件编写手册](https://github.com/jamiebuilds/babel-handbook)
+**插件模板资源：**
 
-[js-codemod 模板来源](https://github.com/cpojer/js-codemod)
+- **JSCodemod 模板**：[JSCodemod 模板来源](https://github.com/cpojer/js-codemod) 提供了JS代码现代化的模板。
 
-[vue-codemod 模板来源](https://github.com/vuejs/vue-codemod)
+- **Vue Codemod 模板**：[Vue Codemod 模板来源](https://github.com/vuejs/vue-codemod) 提供了Vue框架代码现代化的模板。
 
-[react-codemod 模板来源](https://github.com/reactjs/react-codemod)
+- **React Codemod 模板**：[React Codemod 模板来源](https://github.com/reactjs/react-codemod) 提供了React框架代码现代化的模板。
 
-#### 使用
-npm i 安装依赖
+  ## 使用方式：
 
-- cmd方式
-  - 自行修改src/exec/xxx.ts下的new Exec('your dir')
-  - 通过注释添加插件
-  - ts-node src/exec/xxx.ts，执行插件
+**安装依赖**：
 
-- 控制界面方式
-  - npm run dev
-  - npm run dev-electron
-  - 选择目录和插件执行
+git clone
 
-操作界面待完善
+npm i 
+
+**命令行方式：**
+
+1. **修改执行脚本：** 请手动编辑 `src/exec/xxx.ts` 文件，将 `new Exec('your dir')` 中的 `'your dir'` 替换为您的目录路径。
+2. **添加插件注释：** 在相应的 TypeScript 文件中，通过注释的方式引入您需要的插件。
+3. **执行插件：** 打开命令行工具，使用 `ts-node src/exec/xxx.ts` 命令来运行您的插件。
+
+**图形用户界面方式：**
+
+1. **启动开发服务器：** 在命令行中运行 `npm run dev` 命令，启动您的开发环境。
+
+2. **启动Electron应用：** 接着，执行 `npm run dev-electron` 命令，以图形界面模式运行您的应用。
+
+3. **选择目录和执行插件：** 在Electron界面中，选择您希望操作的目录和插件，然后执行它们。
+
+## **操作界面待完善:**
+
 <img src="docs/images/desktop.png" alt="这是图片的描述">
+
 <img src="docs/images/desktop2.png" alt="这是图片的描述2">
+
 <img src="docs/images/desktop3.png" alt="这是图片的描述3">
 
-#### 目录结构部分说明
+## 目录结构(部分)说明
 ```
 pzc-toolbox                                             //
 ├─ src                                                  //
@@ -73,7 +86,7 @@ pzc-toolbox                                             //
 │  │  │  ├─ remove-invalid-comment.ts                   //移除包含this的无效注释
 │  │  │  ├─ replace-memberExpress-object-or-property.ts //替换表达式的调用对象或者调用属性
 │  │  │  ├─ sort-object-array-by-index.ts               //对象数组按index排序
-│  │  │  ├─ transfer-file-name-tok-kebab-case.ts        //驼峰转化
+│  │  │  ├─ transfer-file-name-tok-kebab-case.ts        //引用驼峰转化
 │  │  │  └─ transform-remove-console.ts                 //移除打印
 │  │  ├─ jscodemods                                     //codemode集合
 │  │  │  ├─ arrow-function-arguments.ts                 //简化箭头参数
@@ -86,11 +99,11 @@ pzc-toolbox                                             //
 │  │  │  ├─ template-literals.ts                        //转化模板字符串
 │  │  │  └─ unchain-variables.ts                        //断开链式定义
 │  │  ├─ postcss-plugins                                //postcss插件集合
-│  │  │  └─ transfer-file-name-tok-kebab-case.ts        //驼峰转化
+│  │  │  └─ transfer-file-name-tok-kebab-case.ts        //引用驼峰转化
 │  │  ├─ posthtml-plugins                               //posthtml插件集合
 │  │  │  ├─ property-sort.ts                            //属性排序
 │  │  │  ├─ query-tag.ts                                //查询标签
-│  │  │  └─ transfer-file-name-tok-kebab-case.ts        //驼峰转化
+│  │  │  └─ transfer-file-name-tok-kebab-case.ts        //引用驼峰转化
 │  │  ├─ sfc-utils.ts                                   //@vue/compiler-sfc封装方法集合
 │  │  ├─ use-babel-plugin.ts                            //Babel插件使用包装
 │  │  ├─ use-codemod.ts                                 //codemod使用包装
