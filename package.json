@@ -98,6 +98,7 @@
     "webpackbar": "^5.0.2"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.3.7",
     "@reduxjs/toolkit": "^2.2.5",
     "antd": "^5.17.3",
     "brace": "^0.11.1",

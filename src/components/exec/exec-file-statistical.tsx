@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react'
-import { Input, Button, message } from 'antd'
+import { Input, Button, message, Tooltip } from 'antd'
 import { ipcRendererInvoke } from '../../utils/desktop-utils'
 import MonacoEditor from 'react-monaco-editor'
+import { SwapOutlined } from '@ant-design/icons'
 
 const FeatureListPage: React.FC = () => {
   const [directoryPath, setDirectoryPath] = useState('') // 存储目录路径
   const [output, setOutput] = useState('') // 存储执行结果
-
+  const [isShowInJson, setIsShowInJson] = useState(false)
+  const [resultJson, setResultJson] = useState('')
+  const [resultMd, setResultMd] = useState('')
   // 执行选中的功能
   const handleExecute = async () => {
     if (!directoryPath.length) {
@@ -15,8 +18,10 @@ const FeatureListPage: React.FC = () => {
     }
     try {
       // 假设这里是执行功能并返回结果的代码
-      const result: string = await ipcRendererInvoke('classify-files-group', directoryPath)
-      setOutput(result) // 设置执行结果到状态
+      const result = await ipcRendererInvoke('exec-file-statistical', directoryPath)
+      setResultJson(result.resultJson)
+      setResultMd(result.resultMd)
+      setOutput(isShowInJson ? result.resultJson : result.resultMd) // 设置执行结果到状态
       message.success('Executed successfully.')
     } catch (error) {
       setOutput('Failed to execute: ' + error) // 设置错误信息到状态
@@ -43,9 +48,22 @@ const FeatureListPage: React.FC = () => {
     setDirectoryPath(sessionStorage.getItem('directoryPath') || '')
   }, []) // 空依赖数组表示这个effect只在挂载时运行一次
 
+  const toggleOutputFormat = () => {
+    setIsShowInJson(!isShowInJson)
+  }
+
+  useEffect(() => {
+    setOutput(isShowInJson ? resultJson : resultMd)
+  }, [isShowInJson])
+
+  useEffect(() => {
+    console.log('current isShowInJson state', isShowInJson)
+    console.log('output has been updated to:', output)
+  }, [output])
+
   return (
     <div style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
-      <h1>Feature List Execution Page</h1>
+      <h1>File Statistical</h1>
 
       {/* 显示目录路径的Input组件 */}
       <div style={{ display: 'flex', marginBottom: '20px', width: '100%' }}>
@@ -59,8 +77,14 @@ const FeatureListPage: React.FC = () => {
         <Button onClick={handleExecute} style={{ marginLeft: '10px' }}>
           Exec
         </Button>
+        <Tooltip title="Toggle Output Format">
+          <Button
+            onClick={toggleOutputFormat}
+            style={{ marginLeft: '10px', color: '#1890ff', borderColor: '#1890ff' }}
+            icon={<SwapOutlined />}
+          ></Button>
+        </Tooltip>
       </div>
-
       {/* 显示执行结果的Monaco Editor组件 */}
       <MonacoEditor
         width="100%"

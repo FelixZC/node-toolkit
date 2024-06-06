@@ -53,7 +53,9 @@ npm i
 
 ## **操作界面待完善:**
 
-<img src="docs/images/desktop.png" alt="这是图片的描述">
+<img src="docs/images/desktop0.png" alt="这是图片的描述">
+
+<img src="docs/images/desktop1.png" alt="这是图片的描述">
 
 <img src="docs/images/desktop2.png" alt="这是图片的描述2">
 
@@ -64,15 +66,14 @@ npm i
 ## 目录结构(部分)说明
 ```
 pzc-toolbox                                             //
-├─ src                                                  //
+├─ src                                      ****            //
 │  ├─ exec                                              //执行器集合
-│  │  ├─ classify-files-group.ts                        //文件信息统计
+│  │  ├─ exec-file-statistical.ts                       //文件信息统计
 │  │  ├─ exec-bable-plugin.ts                           //执行babel插件
 │  │  ├─ exec-get-attrs-and-annotation.ts               //获取项目注释
 │  │  ├─ exec-jscodemod.ts                              //执行jscodemode
 │  │  ├─ exec-postcss-plugin.ts                         //执行postcss
 │  │  ├─ exec-posthtml-plugin.ts                        //posthtml
-│  │  ├─ exec-reg-query.ts                              //执行正则指定内容查询
 │  │  ├─ exec-reg-query-batch.ts                        //执行正则批量查询
 │  │  ├─ exec-transfer-file-name-To-kebab-case.ts       //文件名驼峰转化
 │  │  └─ index.ts                                       //方法集合

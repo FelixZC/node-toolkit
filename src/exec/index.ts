@@ -1,7 +1,7 @@
 import * as cliProgress from '../utils/cli-progress'
 import * as fs from 'fs'
 import fsUtils, { writeFile } from '../utils/fs'
-import { groupBy } from '../utils/common'
+import { groupBy, buildTree, pickProperties } from '../utils/common'
 import mdUtils from '../utils/md'
 import * as os from 'os'
 import * as path from 'path'
@@ -42,8 +42,10 @@ interface ExecInterface {
   br: string
   fsInstance: fsUtils
   fileInfoList: FileInfo[]
-  classifyFilesGroup(): string
-  classifyFilesGroupByRepeat(): string
+  getProjectTree(): Record<string, string>
+  classifyFilesByExtname(): string
+  classifyFilesByBasename(): string
+  classifyFilesFirstBasenameThenExtname(): string
   getAttrsAndAnnotation(): string
   batchRegQuery(
     regExpression: RegExp,
@@ -73,20 +75,38 @@ export class Exec implements ExecInterface {
     this.fsInstance = new fsUtils(rootPath)
     this.fileInfoList = this.fsInstance.getFileInfoList()
   }
+  getProjectTree = () => {
+    const pathList = this.fsInstance.filePathList.concat(this.fsInstance.dirPathList)
+    const treeData = pathList.map((item) => {
+      return {
+        ...this.fsInstance.getFileInfo(item),
+        children: []
+      }
+    })
+    const trees = buildTree(treeData, 'filePath', 'dirname')
+    const result = pickProperties(trees, ['filename', 'children'])
+    const resultJson = JSON.stringify(result, null, 2)
+    const resultMd = mdUtils.generateProjectTree(result)
+    return { resultJson, resultMd }
+  }
   /**
    * 对文件信息列表进行分类分组，根据文件的扩展名进行分组。
    * @returns {string} 返回分类分组后的文件信息的JSON字符串。
    */
-  classifyFilesGroup = (): string => {
+  classifyFilesByExtname = (): string => {
     const group = groupBy(this.fileInfoList, 'extname')
     return JSON.stringify(group, null, 2)
   }
 
+  classifyFilesByBasename = () => {
+    const group = groupBy(this.fileInfoList, 'basename')
+    return JSON.stringify(group, null, 2)
+  }
   /**
    * 查询并分类重复命名的文件，首先根据文件名进行分组，然后筛选出包含多个文件的组，最后对这些重复命名的文件组再次根据扩展名进行分类。
    * @returns {string} 返回包含重复命名文件的分类分组后的文件信息的JSON字符串。
    */
-  classifyFilesGroupByRepeat = () => {
+  classifyFilesFirstBasenameThenExtname = () => {
     const group = groupBy(this.fileInfoList, 'basename')
     const filesGroupOfRepeat = Object.values(group).filter((item) => item.group.length > 1)
     const newGroup = groupBy(filesGroupOfRepeat, 'extname')

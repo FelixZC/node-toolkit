@@ -106,9 +106,11 @@ interface FsInstance {
   // 获取指定路径文件列表方法
   getFilePathList(folderPath: string): void
 
+  //获取文件信息
+  getFileInfo(filePath: string): FileInfo
+
   // 获取文件详细信息列表方法
   getFileInfoList(): FileInfo[]
-
   // 修改文件名方法
   modifyFilename(
     customFilename: string | CustomFilenameFunction | null,
@@ -209,6 +211,7 @@ class fsUtils implements FsInstance {
     this.logPath = path.join(rootPath, 'fsUtils.log')
     this.filePathList = []
     this.dirPathList = []
+    this.dirPathList.push(path.resolve(this.folderPath))
     this.getFilePathList(this.folderPath)
   }
 
@@ -269,19 +272,26 @@ class fsUtils implements FsInstance {
   }
 
   /**
+   * 获取详细信息
+   * @param filePath
+   * @returns
+   */
+  getFileInfo(filePath: string): FileInfo {
+    return {
+      filePath,
+      basename: path.basename(filePath),
+      dirname: path.dirname(filePath),
+      extname: path.extname(filePath),
+      filename: path.basename(filePath, path.extname(filePath)),
+      stats: fs.statSync(filePath)
+    }
+  }
+
+  /**
    * 获取文件详细信息列表
    */
   getFileInfoList() {
-    const fileInfoList = this.filePathList.map((filePath) => {
-      return {
-        basename: path.basename(filePath),
-        dirname: path.dirname(filePath),
-        extname: path.extname(filePath),
-        filename: path.basename(filePath, path.extname(filePath)),
-        filePath,
-        stats: fs.statSync(filePath)
-      }
-    })
+    const fileInfoList = this.filePathList.map(this.getFileInfo)
     return fileInfoList
   }
 

@@ -125,7 +125,7 @@ const FeatureListPage: React.FC = () => {
 
   return (
     <div style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
-      <h1 style={{ marginBottom: '20px' }}>Reg Query Batch</h1>
+      <h1>File Content query</h1>
 
       <Row gutter={16} style={{ marginBottom: '20px', alignItems: 'center' }}>
         <Col span={16}>

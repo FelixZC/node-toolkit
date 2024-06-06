@@ -30,16 +30,14 @@ export default function mainWindowHandleEvents() {
     executePostcssPlugins(dir, postcssPluginPathList)
   })
 
-  ipcMain.handle('classify-files-group', async (event, dir: string) => {
-    const { classifyFiles } = require('../exec/classify-files-group')
-    const result = classifyFiles(dir)
-    return result
+  ipcMain.handle('exec-file-statistical', async (event, dir: string) => {
+    const { getProjectTree } = require('../exec/exec-file-statistical')
+    return getProjectTree(dir)
   })
 
   ipcMain.handle('exec-get-attrs-and-annotation', async (event, dir: string) => {
     const { getAttributesDescriptionTable } = require('../exec/exec-get-attrs-and-annotation')
-    const result = getAttributesDescriptionTable(dir)
-    return result
+    return getAttributesDescriptionTable(dir)
   })
   ipcMain.handle(
     'exec-reg-query-batch',
@@ -51,8 +49,7 @@ export default function mainWindowHandleEvents() {
       isAddSourcePath?: boolean
     ) => {
       const { batchRegQueryAndReturnResult } = require('../exec/exec-reg-query-batch')
-      const result = batchRegQueryAndReturnResult(dir, queryRegExp, ignoreRegExp, isAddSourcePath)
-      return result
+      return batchRegQueryAndReturnResult(dir, queryRegExp, ignoreRegExp, isAddSourcePath)
     }
   )
 }

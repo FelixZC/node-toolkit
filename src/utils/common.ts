@@ -256,3 +256,66 @@ export const getValueByKeys = (target: Record<string, any> = {}, keys: string[] 
     return previousValue?.[currentKey]
   }, target)
 }
+
+// 定义一个具体的节点接口，包含 id, parentId 和可选的 children 属性
+interface NodeWithId {
+  id?: string | number
+  parentId?: string | number | null
+  children?: NodeWithId[]
+}
+
+export function buildTree<T extends NodeWithId>(
+  nodes: T[],
+  idProp: keyof T,
+  parentProp: keyof T
+): T[] {
+  const nodeMap: { [key: string]: T } = {}
+  const rootNodes: T[] = []
+
+  // 初始化节点映射
+  nodes.forEach((node) => {
+    const nodeId = String(node[idProp]) // 确保 id 是字符串
+    nodeMap[nodeId] = {
+      ...node,
+      children: node.children || [] // 初始化子节点数组
+    }
+  })
+
+  // 构建树结构
+  nodes.forEach((node) => {
+    const parentId = String(node[parentProp]) // 确保 parentId 是字符串
+    if (parentId && nodeMap[parentId]) {
+      // 如果存在父节点，则将当前节点添加到父节点的子节点中
+      nodeMap[parentId].children?.push(nodeMap[String(node[idProp])])
+    } else {
+      // 如果没有父节点，则认为是根节点
+      rootNodes.push(nodeMap[String(node[idProp])])
+    }
+  })
+
+  return rootNodes // 返回根节点数组
+}
+
+// 使用 Pick 来提取指定的属性
+export function pickProperties<T extends object, K extends keyof T>(
+  objects: T[],
+  propertiesToKeep: K[]
+): Pick<T, K>[] {
+  return (Array.isArray(objects) ? objects : [objects]).map((obj) => {
+    const picked: any = {}
+
+    for (const propertyKey of propertiesToKeep) {
+      const value = obj[propertyKey]
+      // 如果属性是对象且存在，则递归调用pickProperties
+      if (value && typeof value === 'object') {
+        // 这里假设嵌套对象的键也在 propertiesToKeep 中
+        picked[propertyKey] = pickProperties(value as T[], propertiesToKeep)
+      } else {
+        // 否则，直接复制属性值
+        picked[propertyKey] = value
+      }
+    }
+    // 确保返回的对象类型是 Pick<T, K>
+    return picked as Pick<T, K>
+  })
+}

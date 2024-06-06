@@ -81,7 +81,7 @@ const FeatureListPage: React.FC = () => {
 
   return (
     <div style={{ padding: '20px' }}>
-      <h1>Feature List Execution Page</h1>
+      <h1>Postcss Plugin List Execution Page</h1>
       {/* 显示目录路径的Input组件 */}
       <Input.Search
         placeholder="Directory Path"

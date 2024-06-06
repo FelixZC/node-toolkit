@@ -26,7 +26,7 @@ const ExecBabel = lazy(() => import('@src/components/exec/exec-babel'))
 const ExecJscodemod = lazy(() => import('@src/components/exec/exec-jscodemod'))
 const ExecPostcss = lazy(() => import('@src/components/exec/exec-postcss'))
 const ExecPosthtml = lazy(() => import('@src/components/exec/exec-posthtml'))
-const ClassifyFilesGroup = lazy(() => import('@src/components/exec/classify-files-group'))
+const ExecFileStatistical = lazy(() => import('@src/components/exec/exec-file-statistical'))
 const ExecRegQueryBatch = lazy(() => import('@src/components/exec/exec-reg-query-batch'))
 const ExecGetAttrsAndAnnotation = lazy(
   () => import('@src/components/exec/exec-get-attrs-and-annotation')
@@ -54,7 +54,7 @@ const rootRouter: RouteObject[] = [
       {
         index: true,
         path: '/exec/ExecBabel',
-        name: 'babel',
+        name: 'ExecBabel',
         key: '/exec/ExecBabel',
         auth: true,
         element: lazyLoad(ExecBabel)
@@ -62,7 +62,7 @@ const rootRouter: RouteObject[] = [
       {
         index: true,
         path: '/exec/ExecJscodemod',
-        name: 'jscodemod',
+        name: 'ExecJscodemod',
         key: '/exec/ExecJscodemod',
         auth: true,
         element: lazyLoad(ExecJscodemod)
@@ -70,7 +70,7 @@ const rootRouter: RouteObject[] = [
       {
         index: true,
         path: '/exec/ExecPostcss',
-        name: 'postcss',
+        name: 'ExecPostcss',
         key: '/exec/ExecPostcss',
         auth: true,
         element: lazyLoad(ExecPostcss)
@@ -78,23 +78,23 @@ const rootRouter: RouteObject[] = [
       {
         index: true,
         path: '/exec/ExecPosthtml',
-        name: 'posthtml',
+        name: 'ExecPosthtml',
         key: '/exec/ExecPosthtml',
         auth: true,
         element: lazyLoad(ExecPosthtml)
       },
       {
         index: true,
-        path: '/exec/ClassifyFilesGroup',
-        name: 'classifyFilesGroup',
-        key: '/exec/ClassifyFilesGroup',
+        path: '/exec/ExecFileStatistical',
+        name: 'ExecFileStatistical',
+        key: '/exec/ExecFileStatistical',
         auth: true,
-        element: lazyLoad(ClassifyFilesGroup)
+        element: lazyLoad(ExecFileStatistical)
       },
       {
         index: true,
         path: '/exec/ExecGetAttrsAndAnnotation',
-        name: 'getAttrsAndAnnotation',
+        name: 'ExecGetAttrsAndAnnotation',
         key: '/exec/ExecGetAttrsAndAnnotation',
         auth: true,
         element: lazyLoad(ExecGetAttrsAndAnnotation)
@@ -102,7 +102,7 @@ const rootRouter: RouteObject[] = [
       {
         index: true,
         path: '/exec/ExecRegQueryBatch',
-        name: 'regQueryBatch',
+        name: 'ExecRegQueryBatch',
         key: '/exec/ExecRegQueryBatch',
         auth: true,
         element: lazyLoad(ExecRegQueryBatch)

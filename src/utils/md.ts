@@ -142,8 +142,44 @@ function createdStoreTable(
   return cache.join(br)
 }
 
+interface NodeWithId {
+  filename: string
+  comment?: string
+  children?: NodeWithId[]
+}
+
+function generateProjectTree(nodes: NodeWithId[], level: number = 0): string {
+  let treeString = ''
+
+  nodes.forEach((node, index, array) => {
+    // 添加项目或文件夹名称
+    const padding = ' '.repeat(level * 4)
+    treeString += `${padding}├─ ${node.filename}\n`
+
+    // 如果有注释内容，添加注释
+    if (node.comment) {
+      treeString += `${padding}│ ://${node.comment}\n`
+    }
+
+    // 如果存在子节点，递归调用以生成子树
+    if (node.children && node.children.length > 0) {
+      treeString += generateProjectTree(node.children, level + 1)
+    }
+
+    // 如果不是最后一个元素，添加分隔线
+    if (index < array.length - 1) {
+      treeString += `${padding}├─ \n`
+    } else {
+      treeString += `${padding}╰─ \n`
+    }
+  })
+
+  return treeString
+}
+
 export default {
   createdAttributesGroupTable,
   createdStoreTable,
-  queryContentByReg
+  queryContentByReg,
+  generateProjectTree
 }
