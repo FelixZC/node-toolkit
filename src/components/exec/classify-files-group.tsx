@@ -15,7 +15,7 @@ const FeatureListPage: React.FC = () => {
     }
     try {
       // 假设这里是执行功能并返回结果的代码
-      const result = await ipcRendererInvoke('classify-files-group', directoryPath)
+      const result: string = await ipcRendererInvoke('classify-files-group', directoryPath)
       setOutput(result) // 设置执行结果到状态
       message.success('Executed successfully.')
     } catch (error) {

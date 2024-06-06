@@ -19,9 +19,9 @@ export function getAttributesDescriptionTable(dir: string) {
 }
 
 // 使用示例
-const dir = path.join(__dirname, 'src copy')
+const dir = path.join('src copy')
 const attributesDescriptionTable = getAttributesDescriptionTable(dir)
 
 // 写入文件
-const out = path.join(__dirname, 'src/query/md/attributes-description-table.md')
+const out = path.join('src/query/md/attributes-description-table.md')
 writeFile(out, attributesDescriptionTable)

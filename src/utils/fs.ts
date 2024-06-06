@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as os from 'os'
 import * as path from 'path'
-
+import type { UserInfo } from 'os'
 const userInfo = os.userInfo() // 用户信息
 const eol = os.EOL // 换行符
 
@@ -97,6 +97,8 @@ interface FsInstance {
   logPath: string
   filePathList: string[] // 使用项目根目录
   dirPathList: string[]
+  userInfo: UserInfo<string>
+  eol: string
 
   // 操作日志记录方法
   saveOperateLog(message: string): void
@@ -198,8 +200,11 @@ class fsUtils implements FsInstance {
   logPath: string
   filePathList: string[]
   dirPathList: string[]
-
+  userInfo: UserInfo<string>
+  eol: string
   constructor(public rootPath: string) {
+    this.userInfo = userInfo
+    this.eol = eol
     this.folderPath = path.join(rootPath)
     this.logPath = path.join(rootPath, 'fsUtils.log')
     this.filePathList = []

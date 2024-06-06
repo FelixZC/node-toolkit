@@ -25,7 +25,7 @@ const FeatureListPage: React.FC = () => {
     }
     try {
       // 假设这里是执行功能并返回结果的代码
-      const result = await ipcRendererInvoke('exec-get-attrs-and-annotation', directoryPath)
+      const result: string = await ipcRendererInvoke('exec-get-attrs-and-annotation', directoryPath)
       setOutput(result) // 设置执行结果到状态
       message.success('Executed successfully.')
     } catch (error) {

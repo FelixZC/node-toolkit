@@ -27,6 +27,7 @@ const ExecJscodemod = lazy(() => import('@src/components/exec/exec-jscodemod'))
 const ExecPostcss = lazy(() => import('@src/components/exec/exec-postcss'))
 const ExecPosthtml = lazy(() => import('@src/components/exec/exec-posthtml'))
 const ClassifyFilesGroup = lazy(() => import('@src/components/exec/classify-files-group'))
+const ExecRegQueryBatch = lazy(() => import('@src/components/exec/exec-reg-query-batch'))
 const ExecGetAttrsAndAnnotation = lazy(
   () => import('@src/components/exec/exec-get-attrs-and-annotation')
 )
@@ -97,6 +98,14 @@ const rootRouter: RouteObject[] = [
         key: '/exec/ExecGetAttrsAndAnnotation',
         auth: true,
         element: lazyLoad(ExecGetAttrsAndAnnotation)
+      },
+      {
+        index: true,
+        path: '/exec/ExecRegQueryBatch',
+        name: 'regQueryBatch',
+        key: '/exec/ExecRegQueryBatch',
+        auth: true,
+        element: lazyLoad(ExecRegQueryBatch)
       }
     ]
   },

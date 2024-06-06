@@ -41,4 +41,18 @@ export default function mainWindowHandleEvents() {
     const result = getAttributesDescriptionTable(dir)
     return result
   })
+  ipcMain.handle(
+    'exec-reg-query-batch',
+    async (
+      event,
+      dir: string,
+      queryRegExp: RegExp,
+      ignoreRegExp?: Array<RegExp>,
+      isAddSourcePath?: boolean
+    ) => {
+      const { batchRegQueryAndReturnResult } = require('../exec/exec-reg-query-batch')
+      const result = batchRegQueryAndReturnResult(dir, queryRegExp, ignoreRegExp, isAddSourcePath)
+      return result
+    }
+  )
 }

@@ -45,7 +45,11 @@ interface ExecInterface {
   classifyFilesGroup(): string
   classifyFilesGroupByRepeat(): string
   getAttrsAndAnnotation(): string
-  batchRegQuery(regExpression: RegExp): string
+  batchRegQuery(
+    regExpression: RegExp,
+    ignorePatterns?: Array<RegExp>,
+    isAddSourcePath?: boolean
+  ): string
   pageRegQuery(regExpression: RegExp, content: string): string
   batchReplaceByReg(execList: ExecListType, filterCondition?: FilterConditionType): void
   execBabelPlugin(babelPlugins: BabelPlugin[]): { successList: string[]; errorList: string[] }
@@ -196,14 +200,25 @@ export class Exec implements ExecInterface {
 
   /**
    * 批量查询函数，对所有文件内容应用正则表达式查询，并返回查询结果的字符串拼接
-   * @param regExpression 正则表达式对象，用于匹配查询内容
-   * @returns 查询结果的字符串拼接
+   * @param {RegExp} regExpression 正则表达式对象，用于匹配查询内容
+   * @param {Array<RegExp>} [ignorePatterns=[]] 可选参数，用于指定要忽略的文件路径模式e.g. [/\.ts$/, /src\/exclude/]
+   * @param {boolean} [isAddSourcePath=false] 是否在结果中添加文件路径
+   * @returns {string} 查询结果的字符串拼接
    */
-  batchRegQuery(regExpression: RegExp) {
+  batchRegQuery(regExpression: RegExp, ignorePatterns?: Array<RegExp>, isAddSourcePath?: boolean) {
     let str = ''
     this.fsInstance.filePathList.forEach((filePath) => {
-      const content = fs.readFileSync(filePath, 'utf-8')
-      str += mdUtils.queryContentByReg(content, regExpression)
+      if (ignorePatterns && ignorePatterns.some((pattern) => pattern.test(filePath))) {
+        //next file
+      } else {
+        const content = fs.readFileSync(filePath, 'utf-8')
+        const result = mdUtils.queryContentByReg(content, regExpression)
+        // 添加文件路径
+        if (isAddSourcePath && result.length) {
+          str += `${filePath}` + this.fsInstance.eol
+        }
+        str += result
+      }
     })
     return str
   }
