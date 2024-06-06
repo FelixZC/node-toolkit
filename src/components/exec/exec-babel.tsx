@@ -132,7 +132,7 @@ const FeatureListPage: React.FC = () => {
         readOnly
         onSearch={handleChooseDirectory}
       />
-      <div style={{ marginTop: '20px' }}>
+      <div style={{ marginTop: '10px', marginBottom: '10px' }}>
         <Button onClick={handleSelectRevert}>Toggle Select Revert</Button>
         <Button onClick={handleSelectAll}>Toggle Select on </Button>
         <Button onClick={handleSelectNone}>Toggle Select off</Button>

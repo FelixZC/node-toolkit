@@ -127,7 +127,7 @@ const FeatureListPage: React.FC = () => {
     <div style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
       <h1>File Content query</h1>
 
-      <Row gutter={16} style={{ marginBottom: '20px', alignItems: 'center' }}>
+      <Row gutter={16} style={{ marginBottom: '10px', alignItems: 'center' }}>
         <Col span={16}>
           <Input.Search
             placeholder="Directory Path"
@@ -139,7 +139,7 @@ const FeatureListPage: React.FC = () => {
         </Col>
       </Row>
 
-      <Row gutter={16} style={{ marginBottom: '20px', alignItems: 'center' }}>
+      <Row gutter={16} style={{ marginBottom: '10px', alignItems: 'center' }}>
         <Col span={16}>
           <Input
             placeholder="Search Query"
@@ -181,7 +181,7 @@ const FeatureListPage: React.FC = () => {
         </Col>
       </Row>
 
-      <Row gutter={16} style={{ marginBottom: '20px', alignItems: 'center' }}>
+      <Row gutter={16} style={{ marginBottom: '10px', alignItems: 'center' }}>
         <Col span={16}>
           <Input
             placeholder="Files to Exclude (comma separated)"
@@ -191,7 +191,7 @@ const FeatureListPage: React.FC = () => {
         </Col>
         <Col span={8}>
           <Button onClick={handleExecute} type="primary">
-            Exec
+            Search
           </Button>
         </Col>
       </Row>
@@ -201,7 +201,7 @@ const FeatureListPage: React.FC = () => {
           <div
             style={{
               width: '100%',
-              height: 'calc(100vh - 300px)',
+              height: 'calc(100vh - 240px)',
               overflow: 'auto',
               whiteSpace: 'pre-wrap'
             }}

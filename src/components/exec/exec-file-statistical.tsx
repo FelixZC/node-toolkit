@@ -66,7 +66,7 @@ const FeatureListPage: React.FC = () => {
       <h1>File Statistical</h1>
 
       {/* 显示目录路径的Input组件 */}
-      <div style={{ display: 'flex', marginBottom: '20px', width: '100%' }}>
+      <div style={{ display: 'flex', marginBottom: '10px', width: '100%' }}>
         <Input.Search
           placeholder="Directory Path"
           value={directoryPath}
