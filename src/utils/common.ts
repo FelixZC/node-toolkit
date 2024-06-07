@@ -63,30 +63,28 @@ export function sortArray(arr: Array<Record<string, any>>, customSort: Function 
   })
 }
 
-// 定义分组缓存接口
-export interface GroupCache<T> {
-  [cacheKey: string]: {
-    groupKey: string
+// 定义GroupCache接口
+interface GroupCache<T> {
+  [key: string]: {
     count: number
-    group: Array<T>
-    [key: string]: any
+    group: T[]
+    groupKey: string
   }
 }
 
-/**
- * 根据指定属性对数组元素进行分类
- * @param {Array} arr - 指定数组
- * @param {String} groupKey - 分类依据的属性名
- * @returns {Object} 分类结果对象
- */
-export function groupBy<T extends Record<string, any>>(arr: T[], groupKey: string) {
-  const cache = {} as GroupCache<T>
-
-  if (getDataType(arr) !== 'Array') {
+// 改进后的groupBy函数
+export function groupBy<T extends Record<string, any>>(arr: T[], groupKey: string): GroupCache<T> {
+  if (!Array.isArray(arr)) {
     throw new Error('非数组类型，无法分类')
   }
 
+  const cache = {} as GroupCache<T>
+
   arr.forEach((element) => {
+    if (!element.hasOwnProperty(groupKey)) {
+      throw new Error(`元素缺少分组键：${groupKey}`)
+    }
+
     const cacheKey = element[groupKey]
 
     if (cache[cacheKey]) {
@@ -96,8 +94,7 @@ export function groupBy<T extends Record<string, any>>(arr: T[], groupKey: strin
       cache[cacheKey] = {
         count: 1,
         group: [element],
-        groupKey,
-        ...element
+        groupKey
       }
     }
   })

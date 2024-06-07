@@ -3,8 +3,7 @@
  * 执行批处理操作，包括使用babel、postcss和posthtml插件转换文件名和引用，
  * 以及修改文件名和目录名以符合驼峰式规范。
  */
-import { Exec } from './index'
-import * as fs from 'fs'
+import { ModifyFilename } from '../exec/exec-modify-file-names-batch'
 import * as path from 'path'
 import { transferRef } from '../utils/common'
 import type { BabelPlugin } from '../plugins/use-babel-plugin'
@@ -15,8 +14,8 @@ import type { Plugin as PosthtmlPlugin } from 'posthtml'
 const babelPluginPathList: string[] = ['../plugins/babel-plugins/transfer-file-name-tok-kebab-case']
 
 // 实例化Exec类，用于后续执行插件转换和文件名修改操作
-const exec = new Exec()
-
+const modifyFilename = new ModifyFilename()
+const exec = modifyFilename.exec
 try {
   /**
    * 加载并执行babel插件
@@ -75,10 +74,6 @@ try {
     return result
   })
   exec.execPosthtmlPlugin(plugins)
-
-  // 获取文件系统实例，用于后续的文件名和目录名修改操作
-  const fsInstance = exec.fsInstance
-
   // 定义文件名转换函数，将文件名从其他格式转换为驼峰式
   const customFilename = (oldFilename: string) => {
     return transferRef(oldFilename, '\\')
@@ -93,14 +88,9 @@ try {
   // 延迟执行文件名和目录名修改操作，确保前面的插件执行完成
   setTimeout(() => {
     // 修改文件名
-    fsInstance.modifyFilename(customFilename, null, customDirname)
-    // 遍历并删除空目录
-    fsInstance.dirPathList.reverse().forEach((folderPath) => {
-      const result = fs.readdirSync(folderPath)
-
-      if (!result.length) {
-        fs.rmdirSync(folderPath)
-      }
+    modifyFilename.execModifyFileNamesBatchCustom({
+      customFilename,
+      customDirname
     })
   }, 0)
 } catch (e) {

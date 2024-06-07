@@ -57,37 +57,7 @@ export interface FileInfo {
   basename: string
   extname: string
   filename: string
-  stats: fs.Stats
-}
-
-// 定义缓存接口
-interface Cache {
-  [cacheKey: string]: {
-    index: number
-  }
-}
-
-// 定义自定义文件名、扩展名、目录名函数接口
-interface CustomFilenameFunction {
-  (oldFilename: string): string
-}
-interface CustomExtnameFunction {
-  (oldExtname: string): string
-}
-interface CustomDirnameFunction {
-  (oldDirname: string): string
-}
-
-// 修改文件名的结果类型
-interface ModifyResult {
-  oldName: string
-  newName: string
-}
-
-// modifyFilename 方法的返回类型
-type ModifyFilenameReturnType = {
-  modifyCount: number
-  changeRecords: ModifyResult[]
+  stats?: fs.Stats
 }
 
 // 定义FsInstance接口// 定义 FsInstance 接口
@@ -111,20 +81,15 @@ interface FsInstance {
 
   // 获取文件详细信息列表方法
   getFileInfoList(): FileInfo[]
-  // 修改文件名方法
-  modifyFilename(
-    customFilename: string | CustomFilenameFunction | null,
-    customExtname?: string | CustomExtnameFunction | null,
-    customDirname?: string | CustomDirnameFunction | null,
-    filterFilename?: string,
-    filterExtensionName?: string
-  ): ModifyFilenameReturnType
 
   // 重命名文件方法
-  renameFile(oldFilePath: string, newFilePath: string): boolean
+  renameFile(
+    oldFilePath: string,
+    newFilePath: string
+  ): { isChange: boolean; uniqueNewFilePath: string }
 
   // 复制文件方法
-  copyFile(filePath: string): void
+  copyFile(filePath: string): string
 
   // 删除文件方法
   deleteFile(filePath: string): void
@@ -277,13 +242,28 @@ class fsUtils implements FsInstance {
    * @returns
    */
   getFileInfo(filePath: string): FileInfo {
-    return {
-      filePath,
-      basename: path.basename(filePath),
-      dirname: path.dirname(filePath),
-      extname: path.extname(filePath),
-      filename: path.basename(filePath, path.extname(filePath)),
-      stats: fs.statSync(filePath)
+    const { dir, ext, name, base } = path.parse(filePath)
+    try {
+      // 尝试获取文件状态信息
+      const stats = fs.statSync(filePath)
+      return {
+        filePath,
+        basename: base,
+        dirname: dir,
+        extname: ext,
+        filename: name,
+        stats
+      }
+    } catch (error) {
+      // 处理文件不存在或访问权限不足的情况
+      console.error(`无法获取文件stats信息: ${error}`)
+      return {
+        filePath,
+        basename: base,
+        dirname: dir,
+        extname: ext,
+        filename: name
+      }
     }
   }
 
@@ -296,103 +276,6 @@ class fsUtils implements FsInstance {
   }
 
   /**
-   * 修改文件名
-   * @param {string|funcion} customFilename - 新文件名不包含后缀,为空则使用旧文件名
-   * @param {string|funcion} customExtname - 新后缀名，为空则使用旧后缀名
-   * @param {string} filterFilename - 限定过滤关键字
-   * @param {string} filterExtensionName - 限定过滤后缀名
-   * @example // 自定义新文件名规则（不包含后缀名）
-              const customBasenameGenerateFunction = (oldFilename) => {
-                return oldFilename;
-              }
-              fsInstance.modifyFilename(customBasenameGenerateFunction);
-   */
-  @catchHandlerDecorator()
-  @logDecorator()
-  modifyFilename(
-    customFilename: string | CustomFilenameFunction | null,
-    customExtname?: string | CustomExtnameFunction | null,
-    customDirname?: string | CustomDirnameFunction | null,
-    filterFilename?: string | null,
-    filterExtensionName?: string | null
-  ) {
-    if (!this.filePathList.length) {
-      throw new Error('指定路径不存在文件')
-    }
-    const changeRecords: { oldName: string; newName: string }[] = [] // 变更
-    let modifyCount = 0
-    let filePathListBackup = [...this.filePathList]
-    const cache: Cache = {} // 添置所有已有文件缓存
-
-    for (const filePath of filePathListBackup) {
-      cache[filePath] = {
-        index: 0
-      }
-    }
-
-    // 应用文件名和扩展名过滤器
-    const filteredFiles = filePathListBackup.filter((filePath) => {
-      const baseName = path.basename(filePath, path.extname(filePath))
-      const extName = path.extname(filePath)
-      return (
-        (!filterFilename || baseName.includes(filterFilename)) &&
-        (!filterExtensionName || extName.includes(filterExtensionName))
-      )
-    })
-
-    // 批量修改文件名
-    filteredFiles.forEach((filePath) => {
-      const oldDirname = path.dirname(filePath)
-      const oldExtname = path.extname(filePath)
-      // const oldBaseName = path.basename(filePath)
-      const oldFilename = path.basename(filePath, oldExtname)
-
-      let newFilename =
-        typeof customFilename === 'function' ? customFilename(oldFilename) : customFilename
-      let newExtensionName =
-        typeof customExtname === 'function' ? customExtname(oldExtname) : customExtname
-      let newDirname =
-        typeof customDirname === 'function' ? customDirname(oldDirname) : customDirname
-
-      newFilename = newFilename || oldFilename
-      newExtensionName = newExtensionName || oldExtname
-      newDirname = newDirname || oldDirname
-
-      const newBaseName = `${newFilename}${newExtensionName}`
-      const newFilePath = path.resolve(newDirname, newBaseName)
-
-      if (filePath === newFilePath) {
-        return // 如果新旧文件路径相同，跳过
-      }
-
-      // 检查并解决命名冲突
-      let cacheKey = newFilePath
-      if (cache[cacheKey]) {
-        let index = cache[cacheKey].index
-        do {
-          const numberedBaseName = `${newFilename}(${++index})${newExtensionName}`
-          cacheKey = path.resolve(newDirname, numberedBaseName)
-        } while (cache[cacheKey])
-      }
-
-      // 重命名文件
-      const operateResult = this.renameFile(filePath, cacheKey)
-      if (operateResult) {
-        // 更新变更记录数组
-        changeRecords.push({
-          oldName: filePath,
-          newName: cacheKey
-        })
-        cache[cacheKey] = { index: 0 } // 更新缓存
-        modifyCount++
-      }
-    })
-
-    console.log(`批量修改完毕，共${modifyCount}个文件产生变化`)
-    return { modifyCount, changeRecords }
-  }
-
-  /**
    * 重命名文件名，存在资源抢占问题，需要二次执行rename，或者记录oldFilePath执行fs.rm
    * @param {string} oldFilePath
    * @param {string} newFilePath
@@ -401,15 +284,35 @@ class fsUtils implements FsInstance {
   @logDecorator()
   renameFile(oldFilePath: string, newFilePath: string) {
     if (oldFilePath === newFilePath) {
-      return false
+      return { isChange: false, uniqueNewFilePath: oldFilePath }
     }
 
+    // 检查新文件路径是否有效
     checkPathValid(newFilePath)
-    fs.renameSync(oldFilePath, newFilePath)
-    this.filePathList.push(newFilePath)
-    const filePathIndex = this.filePathList.findIndex((i) => i === oldFilePath)
-    this.filePathList.splice(filePathIndex, 1)
-    return true
+
+    // 检查新文件名是否已存在
+    let uniqueNewFilePath = newFilePath
+    let counter = 1
+    while (fs.existsSync(uniqueNewFilePath)) {
+      // 拆分文件名和扩展名
+      const { dir, name, ext } = path.parse(uniqueNewFilePath)
+      // 生成新的文件名
+      uniqueNewFilePath = path.format({ dir, name: `${name}(${counter})`, ext })
+      counter++
+    }
+    // 重命名文件
+    fs.renameSync(oldFilePath, uniqueNewFilePath)
+    this.filePathList.splice(this.filePathList.indexOf(oldFilePath), 1, uniqueNewFilePath)
+
+    // 处理空文件夹
+    const oldDirPath = path.dirname(oldFilePath)
+    const newDirPath = path.dirname(uniqueNewFilePath)
+    const result = fs.readdirSync(oldDirPath)
+    if (!result.length) {
+      fs.rmdirSync(oldDirPath)
+    }
+    this.dirPathList.splice(this.dirPathList.indexOf(oldDirPath), 1, newDirPath)
+    return { isChange: true, uniqueNewFilePath: uniqueNewFilePath }
   }
 
   /**
@@ -422,19 +325,25 @@ class fsUtils implements FsInstance {
     const dirname = path.dirname(filePath)
     const extensionName = path.extname(filePath) // 文件扩展名
 
+    // 从原始文件名中提取基本名称，并去掉可能存在的"copy"后缀
     const filename = path.basename(filePath, extensionName).split('copy')[0].trim()
     let newBaseName = `${filename} copy${extensionName}`
     let newFilePath = path.resolve(dirname, newBaseName)
-    let renameCount = 1 // 文件已存在
+    let renameCount = 1 // 文件已存在时的计数器
 
-    while (this.filePathList.includes(newFilePath)) {
+    // 检查新文件路径是否已存在，并生成一个唯一的新文件名
+    while (fs.existsSync(newFilePath)) {
       renameCount++
       newBaseName = `${filename} copy ${renameCount}${extensionName}`
       newFilePath = path.resolve(dirname, newBaseName)
     }
 
+    // 复制文件
     fs.copyFileSync(filePath, newFilePath)
+
     this.filePathList.push(newFilePath)
+
+    return newFilePath // 返回新文件的路径
   }
 
   /**
@@ -442,12 +351,17 @@ class fsUtils implements FsInstance {
    * @param {string} filePath
    * @returns
    */
-  @catchHandlerDecorator()
-  @logDecorator()
   deleteFile(filePath: string) {
-    fs.unlinkSync(filePath)
-    const filePathIndex = this.filePathList.findIndex((i) => i === filePath)
-    this.filePathList.splice(filePathIndex, 1)
+    // 检查文件路径是否存在
+    if (fs.existsSync(filePath)) {
+      // 同步删除文件
+      fs.unlinkSync(filePath)
+      this.filePathList.splice(this.filePathList.indexOf(filePath), 1)
+      console.log(`文件已被删除: ${filePath}`)
+    } else {
+      console.error(`文件不存在: ${filePath}`)
+    }
   }
 }
+
 export default fsUtils
