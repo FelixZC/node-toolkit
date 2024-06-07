@@ -53,25 +53,16 @@ npm i
 
 ## **操作界面待完善:**
 
-<img src="docs/images/desktop0.png" alt="这是图片的描述">
+<img src="docs/images/desktop0.png" alt="这是图片的描述0">
 
-<img src="docs/images/desktop1.png" alt="这是图片的描述">
-
-<img src="docs/images/desktop2.png" alt="这是图片的描述2">
+<img src="docs/images/desktop1.png" alt="这是图片的描述1">
 
 <img src="docs/images/desktop3.png" alt="这是图片的描述3">
 
-<img src="docs/images/desktop4.png" alt="这是图片的描述4">
-
 <img src="docs/images/desktop5.png" alt="这是图片的描述5">
-
-<img src="docs/images/desktop6.png" alt="这是图片的描述6">
-
-<img src="docs/images/desktop7.png" alt="这是图片的描述7">
 
 <img src="docs/images/desktop8.png" alt="这是图片的描述8">
 
-<img src="docs/images/desktop9.png" alt="这是图片的描述9">
 
 
 ## 目录结构(部分)说明
