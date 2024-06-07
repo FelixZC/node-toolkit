@@ -76,57 +76,77 @@ npm i
 
 ## 目录结构(部分)说明
 ```
-pzc-toolbox                                             //
-├─ src                                      ****            //
-│  ├─ exec                                              //执行器集合
-│  │  ├─ exec-file-statistical.ts                       //文件信息统计
-│  │  ├─ exec-bable-plugin.ts                           //执行babel插件
-│  │  ├─ exec-get-attrs-and-annotation.ts               //获取项目注释
-│  │  ├─ exec-jscodemod.ts                              //执行jscodemode
-│  │  ├─ exec-postcss-plugin.ts                         //执行postcss
-│  │  ├─ exec-posthtml-plugin.ts                        //posthtml
-│  │  ├─ exec-reg-query-batch.ts                        //执行正则批量查询
-│  │  ├─ exec-transfer-file-name-To-kebab-case.ts       //文件名驼峰转化
-│  │  └─ index.ts                                       //方法集合
-│  ├─ plugins                                           //插件集合
-│  │  ├─ babel-plugins                                  //babel插件
-│  │  │  ├─ ast-utils.ts                                //babel工具方法集合
-│  │  │  ├─ depart-default-export-object-express.ts     //重置导出
-│  │  │  ├─ depart-switch.ts                            //分离switch
-│  │  │  ├─ extract-annotation.ts                       //提取注释
-│  │  │  ├─ import-sort.ts                              //导入排序
-│  │  │  ├─ move-default-export-to-last.ts              //移动默认导出
-│  │  │  ├─ remove-invalid-comment.ts                   //移除包含this的无效注释
-│  │  │  ├─ replace-memberExpress-object-or-property.ts //替换表达式的调用对象或者调用属性
-│  │  │  ├─ sort-object-array-by-index.ts               //对象数组按index排序
-│  │  │  ├─ transfer-file-name-tok-kebab-case.ts        //引用驼峰转化
-│  │  │  └─ transform-remove-console.ts                 //移除打印
-│  │  ├─ jscodemods                                     //codemode集合
-│  │  │  ├─ arrow-function-arguments.ts                 //简化箭头参数
-│  │  │  ├─ arrow-function.ts                           //转化箭头函数
-│  │  │  ├─ no-reassign-params.ts                       //不使用函数参数同一命名
-│  │  │  ├─ no-vars.ts                                  //移除全局定义
-│  │  │  ├─ object-shorthand.ts                         //简化对象属性
-│  │  │  ├─ rm-object-assign.ts                         //移除对象注册
-│  │  │  ├─ rm-requires.ts                              //移除无效请求
-│  │  │  ├─ template-literals.ts                        //转化模板字符串
-│  │  │  └─ unchain-variables.ts                        //断开链式定义
-│  │  ├─ postcss-plugins                                //postcss插件集合
-│  │  │  └─ transfer-file-name-tok-kebab-case.ts        //引用驼峰转化
-│  │  ├─ posthtml-plugins                               //posthtml插件集合
-│  │  │  ├─ property-sort.ts                            //属性排序
-│  │  │  ├─ query-tag.ts                                //查询标签
-│  │  │  └─ transfer-file-name-tok-kebab-case.ts        //引用驼峰转化
-│  │  ├─ sfc-utils.ts                                   //@vue/compiler-sfc封装方法集合
-│  │  ├─ use-babel-plugin.ts                            //Babel插件使用包装
-│  │  ├─ use-codemod.ts                                 //codemod使用包装
-│  │  ├─ use-postcss-plugin.ts                          //postcss使用包装
-│  │  ├─ use-posthtml-plugin.ts                         //posthtml使用包装
-│  ├─ query                                             //查询结果和文件输出
-│  └─ utils                  ****                           //查询结果
-│     ├─ cli-progress.ts                                //进度条
-│     ├─ common.ts                                      //通用方法
-│     ├─ fs.ts                       ****               //文件系统相关
-│     ├─ md.ts                                          //文档相关
-└─ tsconfig.json                                        //ts配置
+├─ src
+    ├─ assets
+    |   ├─ icons
+    |   |   ├─ close-icon
+    |   |   ├─ max-icon
+    |   |   ├─ min-icon
+    |   |   ├─ restore-icon
+    |   |   ╰─ index.ts // 索引文件，用于导出所有图标
+    |   ├─ images
+    |   |   ├─ electron-img
+    |   |   ├─ logo
+    |   |   ╰─ index.ts // 索引文件，用于导出所有图片资源
+    |   ╰─ index.ts // 索引文件，用于导出所有资源
+    ├─ components
+    |   ├─ app
+    |   |   ╰─ index.vue // 应用入口组件
+    |   ├─ desktop-header
+    |   |   ╰─ index.vue // 桌面头部组件
+    |   ├─ exception
+    |   |   ├─ exception401.vue
+    |   |   ├─ exception403.vue
+    |   |   ├─ exception404.vue
+    |   |   ├─ exception500.vue
+    |   |   ╰─ index.ts // 异常页面索引
+    |   ├─ exec
+    |   |   ├─ exec-babel.vue // Babel执行组件
+    |   |   ├─ exec-file-statistical.vue // 文件统计组件
+    |   |   ╰─ ...
+    |   ├─ home-page
+    |   |   ╰─ index.vue // 首页组件
+    |   ╰─ ...
+    ├─ desktop
+    |   ├─ handle // **桌面交互处理**
+    |   ├─ index // 桌面入口
+    |   ├─ listen // 监听事件
+    |   ├─ main-window // 主窗口管理
+    |   ╰─ system-tray // 系统托盘
+    ├─ exec
+    |   ├─ exec-babel-plugin.ts // Babel插件执行逻辑
+    |   ├─ exec-file-statistical.ts // 文件统计逻辑
+    |   ├─ exec-get-attrs-and-annotation.ts // 获取属性和注解逻辑
+    |   ├─ exec-jscodemod.ts // JS代码修改逻辑
+    |   ├─ exec-modify-file-names-batch.ts // 批量修改文件名逻辑
+    |   ├─ exec-postcss-plugin.ts // PostCSS插件执行逻辑
+    |   ├─ exec-posthtml-plugin.ts // PostHTML插件执行逻辑
+    |   ├─ exec-reg-query-batch.ts // 正则批量查询逻辑
+    |   ├─ exec-transfer-file-name-To-kebab-case.ts // 文件名转换逻辑
+    |   ╰─ index.ts // 执行逻辑索引
+    ├─ layout
+    |   ╰─ index.vue // 布局组件
+    ├─ plugins
+    |   ├─ ast-utils.js // AST工具方法
+    |   ├─ sfc-utils.js // SFC工具方法
+    |   ├─ use-babel-plugin.js // Babel插件使用包装
+    |   ├─ use-codemod.js // Codemod使用包装
+    |   ├─ use-postcss-plugin.js // PostCSS插件使用包装
+    |   ├─ use-posthtml-plugin.js // PostHTML插件使用包装
+    |   ╰─ ...
+    ├─ query
+    |   ├─ js // JavaScript查询
+    |   ├─ json // JSON查询
+    |   ├─ md // Markdown查询
+    |   ╰─ sfc // SFC查询
+    ├─ routers
+    |   ╰─ index.js // 路由配置
+    ├─ slices // 状态管理切片
+    ├─ store // 状态管理
+    ├─ style // 样式目录
+    ├─ test // 测试目录
+    ├─ utils // 工具函数
+    ├─ web // Web特定逻辑
+    ╰─ index.js // 入口文件
+╰─ package.json // 项目配置文件
 ```

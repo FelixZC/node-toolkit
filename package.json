@@ -1,8 +1,8 @@
 {
   "name": "toolkit",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "node-toolkid",
-  "main": "desktop/index.ts",
+  "main": "./src/desktop/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint:lint-staged": "lint-staged",
