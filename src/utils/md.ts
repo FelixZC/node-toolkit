@@ -148,29 +148,35 @@ interface NodeWithId {
   children?: NodeWithId[]
 }
 
+/**
+ * 生成项目文件结构树的字符串表示。
+ * @param nodes 文件节点数组，每个节点包含文件名和可选的评论。
+ * @param level 当前节点的层级，用于计算缩进和连接符，默认为0。
+ * @returns 项目文件结构树的字符串表示。
+ */
 function generateProjectTree(nodes: NodeWithId[], level: number = 0): string {
   let treeString = ''
-
   nodes.forEach((node, index, array) => {
-    // 添加项目或文件夹名称
-    const padding = ' '.repeat(level * 4)
-    treeString += `${padding}├─ ${node.filename}\n`
-
-    // 如果有注释内容，添加注释
-    if (node.comment) {
-      treeString += `${padding}│ ://${node.comment}\n`
+    // 根据节点位置确定连接符，末尾节点使用'╰─ '，其他节点使用'├─ '
+    const connector = level !== 0 && index === array.length - 1 ? '╰─ ' : '├─ '
+    let padding = ''
+    // 根据层级计算缩进，每层缩进由'│'和三个空格组成。
+    for (let i = 0; i < level; i++) {
+      padding += '│' + ' '.repeat(3)
     }
 
+    // 如果节点有评论，则在文件名后添加注释。
+    // 如果有注释内容，添加注释
+    if (node.comment) {
+      treeString += `${padding}${connector} ${node.filename} //${node.comment}\n`
+    } else {
+      treeString += `${padding}${connector} ${node.filename}\n`
+    }
+
+    // 如果节点有子节点，则递归生成子节点的树结构。
     // 如果存在子节点，递归调用以生成子树
     if (node.children && node.children.length > 0) {
       treeString += generateProjectTree(node.children, level + 1)
-    }
-
-    // 如果不是最后一个元素，添加分隔线
-    if (index < array.length - 1) {
-      treeString += `${padding}├─ \n`
-    } else {
-      treeString += `${padding}╰─ \n`
     }
   })
 
