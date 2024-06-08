@@ -35,7 +35,6 @@ const rootRouterFlattenArray = rootRouter.reduce((acc: RouteObject[], cur) => {
 const Lay: React.FC = () => {
   const navigate = useNavigate() // 初始化 useNavigate 钩子
   const onMenuItemClick = (item: { key: string }) => {
-    console.log('route item:', item)
     // 根据菜单项的 key 导航到对应的路由
     const targetRoute = rootRouterFlattenArray.find((route) => route.key === item.key)
     if (targetRoute) {

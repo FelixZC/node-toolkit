@@ -56,11 +56,6 @@ const FeatureListPage: React.FC = () => {
     setOutput(isShowInJson ? resultJson : resultMd)
   }, [isShowInJson])
 
-  useEffect(() => {
-    console.log('current isShowInJson state', isShowInJson)
-    console.log('output has been updated to:', output)
-  }, [output])
-
   return (
     <div style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
       <h1>File Statistical</h1>

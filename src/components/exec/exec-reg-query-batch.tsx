@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Input, Tooltip, Checkbox, Button, Row, Col, message } from 'antd'
 import { SearchOutlined, CheckSquareOutlined, CloseSquareOutlined } from '@ant-design/icons'
 import { ipcRendererInvoke } from '../../utils/desktop-utils'
+import { getIgnorePatterns, convertToReg } from '@src/utils/common'
 import '@src/style/less/markdown-styles.less'
 import '@src/style/less/icon.less'
 import '@src/style/less/pre.less'
@@ -13,43 +14,8 @@ const FeatureListPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('') // 用户输入的搜索内容
   const [matchCase, setMatchCase] = useState(false) // 是否匹配大小写
   const [matchWholeWord, setMatchWholeWord] = useState(false) // 是否匹配整个单词
-  const [useRegExp, setUseRegExp] = useState(false) // 是否使用正则表达式
+  const [matchReg, setMatchReg] = useState(false) // 是否使用正则表达式
   const [filesToExclude, setFilesToExclude] = useState('') // 要排除的文件列表
-
-  // 将用户输入的字符串转换为正则表达式，考虑全词匹配和大小写匹配
-  const convertToRegExp = (
-    query: string,
-    useRegExp: boolean,
-    matchCase: boolean,
-    matchWholeWord: boolean
-  ) => {
-    if (!query.length) {
-      return null
-    }
-    // 如果是使用正则表达式，直接创建，否则需要转义查询字符串以避免特殊字符
-    const pattern = useRegExp ? query : escapeRegExp(query)
-
-    // 构建正则表达式字符串
-    let regExpString = matchWholeWord ? `\\b${pattern}\\b` : pattern
-    regExpString = matchCase ? regExpString : `${regExpString}i`
-
-    // 默认全局搜索
-    let flags = matchCase ? 'g' : 'gi'
-
-    try {
-      // 创建正则表达式对象，需要将模式和标志作为两个参数传递
-      return new RegExp(pattern, flags)
-    } catch (error) {
-      console.error('Invalid regular expression:', pattern, flags)
-      return null
-    }
-  }
-
-  // 辅助函数，用于转义正则表达式中的特殊字符
-  const escapeRegExp = (string: string) => {
-    // 转义正则表达式中的特殊字符，包括 -
-    return string.replace(/[.*+?^${}()|[\]\\-]/g, '\\$&')
-  }
 
   // 执行选中的功能
   const handleExecute = async () => {
@@ -58,29 +24,16 @@ const FeatureListPage: React.FC = () => {
       return
     }
     // 转换搜索查询为正则表达式
-    const regExp = convertToRegExp(searchQuery, useRegExp, matchCase, matchWholeWord)
+    const regExp = convertToReg(searchQuery, matchReg, matchCase, matchWholeWord)
     if (!regExp) return
-
-    // 将排除文件列表转换为正则表达式数组
-    const ignorePatterns = filesToExclude
-      .split(',')
-      .map((pattern) => pattern.trim())
-      .filter((pattern) => pattern.length)
-      .map((pattern) => {
-        // 转义正则表达式中的特殊字符，除了星号（*）之外
-        let escapedPattern = escapeRegExp(pattern)
-        // 替换星号（*）为正则表达式中的量词 .*，表示匹配任意字符任意次
-        escapedPattern = escapedPattern.replace(/\*/g, '.*')
-        // 创建正则表达式对象
-        return new RegExp(escapedPattern, matchCase ? '' : 'i')
-      })
+    const ignoreFilesPatterns = getIgnorePatterns(filesToExclude)
     try {
       // 调用 ipcRendererInvoke 执行搜索
       const result: string = await ipcRendererInvoke(
         'exec-reg-query-batch',
         directoryPath,
         regExp,
-        ignorePatterns,
+        ignoreFilesPatterns,
         isAddSourcePath
       )
       setOutput(result) // 设置执行结果到状态
@@ -120,7 +73,7 @@ const FeatureListPage: React.FC = () => {
   }
 
   const handleUseRegExpChange = () => {
-    setUseRegExp(!useRegExp)
+    setMatchReg(!matchReg)
   }
 
   return (
@@ -161,7 +114,7 @@ const FeatureListPage: React.FC = () => {
                 </Tooltip>
                 <Tooltip title="Use Regular Expression">
                   <CloseSquareOutlined
-                    className={`icon-base ${useRegExp ? 'icon-selected' : ''}`}
+                    className={`icon-base ${matchReg ? 'icon-selected' : ''}`}
                     onClick={handleUseRegExpChange}
                   />
                 </Tooltip>
