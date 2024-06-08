@@ -26,6 +26,7 @@ module.exports = {
     ['deps', '项目依赖'],
     ['auth', '对 auth 修改'],
     ['md', '文档相关'],
+    ['config', '配置相关'],
     ['other', '其他修改'],
     // 如果选择 custom，后面会让你再输入一个自定义的 scope。也可以不设置此项，把后面的 allowCustomScopes 设置为 true
     ['custom', '以上都不是？我要自定义']

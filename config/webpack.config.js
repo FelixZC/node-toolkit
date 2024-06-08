@@ -47,7 +47,7 @@ module.exports = {
   // 配置输出选项
   output: {
     // 根据是否为生产环境设置输出路径
-    path: isProduction ? path.resolve(__dirname, '../desktop/build') : undefined,
+    path: isProduction ? path.resolve(__dirname, '../src/desktop/build') : undefined,
     // 输出文件命名规则
     filename: 'js/[name].[contenthash:8].js',
     // 异步加载模块的命名规则
@@ -200,7 +200,7 @@ module.exports = {
 
     // HtmlWebpackPlugin，用于根据模板生成 HTML 文件，并注入对应的 js/css 资源
     new HtmlWebpackPlugin({
-      template: './public/index.html', // 指定 HTML 模板文件路径
+      template: path.resolve(__dirname, '../public/index.html'), // 指定 HTML 模板文件路径
       filename: 'index.html' // 生成的 HTML 文件名
     }),
 
@@ -212,7 +212,7 @@ module.exports = {
       patterns: [
         {
           from: path.resolve(__dirname, '../public'), // 指定要复制的源文件或文件夹路径
-          to: path.resolve(__dirname, '../desktop/build'), // 指定复制到的目标路径
+          to: path.resolve(__dirname, '../src/desktop/build'), // 指定复制到的目标路径
           globOptions: {
             ignore: ['**/index.html'] // 忽略指定的文件或文件夹
           }
