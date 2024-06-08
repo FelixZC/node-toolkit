@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron'
+
 export default function mainWindowHandleEvents() {
   ipcMain.handle('choose-directory', async () => {
     const { dialog } = require('electron')
@@ -39,17 +40,34 @@ export default function mainWindowHandleEvents() {
     const { getAttributesDescriptionTable } = require('../exec/exec-get-attrs-and-annotation')
     return getAttributesDescriptionTable(dir)
   })
+
+  ipcMain.handle(
+    'exec-modify-file-names-batch-priview',
+    async (event, dir: string, modifyFilenameOptions) => {
+      const { useModifyFilenameExecPreset } = require('../exec/exec-modify-file-names-batch')
+      return useModifyFilenameExecPreset(dir, 'preview', modifyFilenameOptions)
+    }
+  )
+
+  ipcMain.handle(
+    'exec-modify-file-names-batch',
+    async (event, dir: string, modifyFilenameOptions) => {
+      const { useModifyFilenameExecPreset } = require('../exec/exec-modify-file-names-batch')
+      return useModifyFilenameExecPreset(dir, 'exec', modifyFilenameOptions)
+    }
+  )
+
   ipcMain.handle(
     'exec-reg-query-batch',
     async (
       event,
       dir: string,
-      queryRegExp: RegExp,
-      ignoreRegExp?: Array<RegExp>,
+      queryReg: RegExp,
+      ignoreReg?: Array<RegExp>,
       isAddSourcePath?: boolean
     ) => {
       const { batchRegQueryAndReturnResult } = require('../exec/exec-reg-query-batch')
-      return batchRegQueryAndReturnResult(dir, queryRegExp, ignoreRegExp, isAddSourcePath)
+      return batchRegQueryAndReturnResult(dir, queryReg, ignoreReg, isAddSourcePath)
     }
   )
 }
