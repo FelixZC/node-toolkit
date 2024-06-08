@@ -84,12 +84,14 @@ function createdAttributesGroupTable(attrGroup: Record<string, any>) {
     if (Reflect.get(attrGroupItem, 'groupKey') && Reflect.get(attrGroupItem, 'group')) {
       const title = Reflect.get(attrGroupItem.group[0], attrGroupItem.groupKey)
       attributesDescriptionTable += `## ${title}${br}`
-      attributesDescriptionTable += `|字段|描述|${br}`
-      attributesDescriptionTable += `|-|-|${br}`
+      attributesDescriptionTable += `|字段|描述|位置|${br}`
+      attributesDescriptionTable += `|-|-|-|${br}`
       const group = sortArray(attrGroupItem.group, 'key')
 
       for (const groupItem of group) {
-        attributesDescriptionTable += `${groupItem.key}|${groupItem.value}|${br}`
+        const [name, position] = groupItem.key.split('->')
+        const description = groupItem.value
+        attributesDescriptionTable += `${name}|${description}|${position}|${br}`
       }
     }
   }

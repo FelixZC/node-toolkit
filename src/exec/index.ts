@@ -133,7 +133,7 @@ export class Exec implements ExecInterface {
     // 初始化存储属性信息的对象和数组
     const attrsCollectionTemp: AttrsCollection = {
       key: '',
-      standingInitial: 'string',
+      standingInitial: 'a',
       value: ''
     }
     const attrsCollectionGroup: AttrsCollection[] = []
@@ -155,21 +155,19 @@ export class Exec implements ExecInterface {
 
         runBabelPlugin(execFileInfo, plugins)
         const attributesObj = execFileInfo.extra!.attributesObj as Record<string, string>
-
+        const relativePosition = path.relative(process.cwd(), filePath)
         // 处理和收集属性信息
         if (Object.keys(attributesObj).length) {
           for (const [key, value] of Object.entries(attributesObj)) {
             // 冲突处理
+            const newKey = `${key}->(${relativePosition})`
             if (Reflect.get(attrsCollectionTemp, key)) {
-              const newKey = `${key}:arrow_right:(in ${path.basename(filePath)})`
-
               if (
                 Reflect.get(attrsCollectionTemp, newKey) === value ||
                 Reflect.get(attrsCollectionTemp, key) === value
               ) {
                 continue
               }
-
               Reflect.set(attrsCollectionTemp, newKey, value)
               attrsCollectionGroup.push({
                 key: newKey,
@@ -179,7 +177,7 @@ export class Exec implements ExecInterface {
             } else {
               Reflect.set(attrsCollectionTemp, key, value)
               attrsCollectionGroup.push({
-                key,
+                key: newKey,
                 standingInitial: key.slice(0, 1).toLocaleUpperCase(),
                 value
               })
