@@ -1,28 +1,7 @@
 import * as fs from 'fs'
 import * as os from 'os'
 import * as path from 'path'
-import type { UserInfo } from 'os'
-const userInfo = os.userInfo() // 用户信息
-const eol = os.EOL // 换行符
-
-// 定义操作日志记录的结构
-interface LogRecord {
-  methodName: string
-  arguments: unknown[]
-  timestamp: Date
-}
-
-// 定义异常日志记录的结构
-interface ErrorRecord {
-  methodName: string
-  arguments: unknown[]
-  error: {
-    message: string
-    stack?: string
-  }
-  timestamp: Date
-}
-
+import { logDecorator } from '../utils/log'
 /**
  * 检查路径有效性
  * @param filePath - 要检查的文件路径
@@ -64,14 +43,9 @@ export interface FileInfo {
 interface FsInstance {
   rootPath: string
   folderPath: string
-  logPath: string
   filePathList: string[] // 使用项目根目录
   dirPathList: string[]
-  userInfo: UserInfo<string>
   eol: string
-
-  // 操作日志记录方法
-  saveOperateLog(message: string): void
 
   // 获取指定路径文件列表方法
   getFilePathList(folderPath: string): void
@@ -95,68 +69,6 @@ interface FsInstance {
   deleteFile(filePath: string): void
 }
 
-// 操作日志打印记录装饰器
-function logDecorator() {
-  return function (target: FsInstance, name: string, descriptor: PropertyDescriptor) {
-    const originalMethod = descriptor.value // 保存原始方法引用
-
-    // 增强方法，添加日志记录功能
-    descriptor.value = function (...args: unknown[]) {
-      const record: LogRecord = {
-        methodName: name, // 使用更明确的属性名
-        arguments: args,
-        timestamp: new Date() // 记录日志的时间戳
-      }
-
-      // 执行原始方法之前记录日志
-      target.saveOperateLog(JSON.stringify(record))
-
-      try {
-        // 执行原始方法
-        const result = originalMethod.apply(this, args)
-        return result
-      } catch (error) {
-        // 如果原始方法抛出异常，可以在这里处理（例如记录额外的错误日志）
-        throw error // 重新抛出异常，让调用者处理
-      }
-    }
-
-    return descriptor
-  }
-}
-// 异常处理装饰器与异常日志记录
-function catchHandlerDecorator() {
-  return function (target: FsInstance, name: string, descriptor: PropertyDescriptor) {
-    const originalMethod = descriptor.value
-
-    descriptor.value = function (...args: unknown[]) {
-      try {
-        // 尝试执行原始方法
-        return originalMethod.apply(this, args)
-      } catch (error) {
-        // 捕获到错误时，创建错误记录
-        const record: ErrorRecord = {
-          arguments: args,
-          error: {
-            message: (error as Error).message,
-            stack: (error as Error).stack
-          },
-          methodName: name, // 使用更明确的属性名
-          timestamp: new Date() // 记录日志的时间戳
-        }
-
-        // 调用 saveOperateLog 方法记录异常信息
-        target.saveOperateLog(JSON.stringify(record))
-
-        // 根据业务需求，可以选择重新抛出错误或者返回特定的值
-        return null
-      }
-    }
-
-    return descriptor
-  }
-}
-
 /**
  * 基于Node.js的文件操作类
  * @author pzc
@@ -164,16 +76,12 @@ function catchHandlerDecorator() {
  */
 class fsUtils implements FsInstance {
   folderPath: string
-  logPath: string
   filePathList: string[]
   dirPathList: string[]
-  userInfo: UserInfo<string>
   eol: string
   constructor(public rootPath: string) {
-    this.userInfo = userInfo
-    this.eol = eol
+    this.eol = os.EOL
     this.folderPath = path.join(rootPath)
-    this.logPath = path.join(rootPath, 'fsUtils.log')
     this.filePathList = []
     this.dirPathList = []
     this.dirPathList.push(path.resolve(this.folderPath))
@@ -181,59 +89,32 @@ class fsUtils implements FsInstance {
   }
 
   /**
-   * 简易日志记录
-   * @param {string} message - 消息记录
-   */
-  @catchHandlerDecorator()
-  saveOperateLog(message: string) {
-    // 确保 logPath 是有效的
-    if (!this.logPath) {
-      console.error('Log path is not defined.')
-      return
-    }
-
-    // 创建日志记录的基础信息
-    const baseInfo = {
-      message: message,
-      time: new Date().toLocaleString(),
-      user: userInfo.username
-    }
-
-    // 构建日志内容
-    let content = `${JSON.stringify(baseInfo)}${eol}`
-    content += `${new Array(100).fill('-').join('-')}${eol}`
-
-    try {
-      // 确保日志文件的目录存在
-      checkPathValid(path.dirname(this.logPath))
-
-      // 将日志内容追加到日志文件
-      fs.appendFileSync(this.logPath, content)
-    } catch (err) {
-      // 如果写入日志失败，输出错误信息到控制台
-      console.error(`Failed to write to log file: ${err}`)
-    }
-  }
-
-  /**
    * 获取指定路径所有文件列表
    * @param {string} folderPath - 指定路径
    * @returns {Object} 返回文件路径/文件夹路径/文件错误路径列表
    */
-  @catchHandlerDecorator()
   getFilePathList(folderPath: string) {
-    fs.accessSync(folderPath, fs.constants.F_OK)
-    fs.readdirSync(folderPath).forEach((filename: string) => {
-      const filePath = path.resolve(folderPath, filename) // 连接路径的两个或多个部分：
-
-      // 判断是否为文件
-      if (fs.lstatSync(filePath).isFile()) {
-        this.filePathList.push(filePath)
-      } else {
-        this.dirPathList.push(filePath)
-        this.getFilePathList(filePath)
-      }
-    })
+    try {
+      fs.accessSync(folderPath, fs.constants.F_OK)
+      fs.readdirSync(folderPath).forEach((basename) => {
+        const filePath = path.resolve(folderPath, basename)
+        try {
+          if (fs.lstatSync(filePath).isFile()) {
+            this.filePathList.push(filePath)
+          } else {
+            if (!this.dirPathList.includes(filePath)) {
+              // 避免重复添加目录
+              this.dirPathList.push(filePath)
+              this.getFilePathList(filePath) // 递归调用
+            }
+          }
+        } catch (error) {
+          console.error(`Error accessing file or directory: ${filePath}`, error)
+        }
+      })
+    } catch (error) {
+      console.error(`Error accessing folder: ${folderPath}`, error)
+    }
   }
 
   /**
@@ -280,7 +161,6 @@ class fsUtils implements FsInstance {
    * @param {string} oldFilePath
    * @param {string} newFilePath
    */
-  @catchHandlerDecorator()
   @logDecorator()
   renameFile(oldFilePath: string, newFilePath: string) {
     if (oldFilePath === newFilePath) {
@@ -319,7 +199,6 @@ class fsUtils implements FsInstance {
    * 复制指定路径原文件
    * @param {string} filePath
    */
-  @catchHandlerDecorator()
   @logDecorator()
   copyFile(filePath: string) {
     const dirname = path.dirname(filePath)
@@ -351,6 +230,7 @@ class fsUtils implements FsInstance {
    * @param {string} filePath
    * @returns
    */
+  @logDecorator()
   deleteFile(filePath: string) {
     // 检查文件路径是否存在
     if (fs.existsSync(filePath)) {

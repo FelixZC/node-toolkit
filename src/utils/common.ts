@@ -316,3 +316,63 @@ export function pickProperties<T extends object, K extends keyof T>(
     return picked as Pick<T, K>
   })
 }
+
+export const getIgnorePatterns = (str: string): RegExp[] => {
+  // 将排除文件列表转换为正则表达式数组
+  const ignoreFilesPatterns = str
+    .split(',')
+    .map((pattern) => pattern.trim())
+    .filter((pattern) => pattern.length)
+    .map((pattern) => {
+      // 转义正则表达式中的特殊字符，除了星号（*）之外
+      let escapedPattern = escapeReg(pattern)
+      // 替换星号（*）为正则表达式中的量词 .*，表示匹配任意字符任意次
+      escapedPattern = escapedPattern.replace(/\*/g, '.*')
+      // 创建正则表达式对象
+      return new RegExp(escapedPattern)
+    })
+  return ignoreFilesPatterns
+}
+
+// 辅助函数，用于转义正则表达式中的特殊字符
+export const escapeReg = (string: string) => {
+  // 转义正则表达式中的特殊字符，包括 -
+  return string.replace(/[.*+?^${}()|[\]\\-]/g, '\\$&')
+}
+
+// 将用户输入的字符串转换为正则表达式，考虑全词匹配和大小写匹配
+export const convertToReg = (
+  query: string,
+  matchReg: boolean,
+  matchCase: boolean,
+  matchWholeWord: boolean,
+  matchGlobal?: boolean
+) => {
+  if (!query.length) {
+    return null
+  }
+  // 如果是使用正则表达式，直接创建，否则需要转义查询字符串以避免特殊字符
+  const pattern = matchReg ? query : escapeReg(query)
+
+  // 构建正则表达式字符串
+  let regExpString = matchWholeWord ? `\\b${pattern}\\b` : pattern
+
+  // 默认全局搜索
+  let flags = ''
+
+  if (matchGlobal) {
+    flags += 'g'
+  }
+  // 如果不区分大小写，则添加 'i' 标志
+  if (!matchCase) {
+    flags += 'i'
+  }
+
+  try {
+    // 创建正则表达式对象，需要将模式和标志作为两个参数传递
+    return new RegExp(regExpString, flags)
+  } catch (error) {
+    console.error('Invalid regular expression:', regExpString, flags)
+    return null
+  }
+}

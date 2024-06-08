@@ -3,7 +3,6 @@ import * as fs from 'fs'
 import fsUtils, { writeFile } from '../utils/fs'
 import { groupBy, buildTree, pickProperties } from '../utils/common'
 import mdUtils from '../utils/md'
-import * as os from 'os'
 import * as path from 'path'
 import runBabelPlugin from '../plugins/use-babel-plugin'
 import runCodemod from '../plugins/use-codemod'
@@ -39,7 +38,6 @@ export type ExecListType = Array<RegExec>
 // Exec类定义
 // 重写ExecInterface接口，去除具体实现，使其成为一个纯接口定义
 interface ExecInterface {
-  br: string
   fsInstance: fsUtils
   fileInfoList: FileInfo[]
   getProjectTree(): Record<string, string>
@@ -49,7 +47,7 @@ interface ExecInterface {
   getAttrsAndAnnotation(): string
   batchRegQuery(
     regExpression: RegExp,
-    ignorePatterns?: Array<RegExp>,
+    ignoreFilesPatterns?: Array<RegExp>,
     isAddSourcePath?: boolean
   ): string
   pageRegQuery(regExpression: RegExp, content: string): string
@@ -66,11 +64,9 @@ interface ExecInterface {
 }
 
 export class Exec implements ExecInterface {
-  br: string // 换行符属性
   fsInstance: fsUtils // 文件系统实例属性
   fileInfoList: FileInfo[] // 文件信息列表属性
   constructor(rootPath = path.join('src copy')) {
-    this.br = os.EOL // 换行符
     /** 项目根目录，在此变更执行目录 */
     this.fsInstance = new fsUtils(rootPath)
     this.fileInfoList = this.fsInstance.getFileInfoList()
@@ -84,7 +80,7 @@ export class Exec implements ExecInterface {
       }
     })
     const trees = buildTree(treeData, 'filePath', 'dirname')
-    const result = pickProperties(trees, ['filename', 'children'])
+    const result = pickProperties(trees, ['filename', 'extname', 'children'])
     const resultJson = JSON.stringify(result, null, 2)
     const resultMd = mdUtils.generateProjectTree(result)
     return { resultJson, resultMd }
@@ -221,14 +217,18 @@ export class Exec implements ExecInterface {
   /**
    * 批量查询函数，对所有文件内容应用正则表达式查询，并返回查询结果的字符串拼接
    * @param {RegExp} regExpression 正则表达式对象，用于匹配查询内容
-   * @param {Array<RegExp>} [ignorePatterns=[]] 可选参数，用于指定要忽略的文件路径模式e.g. [/\.ts$/, /src\/exclude/]
+   * @param {Array<RegExp>} [ignoreFilesPatterns=[]] 可选参数，用于指定要忽略的文件路径模式e.g. [/\.ts$/, /src\/exclude/]
    * @param {boolean} [isAddSourcePath=false] 是否在结果中添加文件路径
    * @returns {string} 查询结果的字符串拼接
    */
-  batchRegQuery(regExpression: RegExp, ignorePatterns?: Array<RegExp>, isAddSourcePath?: boolean) {
+  batchRegQuery(
+    regExpression: RegExp,
+    ignoreFilesPatterns?: Array<RegExp>,
+    isAddSourcePath?: boolean
+  ) {
     let str = ''
     this.fsInstance.filePathList.forEach((filePath) => {
-      if (ignorePatterns && ignorePatterns.some((pattern) => pattern.test(filePath))) {
+      if (ignoreFilesPatterns && ignoreFilesPatterns.some((pattern) => pattern.test(filePath))) {
         //next file
       } else {
         const content = fs.readFileSync(filePath, 'utf-8')
@@ -264,49 +264,45 @@ export class Exec implements ExecInterface {
     content: string,
     matchContentHandle: (content: string) => string
   ) => {
-    let localContent = content // 存储进行替换操作的内容字符串
-
-    if (!reg.global) {
-      throw new Error('正则必须使用全局匹配模式')
+    // 参数验证
+    if (!(reg instanceof RegExp)) {
+      throw new Error('The first argument must be a RegExp object.')
+    }
+    if (typeof content !== 'string') {
+      throw new Error('The second argument must be a string.')
+    }
+    if (typeof matchContentHandle !== 'function') {
+      throw new Error('The third argument must be a function.')
     }
 
-    let result
+    // 确保正则表达式用于全局搜索
+    if (!reg.global) {
+      reg = new RegExp(reg.source, reg.flags + 'g')
+    }
+
     let isChange = false // 标识内容是否发生了替换
+    let match
 
-    // 循环执行替换操作，直到没有匹配的内容为止
-    while ((result = reg.exec(localContent))) {
-      const matchContent = result[0] // 匹配到的内容
-
-      const leftIndex = result.index
-      const rightIndex = leftIndex + matchContent.length
-      const resultLeft = localContent.slice(0, leftIndex)
-      const resultRight = localContent.slice(rightIndex)
-      let replaceResult = ''
-
-      // 如果正则匹配结果中有命名组，则使用命名组进行替换；否则，直接使用匹配的内容进行替换
-      if (result.groups?.target) {
-        replaceResult = matchContent.replace(
-          result.groups.target,
-          matchContentHandle(result.groups.target)
-        )
-      } else {
-        replaceResult = matchContentHandle(matchContent)
+    // 使用循环进行替换操作
+    while ((match = reg.exec(content))) {
+      if (match[0].length === 0) {
+        // 避免空匹配导致的无限循环
+        reg.lastIndex++
+        continue
       }
 
-      // 如果替换结果与匹配内容不同，则标记内容发生了替换
-      if (replaceResult !== matchContent) {
+      const replaceResult = matchContentHandle(match[0])
+      if (replaceResult !== match[0]) {
         isChange = true
       }
 
-      // 更新内容字符串，进行下一次替换操作
-      localContent = resultLeft + replaceResult + resultRight
-      // 调整正则表达式的 lastIndex，以避免重复替换相同内容
-      reg.lastIndex = (resultLeft + replaceResult).length
+      // 构建新的字符串
+      content = content.slice(0, match.index) + replaceResult + content.slice(reg.lastIndex)
     }
 
     return {
       isChange,
-      localContent
+      content // 返回替换后的内容
     }
   }
 
@@ -336,7 +332,7 @@ export class Exec implements ExecInterface {
         // 如果替换结果指示内容发生了变化，则更新内容标记和替换后的内容
         if (result.isChange) {
           isChange = true
-          content = result.localContent
+          content = result.content
         }
       }
 

@@ -11,18 +11,18 @@ import path from 'path'
 export function batchRegQueryAndReturnResult(
   dir: string,
   reg: RegExp,
-  ignorePatterns?: Array<RegExp>,
+  ignoreFilesPatterns?: Array<RegExp>,
   isAddSourcePath?: boolean
 ) {
   const exec = new Exec(dir)
-  const result = exec.batchRegQuery(reg, ignorePatterns, isAddSourcePath)
+  const result = exec.batchRegQuery(reg, ignoreFilesPatterns, isAddSourcePath)
   return result
 }
 
 const dirPath = path.join('src copy') // 指定要查询的目录
 // const regexPattern = /(\w+)?(Date|Term)\b/gi; // 指定要使用的正则表达式
 const regexPattern = /执行.*/gi
-const ignorePatterns = [
+const ignoreFilesPatterns = [
   /node_modules/,
   /\.git/,
   /\.vscode/,
@@ -32,7 +32,7 @@ const ignorePatterns = [
   /\.DS_Store/,
   /\.DS_Store/
 ].map((i) => new RegExp(i))
-const result = batchRegQueryAndReturnResult(dirPath, regexPattern, ignorePatterns, true)
+const result = batchRegQueryAndReturnResult(dirPath, regexPattern, ignoreFilesPatterns, true)
 
 const writeFilePath = path.join('src/query/md/query-batch-result.md')
 writeFile(writeFilePath, result)

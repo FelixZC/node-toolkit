@@ -125,7 +125,7 @@ export default declare((babel) => {
             // 更新程序体，按排序后的顺序合并导入声明和其他语句
             path.node.body = [...normalImportList, ...typeImportList, ...statementList]
           } catch (e) {
-            console.log(e)
+            throw e
           }
         }
       }

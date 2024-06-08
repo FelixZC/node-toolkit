@@ -1,13 +1,30 @@
 import path from 'path'
 import { Exec } from './index'
-type ModifyFilenameReturnType = {
-  modifyCount: number
-  changeRecords: ModifyResult[]
-}
-
 interface ModifyResult {
   oldFilePath: string
   newFilePath: string
+}
+
+export type ModifyResultReturnType = {
+  changeCount: number
+  changeRecords: ModifyResult[]
+}
+
+interface PreviewResult {
+  oldFilePath: string
+  newFilePath: string
+  oldFilename?: string
+  newFilename?: string
+  oldDirname?: string
+  newDirname?: string
+  oldExtname?: string
+  newExtname?: string
+  isChange: boolean
+}
+
+export type PriviewResultReturnType = {
+  changeCount: number
+  changeRecords: PreviewResult[]
 }
 
 type ModifyFilenameOptions = {
@@ -40,11 +57,17 @@ interface CustomDirnameFunction {
   (oldDirname: string): string
 }
 
-export class ModifyFilename {
+class ModifyFilenameExec {
   exec: Exec
-  constructor(dir?: string) {
+  constructor(dir: string) {
     this.exec = new Exec(dir)
   }
+
+  // 确保文件扩展名以点开头
+  private ensureExtname(extname: string): string {
+    return extname.startsWith('.') ? extname : `.${extname}`
+  }
+
   /**
    * 批量查询符合修改文件名条件的文件信息列表。
    * 此方法根据提供的修改文件名选项，筛选出符合特定条件的文件列表。
@@ -84,7 +107,9 @@ export class ModifyFilename {
    * @param modifyFilenameOptions 包含用于修改文件名的各种选项的对象。
    * @returns 返回一个数组，其中每个元素都包含了原始文件名和拟修改后的文件名的详细比较。
    */
-  execModifyFileNamesBatchPreview = (modifyFilenameOptions: ModifyFilenameOptions) => {
+  execModifyFileNamesBatchPreview = (
+    modifyFilenameOptions: ModifyFilenameOptions
+  ): PriviewResultReturnType => {
     const targetList = this.execModifyFileNamesBatchQuery(modifyFilenameOptions)
 
     const replaceResult = targetList.map((item) => {
@@ -92,7 +117,7 @@ export class ModifyFilename {
         modifyFilenameOptions.filenameReg && modifyFilenameOptions.filename
           ? item.filename.replace(modifyFilenameOptions.filenameReg, modifyFilenameOptions.filename)
           : item.filename
-      const newExtname =
+      let newExtname =
         modifyFilenameOptions.extnameReg && modifyFilenameOptions.extname
           ? item.extname.replace(modifyFilenameOptions.extnameReg, modifyFilenameOptions.extname)
           : item.extname
@@ -100,27 +125,19 @@ export class ModifyFilename {
         modifyFilenameOptions.dirnameReg && modifyFilenameOptions.dirname
           ? item.dirname.replace(modifyFilenameOptions.dirnameReg, modifyFilenameOptions.dirname)
           : item.dirname
-
+      newExtname = this.ensureExtname(newExtname)
       const newFilePath = path.format({
         dir: newDirname,
         name: newFilename,
         ext: newExtname
       })
-
       return {
-        oldFilename: item.filename,
-        newFilename,
-        oldExtname: item.extname,
-        newExtname,
-        oldDirname: item.dirname,
-        newDirname,
         oldFilePath: item.filePath,
         newFilePath,
         isChange: item.filePath !== newFilePath
       }
     })
-
-    return replaceResult
+    return { changeCount: replaceResult.length, changeRecords: replaceResult }
   }
   /**
    * 批量修改文件名的执行函数。
@@ -128,11 +145,11 @@ export class ModifyFilename {
    * @param modifyFilenameOptions 修改文件名的选项对象，包含文件名、扩展名和目录名的正则表达式和替换值。
    * @returns 返回一个对象，包含修改的文件数量和修改记录。
    */
-  execModifyFileNamesBatchExec = (
+  execModifyFileNamesBatch = (
     modifyFilenameOptions: ModifyFilenameOptions
-  ): ModifyFilenameReturnType => {
+  ): ModifyResultReturnType => {
     const changeRecords: ModifyResult[] = []
-    let modifyCount = 0
+    let changeCount = 0
 
     const targetList = this.execModifyFileNamesBatchQuery(modifyFilenameOptions)
 
@@ -144,7 +161,7 @@ export class ModifyFilename {
               modifyFilenameOptions.filename
             )
           : fileInfo.filename
-      const newExtname =
+      let newExtname =
         modifyFilenameOptions.extnameReg && modifyFilenameOptions.extname
           ? fileInfo.extname.replace(
               modifyFilenameOptions.extnameReg,
@@ -158,7 +175,12 @@ export class ModifyFilename {
               modifyFilenameOptions.dirname
             )
           : fileInfo.dirname
-      const newFilePath = path.join(newDirname, newFilename + newExtname)
+      newExtname = this.ensureExtname(newExtname)
+      const newFilePath = path.format({
+        dir: newDirname,
+        name: newFilename,
+        ext: newExtname
+      })
       try {
         const { isChange, uniqueNewFilePath } = this.exec.fsInstance.renameFile(
           fileInfo.filePath,
@@ -169,14 +191,14 @@ export class ModifyFilename {
             oldFilePath: fileInfo.filePath,
             newFilePath: uniqueNewFilePath
           })
-          modifyCount++
+          changeCount++
         }
       } catch (error) {
         console.error(`重命名文件失败：${fileInfo.filePath} -> ${newFilePath}`, error)
       }
     })
-    console.log(`批量修改完毕，共${modifyCount}个文件产生变化`)
-    return { modifyCount, changeRecords }
+    console.log(`批量修改完毕，共${changeCount}个文件产生变化`)
+    return { changeCount, changeRecords }
   }
 
   /**
@@ -189,9 +211,9 @@ export class ModifyFilename {
    */
   execModifyFileNamesBatchCustom = (
     modifyFilenameCustomOptions: ModifyFilenameCustomOptions
-  ): ModifyFilenameReturnType => {
+  ): ModifyResultReturnType => {
     const changeRecords: ModifyResult[] = []
-    let modifyCount = 0
+    let changeCount = 0
 
     const targetList = this.execModifyFileNamesBatchQuery(modifyFilenameCustomOptions)
 
@@ -199,14 +221,19 @@ export class ModifyFilename {
       const newFilename = modifyFilenameCustomOptions.customFilename
         ? modifyFilenameCustomOptions.customFilename(fileInfo.filename)
         : fileInfo.filename
-      const newExtname = modifyFilenameCustomOptions.customExtname
+      let newExtname = modifyFilenameCustomOptions.customExtname
         ? modifyFilenameCustomOptions.customExtname(fileInfo.extname)
         : fileInfo.extname
       const newDirname = modifyFilenameCustomOptions.customDirname
         ? modifyFilenameCustomOptions.customDirname(fileInfo.dirname)
         : fileInfo.dirname
-      const newFilePath = path.join(newDirname, newFilename + newExtname)
 
+      newExtname = this.ensureExtname(newExtname)
+      const newFilePath = path.format({
+        dir: newDirname,
+        name: newFilename,
+        ext: newExtname
+      })
       try {
         const { isChange, uniqueNewFilePath } = this.exec.fsInstance.renameFile(
           fileInfo.filePath,
@@ -217,14 +244,41 @@ export class ModifyFilename {
             oldFilePath: fileInfo.filePath,
             newFilePath: uniqueNewFilePath
           })
-          modifyCount++
+          changeCount++
         }
       } catch (error) {
         console.error(`重命名文件失败：${fileInfo.filePath} -> ${newFilePath}`, error)
       }
     })
 
-    console.log(`批量修改完毕，共${modifyCount}个文件产生变化`)
-    return { modifyCount, changeRecords }
+    console.log(`批量修改完毕，共${changeCount}个文件产生变化`)
+    return { changeCount, changeRecords }
   }
 }
+
+export const useModifyFilenameExec = (dir: string) => {
+  return new ModifyFilenameExec(dir)
+}
+
+export const useModifyFilenameExecPreset = (
+  dir: string,
+  mode: 'preview' | 'exec',
+  modifyFilenameOptions: ModifyFilenameOptions
+) => {
+  const exec = new ModifyFilenameExec(dir)
+  if (mode === 'preview') {
+    return exec.execModifyFileNamesBatchPreview(modifyFilenameOptions)
+  } else if (mode === 'exec') {
+    return exec.execModifyFileNamesBatch(modifyFilenameOptions)
+  }
+}
+
+const modifyFilenameOptions: ModifyFilenameOptions = {
+  filename: '',
+  extname: '.test',
+  extnameReg: /\.pzc/i,
+  ignoreFilesPatterns: []
+}
+
+const modify = new ModifyFilenameExec(path.join('src copy'))
+modify.execModifyFileNamesBatchQuery(modifyFilenameOptions)

@@ -23,26 +23,47 @@ function queryContentByReg(
   matchIndex = 0,
   customHandel?: Function
 ) {
+  // 参数验证
+  if (typeof content !== 'string') {
+    throw new Error('Content must be a string.')
+  }
+  if (!(queryReg instanceof RegExp)) {
+    throw new Error('QueryReg must be a RegExp object.')
+  }
+  if (typeof matchIndex !== 'number') {
+    throw new Error('MatchIndex must be a number.')
+  }
+  if (customHandel && typeof customHandel !== 'function') {
+    throw new Error('CustomHandel must be a function.')
+  }
+
   let queryResult
   let str = ''
 
-  if (queryReg.global) {
-    while ((queryResult = queryReg.exec(content))) {
-      str +=
-        customHandel && typeof customHandel === 'function'
-          ? customHandel(queryResult)
-          : queryResult[matchIndex] + br
+  // 确保正则表达式用于全局搜索
+  if (!queryReg.global) {
+    queryReg = new RegExp(queryReg.source, queryReg.flags + 'g')
+  }
+
+  let lastIndex = 0 // 记录上次匹配的结束位置
+  while ((queryResult = queryReg.exec(content))) {
+    // 处理匹配结果
+    const resultStr = customHandel ? customHandel(queryResult) : queryResult[matchIndex]
+    str += resultStr
+    if (queryResult[0].length === 0) {
+      lastIndex = queryReg.lastIndex // 避免无限循环
+      queryReg.lastIndex++ // 移动 lastIndex 以避免空匹配
+    } else {
+      lastIndex = queryReg.lastIndex
     }
-  } else if ((queryResult = queryReg.exec(content))) {
-    str +=
-      customHandel && typeof customHandel === 'function'
-        ? customHandel(queryResult)
-        : queryResult[matchIndex] + br
+    // 确保不会重复添加 br
+    if (lastIndex < content.length) {
+      str += br
+    }
   }
 
   return str
 }
-
 /**
  * 创建属性描述表格
  * @param {*} attrGroup - 属性描述分组后的对象
