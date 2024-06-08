@@ -28,15 +28,16 @@ export const executeBabelPlugins = (dir: string, babelPluginPathList: string[]):
   }
 }
 
-const babelPluginPathList: string[] = [
-  '../plugins/babel-plugins/import-sort',
-  '../plugins/babel-plugins/move-default-export-to-last',
-  '../plugins/babel-plugins/depart-switch',
-  // '../plugins/babel-plugins/remove-invalid-comment'
-  '../plugins/babel-plugins/transform-remove-console'
-  // '../plugins/babel-plugins/depart-default-export-object-express'
-  // '../plugins/babel-plugins/replace-memberExpress-object-or-property'
-]
-
-// 调用公共方法执行 Babel 插件
-executeBabelPlugins(path.join('src copy'), babelPluginPathList)
+// 使用示例
+export function test() {
+  const babelPluginPathList: string[] = [
+    '../plugins/babel-plugins/import-sort',
+    '../plugins/babel-plugins/move-default-export-to-last',
+    '../plugins/babel-plugins/depart-switch',
+    // '../plugins/babel-plugins/remove-invalid-comment'
+    '../plugins/babel-plugins/transform-remove-console'
+    // '../plugins/babel-plugins/depart-default-export-object-express'
+    // '../plugins/babel-plugins/replace-memberExpress-object-or-property'
+  ]
+  executeBabelPlugins(path.join('src copy'), babelPluginPathList)
+}

@@ -29,5 +29,7 @@ export function executePosthtmlPlugins(dir: string, pluginsPathList: string[]): 
 }
 
 // 使用示例
-const pluginsPathList: string[] = ['../plugins/posthtml-plugins/property-sort']
-executePosthtmlPlugins(path.join('src copy'), pluginsPathList)
+export function test() {
+  const pluginsPathList: string[] = ['../plugins/posthtml-plugins/property-sort']
+  executePosthtmlPlugins(path.join('src copy'), pluginsPathList)
+}

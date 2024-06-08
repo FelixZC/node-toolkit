@@ -17,11 +17,10 @@ export function getAttributesDescriptionTable(dir: string) {
   // 返回属性描述表
   return attributesDescriptionTable
 }
-
 // 使用示例
-const dir = path.join('src copy')
-const attributesDescriptionTable = getAttributesDescriptionTable(dir)
-
-// 写入文件
-const out = path.join('src/query/md/attributes-description-table.md')
-writeFile(out, attributesDescriptionTable)
+export function test() {
+  const dir = path.join('src copy')
+  const attributesDescriptionTable = getAttributesDescriptionTable(dir)
+  const out = path.join('src/query/md/attributes-description-table.md')
+  writeFile(out, attributesDescriptionTable)
+}

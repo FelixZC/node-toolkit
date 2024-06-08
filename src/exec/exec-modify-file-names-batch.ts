@@ -273,12 +273,15 @@ export const useModifyFilenameExecPreset = (
   }
 }
 
-const modifyFilenameOptions: ModifyFilenameOptions = {
-  filename: '',
-  extname: '.test',
-  extnameReg: /\.pzc/i,
-  ignoreFilesPatterns: []
-}
+// test
+export function test() {
+  const modifyFilenameOptions: ModifyFilenameOptions = {
+    filename: '',
+    extname: '.test',
+    extnameReg: /\.pzc/i,
+    ignoreFilesPatterns: []
+  }
 
-const modify = new ModifyFilenameExec(path.join('src copy'))
-modify.execModifyFileNamesBatchQuery(modifyFilenameOptions)
+  const modify = new ModifyFilenameExec(path.join('src copy'))
+  modify.execModifyFileNamesBatchQuery(modifyFilenameOptions)
+}

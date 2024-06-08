@@ -29,9 +29,11 @@ export function classifyFilesFirstBasenameThenExtname(dir: string) {
   const result = exec.classifyFilesFirstBasenameThenExtname()
   return result
 }
-const result = getProjectTree(path.join('src copy')).resultMd
-// const result = classifyFilesByExtname(path.join('src copy'))
-// 构建输出文件的路径
-const outputPath = path.join('src/query/json/files-group.json')
-// 将分类结果写入文件
-writeFile(outputPath, result)
+
+//使用示例
+export function test() {
+  const result = getProjectTree(path.join('src copy')).resultMd
+  // const result = classifyFilesByExtname(path.join('src copy'))
+  const outputPath = path.join('src/query/json/files-group.json')
+  writeFile(outputPath, result)
+}

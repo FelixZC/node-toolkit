@@ -19,20 +19,23 @@ export function batchRegQueryAndReturnResult(
   return result
 }
 
-const dirPath = path.join('src copy') // 指定要查询的目录
-// const regexPattern = /(\w+)?(Date|Term)\b/gi; // 指定要使用的正则表达式
-const regexPattern = /执行.*/gi
-const ignoreFilesPatterns = [
-  /node_modules/,
-  /\.git/,
-  /\.vscode/,
-  /\.idea/,
-  /\.gitignore/,
-  /\.gitkeep/,
-  /\.DS_Store/,
-  /\.DS_Store/
-].map((i) => new RegExp(i))
-const result = batchRegQueryAndReturnResult(dirPath, regexPattern, ignoreFilesPatterns, true)
+//test
+export function test() {
+  const dirPath = path.join('src copy') // 指定要查询的目录
+  // const regexPattern = /(\w+)?(Date|Term)\b/gi; // 指定要使用的正则表达式
+  const regexPattern = /执行.*/gi
+  const ignoreFilesPatterns = [
+    /node_modules/,
+    /\.git/,
+    /\.vscode/,
+    /\.idea/,
+    /\.gitignore/,
+    /\.gitkeep/,
+    /\.DS_Store/,
+    /\.DS_Store/
+  ].map((i) => new RegExp(i))
+  const result = batchRegQueryAndReturnResult(dirPath, regexPattern, ignoreFilesPatterns, true)
 
-const writeFilePath = path.join('src/query/md/query-batch-result.md')
-writeFile(writeFilePath, result)
+  const writeFilePath = path.join('src/query/md/query-batch-result.md')
+  writeFile(writeFilePath, result)
+}

@@ -29,17 +29,18 @@ export const executeJSCodemods = (dir: string, jscodemodeList: string[]): void =
 }
 
 // 示例用法：
-const jscodemodeList = [
-  '../plugins/jscodemods/arrow-function-arguments',
-  '../plugins/jscodemods/arrow-function',
-  '../plugins/jscodemods/no-reassign-params',
-  '../plugins/jscodemods/no-vars',
-  '../plugins/jscodemods/object-shorthand',
-  '../plugins/jscodemods/rm-object-assign',
-  '../plugins/jscodemods/rm-requires',
-  '../plugins/jscodemods/template-literals',
-  '../plugins/jscodemods/unchain-variables'
-]
-
-// 调用公共方法执行 JSCodeMod 模板
-executeJSCodemods(path.join('src copy'), jscodemodeList)
+export function test() {
+  const jscodemodeList = [
+    '../plugins/jscodemods/arrow-function-arguments',
+    '../plugins/jscodemods/arrow-function',
+    '../plugins/jscodemods/no-reassign-params',
+    '../plugins/jscodemods/no-vars',
+    '../plugins/jscodemods/object-shorthand',
+    '../plugins/jscodemods/rm-object-assign',
+    '../plugins/jscodemods/rm-requires',
+    '../plugins/jscodemods/template-literals',
+    '../plugins/jscodemods/unchain-variables'
+  ]
+  // 调用公共方法执行 JSCodeMod 模板
+  executeJSCodemods(path.join('src copy'), jscodemodeList)
+}

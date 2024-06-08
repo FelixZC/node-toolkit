@@ -32,6 +32,7 @@ export function executePostcssPlugins(dir: string, pluginsPathList: string[]) {
 }
 
 // 示例：指定插件路径列表，并调用函数执行这些插件。
-// 这里的插件路径是相对路径，示例中假设项目结构和插件位置。
-const pluginsPathList = ['../plugins/postcss-plugins/property-sort']
-executePostcssPlugins(path.join('src copy'), pluginsPathList)
+export function test() {
+  const pluginsPathList = ['../plugins/postcss-plugins/property-sort']
+  executePostcssPlugins(path.join('src copy'), pluginsPathList)
+}
