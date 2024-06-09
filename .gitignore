@@ -16,7 +16,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-operate.log*
+*.log*
 # Editor directories and files
 .idea
 # .vscode
@@ -25,3 +25,4 @@ operate.log*
 *.njsproj
 *.sln
 *.sw?
+.*audit.json
