@@ -166,53 +166,57 @@ function createdStoreTable(
 }
 
 interface NodeWithId {
-  name: string
+  base: string
   comment?: string
   children?: NodeWithId[]
 }
 
 /**
- * TODO 重新计算族系关系
- * 生成项目文件结构树的字符串表示。
- * @param nodes 文件节点数组，每个节点包含文件名和可选的评论。
- * @param level 当前节点的层级，用于计算缩进和连接符，默认为0。
- * @returns 项目文件结构树的字符串表示。
+ * 生成项目结构树的字符串表示。
+ *
+ * @param nodes 节点数组，每个节点包含一个id和基础名称。
+ * @param level 当前处理的层级，默认为0，表示根层级。
+ * @param isLevelLastNode 一个布尔数组，表示每个层级的最后一个节点的标记，默认为空数组。
+ * @returns 返回项目结构树的字符串。
  */
 function generateProjectTree(
   nodes: NodeWithId[],
   level: number = 0,
-  isHasNextSibling = false
+  isLevelLastNode: boolean[] = []
 ): string {
   let treeString = ''
   nodes.forEach((node, index, array) => {
-    // 根据节点位置确定连接符，末尾节点使用'╰─ '，其他节点使用'├─ '
-    const connector = level !== 0 && index === array.length - 1 ? '╰─ ' : '├─ '
+    // 复制isLevelLastNode数组，以避免在递归调用中修改原始数组
+    const isLevelLastNodeClone: boolean[] = [...isLevelLastNode]
+    let connector
+    // 根据层级和当前节点是否是本层级的最后一个节点，确定连接符
+    if (level === 0) {
+      connector = '  '
+    } else {
+      connector = index === array.length - 1 ? '╰─ ' : '├─ '
+    }
     let padding = ''
-    // 根据层级计算缩进，每层缩进由'│'和三个空格组成。
-    for (let i = 0; i < level; i++) {
-      if (i == 0) {
-        padding += ' '.repeat(4)
-      } else if (i == level - 1 && !isHasNextSibling) {
+    // 根据isLevelLastNodeClone的值生成当前节点的前缀空白或竖线，以形成树的结构
+    for (const isLevelLastNode of isLevelLastNodeClone) {
+      if (isLevelLastNode) {
         padding += ' '.repeat(4)
       } else {
         padding += '│' + ' '.repeat(3)
       }
     }
-
-    // 如果节点有评论，则在文件名后添加注释。
-    // 如果有注释内容，添加注释
+    // 如果节点有注释，则在节点名称后添加注释
     if (node.comment) {
-      treeString += `${padding}${connector} ${node.name} //${node.comment}\n`
+      treeString += `${padding}${connector}${node.base} //${node.comment}\n`
     } else {
-      treeString += `${padding}${connector} ${node.name}\n`
+      treeString += `${padding}${connector}${node.base}\n`
     }
-
-    // 如果节点有子节点，则递归生成子节点的树结构。
+    // 标记当前层级的最后一个节点
+    isLevelLastNodeClone[level] = index === array.length - 1
+    // 如果节点有子节点，则递归生成子节点的树结构
     if (node.children && node.children.length > 0) {
-      treeString += generateProjectTree(node.children, level + 1, !!nodes[index + 1])
+      treeString += generateProjectTree(node.children, level + 1, isLevelLastNodeClone)
     }
   })
-
   return treeString
 }
 

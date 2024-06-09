@@ -37,3 +37,4 @@ export function test() {
   const outputPath = path.join('src/query/json/files-group.json')
   writeFile(outputPath, result)
 }
+// test()

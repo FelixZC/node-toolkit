@@ -82,7 +82,7 @@ export class Exec implements ExecInterface {
       }
     })
     const trees = buildTree(treeData, 'filePath', 'dir')
-    const result = pickProperties(trees, ['name', 'ext', 'dir', 'children'])
+    const result = pickProperties(trees, ['base', 'dir', 'children'])
     const resultJson = JSON.stringify(result, null, 2)
     const resultMd = mdUtils.generateProjectTree(result)
     return { resultJson, resultMd }
