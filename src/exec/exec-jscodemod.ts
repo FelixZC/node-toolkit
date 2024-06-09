@@ -6,7 +6,7 @@ import type { Transform } from 'jscodeshift'
  * 执行 JSCodeMod 模板的公共方法。
  * @param jscodemodeList 需要执行的 JSCodeMod 模板路径列表。
  */
-export const executeJSCodemods = (dir: string, jscodemodeList: string[]): void => {
+export const executeJSCodemods = async (dir: string, jscodemodeList: string[]) => {
   const exec = new Exec(dir)
 
   try {
@@ -22,7 +22,7 @@ export const executeJSCodemods = (dir: string, jscodemodeList: string[]): void =
     })
 
     // 执行 JSCodeMod 模板
-    exec.execCodemod(codemodList)
+    await exec.execCodemod(codemodList)
   } catch (e) {
     console.warn('执行 JSCodeMod 模板时发生错误:', e)
   }
@@ -44,3 +44,4 @@ export function test() {
   // 调用公共方法执行 JSCodeMod 模板
   executeJSCodemods(path.join('src copy'), jscodemodeList)
 }
+// test()

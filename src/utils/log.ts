@@ -1,14 +1,8 @@
-import path from 'path'
+import { createLogger, format, transports, Logger as WinstonLogger } from 'winston'
+import DailyRotateFile from 'winston-daily-rotate-file'
 import * as os from 'os'
-import * as fs from 'fs'
-
-const eol = os.EOL // 换行符
-const userInfo = os.userInfo() // 用户信息
-const logPath = path.join(process.cwd(), 'operate.log')
-
-if (!fs.existsSync(logPath)) {
-  fs.writeFileSync(logPath, '') // 创建空文件
-}
+// import express, { Request, Response, NextFunction } from 'express';
+const userInfo = os.userInfo()
 
 interface LogRecord {
   methodName: string
@@ -29,43 +23,111 @@ interface ErrorRecord {
   user?: string
 }
 
-function saveOperateLog(record: LogRecord | ErrorRecord) {
-  const content = `${JSON.stringify(record)}${eol}${new Array(100).fill('-').join('-')}${eol}`
-  fs.appendFileSync(logPath, content)
-}
+// 创建 Winston 日志器实例
+export const logger: WinstonLogger = createLogger({
+  level: 'info',
+  format: format.combine(
+    format.timestamp(),
+    format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}`)
+  ),
+  transports: [
+    new transports.Console({
+      format: format.simple()
+    }),
+    new DailyRotateFile({
+      filename: 'operate-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      zippedArchive: true,
+      maxSize: '20m',
+      maxFiles: '14d',
+      level: 'info',
+      format: format.combine(format.timestamp(), format.json())
+    }),
+    new transports.File({
+      filename: 'error.log',
+      level: 'error',
+      format: format.combine(format.timestamp(), format.json())
+    })
+  ]
+})
 
-export function logDecorator() {
-  return function (target: any, name: string, descriptor: PropertyDescriptor) {
-    const originalMethod = descriptor.value // 保存原始方法引用
-    descriptor.value = function (...args: unknown[]) {
-      try {
-        const result = originalMethod.apply(this, args)
-        const logRecord: LogRecord = {
-          methodName: name,
-          arguments: args,
-          timestamp: new Date(),
-          result,
-          user: userInfo.username
-        }
-        saveOperateLog(logRecord)
-        return result
-      } catch (error) {
-        // 确保 error 是 Error 类型的实例
-        const typedError = error as Error
-        const errorRecord: ErrorRecord = {
-          methodName: name,
-          arguments: args,
-          error: {
-            message: typedError?.message,
-            stack: typedError?.stack
-          },
-          timestamp: new Date(),
-          user: userInfo.username
-        }
-        saveOperateLog(errorRecord)
-        throw typedError // 重新抛出错误
-      }
-    }
-    return descriptor
+function saveOperateLog(record: LogRecord | ErrorRecord) {
+  const { methodName, arguments: args, timestamp, ...rest } = record
+  const logMessage = `${methodName} called at ${timestamp.toISOString()} with arguments: ${JSON.stringify(
+    args
+  )}`
+  if ('result' in rest) {
+    logger.info(logMessage, { ...rest })
+  } else {
+    logger.error(logMessage, { ...rest })
   }
 }
+
+export function logDecorator(target: Object, name: string, descriptor: PropertyDescriptor) {
+  const originalMethod = descriptor.value
+  descriptor.value = function (...args: unknown[]) {
+    try {
+      const result = originalMethod.apply(this, args)
+      const logRecord: LogRecord = {
+        methodName: name,
+        arguments: args,
+        timestamp: new Date(),
+        result,
+        user: userInfo.username
+      }
+      saveOperateLog(logRecord)
+      return result
+    } catch (error) {
+      const typedError = error as Error
+      const errorRecord: ErrorRecord = {
+        methodName: name,
+        arguments: args,
+        error: {
+          message: typedError?.message,
+          stack: typedError?.stack
+        },
+        timestamp: new Date(),
+        user: userInfo.username
+      }
+      saveOperateLog(errorRecord)
+      throw error
+    }
+  }
+  return descriptor
+}
+
+// 异常处理
+process.on('uncaughtException', (error) => {
+  logger.error('Uncaught Exception:', error)
+  process.exit(1)
+})
+
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('Unhandled Rejection:', promise, 'reason:', reason)
+})
+/************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************ */
+// HTTP 请求日志中间件
+// const app = express();
+// const port = 3000; // 你可以根据需要更改端口
+// // 中间件，记录每个请求
+// app.use((req: Request, res: Response, next: NextFunction) => {
+//   logger.info(`接收到 ${req.method} 请求：${req.originalUrl}`);
+//   next();
+// });
+
+// // 路由，响应根路径
+// app.get('/', (req: Request, res: Response) => {
+//   res.send('Hello, World!');
+// });
+
+// // 错误处理中间件
+// app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+//   logger.error(`服务器错误：${err.message}`);
+//   res.status(500).send('服务器遇到错误，请稍后再试。');
+// });
+
+// // 监听端口
+// app.listen(port, () => {
+//   logger.info(`服务器正在监听 http://localhost:${port}`);
+// });
+/************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************ */

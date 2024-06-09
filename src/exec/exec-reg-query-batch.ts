@@ -8,22 +8,22 @@ import path from 'path'
  * @param {RegExp} reg - 要应用的正则表达式
  * @returns {string} - 查询结果
  */
-export function batchRegQueryAndReturnResult(
+export async function batchRegQueryAndReturnResult(
   dir: string,
   reg: RegExp,
   ignoreFilesPatterns?: Array<RegExp>,
   isAddSourcePath?: boolean
 ) {
   const exec = new Exec(dir)
-  const result = exec.batchRegQuery(reg, ignoreFilesPatterns, isAddSourcePath)
+  const result = await exec.batchRegQuery(reg, ignoreFilesPatterns, isAddSourcePath)
   return result
 }
 
 //test
-export function test() {
+export async function test() {
   const dirPath = path.join('src copy') // 指定要查询的目录
   // const regexPattern = /(\w+)?(Date|Term)\b/gi; // 指定要使用的正则表达式
-  const regexPattern = /执行.*/gi
+  const regexPattern = /ba.*/gi
   const ignoreFilesPatterns = [
     /node_modules/,
     /\.git/,
@@ -34,8 +34,13 @@ export function test() {
     /\.DS_Store/,
     /\.DS_Store/
   ].map((i) => new RegExp(i))
-  const result = batchRegQueryAndReturnResult(dirPath, regexPattern, ignoreFilesPatterns, true)
-
+  const result = await batchRegQueryAndReturnResult(
+    dirPath,
+    regexPattern,
+    ignoreFilesPatterns,
+    true
+  )
   const writeFilePath = path.join('src/query/md/query-batch-result.md')
   writeFile(writeFilePath, result)
 }
+// test()

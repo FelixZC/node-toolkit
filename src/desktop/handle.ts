@@ -12,40 +12,40 @@ export default function mainWindowHandleEvents() {
   ipcMain.handle('exec-babel', async (event, dir: string, babelPluginPathList) => {
     // 只在需要时导入 executeBabelPlugins
     const { executeBabelPlugins } = require('../exec/exec-babel-plugin')
-    executeBabelPlugins(dir, babelPluginPathList)
+    await executeBabelPlugins(dir, babelPluginPathList)
   })
 
   ipcMain.handle('exec-jscodemod', async (event, dir: string, jscodemodeList) => {
     // 只在需要时导入 executeJSCodemods
     const { executeJSCodemods } = require('../exec/exec-jscodemod')
-    executeJSCodemods(dir, jscodemodeList)
+    await executeJSCodemods(dir, jscodemodeList)
   })
 
   ipcMain.handle('exec-posthtml', async (event, dir: string, posthtmlPluginPathList) => {
     const { executePosthtmlPlugins } = require('../exec/exec-posthtml-plugin')
-    executePosthtmlPlugins(dir, posthtmlPluginPathList)
+    await executePosthtmlPlugins(dir, posthtmlPluginPathList)
   })
 
   ipcMain.handle('exec-postcss', async (event, dir: string, postcssPluginPathList) => {
     const { executePostcssPlugins } = require('../exec/exec-postcss-plugin')
-    executePostcssPlugins(dir, postcssPluginPathList)
+    await executePostcssPlugins(dir, postcssPluginPathList)
   })
 
   ipcMain.handle('exec-file-statistical', async (event, dir: string) => {
     const { getProjectTree } = require('../exec/exec-file-statistical')
-    return getProjectTree(dir)
+    return await getProjectTree(dir)
   })
 
   ipcMain.handle('exec-get-attrs-and-annotation', async (event, dir: string) => {
     const { getAttributesDescriptionTable } = require('../exec/exec-get-attrs-and-annotation')
-    return getAttributesDescriptionTable(dir)
+    return await getAttributesDescriptionTable(dir)
   })
 
   ipcMain.handle(
     'exec-modify-file-names-batch-priview',
     async (event, dir: string, modifyFilenameOptions) => {
       const { useModifyFilenameExecPreset } = require('../exec/exec-modify-file-names-batch')
-      return useModifyFilenameExecPreset(dir, 'preview', modifyFilenameOptions)
+      return await useModifyFilenameExecPreset(dir, 'preview', modifyFilenameOptions)
     }
   )
 
@@ -53,7 +53,7 @@ export default function mainWindowHandleEvents() {
     'exec-modify-file-names-batch',
     async (event, dir: string, modifyFilenameOptions) => {
       const { useModifyFilenameExecPreset } = require('../exec/exec-modify-file-names-batch')
-      return useModifyFilenameExecPreset(dir, 'exec', modifyFilenameOptions)
+      return await useModifyFilenameExecPreset(dir, 'exec', modifyFilenameOptions)
     }
   )
 
@@ -67,7 +67,7 @@ export default function mainWindowHandleEvents() {
       isAddSourcePath?: boolean
     ) => {
       const { batchRegQueryAndReturnResult } = require('../exec/exec-reg-query-batch')
-      return batchRegQueryAndReturnResult(dir, queryReg, ignoreReg, isAddSourcePath)
+      return await batchRegQueryAndReturnResult(dir, queryReg, ignoreReg, isAddSourcePath)
     }
   )
 }

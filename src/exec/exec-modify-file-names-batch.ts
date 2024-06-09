@@ -82,12 +82,11 @@ class ModifyFilenameExec {
   ) => {
     const targetList = this.exec.fsInstance.getFileInfoList().filter((item) => {
       const isFilenameMatch =
-        !modifyFilenameOptions?.filenameReg ||
-        modifyFilenameOptions?.filenameReg.test(item.filename)
+        !modifyFilenameOptions?.filenameReg || modifyFilenameOptions?.filenameReg.test(item.name)
       const isExtnameMatch =
-        !modifyFilenameOptions?.extnameReg || modifyFilenameOptions?.extnameReg.test(item.extname)
+        !modifyFilenameOptions?.extnameReg || modifyFilenameOptions?.extnameReg.test(item.ext)
       const isDirnameMatch =
-        !modifyFilenameOptions?.dirnameReg || modifyFilenameOptions?.dirnameReg.test(item.dirname)
+        !modifyFilenameOptions?.dirnameReg || modifyFilenameOptions?.dirnameReg.test(item.dir)
       const isIgnored =
         modifyFilenameOptions?.ignoreFilesPatterns?.some((pattern) =>
           pattern.test(item.filePath)
@@ -115,16 +114,16 @@ class ModifyFilenameExec {
     const replaceResult = targetList.map((item) => {
       const newFilename =
         modifyFilenameOptions.filenameReg && modifyFilenameOptions.filename
-          ? item.filename.replace(modifyFilenameOptions.filenameReg, modifyFilenameOptions.filename)
-          : item.filename
+          ? item.name.replace(modifyFilenameOptions.filenameReg, modifyFilenameOptions.filename)
+          : item.name
       let newExtname =
         modifyFilenameOptions.extnameReg && modifyFilenameOptions.extname
-          ? item.extname.replace(modifyFilenameOptions.extnameReg, modifyFilenameOptions.extname)
-          : item.extname
+          ? item.ext.replace(modifyFilenameOptions.extnameReg, modifyFilenameOptions.extname)
+          : item.ext
       const newDirname =
         modifyFilenameOptions.dirnameReg && modifyFilenameOptions.dirname
-          ? item.dirname.replace(modifyFilenameOptions.dirnameReg, modifyFilenameOptions.dirname)
-          : item.dirname
+          ? item.dir.replace(modifyFilenameOptions.dirnameReg, modifyFilenameOptions.dirname)
+          : item.dir
       newExtname = this.ensureExtname(newExtname)
       const newFilePath = path.format({
         dir: newDirname,
@@ -145,44 +144,40 @@ class ModifyFilenameExec {
    * @param modifyFilenameOptions 修改文件名的选项对象，包含文件名、扩展名和目录名的正则表达式和替换值。
    * @returns 返回一个对象，包含修改的文件数量和修改记录。
    */
-  execModifyFileNamesBatch = (
+  async execModifyFileNamesBatch(
     modifyFilenameOptions: ModifyFilenameOptions
-  ): ModifyResultReturnType => {
+  ): Promise<ModifyResultReturnType> {
     const changeRecords: ModifyResult[] = []
     let changeCount = 0
 
     const targetList = this.execModifyFileNamesBatchQuery(modifyFilenameOptions)
 
-    targetList.forEach((fileInfo) => {
+    // 使用 map 创建一个包含所有异步操作的 Promise 数组
+    const promises = targetList.map(async (fileInfo) => {
       const newFilename =
         modifyFilenameOptions.filenameReg && modifyFilenameOptions.filename
-          ? fileInfo.filename.replace(
-              modifyFilenameOptions.filenameReg,
-              modifyFilenameOptions.filename
-            )
-          : fileInfo.filename
+          ? fileInfo.name.replace(modifyFilenameOptions.filenameReg, modifyFilenameOptions.filename)
+          : fileInfo.name
+
       let newExtname =
         modifyFilenameOptions.extnameReg && modifyFilenameOptions.extname
-          ? fileInfo.extname.replace(
-              modifyFilenameOptions.extnameReg,
-              modifyFilenameOptions.extname
-            )
-          : fileInfo.extname
+          ? fileInfo.ext.replace(modifyFilenameOptions.extnameReg, modifyFilenameOptions.extname)
+          : fileInfo.ext
+
       const newDirname =
         modifyFilenameOptions.dirnameReg && modifyFilenameOptions.dirname
-          ? fileInfo.dirname.replace(
-              modifyFilenameOptions.dirnameReg,
-              modifyFilenameOptions.dirname
-            )
-          : fileInfo.dirname
+          ? fileInfo.dir.replace(modifyFilenameOptions.dirnameReg, modifyFilenameOptions.dirname)
+          : fileInfo.dir
+
       newExtname = this.ensureExtname(newExtname)
       const newFilePath = path.format({
         dir: newDirname,
         name: newFilename,
         ext: newExtname
       })
+
       try {
-        const { isChange, uniqueNewFilePath } = this.exec.fsInstance.renameFile(
+        const { isChange, uniqueNewFilePath } = await this.exec.fsInstance.renameFile(
           fileInfo.filePath,
           newFilePath
         )
@@ -197,7 +192,8 @@ class ModifyFilenameExec {
         console.error(`重命名文件失败：${fileInfo.filePath} -> ${newFilePath}`, error)
       }
     })
-    console.log(`批量修改完毕，共${changeCount}个文件产生变化`)
+    // 等待所有的 Promise 完成
+    await Promise.all(promises)
     return { changeCount, changeRecords }
   }
 
@@ -209,33 +205,37 @@ class ModifyFilenameExec {
    * @param modifyFilenameCustomOptions 修改文件名的自定义选项，包括自定义文件名、扩展名和目录名的函数。
    * @returns 返回一个对象，包含修改计数和变更记录列表。
    */
-  execModifyFileNamesBatchCustom = (
+  async execModifyFileNamesBatchCustom(
     modifyFilenameCustomOptions: ModifyFilenameCustomOptions
-  ): ModifyResultReturnType => {
+  ): Promise<ModifyResultReturnType> {
     const changeRecords: ModifyResult[] = []
     let changeCount = 0
 
     const targetList = this.execModifyFileNamesBatchQuery(modifyFilenameCustomOptions)
 
-    targetList.forEach((fileInfo) => {
+    // 使用 map 创建一个包含所有异步操作的 Promise 数组
+    const promises = targetList.map(async (fileInfo) => {
       const newFilename = modifyFilenameCustomOptions.customFilename
-        ? modifyFilenameCustomOptions.customFilename(fileInfo.filename)
-        : fileInfo.filename
-      let newExtname = modifyFilenameCustomOptions.customExtname
-        ? modifyFilenameCustomOptions.customExtname(fileInfo.extname)
-        : fileInfo.extname
-      const newDirname = modifyFilenameCustomOptions.customDirname
-        ? modifyFilenameCustomOptions.customDirname(fileInfo.dirname)
-        : fileInfo.dirname
+        ? modifyFilenameCustomOptions.customFilename(fileInfo.name)
+        : fileInfo.name
 
-      newExtname = this.ensureExtname(newExtname)
+      let newExtname = modifyFilenameCustomOptions.customExtname
+        ? modifyFilenameCustomOptions.customExtname(fileInfo.ext)
+        : fileInfo.ext
+
+      const newDirname = modifyFilenameCustomOptions.customDirname
+        ? modifyFilenameCustomOptions.customDirname(fileInfo.dir)
+        : fileInfo.dir
+
+      newExtname = this.ensureExtname(newExtname) // 假设这是同步函数
       const newFilePath = path.format({
         dir: newDirname,
         name: newFilename,
         ext: newExtname
       })
+
       try {
-        const { isChange, uniqueNewFilePath } = this.exec.fsInstance.renameFile(
+        const { isChange, uniqueNewFilePath } = await this.exec.fsInstance.renameFile(
           fileInfo.filePath,
           newFilePath
         )
@@ -251,7 +251,10 @@ class ModifyFilenameExec {
       }
     })
 
-    console.log(`批量修改完毕，共${changeCount}个文件产生变化`)
+    // 等待所有的异步操作完成
+    await Promise.all(promises)
+
+    // 所有操作完成后返回结果
     return { changeCount, changeRecords }
   }
 }
@@ -260,7 +263,7 @@ export const useModifyFilenameExec = (dir: string) => {
   return new ModifyFilenameExec(dir)
 }
 
-export const useModifyFilenameExecPreset = (
+export const useModifyFilenameExecPreset = async (
   dir: string,
   mode: 'preview' | 'exec',
   modifyFilenameOptions: ModifyFilenameOptions
@@ -269,7 +272,7 @@ export const useModifyFilenameExecPreset = (
   if (mode === 'preview') {
     return exec.execModifyFileNamesBatchPreview(modifyFilenameOptions)
   } else if (mode === 'exec') {
-    return exec.execModifyFileNamesBatch(modifyFilenameOptions)
+    return await exec.execModifyFileNamesBatch(modifyFilenameOptions)
   }
 }
 

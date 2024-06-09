@@ -11,7 +11,7 @@ import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
  * @param {string[]} dir - 工作目录，用于执行插件。
  * @param {string[]} pluginsPathList - PostCSS插件的路径列表。
  */
-export function executePostcssPlugins(dir: string, pluginsPathList: string[]) {
+export async function executePostcssPlugins(dir: string, pluginsPathList: string[]) {
   const exec = new Exec(dir)
 
   try {
@@ -25,7 +25,7 @@ export function executePostcssPlugins(dir: string, pluginsPathList: string[]) {
       return result
     })
 
-    exec.execPostcssPlugin(plugins)
+    await exec.execPostcssPlugin(plugins)
   } catch (e) {
     console.warn(e)
   }

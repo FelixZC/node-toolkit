@@ -1,246 +1,252 @@
-import * as fs from 'fs'
+import * as fs from 'fs-extra'
+import { ParsedPath } from 'path'
 import * as os from 'os'
 import * as path from 'path'
+import { LRUCache } from 'lru-cache'
 import { logDecorator } from '../utils/log'
-/**
- * 检查路径有效性
- * @param filePath - 要检查的文件路径
- */
-export const checkPathValid = (filePath: string) => {
-  try {
-    // 尝试访问文件，如果存在则无异常抛出
-    fs.accessSync(filePath, fs.constants.F_OK)
-  } catch {
-    // 若访问失败，获取父级目录路径，并递归创建缺失的目录结构
-    const dirPath = path.dirname(filePath)
-    fs.mkdirSync(dirPath, { recursive: true })
-  }
-}
 
-/**
- * 写入文件内容
- * @param filePath - 目标文件路径
- * @param content - 要写入文件的文本内容
- */
-export const writeFile = (filePath: string, content: string) => {
-  // 先检查路径有效性，确保文件能被正确写入
-  checkPathValid(filePath)
-  // 使用同步方式写入文件，编码为 UTF-8
-  fs.writeFileSync(filePath, content, 'utf-8')
-}
-
-// 定义文件信息接口
-export interface FileInfo {
+//TODO 添加清楚缓存功能
+export interface FileInfo extends ParsedPath {
   filePath: string
-  dirname: string
-  basename: string
-  extname: string
-  filename: string
   stats?: fs.Stats
 }
 
-// 定义FsInstance接口// 定义 FsInstance 接口
-interface FsInstance {
-  rootPath: string
-  folderPath: string
-  filePathList: string[] // 使用项目根目录
-  dirPathList: string[]
-  eol: string
+// 创建LRU缓存实例，最大容量为1000个缓存项，缓存项在10分钟后过期
+const fileContentCache = new LRUCache<string, string>({
+  max: 1000,
+  ttl: 10 * 60 * 1000 // 10 minutes
+})
 
-  // 获取指定路径文件列表方法
-  getFilePathList(folderPath: string): void
+const fileStatsCache = new LRUCache<string, fs.Stats>({
+  max: 1000,
+  ttl: 10 * 60 * 1000 // 10 minutes
+})
 
-  //获取文件信息
-  getFileInfo(filePath: string): FileInfo
-
-  // 获取文件详细信息列表方法
-  getFileInfoList(): FileInfo[]
-
-  // 重命名文件方法
-  renameFile(
-    oldFilePath: string,
-    newFilePath: string
-  ): { isChange: boolean; uniqueNewFilePath: string }
-
-  // 复制文件方法
-  copyFile(filePath: string): string
-
-  // 删除文件方法
-  deleteFile(filePath: string): void
+// writeFile 函数添加缓存逻辑
+export const writeFile = async (filePath: string, content: string) => {
+  // 先更新缓存
+  fileContentCache.set(filePath, content)
+  // 然后写入文件系统
+  await fs.outputFile(filePath, content, 'utf-8')
 }
 
-/**
- * 基于Node.js的文件操作类
- * @author pzc
- * @date 2021/07/12
- */
-class fsUtils implements FsInstance {
+export const readFile = (filePath: string): Promise<string> => {
+  // 检查缓存中是否存在内容
+  const cachedContent = fileContentCache.get(filePath)
+  if (cachedContent) {
+    return Promise.resolve(cachedContent)
+  }
+  // 如果缓存中没有，读取文件并更新缓存
+  return new Promise((resolve, reject) => {
+    fs.readFile(filePath, 'utf-8', (err, data) => {
+      if (err) {
+        reject(err)
+      } else {
+        fileContentCache.set(filePath, data)
+        resolve(data)
+      }
+    })
+  })
+}
+
+export const readFileStats = async (filePath: string): Promise<fs.Stats> => {
+  const cachedStats = fileStatsCache.get(filePath)
+  if (cachedStats !== undefined) {
+    return cachedStats
+  } else {
+    const stats = await fs.stat(filePath)
+    fileStatsCache.set(filePath, stats)
+    return stats
+  }
+}
+
+export function getFileInfo(filePath: string): FileInfo {
+  return {
+    filePath: filePath,
+    ...path.parse(filePath)
+  }
+}
+
+export async function getFileInfoWithStats(filePath: string): Promise<FileInfo> {
+  return {
+    filePath,
+    ...path.parse(filePath),
+    stats: await readFileStats(filePath)
+  }
+}
+
+function generateUniquePath(filePath: string): string {
+  let uniquePath = filePath
+  while (fs.existsSync(uniquePath)) {
+    const { dir, name, ext } = path.parse(uniquePath)
+    const base = name.split('(')[0] // Handle file names with counters like 'example(1)'
+    const counter = parseInt(base.match(/\((\d+)\)/)?.[1] || '0')
+    uniquePath = path.format({ dir, name: `${base}(${counter + 1})`, ext })
+  }
+  return uniquePath
+}
+
+function generateUniquePathForCopy(filePath: string): string {
+  const { dir, name, ext } = path.parse(filePath)
+  let newBaseName = `${name} copy${ext}`
+  let newFilePath = path.resolve(dir, newBaseName)
+  let renameCount = 1
+
+  while (fs.existsSync(newFilePath)) {
+    newBaseName = `${name} copy ${renameCount}${ext}`
+    newFilePath = path.resolve(dir, newBaseName)
+    renameCount++
+  }
+
+  return newFilePath
+}
+
+export async function copyFile(filePath: string): Promise<string> {
+  const newFilePath = generateUniquePathForCopy(filePath)
+  try {
+    await fs.copy(filePath, newFilePath)
+    fileContentCache.set(newFilePath, await readFile(filePath))
+    return newFilePath
+  } catch (err) {
+    console.error(`Error copying file ${filePath}:`, err)
+    throw err
+  }
+}
+
+export async function deleteFile(filePath: string): Promise<void> {
+  try {
+    await fs.remove(filePath)
+    fileContentCache.delete(filePath)
+    fileStatsCache.delete(filePath)
+  } catch (err) {
+    console.error(`Error deleting file ${filePath}:`, err)
+    throw err
+  }
+}
+
+export async function renameFile(
+  oldFilePath: string,
+  newFilePath: string
+): Promise<{ isChange: boolean; uniqueNewFilePath: string }> {
+  if (oldFilePath === newFilePath) {
+    return { isChange: false, uniqueNewFilePath: oldFilePath }
+  }
+
+  let uniqueNewFilePath = newFilePath
+  while (await fs.pathExists(uniqueNewFilePath)) {
+    uniqueNewFilePath = generateUniquePath(uniqueNewFilePath)
+  }
+
+  try {
+    await fs.rename(oldFilePath, uniqueNewFilePath)
+    fileContentCache.set(uniqueNewFilePath, fileContentCache.get(oldFilePath))
+    return { isChange: true, uniqueNewFilePath }
+  } catch (err) {
+    console.error(`Error renaming file from ${oldFilePath} to ${uniqueNewFilePath}:`, err)
+    throw err
+  }
+}
+
+// FsInstance接口
+export interface FsInstance {
+  rootPath: string
   folderPath: string
   filePathList: string[]
   dirPathList: string[]
   eol: string
+  getFileInfoList(): FileInfo[]
+  getFileInfoListWithStats(): Promise<FileInfo[]>
+  addFile(filePath: string, content: string): Promise<void>
+  deleteFile(filePath: string): Promise<void>
+  renameFile(
+    oldFilePath: string,
+    newFilePath: string
+  ): Promise<{ isChange: boolean; uniqueNewFilePath: string }>
+}
+
+// 文件夹操作类
+class fsUtils implements FsInstance {
+  folderPath: string
+  filePathList: string[] = []
+  dirPathList: string[] = []
+  eol: string
   constructor(public rootPath: string) {
+    this.rootPath = rootPath
     this.eol = os.EOL
-    this.folderPath = path.join(rootPath)
+    this.folderPath = path.resolve(rootPath)
+    this.refreshFileLists()
+  }
+
+  // 刷新文件列表和目录列表
+  private refreshFileLists() {
     this.filePathList = []
-    this.dirPathList = []
-    this.dirPathList.push(path.resolve(this.folderPath))
-    this.getFilePathList(this.folderPath)
-  }
-
-  /**
-   * 获取指定路径所有文件列表
-   * @param {string} folderPath - 指定路径
-   * @returns {Object} 返回文件路径/文件夹路径/文件错误路径列表
-   */
-  getFilePathList(folderPath: string) {
-    try {
-      fs.accessSync(folderPath, fs.constants.F_OK)
-      fs.readdirSync(folderPath).forEach((basename) => {
-        const filePath = path.resolve(folderPath, basename)
-        try {
-          if (fs.lstatSync(filePath).isFile()) {
-            this.filePathList.push(filePath)
-          } else {
-            if (!this.dirPathList.includes(filePath)) {
-              // 避免重复添加目录
-              this.dirPathList.push(filePath)
-              this.getFilePathList(filePath) // 递归调用
-            }
-          }
-        } catch (error) {
-          console.error(`Error accessing file or directory: ${filePath}`, error)
+    this.dirPathList = [this.folderPath]
+    const walk = async (dir: string): Promise<void> => {
+      const dirents = fs.readdirSync(dir, { withFileTypes: true })
+      for (const dirent of dirents) {
+        const newDir = path.resolve(dir, dirent.name)
+        if (dirent.isDirectory()) {
+          this.dirPathList.push(newDir)
+          walk(newDir)
+        } else {
+          this.filePathList.push(newDir)
         }
-      })
-    } catch (error) {
-      console.error(`Error accessing folder: ${folderPath}`, error)
-    }
-  }
-
-  /**
-   * 获取详细信息
-   * @param filePath
-   * @returns
-   */
-  getFileInfo(filePath: string): FileInfo {
-    const { dir, ext, name, base } = path.parse(filePath)
-    try {
-      // 尝试获取文件状态信息
-      const stats = fs.statSync(filePath)
-      return {
-        filePath,
-        basename: base,
-        dirname: dir,
-        extname: ext,
-        filename: name,
-        stats
-      }
-    } catch (error) {
-      // 处理文件不存在或访问权限不足的情况
-      console.error(`无法获取文件stats信息: ${error}`)
-      return {
-        filePath,
-        basename: base,
-        dirname: dir,
-        extname: ext,
-        filename: name
       }
     }
+
+    walk(this.folderPath)
   }
 
-  /**
-   * 获取文件详细信息列表
-   */
-  getFileInfoList() {
-    const fileInfoList = this.filePathList.map(this.getFileInfo)
-    return fileInfoList
+  getFileInfoList(): FileInfo[] {
+    return this.filePathList.map((filePath) => getFileInfo(filePath))
+  }
+  async getFileInfoListWithStats(): Promise<FileInfo[]> {
+    return Promise.all(this.filePathList.map((filePath) => getFileInfoWithStats(filePath)))
   }
 
-  /**
-   * 重命名文件名，存在资源抢占问题，需要二次执行rename，或者记录oldFilePath执行fs.rm
-   * @param {string} oldFilePath
-   * @param {string} newFilePath
-   */
-  @logDecorator()
-  renameFile(oldFilePath: string, newFilePath: string) {
-    if (oldFilePath === newFilePath) {
-      return { isChange: false, uniqueNewFilePath: oldFilePath }
+  // 更新文件列表和目录列表
+  private updateFileListsAfterChange(oldPath?: string, newPath?: string): void {
+    // 移除旧路径
+    if (oldPath) {
+      this.filePathList.splice(this.filePathList.indexOf(oldPath), 1)
     }
-
-    // 检查新文件路径是否有效
-    checkPathValid(newFilePath)
-
-    // 检查新文件名是否已存在
-    let uniqueNewFilePath = newFilePath
-    let counter = 1
-    while (fs.existsSync(uniqueNewFilePath)) {
-      // 拆分文件名和扩展名
-      const { dir, name, ext } = path.parse(uniqueNewFilePath)
-      // 生成新的文件名
-      uniqueNewFilePath = path.format({ dir, name: `${name}(${counter})`, ext })
-      counter++
+    // 添加新路径
+    if (newPath) {
+      this.filePathList.push(newPath)
     }
-    // 重命名文件
-    fs.renameSync(oldFilePath, uniqueNewFilePath)
-    this.filePathList.splice(this.filePathList.indexOf(oldFilePath), 1, uniqueNewFilePath)
-
-    // 处理空文件夹
-    const oldDirPath = path.dirname(oldFilePath)
-    const newDirPath = path.dirname(uniqueNewFilePath)
-    const result = fs.readdirSync(oldDirPath)
-    if (!result.length) {
-      fs.rmdirSync(oldDirPath)
-    }
-    this.dirPathList.splice(this.dirPathList.indexOf(oldDirPath), 1, newDirPath)
-    return { isChange: true, uniqueNewFilePath: uniqueNewFilePath }
   }
 
-  /**
-   * 复制指定路径原文件
-   * @param {string} filePath
-   */
-  @logDecorator()
-  copyFile(filePath: string) {
-    const dirname = path.dirname(filePath)
-    const extensionName = path.extname(filePath) // 文件扩展名
-
-    // 从原始文件名中提取基本名称，并去掉可能存在的"copy"后缀
-    const filename = path.basename(filePath, extensionName).split('copy')[0].trim()
-    let newBaseName = `${filename} copy${extensionName}`
-    let newFilePath = path.resolve(dirname, newBaseName)
-    let renameCount = 1 // 文件已存在时的计数器
-
-    // 检查新文件路径是否已存在，并生成一个唯一的新文件名
-    while (fs.existsSync(newFilePath)) {
-      renameCount++
-      newBaseName = `${filename} copy ${renameCount}${extensionName}`
-      newFilePath = path.resolve(dirname, newBaseName)
-    }
-
-    // 复制文件
-    fs.copyFileSync(filePath, newFilePath)
-
-    this.filePathList.push(newFilePath)
-
-    return newFilePath // 返回新文件的路径
+  // 新增文件操作
+  @logDecorator
+  async addFile(filePath: string, content: string): Promise<void> {
+    const newFilePath = path.resolve(this.folderPath, filePath)
+    await writeFile(newFilePath, content)
+    this.updateFileListsAfterChange(undefined, newFilePath)
   }
 
-  /**
-   * 删除指定路径文件
-   * @param {string} filePath
-   * @returns
-   */
-  @logDecorator()
-  deleteFile(filePath: string) {
-    // 检查文件路径是否存在
-    if (fs.existsSync(filePath)) {
-      // 同步删除文件
-      fs.unlinkSync(filePath)
-      this.filePathList.splice(this.filePathList.indexOf(filePath), 1)
-      console.log(`文件已被删除: ${filePath}`)
-    } else {
-      console.error(`文件不存在: ${filePath}`)
+  // 删除文件操作
+  @logDecorator
+  async deleteFile(filePath: string): Promise<void> {
+    const oldFilePath = path.resolve(this.folderPath, filePath)
+    await deleteFile(oldFilePath)
+    this.updateFileListsAfterChange(oldFilePath)
+  }
+
+  // 重命名文件操作
+  @logDecorator
+  async renameFile(oldFilePath: string, newFilePath: string) {
+    const { isChange, uniqueNewFilePath } = await renameFile(oldFilePath, newFilePath)
+    if (isChange) {
+      this.updateFileListsAfterChange(oldFilePath, uniqueNewFilePath)
     }
+    return { isChange, uniqueNewFilePath }
+  }
+
+  @logDecorator
+  async copyFile(oldFilePath: string) {
+    const newFilePath = await copyFile(oldFilePath)
+    this.updateFileListsAfterChange(undefined, newFilePath)
+    return newFilePath
   }
 }
 

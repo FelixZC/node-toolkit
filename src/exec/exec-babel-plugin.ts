@@ -6,7 +6,7 @@ import type { BabelPlugin } from '../plugins/use-babel-plugin'
  * 执行 Babel 插件的公共方法。
  * @param babelPluginPathList 需要执行的 Babel 插件路径列表。
  */
-export const executeBabelPlugins = (dir: string, babelPluginPathList: string[]): void => {
+export const executeBabelPlugins = async (dir: string, babelPluginPathList: string[]) => {
   const exec = new Exec(dir)
 
   try {
@@ -22,7 +22,7 @@ export const executeBabelPlugins = (dir: string, babelPluginPathList: string[]):
     })
 
     // 执行 Babel 插件
-    exec.execBabelPlugin(plugins)
+    await exec.execBabelPlugin(plugins)
   } catch (e) {
     console.warn('执行 Babel 插件时发生错误:', e)
   }
@@ -41,3 +41,4 @@ export function test() {
   ]
   executeBabelPlugins(path.join('src copy'), babelPluginPathList)
 }
+// test()

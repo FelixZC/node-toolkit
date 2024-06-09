@@ -166,18 +166,23 @@ function createdStoreTable(
 }
 
 interface NodeWithId {
-  filename: string
+  name: string
   comment?: string
   children?: NodeWithId[]
 }
 
 /**
+ * TODO 重新计算族系关系
  * 生成项目文件结构树的字符串表示。
  * @param nodes 文件节点数组，每个节点包含文件名和可选的评论。
  * @param level 当前节点的层级，用于计算缩进和连接符，默认为0。
  * @returns 项目文件结构树的字符串表示。
  */
-function generateProjectTree(nodes: NodeWithId[], level: number = 0): string {
+function generateProjectTree(
+  nodes: NodeWithId[],
+  level: number = 0,
+  isHasNextSibling = false
+): string {
   let treeString = ''
   nodes.forEach((node, index, array) => {
     // 根据节点位置确定连接符，末尾节点使用'╰─ '，其他节点使用'├─ '
@@ -185,21 +190,26 @@ function generateProjectTree(nodes: NodeWithId[], level: number = 0): string {
     let padding = ''
     // 根据层级计算缩进，每层缩进由'│'和三个空格组成。
     for (let i = 0; i < level; i++) {
-      padding += '│' + ' '.repeat(3)
+      if (i == 0) {
+        padding += ' '.repeat(4)
+      } else if (i == level - 1 && !isHasNextSibling) {
+        padding += ' '.repeat(4)
+      } else {
+        padding += '│' + ' '.repeat(3)
+      }
     }
 
     // 如果节点有评论，则在文件名后添加注释。
     // 如果有注释内容，添加注释
     if (node.comment) {
-      treeString += `${padding}${connector} ${node.filename} //${node.comment}\n`
+      treeString += `${padding}${connector} ${node.name} //${node.comment}\n`
     } else {
-      treeString += `${padding}${connector} ${node.filename}\n`
+      treeString += `${padding}${connector} ${node.name}\n`
     }
 
     // 如果节点有子节点，则递归生成子节点的树结构。
-    // 如果存在子节点，递归调用以生成子树
     if (node.children && node.children.length > 0) {
-      treeString += generateProjectTree(node.children, level + 1)
+      treeString += generateProjectTree(node.children, level + 1, !!nodes[index + 1])
     }
   })
 
