@@ -116,7 +116,7 @@ npm i
     |   ├─ exec-postcss-plugin.ts // PostCSS插件执行逻辑
     |   ├─ exec-posthtml-plugin.ts // PostHTML插件执行逻辑
     |   ├─ exec-reg-query-batch.ts // 正则批量查询逻辑
-    |   ├─ exec-transfer-file-name-To-kebab-case.ts // 文件名转换逻辑
+    |   ├─ exec-transfer-file-name-to-kebab-case.ts // 文件名转换逻辑
     |   ╰─ index.ts // 执行逻辑索引
     ├─ layout
     |   ╰─ index.vue // 布局组件
