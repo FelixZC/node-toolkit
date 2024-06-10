@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from 'react'
 import Loading from '@src/components/loading'
 import { Layout } from 'antd'
+import { Navigate } from 'react-router-dom'
 
 export interface RouteObject {
   path: string
@@ -36,6 +37,13 @@ const Exception403 = lazy(() => import('@src/components/exception/exception403')
 const NoMatch = lazy(() => import('@src/components/no-match'))
 // 路由配置
 const rootRouter: RouteObject[] = [
+  {
+    path: '/',
+    index: false,
+    name: '',
+    key: '/redirect',
+    element: <Navigate replace to="/home" />
+  },
   {
     index: true,
     path: '/home',

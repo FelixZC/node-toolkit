@@ -27,7 +27,8 @@ export default function mainWindowListenEvents(mainWindow: BrowserWindow): void 
 
   ipcMain.on('mainWindow-close', () => {
     if (mainWindowIsExist()) {
-      mainWindow!.hide()
+      // mainWindow!.hide()
+      mainWindow!.close()
     }
   })
 

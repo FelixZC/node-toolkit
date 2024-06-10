@@ -30,6 +30,7 @@ app.on('before-quit', () => {
 
 app.on('window-all-closed', () => {
   console.log('window-all-closed')
+  app.exit()
 })
 
 app.on('activate', () => {
@@ -41,6 +42,7 @@ app.on('quit', () => {
   if (getTray()) {
     getTray()!.destroy()
   }
+  app.exit()
 })
 
 app.on('will-quit', () => {

@@ -15,7 +15,7 @@
     "baseUrl": ".",
     "types": ["jest", "jscodeshift", "node"],
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"],
-    "outDir": "./dist",
+    "outDir": "./dist/main",
     "declaration": true,
     "noUnusedLocals": true,
     "strictNullChecks": true,

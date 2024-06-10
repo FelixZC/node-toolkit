@@ -2,7 +2,7 @@ import '../../style/less/desktop-header.less'
 import React, { memo, useState, useEffect } from 'react'
 import SvgIcon from '@src/components/svg-icon'
 import { ipcRendererSend, ipcRendererOn, ipcRendererRemoveListener } from '@src/utils/desktop-utils'
-import logoImage from '@assets/images/logo.png'
+import logoImage from '@assets/images/electron-img.png'
 /**
  * DesktopHeader组件用于渲染桌面头部栏。
  * 该组件通过ipcRenderer与主进程进行通信，获取和设置窗口最大化状态，并提供窗口最小化、最大化和关闭功能。

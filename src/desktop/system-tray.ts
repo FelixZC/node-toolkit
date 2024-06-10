@@ -15,7 +15,7 @@ let tray: Tray | null = null
 /*
  * 定义Tray图标的路径
  */
-const iconPath: string = path.resolve(__dirname, '../assets/images/logo.png')
+const iconPath: string = path.resolve(__dirname, '../assets/images/electron-logo1.png')
 
 /*
  * 初始化Tray菜单

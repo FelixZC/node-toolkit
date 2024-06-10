@@ -28,15 +28,16 @@ function createMainWindow(): void {
     title: 'node tookit',
     webPreferences: {
       nodeIntegration: true,
+      // contextIsolation: false,
       preload: path.resolve(__dirname, '../utils/context-bridge.js')
     },
-    icon: path.resolve(__dirname, '../assets/images/logo.png')
+    icon: path.resolve(__dirname, '../assets/images/electron-logo1.png')
   })
 
   if (isDevelopment === 'development') {
     mainWindow.loadURL('http://localhost:8848/home')
   } else {
-    const entryPath = path.resolve(__dirname, '../build/index.html')
+    const entryPath = path.join(__dirname, '../../../build/index.html')
     mainWindow.loadFile(entryPath)
   }
 
