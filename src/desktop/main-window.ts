@@ -25,7 +25,7 @@ function createMainWindow(): void {
     minWidth: 960,
     show: false,
     frame: false,
-    title: 'pzc tookit',
+    title: 'node tookit',
     webPreferences: {
       nodeIntegration: true,
       preload: path.resolve(__dirname, '../utils/context-bridge.js')
