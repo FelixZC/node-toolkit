@@ -1,5 +1,8 @@
 import path from 'path'
 import { Exec } from './index'
+import { generateUniquePathWithoutFs } from '../utils/fs'
+import { getFormattedTimestamp } from '../utils/time'
+import { generateSimpleRandomString } from '../utils/random'
 interface ModifyResult {
   oldFilePath: string
   newFilePath: string
@@ -35,6 +38,8 @@ type ModifyFilenameOptions = {
   extnameReg?: RegExp
   dirnameReg?: RegExp
   ignoreFilesPatterns?: Array<RegExp>
+  addTimeStamp: boolean
+  addDateTime: boolean
 }
 
 type ModifyFilenameCustomOptions = {
@@ -110,9 +115,9 @@ class ModifyFilenameExec {
     modifyFilenameOptions: ModifyFilenameOptions
   ): PriviewResultReturnType => {
     const targetList = this.execModifyFileNamesBatchQuery(modifyFilenameOptions)
-
+    const filePathListSet = new Set(this.exec.fsInstance.filePathList)
     const replaceResult = targetList.map((item) => {
-      const newFilename =
+      let newFilename =
         modifyFilenameOptions.filenameReg && modifyFilenameOptions.filename
           ? item.name.replace(modifyFilenameOptions.filenameReg, modifyFilenameOptions.filename)
           : item.name
@@ -125,11 +130,23 @@ class ModifyFilenameExec {
           ? item.dir.replace(modifyFilenameOptions.dirnameReg, modifyFilenameOptions.dirname)
           : item.dir
       newExtname = this.ensureExtname(newExtname)
-      const newFilePath = path.format({
+      if (modifyFilenameOptions.addTimeStamp) {
+        const timeStamp = Date.now()
+        const randomString = generateSimpleRandomString()
+        newFilename += `_${timeStamp}_${randomString}`
+      }
+      if (modifyFilenameOptions.addDateTime) {
+        const dateTime = getFormattedTimestamp()
+        const randomString = generateSimpleRandomString()
+        newFilename += `_${dateTime}_${randomString}`
+      }
+      let newFilePath = path.format({
         dir: newDirname,
         name: newFilename,
         ext: newExtname
       })
+      newFilePath = generateUniquePathWithoutFs(newFilePath, filePathListSet)
+      filePathListSet.add(newFilePath)
       return {
         oldFilePath: item.filePath,
         newFilePath,
@@ -151,10 +168,10 @@ class ModifyFilenameExec {
     let changeCount = 0
 
     const targetList = this.execModifyFileNamesBatchQuery(modifyFilenameOptions)
-
+    const filePathListSet = new Set(this.exec.fsInstance.filePathList)
     // 使用 map 创建一个包含所有异步操作的 Promise 数组
     const promises = targetList.map(async (fileInfo) => {
-      const newFilename =
+      let newFilename =
         modifyFilenameOptions.filenameReg && modifyFilenameOptions.filename
           ? fileInfo.name.replace(modifyFilenameOptions.filenameReg, modifyFilenameOptions.filename)
           : fileInfo.name
@@ -170,12 +187,25 @@ class ModifyFilenameExec {
           : fileInfo.dir
 
       newExtname = this.ensureExtname(newExtname)
-      const newFilePath = path.format({
+
+      if (modifyFilenameOptions.addTimeStamp) {
+        const timeStamp = Date.now()
+        const randomString = generateSimpleRandomString()
+        newFilename += `_${timeStamp}_${randomString}`
+      }
+      if (modifyFilenameOptions.addDateTime) {
+        const dateTime = getFormattedTimestamp()
+        const randomString = generateSimpleRandomString()
+        newFilename += `_${dateTime}_${randomString}`
+      }
+      let newFilePath = path.format({
         dir: newDirname,
         name: newFilename,
         ext: newExtname
       })
-
+      //避免使用generateUniquePath,提高响应性
+      newFilePath = generateUniquePathWithoutFs(newFilePath, filePathListSet)
+      filePathListSet.add(newFilePath)
       try {
         const { isChange, uniqueNewFilePath } = await this.exec.fsInstance.renameFile(
           fileInfo.filePath,
@@ -228,6 +258,7 @@ class ModifyFilenameExec {
         : fileInfo.dir
 
       newExtname = this.ensureExtname(newExtname) // 假设这是同步函数
+
       const newFilePath = path.format({
         dir: newDirname,
         name: newFilename,
@@ -277,14 +308,15 @@ export const useModifyFilenameExecPreset = async (
 }
 
 // test
-export function test() {
-  const modifyFilenameOptions: ModifyFilenameOptions = {
-    filename: '',
-    extname: '.test',
-    extnameReg: /\.pzc/i,
-    ignoreFilesPatterns: []
-  }
-
-  const modify = new ModifyFilenameExec(path.join('src copy'))
-  modify.execModifyFileNamesBatchQuery(modifyFilenameOptions)
-}
+// export function test() {
+//   const modifyFilenameOptions: ModifyFilenameOptions = {
+//     filename: 'test',
+//     filenameReg: /Screenshot.*/i,
+//     ignoreFilesPatterns: [],
+//     addTimeStamp: false,
+//     addDateTime: false
+//   }
+//   const modify = new ModifyFilenameExec(path.join('C:/Users/ZC/Pictures/Screenshots'))
+//   modify.execModifyFileNamesBatchPreview(modifyFilenameOptions)
+// }
+// test()

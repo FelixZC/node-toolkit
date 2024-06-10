@@ -5,7 +5,10 @@ import * as path from 'path'
 import { LRUCache } from 'lru-cache'
 import { logDecorator } from '../utils/log'
 
-//TODO 添加清楚缓存功能
+/**
+ * fs.ts使用读异步，写同步
+ * TODO 添加缓存功能操作
+ */
 export interface FileInfo extends ParsedPath {
   filePath: string
   stats?: fs.Stats
@@ -79,10 +82,23 @@ function generateUniquePath(filePath: string): string {
   let uniquePath = filePath
   while (fs.existsSync(uniquePath)) {
     const { dir, name, ext } = path.parse(uniquePath)
-    const base = name.split('(')[0] // Handle file names with counters like 'example(1)'
-    const counter = parseInt(base.match(/\((\d+)\)/)?.[1] || '0')
-    uniquePath = path.format({ dir, name: `${base}(${counter + 1})`, ext })
+    const pre = name.split('(')[0] // Handle file names with counters like 'example(1)'
+    const counter = parseInt(name.match(/\((\d+)\)/)?.[1] || '0')
+    uniquePath = path.format({ dir, name: `${pre}(${counter + 1})`, ext })
   }
+  return uniquePath
+}
+
+export function generateUniquePathWithoutFs(filePath: string, oldFilePathSet: Set<string>): string {
+  let uniquePath = filePath
+  while (oldFilePathSet.has(uniquePath)) {
+    const { dir, name, ext } = path.parse(uniquePath)
+    const pre = name.split('(')[0]
+    const matchResult = name.match(/\((\d+)\)/)
+    const counter = parseInt(matchResult ? matchResult[1] : '0', 10)
+    uniquePath = path.format({ dir, name: `${pre}(${counter + 1})`, ext })
+  }
+
   return uniquePath
 }
 
@@ -104,7 +120,7 @@ function generateUniquePathForCopy(filePath: string): string {
 export async function copyFile(filePath: string): Promise<string> {
   const newFilePath = generateUniquePathForCopy(filePath)
   try {
-    await fs.copy(filePath, newFilePath)
+    fs.copySync(filePath, newFilePath)
     fileContentCache.set(newFilePath, await readFile(filePath))
     return newFilePath
   } catch (err) {
@@ -124,21 +140,16 @@ export async function deleteFile(filePath: string): Promise<void> {
   }
 }
 
-export async function renameFile(
+export function renameFile(
   oldFilePath: string,
   newFilePath: string
-): Promise<{ isChange: boolean; uniqueNewFilePath: string }> {
+): { isChange: boolean; uniqueNewFilePath: string } {
   if (oldFilePath === newFilePath) {
     return { isChange: false, uniqueNewFilePath: oldFilePath }
   }
-
-  let uniqueNewFilePath = newFilePath
-  while (await fs.pathExists(uniqueNewFilePath)) {
-    uniqueNewFilePath = generateUniquePath(uniqueNewFilePath)
-  }
-
+  const uniqueNewFilePath = generateUniquePath(newFilePath)
   try {
-    await fs.rename(oldFilePath, uniqueNewFilePath)
+    fs.renameSync(oldFilePath, uniqueNewFilePath)
     fileContentCache.set(uniqueNewFilePath, fileContentCache.get(oldFilePath))
     return { isChange: true, uniqueNewFilePath }
   } catch (err) {
@@ -161,7 +172,7 @@ export interface FsInstance {
   renameFile(
     oldFilePath: string,
     newFilePath: string
-  ): Promise<{ isChange: boolean; uniqueNewFilePath: string }>
+  ): { isChange: boolean; uniqueNewFilePath: string }
 }
 
 // 文件夹操作类
@@ -234,8 +245,8 @@ class fsUtils implements FsInstance {
 
   // 重命名文件操作
   @logDecorator
-  async renameFile(oldFilePath: string, newFilePath: string) {
-    const { isChange, uniqueNewFilePath } = await renameFile(oldFilePath, newFilePath)
+  renameFile(oldFilePath: string, newFilePath: string) {
+    const { isChange, uniqueNewFilePath } = renameFile(oldFilePath, newFilePath)
     if (isChange) {
       this.updateFileListsAfterChange(oldFilePath, uniqueNewFilePath)
     }

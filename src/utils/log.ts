@@ -63,7 +63,7 @@ function saveOperateLog(record: LogRecord | ErrorRecord) {
   }
 }
 
-export function logDecorator(target: Object, name: string, descriptor: PropertyDescriptor) {
+export function logDecorator(target: any, name: string, descriptor: PropertyDescriptor) {
   const originalMethod = descriptor.value
   descriptor.value = function (...args: unknown[]) {
     try {

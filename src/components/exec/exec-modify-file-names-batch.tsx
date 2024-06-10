@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { Input, Tooltip, Button, Row, Col, message, Modal } from 'antd'
-import { SearchOutlined, CheckSquareOutlined, CloseSquareOutlined } from '@ant-design/icons'
+import {
+  SearchOutlined,
+  CheckSquareOutlined,
+  CloseSquareOutlined,
+  ClockCircleOutlined,
+  CalendarOutlined
+} from '@ant-design/icons'
 import { ipcRendererInvoke } from '../../utils/desktop-utils'
 import { getIgnorePatterns, convertToReg } from '@src/utils/common'
 import type {
@@ -26,6 +32,9 @@ const FeatureListPage: React.FC = () => {
   const [extnameMatchReg, setExtnameMatchReg] = useState(false) // 是否使用正则表达式
 
   const [filesToExclude, setFilesToExclude] = useState('') // 要排除的文件列表
+
+  const [addTimeStamp, setAddTimeStamp] = useState(false) // 文件名是否添加时间戳
+  const [addDateTime, setAddDateTime] = useState(false) //文件名是否添加时间秒onds
 
   //处理预览结果
   const handlePreview = async () => {
@@ -73,7 +82,9 @@ const FeatureListPage: React.FC = () => {
           extname: replaceExtname,
           filenameReg,
           extnameReg,
-          ignoreFilesPatterns
+          ignoreFilesPatterns,
+          addTimeStamp,
+          addDateTime
         }
       )
       const { changeCount, changeRecords } = result
@@ -150,7 +161,9 @@ const FeatureListPage: React.FC = () => {
               extname: replaceExtname,
               filenameReg,
               extnameReg,
-              ignoreFilesPatterns
+              ignoreFilesPatterns,
+              addTimeStamp,
+              addDateTime
             }
           )
           const { changeCount, changeRecords } = result
@@ -218,6 +231,15 @@ const FeatureListPage: React.FC = () => {
     setExtnameMatchReg(!extnameMatchReg)
   }
 
+  // 图标点击事件处理函数
+  const handleAddTimeStamp = () => {
+    setAddTimeStamp(!addTimeStamp)
+  }
+
+  const handleAddDateTime = () => {
+    setAddDateTime(!addDateTime)
+  }
+
   return (
     <div style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
       <h1>Modify Filename Batch</h1>
@@ -271,6 +293,22 @@ const FeatureListPage: React.FC = () => {
             placeholder="Replace"
             value={replaceFilename}
             onChange={(e) => setReplaceFilename(e.target.value)}
+            suffix={
+              <div className="icon-container">
+                <Tooltip title="Add TimeStamp">
+                  <ClockCircleOutlined
+                    className={`icon-base ${addTimeStamp ? 'icon-selected' : ''}`}
+                    onClick={handleAddTimeStamp}
+                  />
+                </Tooltip>
+                <Tooltip title="Add DateTime">
+                  <CalendarOutlined
+                    className={`icon-base ${addDateTime ? 'icon-selected' : ''}`}
+                    onClick={handleAddDateTime}
+                  />
+                </Tooltip>
+              </div>
+            }
           />
         </Col>
       </Row>
