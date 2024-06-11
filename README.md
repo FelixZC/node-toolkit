@@ -53,7 +53,7 @@ npm i
 
 **exe安装方式**
 
-  等待上传release包,或者自己动手打包
+  下载release,自己动手打包
 
 1. **打开命令行工具**：首先，你需要打开命令行工具，比如Windows的CMD或者PowerShell（管理员）。
 
