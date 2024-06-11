@@ -26,6 +26,4 @@ pnpm-debug.log*
 *.sln
 *.sw?
 .*audit.json
-electron/electron-v26.6.10-win32-x64/*
-electron/cache/*
 

@@ -181,6 +181,6 @@
       "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
       "target": "nsis"
     },
-    "electronDist": "./electron/electron-v26.6.10-win32-x64"
+    "electronDist": "./electron"
   }
 }
