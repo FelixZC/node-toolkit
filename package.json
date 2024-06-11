@@ -11,10 +11,11 @@
     "prepare": "husky install",
     "compile": "tsc",
     "dev": "cross-env NODE_ENV=development webpack server --config ./config/webpack.config.js",
-    "build": "cross-env NODE_ENV=production webpack --config ./config/webpack.config.js",
+    "webpack": "cross-env NODE_ENV=production webpack --config ./config/webpack.config.js",
     "dev-electron": "npm run compile && cross-env NODE_ENV=development electron ./dist/main/src/desktop/index.js",
     "prod-electron": "npm run compile && cross-env NODE_ENV=production electron ./dist/main/src/desktop/index.js",
-    "build-electron-win64": "npm run compile && electron-builder -w --x64"
+    "build-electron-win64": "npm run compile && electron-builder -w --x64",
+    "build": "npm run webpack && npm run build-electron-win64"
   },
   "author": "pzc",
   "license": "ISC",
