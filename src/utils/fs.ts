@@ -4,14 +4,20 @@ import * as os from 'os'
 import * as path from 'path'
 import { LRUCache } from 'lru-cache'
 import { logDecorator } from '../utils/log'
+import { FileType, classifyFileTypeByExt } from './common'
 
 /**
  * fs.ts使用读异步，写同步
  * TODO 添加缓存功能操作
  */
+
 export interface FileInfo extends ParsedPath {
   filePath: string
-  stats?: fs.Stats
+}
+
+export interface FileInfoWithStats extends ParsedPath, fs.Stats {
+  filePath: string
+  type: FileType
 }
 
 // 创建LRU缓存实例，最大容量为1000个缓存项，缓存项在10分钟后过期
@@ -51,7 +57,6 @@ export const readFile = (filePath: string): Promise<string> => {
     })
   })
 }
-
 export const readFileStats = async (filePath: string): Promise<fs.Stats> => {
   const cachedStats = fileStatsCache.get(filePath)
   if (cachedStats !== undefined) {
@@ -64,17 +69,21 @@ export const readFileStats = async (filePath: string): Promise<fs.Stats> => {
 }
 
 export function getFileInfo(filePath: string): FileInfo {
+  const parsedPath = path.parse(filePath)
   return {
     filePath: filePath,
-    ...path.parse(filePath)
+    ...parsedPath
   }
 }
 
-export async function getFileInfoWithStats(filePath: string): Promise<FileInfo> {
+export async function getFileInfoWithStats(filePath: string): Promise<FileInfoWithStats> {
+  const stats = await readFileStats(filePath)
+  const parsedPath = path.parse(filePath)
   return {
     filePath,
-    ...path.parse(filePath),
-    stats: await readFileStats(filePath)
+    ...parsedPath,
+    ...stats,
+    type: stats.isDirectory() ? 'Folder' : classifyFileTypeByExt(parsedPath.ext) // 文件类型
   }
 }
 
