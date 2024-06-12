@@ -16,12 +16,6 @@ const initialFeatures: Feature[] = [
     path: '../plugins/babel-plugins/depart-default-export-object-express'
   },
   {
-    id: 2,
-    name: 'depart-switch',
-    isSelected: false,
-    path: '../plugins/babel-plugins/depart-switch'
-  },
-  {
     id: 4,
     name: 'import-sort',
     isSelected: false,

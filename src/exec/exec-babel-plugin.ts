@@ -33,7 +33,6 @@ export function test() {
   const babelPluginPathList: string[] = [
     '../plugins/babel-plugins/import-sort',
     '../plugins/babel-plugins/move-default-export-to-last',
-    '../plugins/babel-plugins/depart-switch',
     // '../plugins/babel-plugins/remove-invalid-comment'
     '../plugins/babel-plugins/transform-remove-console'
     // '../plugins/babel-plugins/depart-default-export-object-express'
