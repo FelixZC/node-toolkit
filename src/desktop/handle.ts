@@ -1,8 +1,7 @@
-import { ipcMain } from 'electron'
+import { ipcMain, dialog } from 'electron'
 
 export default function mainWindowHandleEvents() {
   ipcMain.handle('choose-directory', async () => {
-    const { dialog } = require('electron')
     const result = await dialog.showOpenDialog({
       properties: ['openDirectory']
     })

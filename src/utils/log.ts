@@ -1,9 +1,12 @@
 import { createLogger, format, transports, Logger as WinstonLogger } from 'winston'
 import DailyRotateFile from 'winston-daily-rotate-file'
+import { app } from 'electron'
+import * as path from 'path'
 import * as os from 'os'
+import * as fs from 'fs-extra'
+import { getCurrentDateFormatted } from './time'
 // import express, { Request, Response, NextFunction } from 'express';
 const userInfo = os.userInfo()
-
 interface LogRecord {
   methodName: string
   arguments: unknown[]
@@ -23,6 +26,17 @@ interface ErrorRecord {
   user?: string
 }
 
+let logDirectory = path.join(app.getPath('userData'), 'logs')
+
+fs.ensureDirSync(logDirectory)
+
+export const getFilename = () => {
+  return `operate-${getCurrentDateFormatted()}.log`
+}
+export const getLogPath = () => {
+  return path.join(logDirectory, getFilename())
+}
+
 // 创建 Winston 日志器实例
 export const logger: WinstonLogger = createLogger({
   level: 'info',
@@ -36,6 +50,7 @@ export const logger: WinstonLogger = createLogger({
     }),
     new DailyRotateFile({
       filename: 'operate-%DATE%.log',
+      dirname: logDirectory,
       datePattern: 'YYYY-MM-DD',
       zippedArchive: true,
       maxSize: '20m',
@@ -45,6 +60,7 @@ export const logger: WinstonLogger = createLogger({
     }),
     new transports.File({
       filename: 'error.log',
+      dirname: logDirectory,
       level: 'error',
       format: format.combine(format.timestamp(), format.json())
     })

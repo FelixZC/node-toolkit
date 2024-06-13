@@ -1,10 +1,9 @@
 import { Menu, MenuItemConstructorOptions } from 'electron'
 import { clearCacheAll } from '../utils/fs'
-import { getCurrentDateFormatted } from '../utils/time'
-import * as path from 'path'
-const { shell } = require('electron')
+import { shell } from 'electron'
 import { dialog } from 'electron'
 import { logger } from '../utils/log'
+import { getLogPath } from '../utils/log'
 const getMenuTemplate = (mainWindow: Electron.BrowserWindow): Array<MenuItemConstructorOptions> => {
   const menuTemplate: Array<MenuItemConstructorOptions> = [
     {
@@ -27,8 +26,7 @@ const getMenuTemplate = (mainWindow: Electron.BrowserWindow): Array<MenuItemCons
           label: 'Open Operate Log',
           accelerator: 'CmdOrCtrl+I',
           click: () => {
-            const logName = `operate-${getCurrentDateFormatted()}.log`
-            const logPath = path.join(process.cwd(), logName)
+            const logPath = getLogPath()
             try {
               shell.openPath(logPath)
             } catch (error) {

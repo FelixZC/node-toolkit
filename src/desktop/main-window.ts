@@ -29,7 +29,7 @@ function createMainWindow(): void {
     title: 'node tookit',
     webPreferences: {
       nodeIntegration: true,
-      contextIsolation: false,
+      contextIsolation: true,
       preload: path.resolve(__dirname, '../utils/context-bridge.js')
     },
     icon: path.resolve(__dirname, '../../../build/electron-logo1.ico')
