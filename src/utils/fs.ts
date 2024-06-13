@@ -172,7 +172,33 @@ export function renameFile(
     throw err
   }
 }
+/******************************************************************************************************************** */
+// 定义一个类型来表示忽略规则
+type IgnoreRule = (filePath: string) => boolean
+export function useIgnored(): Array<IgnoreRule> {
+  const gitIgnorePath = path.join(process.cwd(), '.gitignore') // 假设 .gitignore 文件在当前目录
+  const gitIgnoreContent = fs.readFileSync(gitIgnorePath, 'utf-8')
+  const rules = gitIgnoreContent.split(/\r?\n/).map((line) => {
+    // 去除行首尾空白字符，并忽略注释行和空行
+    const trimmedLine = line.trim()
+    if (trimmedLine === '' || trimmedLine.startsWith('#')) {
+      return () => false // 忽略无效规则
+    }
+    // 返回一个函数，该函数根据规则判断文件路径是否被忽略
+    return (filePath: string) => {
+      return new RegExp(
+        `^${path
+          .normalize(trimmedLine)
+          .replace(/([\\/.*+?^=!:${}|[]()])/g, '\\$1')
+          .replace(/\*\*$/, '(.+/)?')
+          .replace(/\*/g, '[^/]*')}$`
+      ).test(filePath)
+    }
+  })
+  return rules
+}
 
+/******************************************************************************************************************** */
 // FsInstance接口
 export interface FsInstance {
   rootPath: string
@@ -196,11 +222,15 @@ class fsUtils implements FsInstance {
   filePathList: string[] = []
   dirPathList: string[] = []
   eol: string
-  constructor(public rootPath: string) {
+  constructor(public rootPath: string, isUseIgnore?: boolean) {
     this.rootPath = rootPath
     this.eol = os.EOL
     this.folderPath = path.resolve(rootPath)
-    this.refreshFileLists()
+    if (isUseIgnore) {
+      this.refreshFileListsUseIgnore()
+    } else {
+      this.refreshFileLists()
+    }
   }
 
   // 刷新文件列表和目录列表
@@ -223,6 +253,30 @@ class fsUtils implements FsInstance {
     walk(this.folderPath)
   }
 
+  // 刷新文件列表和目录列表，使用忽略文件.gitignore
+  private refreshFileListsUseIgnore() {
+    this.filePathList = []
+    this.dirPathList = [this.folderPath]
+    const ignoreRules = useIgnored()
+    const walk = (dir: string): void => {
+      const dirents = fs.readdirSync(dir, { withFileTypes: true })
+      for (const dirent of dirents) {
+        const newDir = path.resolve(dir, dirent.name)
+        const relativePath = path.relative(this.rootPath, newDir).replace(/\\/g, '/')
+        // 检查是否应该忽略该文件或目录
+        if (ignoreRules.some((rule) => rule(relativePath))) {
+          continue
+        }
+        if (dirent.isDirectory()) {
+          this.dirPathList.push(newDir)
+          walk(newDir)
+        } else {
+          this.filePathList.push(newDir)
+        }
+      }
+    }
+    walk(this.folderPath)
+  }
   getFileInfoList(): FileInfo[] {
     return this.filePathList.map((filePath) => getFileInfo(filePath))
   }

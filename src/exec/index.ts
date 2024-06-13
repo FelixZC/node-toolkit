@@ -68,9 +68,9 @@ interface ExecInterface {
 export class Exec implements ExecInterface {
   fsInstance: fsUtils // 文件系统实例属性
   fileInfoList: FileInfo[] // 文件信息列表属性
-  constructor(rootPath = path.join('src copy')) {
+  constructor(rootPath = path.join('src copy'), isUseIgnore: boolean = false) {
     /** 项目根目录，在此变更执行目录 */
-    this.fsInstance = new fsUtils(rootPath)
+    this.fsInstance = new fsUtils(rootPath, isUseIgnore)
     this.fileInfoList = this.fsInstance.getFileInfoList()
   }
   getProjectTree = () => {
