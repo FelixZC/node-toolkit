@@ -31,6 +31,12 @@ const fileStatsCache = new LRUCache<string, fs.Stats>({
   ttl: 10 * 60 * 1000 // 10 minutes
 })
 
+// 清除所有缓存
+export const clearCacheAll = () => {
+  fileContentCache.clear() // 清除所有缓存项
+  fileStatsCache.clear() // 清除所有缓存项
+}
+
 // writeFile 函数添加缓存逻辑
 export const writeFile = async (filePath: string, content: string) => {
   // 先更新缓存

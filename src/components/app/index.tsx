@@ -1,6 +1,6 @@
 import '../../style/less/app.less'
 import React, { useEffect, useRef, useCallback, ChangeEvent } from 'react'
-import DesktopHeader from '@src/components/desktop-header'
+// import DesktopHeader from '@src/components/desktop-header'
 import { isDesktop, getProcessNodeEnv, ipcRendererSend } from '@src/utils/desktop-utils'
 import MineLayout from '@src/layout/index'
 /**
@@ -61,7 +61,7 @@ function App() {
           }} // 失去焦点时清空输入框的值
         />
       )}
-      {isDesktop() && <DesktopHeader />}
+      {/* {isDesktop() && <DesktopHeader />} */}
       {/* 如果是桌面环境，则渲染桌面头部组件 */}
       <div className={isDesktop() ? 'desktop-app-content' : 'app-content'}>
         {/*根据是否是桌面环境应用不同的样式类  */}

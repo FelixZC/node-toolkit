@@ -6,7 +6,8 @@ import { BrowserWindow } from 'electron'
 import mainWindowHandleEvents from './handle'
 import mainWindowListenEvents from './listen'
 import * as path from 'path'
-
+import { initTray } from './system-tray'
+import { createMenu } from './menus'
 // 判断是否为开发环境
 type DevelopmentOrProduction = 'development' | 'production'
 const isDevelopment: DevelopmentOrProduction = process.env.NODE_ENV! as DevelopmentOrProduction
@@ -24,14 +25,14 @@ function createMainWindow(): void {
     minHeight: 632,
     minWidth: 960,
     show: false,
-    frame: false,
+    // frame: false,
     title: 'node tookit',
     webPreferences: {
       nodeIntegration: true,
-      // contextIsolation: false,
+      contextIsolation: false,
       preload: path.resolve(__dirname, '../utils/context-bridge.js')
     },
-    icon: path.resolve(__dirname, '../assets/images/electron-logo1.png')
+    icon: path.resolve(__dirname, '../../../build/electron-logo1.ico')
   })
 
   if (isDevelopment === 'development') {
@@ -42,6 +43,8 @@ function createMainWindow(): void {
   }
 
   mainWindow.once('ready-to-show', () => {
+    initTray()
+    createMenu(mainWindow!)
     mainWindow!.show()
   })
   mainWindowListenEvents(mainWindow)

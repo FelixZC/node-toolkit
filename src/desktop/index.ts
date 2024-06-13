@@ -1,12 +1,9 @@
 import { app, Event as ElectronEvent, WebContents, Certificate } from 'electron'
 import { createMainWindow } from './main-window'
-import { initTray, getTray } from './system-tray'
-
+import { getTray } from './system-tray'
 app.on('ready', () => {
   createMainWindow()
-  initTray()
 })
-
 // 正确处理 'certificate-error' 事件
 app.on(
   'certificate-error',
@@ -30,7 +27,7 @@ app.on('before-quit', () => {
 
 app.on('window-all-closed', () => {
   console.log('window-all-closed')
-  app.exit()
+  app.quit()
 })
 
 app.on('activate', () => {
@@ -42,7 +39,6 @@ app.on('quit', () => {
   if (getTray()) {
     getTray()!.destroy()
   }
-  app.exit()
 })
 
 app.on('will-quit', () => {

@@ -1,6 +1,7 @@
 import { ipcMain } from 'electron'
 import { BrowserWindow } from 'electron'
 import { mainWindowIsExist } from './main-window'
+
 /**
  * 监听主窗口的事件，包括最小化、最大化、恢复、关闭和打开开发者工具。
  */
@@ -27,7 +28,6 @@ export default function mainWindowListenEvents(mainWindow: BrowserWindow): void 
 
   ipcMain.on('mainWindow-close', () => {
     if (mainWindowIsExist()) {
-      // mainWindow!.hide()
       mainWindow!.close()
     }
   })
