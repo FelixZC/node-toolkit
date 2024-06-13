@@ -15,7 +15,7 @@ let tray: Tray | null = null
 /*
  * 定义Tray图标的路径
  */
-const iconPath: string = path.resolve(__dirname, '../assets/images/electron-logo1.png')
+const iconPath: string = path.resolve(__dirname, '../../../build/electron-logo1.png')
 
 /*
  * 初始化Tray菜单
@@ -33,11 +33,13 @@ function initTray(): void {
         if (mainWindowIsExist()) {
           getMainWindow()!.show()
         }
+        console.log('打开应用')
       }
     },
     {
       label: '退出应用',
       click: (): void => {
+        console.log('退出应用')
         // 点击退出应用菜单项时，退出应用
         app.quit()
       }

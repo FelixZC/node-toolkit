@@ -25,6 +25,7 @@ module.exports = {
     ['styles', '样式相关'],
     ['deps', '项目依赖'],
     ['auth', '对 auth 修改'],
+    ['assets', '对静态资源修改'],
     ['md', '文档相关'],
     ['config', '配置相关'],
     ['other', '其他修改'],

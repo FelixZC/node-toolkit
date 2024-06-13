@@ -98,9 +98,6 @@ npm i
     |   |   ├─ restore-icon
     |   |   ╰─ index.ts // 索引文件，用于导出所有图标
     |   ├─ images
-    |   |   ├─ electron-img
-    |   |   ├─ logo
-    |   |   ╰─ index.ts // 索引文件，用于导出所有图片资源
     |   ╰─ index.ts // 索引文件，用于导出所有资源
     ├─ components
     |   ├─ app
