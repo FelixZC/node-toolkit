@@ -7,6 +7,7 @@ import runBabelPlugin from '../plugins/use-babel-plugin'
 import runCodemod from '../plugins/use-codemod'
 import runPostcssPlugin from '../plugins/use-postcss-plugin'
 import runPosthtmlPlugin from '../plugins/use-posthtml-plugin'
+import { Notification } from 'electron'
 import { getMainWindow } from '../desktop/main-window'
 import type { BabelPlugin } from '../plugins/use-babel-plugin'
 import type { ExecFileInfo } from '../../types/common'
@@ -129,7 +130,7 @@ export class Exec implements ExecInterface {
       return result
     })
 
-    const successList: string[] = [] // 执行成功列表
+    const successList: string[] = [] // 执行改动文件列表
     const errorList: string[] = [] // 执行错误列表
 
     // 初始化存储属性信息的对象和数组
@@ -203,6 +204,11 @@ export class Exec implements ExecInterface {
       updateBar()
       mainWindow && mainWindow.setProgressBar(count++ / targetList.length)
     }
+    mainWindow &&
+      new Notification({
+        title: '处理完成',
+        body: `共扫描${targetList.length}个文件，收集注释文件${targetList.length}个`
+      }).show()
     // 根据首字母对收集到的属性信息进行分组，并生成属性描述表格
     const attrsGroup = groupBy(attrsCollectionGroup, 'standingInitial') // 根据首字母排序
 
@@ -355,7 +361,7 @@ export class Exec implements ExecInterface {
    */
   execBabelPlugin = async (babelPlugins: BabelPlugin[]) => {
     const globalExtra: Record<string, any> = {} // 用于存储全局额外信息的字典。
-    const successList: string[] = [] // 执行成功列表
+    const successList: string[] = [] // 执行改动文件列表
     const errorList: string[] = [] // 执行错误列表
     /**
      * 处理单个文件，应用Babel插件并更新文件内容。
@@ -382,7 +388,7 @@ export class Exec implements ExecInterface {
         }
 
         await writeFile(filePath, newContent) // 写入处理后的新内容。
-        successList.push(filePath) // 添加到执行成功列表
+        successList.push(filePath) // 添加到执行改动文件列表
       } catch (e) {
         console.warn(e) // 捕获并警告处理过程中的任何错误。
         errorList.push(filePath) // 添加到执行错误列表
@@ -400,6 +406,11 @@ export class Exec implements ExecInterface {
       updateBar()
       mainWindow && mainWindow.setProgressBar(count++ / targetList.length)
     }
+    mainWindow &&
+      new Notification({
+        title: '处理完成',
+        body: `共扫描${targetList.length}个文件，执行改动文件${successList.length}个，执行失败文件${errorList.length}个`
+      }).show()
     return { successList, errorList }
   }
 
@@ -411,7 +422,7 @@ export class Exec implements ExecInterface {
   execPosthtmlPlugin = async (plugins: PosthtmlPlugin<unknown>[]) => {
     // 用于存储所有文件处理过程中产生的额外全局信息
     const globalExtra: Record<string, any> = {}
-    const successList: string[] = [] // 执行成功列表
+    const successList: string[] = [] // 执行改动文件列表
     const errorList: string[] = [] // 执行错误列表
     // 处理单个文件的函数
     const handler = async (filePath: string) => {
@@ -462,6 +473,11 @@ export class Exec implements ExecInterface {
       updateBar()
       mainWindow && mainWindow.setProgressBar(count++ / targetList.length)
     }
+    mainWindow &&
+      new Notification({
+        title: '处理完成',
+        body: `共扫描${targetList.length}个文件，执行改动文件${successList.length}个，执行失败文件${errorList.length}个`
+      }).show()
     return { successList, errorList }
   }
 
@@ -470,7 +486,7 @@ export class Exec implements ExecInterface {
    * @param plugins PostCSS插件数组，将按顺序对文件内容进行处理。
    */
   execPostcssPlugin = async (plugins: PostcssPlugin[]) => {
-    const successList: string[] = [] // 执行成功列表
+    const successList: string[] = [] // 执行改动文件列表
     const errorList: string[] = [] // 执行错误列表
     // 定义一个处理单个文件的异步函数。
     const handler = async (filePath: string) => {
@@ -514,6 +530,11 @@ export class Exec implements ExecInterface {
       updateBar()
       mainWindow && mainWindow.setProgressBar(count++ / targetList.length)
     }
+    mainWindow &&
+      new Notification({
+        title: '处理完成',
+        body: `共扫描${targetList.length}个文件，执行改动文件${successList.length}个，执行失败文件${errorList.length}个`
+      }).show()
     return { successList, errorList }
   }
 
@@ -522,7 +543,7 @@ export class Exec implements ExecInterface {
    * @param codemodList 要执行的转换操作列表，每个转换操作是一个Transform类型的函数。
    */
   execCodemod = async (codemodList: Transform[]) => {
-    const successList: string[] = [] // 执行成功列表
+    const successList: string[] = [] // 执行改动文件列表
     const errorList: string[] = [] // 执行错误列表
     // 定义一个处理函数，用于处理单个文件的转换
     const handler = async (filePath: string) => {
@@ -564,6 +585,11 @@ export class Exec implements ExecInterface {
       updateBar()
       mainWindow && mainWindow.setProgressBar(count++ / targetList.length)
     }
+    mainWindow &&
+      new Notification({
+        title: '处理完成',
+        body: `共扫描${targetList.length}个文件，执行改动文件${successList.length}个，执行失败文件${errorList.length}个`
+      }).show()
     return { successList, errorList }
   }
 }
