@@ -62,6 +62,7 @@ const FeatureListPage: React.FC = () => {
       editor.session.setMode('ace/mode/markdown')
     }
     setDirectoryPath(sessionStorage.getItem('directoryPath') || '')
+    setIsUseIgnoredFiles(sessionStorage.getItem('isUseIgnoredFiles') === 'true')
   }, []) // 空依赖数组表示这个effect只在挂载时运行一次
 
   const editorRef = useRef<AceEditor>(null)
@@ -76,6 +77,7 @@ const FeatureListPage: React.FC = () => {
 
   const handleUseIgnoreFiles = () => {
     setIsUseIgnoredFiles(!isUseIgnoredFiles)
+    sessionStorage.setItem('isUseIgnoredFiles', String(!isUseIgnoredFiles))
   }
 
   return (

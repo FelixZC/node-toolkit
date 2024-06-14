@@ -51,6 +51,7 @@ const FeatureListPage: React.FC = () => {
   // 组件加载完毕后执行的方法
   useEffect(() => {
     setDirectoryPath(sessionStorage.getItem('directoryPath') || '')
+    setIsUseIgnoredFiles(sessionStorage.getItem('isUseIgnoredFiles') === 'true')
   }, []) // 空依赖数组表示这个effect只在挂载时运行一次
 
   const toggleOutputFormat = () => {
@@ -63,6 +64,7 @@ const FeatureListPage: React.FC = () => {
 
   const handleUseIgnoreFiles = () => {
     setIsUseIgnoredFiles(!isUseIgnoredFiles)
+    sessionStorage.setItem('isUseIgnoredFiles', String(!isUseIgnoredFiles))
   }
 
   return (
