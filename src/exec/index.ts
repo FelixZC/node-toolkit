@@ -241,10 +241,12 @@ export class Exec implements ExecInterface {
     ignoreFilesPatterns?: Array<RegExp>,
     isAddSourcePath?: boolean
   ) {
+    let count = 1
+    const mainWindow = getMainWindow()
     let promises = this.fsInstance.filePathList.map(async (filePath) => {
       let result = ''
       if (ignoreFilesPatterns && ignoreFilesPatterns.some((pattern) => pattern.test(filePath))) {
-        return result // 如果文件应该被忽略，则返回空字符串
+        // 如果文件应该被忽略，则返回空字符串
       } else {
         const content = await readFile(filePath)
         result = mdUtils.queryContentByReg(content, regExpression)
@@ -253,9 +255,9 @@ export class Exec implements ExecInterface {
           result = `${filePath}${this.fsInstance.eol}${result}`
         }
       }
+      mainWindow && mainWindow.setProgressBar(count++ / this.fsInstance.filePathList.length)
       return result
     })
-
     let results = await Promise.all(promises)
     let str = results.join('')
     return str
