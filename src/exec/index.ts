@@ -16,6 +16,7 @@ import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
 import type { Plugin as PosthtmlPlugin } from 'posthtml'
 import type { Transform } from 'jscodeshift'
 import type { FsInstance } from '../utils/fs'
+import { logger } from '../utils/log'
 // 定义文件属性集合接口
 interface AttrsCollection {
   key: string | number
@@ -189,7 +190,7 @@ export class Exec implements ExecInterface {
         }
         successList.push(filePath)
       } catch (e) {
-        console.warn(e)
+        logger.warn(e)
         errorList.push(filePath)
       }
     }
@@ -390,7 +391,7 @@ export class Exec implements ExecInterface {
         await writeFile(filePath, newContent) // 写入处理后的新内容。
         successList.push(filePath) // 添加到执行改动文件列表
       } catch (e) {
-        console.warn(e) // 捕获并警告处理过程中的任何错误。
+        logger.warn(e) // 捕获并警告处理过程中的任何错误。
         errorList.push(filePath) // 添加到执行错误列表
       }
     }
@@ -455,7 +456,7 @@ export class Exec implements ExecInterface {
         successList.push(filePath)
       } catch (e) {
         // 打印错误警告
-        console.warn(e)
+        logger.warn(e)
         errorList.push(filePath)
       }
     }
@@ -511,7 +512,7 @@ export class Exec implements ExecInterface {
         successList.push(filePath)
       } catch (e) {
         // 捕获并警告处理过程中可能出现的错误。
-        console.warn(e)
+        logger.warn(e)
         errorList.push(filePath)
       }
     }
@@ -568,7 +569,7 @@ export class Exec implements ExecInterface {
         successList.push(filePath)
       } catch (e) {
         // 捕获并打印转换过程中可能出现的错误
-        console.warn(e)
+        logger.warn(e)
         errorList.push(filePath)
       }
     }

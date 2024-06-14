@@ -1,6 +1,7 @@
 import { Exec } from './index'
 import path from 'path'
 import type { BabelPlugin } from '../plugins/use-babel-plugin'
+import { logger } from '../utils/log'
 
 /**
  * 执行 Babel 插件的公共方法。
@@ -28,7 +29,7 @@ export const executeBabelPlugins = async (
     // 执行 Babel 插件
     await exec.execBabelPlugin(plugins)
   } catch (e) {
-    console.warn('执行 Babel 插件时发生错误:', e)
+    logger.warn('执行 Babel 插件时发生错误:', e)
   }
 }
 

@@ -9,6 +9,7 @@ import { transferRef } from '../utils/common'
 import type { BabelPlugin } from '../plugins/use-babel-plugin'
 import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
 import type { Plugin as PosthtmlPlugin } from 'posthtml'
+import { logger } from '../utils/log'
 export async function execTransferFileNameToKebabCase() {
   // 定义babel插件路径列表，用于加载插件
   const babelPluginPathList: string[] = [
@@ -95,6 +96,6 @@ export async function execTransferFileNameToKebabCase() {
       customDirname
     })
   } catch (e) {
-    console.warn(e)
+    logger.warn(e)
   }
 }

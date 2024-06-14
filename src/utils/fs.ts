@@ -2,11 +2,10 @@ import * as fs from 'fs-extra'
 import { ParsedPath } from 'path'
 import * as os from 'os'
 import * as path from 'path'
-import { app } from 'electron'
 import { LRUCache } from 'lru-cache'
-import { logDecorator } from '../utils/log'
+import { logDecorator, logger } from '../utils/log'
 import { FileType, classifyFileTypeByExt } from './common'
-import ignore from 'ignore' // 导入默认导出的 ignore 函数
+import { useIgnored } from '../utils/ignore'
 /**
  * fs.ts使用读异步，写同步
  * TODO 添加缓存功能操作
@@ -140,7 +139,7 @@ export async function copyFile(filePath: string): Promise<string> {
     fileContentCache.set(newFilePath, await readFile(filePath))
     return newFilePath
   } catch (err) {
-    console.error(`Error copying file ${filePath}:`, err)
+    logger.error(`Error copying file ${filePath}:`, err)
     throw err
   }
 }
@@ -151,7 +150,7 @@ export async function deleteFile(filePath: string): Promise<void> {
     fileContentCache.delete(filePath)
     fileStatsCache.delete(filePath)
   } catch (err) {
-    console.error(`Error deleting file ${filePath}:`, err)
+    logger.error(`Error deleting file ${filePath}:`, err)
     throw err
   }
 }
@@ -169,45 +168,12 @@ export function renameFile(
     fileContentCache.set(uniqueNewFilePath, fileContentCache.get(oldFilePath))
     return { isChange: true, uniqueNewFilePath }
   } catch (err) {
-    console.error(`Error renaming file from ${oldFilePath} to ${uniqueNewFilePath}:`, err)
+    logger.error(`Error renaming file from ${oldFilePath} to ${uniqueNewFilePath}:`, err)
     throw err
   }
 }
 /******************************************************************************************************************** */
-export function getIgnorePath(): string {
-  const basePath = process.env.NODE_ENV === 'production' ? app.getPath('appData') : process.cwd()
-  return path.join(basePath, '.gitignore')
-}
-class GitIgnoreParser {
-  private ignoreRules: ReturnType<typeof ignore>
 
-  constructor() {
-    this.ignoreRules = ignore()
-  }
-  loadFromFile() {
-    const gitIgnorePath = getIgnorePath()
-    if (fs.existsSync(gitIgnorePath)) {
-      const gitIgnoreContent = fs.readFileSync(gitIgnorePath, 'utf-8')
-      this.ignoreRules.add(gitIgnoreContent)
-    } else {
-      fs.ensureFileSync(gitIgnorePath)
-    }
-  }
-
-  test(filePath: string): boolean {
-    // 传入的 filePath 应该是相对于项目根目录的相对路径
-    return this.ignoreRules.ignores(filePath)
-  }
-}
-
-export function useIgnored(): { ignore: (filePath: string) => boolean } {
-  const parser = new GitIgnoreParser()
-  parser.loadFromFile()
-
-  return {
-    ignore: (filePath: string) => parser.test(filePath)
-  }
-}
 /******************************************************************************************************************** */
 // FsInstance接口
 export interface FsInstance {

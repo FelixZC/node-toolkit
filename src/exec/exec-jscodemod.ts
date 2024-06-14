@@ -1,6 +1,7 @@
 import { Exec } from './index'
 import path from 'path'
 import type { Transform } from 'jscodeshift'
+import { logger } from '../utils/log'
 
 /**
  * 执行 JSCodeMod 模板的公共方法。
@@ -28,7 +29,7 @@ export const executeJSCodemods = async (
     // 执行 JSCodeMod 模板
     await exec.execCodemod(codemodList)
   } catch (e) {
-    console.warn('执行 JSCodeMod 模板时发生错误:', e)
+    logger.warn('执行 JSCodeMod 模板时发生错误:', e)
   }
 }
 

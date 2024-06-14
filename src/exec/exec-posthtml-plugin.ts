@@ -1,3 +1,4 @@
+import { logger } from '../utils/log'
 import { Exec } from './index'
 import path from 'path'
 import type { Plugin as PosthtmlPlugin } from 'posthtml'
@@ -28,7 +29,7 @@ export async function executePosthtmlPlugins(
     await exec.execPosthtmlPlugin(plugins)
   } catch (e) {
     // 可以在这里添加更详细的错误处理逻辑
-    console.error('Error executing PostHTML plugins:', e)
+    logger.error('Error executing PostHTML plugins:', e)
   }
 }
 
