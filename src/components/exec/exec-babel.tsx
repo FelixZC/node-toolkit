@@ -13,12 +13,6 @@ interface Feature {
 
 const initialFeatures: Feature[] = [
   {
-    id: 1,
-    name: 'depart-default-export-object-express',
-    isSelected: false,
-    path: '../plugins/babel-plugins/depart-default-export-object-express'
-  },
-  {
     id: 4,
     name: 'import-sort',
     isSelected: false,

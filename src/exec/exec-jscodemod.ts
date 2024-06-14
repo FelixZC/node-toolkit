@@ -36,7 +36,6 @@ export const executeJSCodemods = async (
 export function test() {
   const jscodemodeList = [
     '../plugins/jscodemods/arrow-function',
-    '../plugins/jscodemods/no-reassign-params',
     '../plugins/jscodemods/no-vars',
     '../plugins/jscodemods/object-shorthand',
     '../plugins/jscodemods/rm-object-assign',
