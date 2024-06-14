@@ -12,19 +12,19 @@ export function initIgnorePath() {
   if (!fs.existsSync(gitIgnorePath)) {
     fs.ensureFileSync(gitIgnorePath)
     const gitIgnoreContent = `
-      # Default ignore rules
-      node_modules
-      dist
-      .npmrc
-      .cache
-      .local
-      .git
-      .history
-      # Editor directories and files
-      .idea
-      .vscode
-      .husky
-    `
+# Default ignore rules
+node_modules
+dist
+.npmrc
+.cache
+.local
+.git
+.history
+# Editor directories and files
+.idea
+.vscode
+.husky
+`
     fs.writeFileSync(gitIgnorePath, gitIgnoreContent)
   }
 }

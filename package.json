@@ -115,6 +115,7 @@
     "postcss-sass": "^0.5.0",
     "postcss-scss": "^4.0.4",
     "postcss-styl": "^0.12.3",
+    "postcss-syntax": "^0.36.2",
     "posthtml": "^0.16.6",
     "posthtml-parser": "^0.11.0",
     "posthtml-render": "^3.0.0",
