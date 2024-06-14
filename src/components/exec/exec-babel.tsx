@@ -25,18 +25,6 @@ const initialFeatures: Feature[] = [
     path: '../plugins/babel-plugins/move-default-export-to-last'
   },
   {
-    id: 6,
-    name: 'remove-invalid-comment',
-    isSelected: false,
-    path: '../plugins/babel-plugins/remove-invalid-comment'
-  },
-  {
-    id: 7,
-    name: 'replace-memberExpress-object-or-property',
-    isSelected: false,
-    path: '../plugins/babel-plugins/replace-memberExpress-object-or-property'
-  },
-  {
     id: 8,
     name: 'sort-object-array-by-index',
     isSelected: false,

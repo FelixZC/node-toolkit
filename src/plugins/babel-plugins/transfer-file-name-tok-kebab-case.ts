@@ -2,6 +2,7 @@ import { declare } from '@babel/helper-plugin-utils'
 import { isPath, transferRef } from '../../utils/common'
 
 /**
+ * @deprecated
  * 变更驼峰命名
  * 定义一个插件，用于转换AST（抽象语法树）。
  * @param babel Babel对象，提供插件运行时的环境和工具。

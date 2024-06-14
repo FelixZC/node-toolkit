@@ -38,9 +38,7 @@ export function test() {
   const babelPluginPathList: string[] = [
     '../plugins/babel-plugins/import-sort',
     '../plugins/babel-plugins/move-default-export-to-last',
-    // '../plugins/babel-plugins/remove-invalid-comment'
     '../plugins/babel-plugins/transform-remove-console'
-    // '../plugins/babel-plugins/replace-memberExpress-object-or-property'
   ]
   executeBabelPlugins(path.join('src copy'), babelPluginPathList, true)
 }
