@@ -18,6 +18,7 @@ interface ReplacePropertyInfo {
   newProperty: string
 }
 /**
+ * @deprecated
  * 替换表达式的调用对象或者调用属性
  * 该函数为一个AST（抽象语法树）转换插件的声明函数。
  * 使用babel和提供的选项对JavaScript代码的AST进行转换。
@@ -36,6 +37,7 @@ export default declare(
       replacePropertyList: ReplacePropertyInfo[]
     }
   ) => {
+    //替换引用对象
     let refList: string[] = []
 
     /**

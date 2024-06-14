@@ -1,9 +1,10 @@
 import { Menu, MenuItemConstructorOptions } from 'electron'
-import { clearCacheAll, getIgnorePath } from '../utils/fs'
+import { clearCacheAll } from '../utils/fs'
 import { shell } from 'electron'
 import { dialog } from 'electron'
 import { logger } from '../utils/log'
 import { getLogPath } from '../utils/log'
+import { getIgnorePath } from '../utils/ignore'
 const getMenuTemplate = (mainWindow: Electron.BrowserWindow): Array<MenuItemConstructorOptions> => {
   const menuTemplate: Array<MenuItemConstructorOptions> = [
     {

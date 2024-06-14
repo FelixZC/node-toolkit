@@ -3,6 +3,7 @@ import { Exec } from './index'
 import { generateUniquePathWithoutFs } from '../utils/fs'
 import { getFormattedTimestamp } from '../utils/time'
 import { generateSimpleRandomString } from '../utils/random'
+import { logger } from '../utils/log'
 interface ModifyResult {
   oldFilePath: string
   newFilePath: string
@@ -219,7 +220,7 @@ class ModifyFilenameExec {
           changeCount++
         }
       } catch (error) {
-        console.error(`重命名文件失败：${fileInfo.filePath} -> ${newFilePath}`, error)
+        logger.error(`重命名文件失败：${fileInfo.filePath} -> ${newFilePath}`, error)
       }
     })
     // 等待所有的 Promise 完成
@@ -278,7 +279,7 @@ class ModifyFilenameExec {
           changeCount++
         }
       } catch (error) {
-        console.error(`重命名文件失败：${fileInfo.filePath} -> ${newFilePath}`, error)
+        logger.error(`重命名文件失败：${fileInfo.filePath} -> ${newFilePath}`, error)
       }
     })
 

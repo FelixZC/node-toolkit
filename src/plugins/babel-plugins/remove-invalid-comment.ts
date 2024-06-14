@@ -1,5 +1,6 @@
 import { declare } from '@babel/helper-plugin-utils'
 /**
+ * @deprecated
  * 移除包含this的无效代码
  * 声明一个AST（抽象语法树）转换插件。
  * @param babel Babel实例，提供转换环境和工具。

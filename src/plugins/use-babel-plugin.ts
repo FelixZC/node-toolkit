@@ -7,6 +7,7 @@ import traverse from '@babel/traverse'
 import type * as Babel from '@babel/core'
 import type { PluginObj, Visitor } from '@babel/core'
 import type { ExecFileInfo } from '../../types/common'
+import { logger } from '../utils/log'
 // 导出 Babel 核心 API 类型
 export type BabelAPI = typeof Babel
 // 定义一个自定义插件对象接口，扩展 Babel 插件对象，添加 getExtra 方法和 visitor
@@ -47,7 +48,7 @@ const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
     // 返回转换后的代码
     return `\n${newCode.code}\n`
   } catch (e) {
-    console.error(e)
+    logger.error(e)
     // 如果转换过程中出错，则返回原始代码
     return execFileInfo.source
   }

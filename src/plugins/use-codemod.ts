@@ -4,6 +4,7 @@ import getParser from 'jscodeshift/src/getParser'
 import jscodeshift, { Options, Parser, Transform } from 'jscodeshift'
 import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
 import type { SFCDescriptor } from '@vue/compiler-sfc'
+import { logger } from '../utils/log'
 
 /**
  * parser可传的值有 babylon、flow、ts、tsx、babel,会去获取对应的解析器
@@ -79,7 +80,7 @@ const transform = (
 
     return execFileInfo.source
   } catch (e) {
-    console.error(e)
+    logger.error(e)
     return execFileInfo.source
   }
 }

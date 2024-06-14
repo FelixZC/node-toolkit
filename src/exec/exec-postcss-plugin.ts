@@ -1,3 +1,4 @@
+import { logger } from '../utils/log'
 import { Exec } from './index'
 import path from 'path'
 import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
@@ -31,7 +32,7 @@ export async function executePostcssPlugins(
 
     await exec.execPostcssPlugin(plugins)
   } catch (e) {
-    console.warn(e)
+    logger.warn(e)
   }
 }
 

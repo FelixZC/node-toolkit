@@ -18,12 +18,6 @@ const initialFeatures: Feature[] = [
     path: '../plugins/jscodemods/arrow-function'
   },
   {
-    id: 2,
-    name: 'no-reassign-params',
-    isSelected: false,
-    path: '../plugins/jscodemods/no-reassign-params'
-  },
-  {
     id: 3,
     name: 'no-vars',
     isSelected: false,

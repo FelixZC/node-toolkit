@@ -13,12 +13,6 @@ interface Feature {
 
 const initialFeatures: Feature[] = [
   {
-    id: 1,
-    name: 'depart-default-export-object-express',
-    isSelected: false,
-    path: '../plugins/babel-plugins/depart-default-export-object-express'
-  },
-  {
     id: 4,
     name: 'import-sort',
     isSelected: false,
@@ -29,18 +23,6 @@ const initialFeatures: Feature[] = [
     name: 'move-default-export-to-last',
     isSelected: false,
     path: '../plugins/babel-plugins/move-default-export-to-last'
-  },
-  {
-    id: 6,
-    name: 'remove-invalid-comment',
-    isSelected: false,
-    path: '../plugins/babel-plugins/remove-invalid-comment'
-  },
-  {
-    id: 7,
-    name: 'replace-memberExpress-object-or-property',
-    isSelected: false,
-    path: '../plugins/babel-plugins/replace-memberExpress-object-or-property'
   },
   {
     id: 8,

@@ -287,8 +287,15 @@ module.exports = {
     hot: true // 启用热更新
   },
 
-  // 开发工具相关的配置，用于控制 source map 的生成
-  devtool: isProduction ? 'source-map' : 'eval-cheap-module-source-map', // 根据是否是生产环境选择 source map 类型
+  /**
+   * eval：最快的 Source Map 类型，但不支持隐藏 sourceURL 或 sourceMappingURL 注释。
+   * cheap-eval-source-map：与 eval 类似，但添加了 sourceURL 注释。
+   * source-map：最详细的 Source Map 类型，支持所有特性，但构建速度较慢。
+   * nosources-source-map：包含所有源代码的位置信息，但不包含源代码内容。
+   * hidden-source-map：生成 Source Map，但不在最终输出中包含 sourceURL 或 sourceMappingURL 注释。
+   * inline-source-map：将 Source Map 作为数据 URI 嵌入最终输出中。
+   */
+  devtool: isProduction ? 'hidden-source-map' : 'eval-cheap-module-source-map', // 根据是否是生产环境选择 source map 类型
 
   // 性能相关的配置，包括对入口点大小和资产大小的提示
   performance: {
