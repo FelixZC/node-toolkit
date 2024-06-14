@@ -1,7 +1,7 @@
 import { declare } from '@babel/helper-plugin-utils'
-import { findObjectPropertyWithKey, resetIndexObjectProperty } from './ast-utils'
+// import { findObjectPropertyWithKey, resetIndexObjectProperty } from './ast-utils';
+import { findObjectPropertyWithKey } from './ast-utils'
 import * as t from '@babel/types'
-
 export default declare((babel) => {
   /**
    * 根据属性index对对象数组进行排序
@@ -34,7 +34,6 @@ export default declare((babel) => {
     elements.sort(sortHandle) // 对元素进行排序
     return elements // 返回排序后的元素数组
   }
-
   return {
     name: 'ast-transform',
     visitor: {
@@ -57,7 +56,8 @@ export default declare((babel) => {
 
         // 对元素进行排序，并更新数组节点的元素列表
         let result = sortObjectArrayExpression(elements as t.ObjectExpression[])
-        path.node.elements = resetIndexObjectProperty(result)
+        // path.node.elements = resetIndexObjectProperty(result);
+        path.node.elements = result
       }
     }
   }

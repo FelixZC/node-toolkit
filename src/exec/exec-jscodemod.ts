@@ -35,7 +35,6 @@ export const executeJSCodemods = async (
 // 示例用法：
 export function test() {
   const jscodemodeList = [
-    '../plugins/jscodemods/arrow-function-arguments',
     '../plugins/jscodemods/arrow-function',
     '../plugins/jscodemods/no-reassign-params',
     '../plugins/jscodemods/no-vars',

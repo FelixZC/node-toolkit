@@ -12,12 +12,6 @@ interface Feature {
 
 const initialFeatures: Feature[] = [
   {
-    id: 0,
-    name: 'arrow-function-arguments',
-    isSelected: false,
-    path: '../plugins/jscodemods/arrow-function-arguments'
-  },
-  {
     id: 1,
     name: 'arrow-function',
     isSelected: false,
