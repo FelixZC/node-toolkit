@@ -12,9 +12,10 @@ export async function batchRegQueryAndReturnResult(
   dir: string,
   reg: RegExp,
   ignoreFilesPatterns?: Array<RegExp>,
-  isAddSourcePath?: boolean
+  isAddSourcePath?: boolean,
+  isUseIgnoredFiles?: boolean
 ) {
-  const exec = new Exec(dir)
+  const exec = new Exec(dir, isUseIgnoredFiles)
   const result = await exec.batchRegQuery(reg, ignoreFilesPatterns, isAddSourcePath)
   return result
 }
@@ -38,6 +39,7 @@ export async function test() {
     dirPath,
     regexPattern,
     ignoreFilesPatterns,
+    true,
     true
   )
   const writeFilePath = path.join('src/query/md/query-batch-result.md')

@@ -6,8 +6,12 @@ import type { Transform } from 'jscodeshift'
  * 执行 JSCodeMod 模板的公共方法。
  * @param jscodemodeList 需要执行的 JSCodeMod 模板路径列表。
  */
-export const executeJSCodemods = async (dir: string, jscodemodeList: string[]) => {
-  const exec = new Exec(dir)
+export const executeJSCodemods = async (
+  dir: string,
+  jscodemodeList: string[],
+  isUseIgnoredFiles: boolean
+) => {
+  const exec = new Exec(dir, isUseIgnoredFiles)
 
   try {
     // 将模板路径列表映射为具体的 Transform 函数数组
@@ -42,6 +46,6 @@ export function test() {
     '../plugins/jscodemods/unchain-variables'
   ]
   // 调用公共方法执行 JSCodeMod 模板
-  executeJSCodemods(path.join('src copy'), jscodemodeList)
+  executeJSCodemods(path.join('src copy'), jscodemodeList, true)
 }
 // test()

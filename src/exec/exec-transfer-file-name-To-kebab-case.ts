@@ -17,7 +17,7 @@ export async function execTransferFileNameToKebabCase() {
 
   const dir = path.join('src copy')
   // 实例化Exec类，用于后续执行插件转换和文件名修改操作
-  const modifyFilenameExec = useModifyFilenameExec(dir)
+  const modifyFilenameExec = useModifyFilenameExec(dir, true)
   const exec = modifyFilenameExec.exec
   try {
     /**

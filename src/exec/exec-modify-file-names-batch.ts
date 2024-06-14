@@ -30,7 +30,7 @@ export type PriviewResultReturnType = {
   changeRecords: PreviewResult[]
 }
 
-type ModifyFilenameOptions = {
+export type ModifyFilenameOptions = {
   filename?: string
   extname?: string
   dirname?: string
@@ -64,8 +64,8 @@ interface CustomDirnameFunction {
 
 class ModifyFilenameExec {
   exec: Exec
-  constructor(dir: string) {
-    this.exec = new Exec(dir)
+  constructor(dir: string, isUseIgnoredFiles: boolean) {
+    this.exec = new Exec(dir, isUseIgnoredFiles)
   }
 
   // 确保文件扩展名以点开头
@@ -290,16 +290,17 @@ class ModifyFilenameExec {
   }
 }
 
-export const useModifyFilenameExec = (dir: string) => {
-  return new ModifyFilenameExec(dir)
+export const useModifyFilenameExec = (dir: string, isUseIgnoredFiles: boolean) => {
+  return new ModifyFilenameExec(dir, isUseIgnoredFiles)
 }
 
 export const useModifyFilenameExecPreset = async (
   dir: string,
   mode: 'preview' | 'exec',
-  modifyFilenameOptions: ModifyFilenameOptions
+  modifyFilenameOptions: ModifyFilenameOptions,
+  isUseIgnoredFiles: boolean
 ) => {
-  const exec = new ModifyFilenameExec(dir)
+  const exec = new ModifyFilenameExec(dir, isUseIgnoredFiles)
   if (mode === 'preview') {
     return exec.execModifyFileNamesBatchPreview(modifyFilenameOptions)
   } else if (mode === 'exec') {
@@ -316,7 +317,7 @@ export const useModifyFilenameExecPreset = async (
 //     addTimeStamp: false,
 //     addDateTime: false
 //   }
-//   const modify = new ModifyFilenameExec(path.join('C:/Users/ZC/Pictures/Screenshots'))
+//   const modify = new ModifyFilenameExec(path.join('C:/Users/ZC/Pictures/Screenshots'),true)
 //   modify.execModifyFileNamesBatchPreview(modifyFilenameOptions)
 // }
 // test()

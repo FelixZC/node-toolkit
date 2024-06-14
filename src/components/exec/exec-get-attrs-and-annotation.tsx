@@ -10,12 +10,14 @@ import ReactMarkdown from 'react-markdown'
 import gfm from 'remark-gfm'
 import '@src/style/less/markdown-styles.less'
 import 'github-markdown-css/github-markdown.css'
-import { EditOutlined, SplitCellsOutlined, EyeOutlined } from '@ant-design/icons'
+import { EditOutlined, SplitCellsOutlined, EyeOutlined, SettingOutlined } from '@ant-design/icons'
+import '@src/style/less/icon.less'
 
 const FeatureListPage: React.FC = () => {
   const [directoryPath, setDirectoryPath] = useState('') // 存储目录路径
   const [output, setOutput] = useState('') // 存储执行结果
   const [mode, setMode] = useState('split') // 控制编辑器和预览器的显示模式
+  const [isUseIgnoredFiles, setIsUseIgnoredFiles] = useState(false)
 
   // 执行选中的功能
   const handleExecute = async () => {
@@ -25,7 +27,11 @@ const FeatureListPage: React.FC = () => {
     }
     try {
       // 假设这里是执行功能并返回结果的代码
-      const result: string = await ipcRendererInvoke('exec-get-attrs-and-annotation', directoryPath)
+      const result: string = await ipcRendererInvoke(
+        'exec-get-attrs-and-annotation',
+        directoryPath,
+        isUseIgnoredFiles
+      )
       setOutput(result) // 设置执行结果到状态
       message.success('Executed successfully.')
     } catch (error) {
@@ -68,6 +74,10 @@ const FeatureListPage: React.FC = () => {
     setMode(value)
   }
 
+  const handleUseIgnoreFiles = () => {
+    setIsUseIgnoredFiles(!isUseIgnoredFiles)
+  }
+
   return (
     <div style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
       <h1>Get Project Attribute Annotation</h1>
@@ -80,6 +90,14 @@ const FeatureListPage: React.FC = () => {
           readOnly
           onSearch={handleChooseDirectory}
           style={{ flex: 1 }}
+          suffix={
+            <Tooltip title="Use Ignore Files">
+              <SettingOutlined
+                className={`icon-base ${isUseIgnoredFiles ? 'icon-selected' : ''}`}
+                onClick={handleUseIgnoreFiles}
+              />
+            </Tooltip>
+          }
         />
         <Button onClick={handleExecute} style={{ marginLeft: '10px' }}>
           Exec

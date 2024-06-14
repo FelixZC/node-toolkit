@@ -11,8 +11,12 @@ import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
  * @param {string[]} dir - 工作目录，用于执行插件。
  * @param {string[]} pluginsPathList - PostCSS插件的路径列表。
  */
-export async function executePostcssPlugins(dir: string, pluginsPathList: string[]) {
-  const exec = new Exec(dir)
+export async function executePostcssPlugins(
+  dir: string,
+  pluginsPathList: string[],
+  isUseIgnoredFiles: boolean
+) {
+  const exec = new Exec(dir, isUseIgnoredFiles)
 
   try {
     const plugins: PostcssPlugin[] = pluginsPathList.map((pluginPath) => {
@@ -34,5 +38,5 @@ export async function executePostcssPlugins(dir: string, pluginsPathList: string
 // 示例：指定插件路径列表，并调用函数执行这些插件。
 export function test() {
   const pluginsPathList = ['../plugins/postcss-plugins/property-sort']
-  executePostcssPlugins(path.join('src copy'), pluginsPathList)
+  executePostcssPlugins(path.join('src copy'), pluginsPathList, true)
 }

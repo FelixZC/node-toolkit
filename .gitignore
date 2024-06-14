@@ -5,7 +5,6 @@ dist
 .local
 .git
 .history
-/src-copy
 /src copy
 # local env files
 .env.local

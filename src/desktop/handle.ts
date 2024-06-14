@@ -1,5 +1,4 @@
 import { ipcMain, dialog } from 'electron'
-
 export default function mainWindowHandleEvents() {
   ipcMain.handle('choose-directory', async () => {
     const result = await dialog.showOpenDialog({
@@ -8,51 +7,80 @@ export default function mainWindowHandleEvents() {
     return result.filePaths
   })
 
-  ipcMain.handle('exec-babel', async (event, dir: string, babelPluginPathList) => {
-    // 只在需要时导入 executeBabelPlugins
-    const { executeBabelPlugins } = require('../exec/exec-babel-plugin')
-    await executeBabelPlugins(dir, babelPluginPathList)
-  })
+  // 假设所有exec函数都接受一个额外的isUseIgnoredFiles参数
+  ipcMain.handle(
+    'exec-babel',
+    async (event, dir: string, babelPluginPathList: string[], isUseIgnoredFiles: boolean) => {
+      const { executeBabelPlugins } = await import('../exec/exec-babel-plugin')
+      await executeBabelPlugins(dir, babelPluginPathList, isUseIgnoredFiles)
+    }
+  )
 
-  ipcMain.handle('exec-jscodemod', async (event, dir: string, jscodemodeList) => {
-    // 只在需要时导入 executeJSCodemods
-    const { executeJSCodemods } = require('../exec/exec-jscodemod')
-    await executeJSCodemods(dir, jscodemodeList)
-  })
+  ipcMain.handle(
+    'exec-jscodemod',
+    async (event, dir: string, jscodemodeList: string[], isUseIgnoredFiles: boolean) => {
+      const { executeJSCodemods } = await import('../exec/exec-jscodemod')
+      await executeJSCodemods(dir, jscodemodeList, isUseIgnoredFiles)
+    }
+  )
 
-  ipcMain.handle('exec-posthtml', async (event, dir: string, posthtmlPluginPathList) => {
-    const { executePosthtmlPlugins } = require('../exec/exec-posthtml-plugin')
-    await executePosthtmlPlugins(dir, posthtmlPluginPathList)
-  })
+  ipcMain.handle(
+    'exec-posthtml',
+    async (event, dir: string, posthtmlPluginPathList: string[], isUseIgnoredFiles: boolean) => {
+      const { executePosthtmlPlugins } = await import('../exec/exec-posthtml-plugin')
+      await executePosthtmlPlugins(dir, posthtmlPluginPathList, isUseIgnoredFiles)
+    }
+  )
 
-  ipcMain.handle('exec-postcss', async (event, dir: string, postcssPluginPathList) => {
-    const { executePostcssPlugins } = require('../exec/exec-postcss-plugin')
-    await executePostcssPlugins(dir, postcssPluginPathList)
-  })
+  ipcMain.handle(
+    'exec-postcss',
+    async (event, dir: string, postcssPluginPathList: string[], isUseIgnoredFiles: boolean) => {
+      const { executePostcssPlugins } = await import('../exec/exec-postcss-plugin')
+      await executePostcssPlugins(dir, postcssPluginPathList, isUseIgnoredFiles)
+    }
+  )
 
-  ipcMain.handle('exec-file-statistical', async (event, dir: string) => {
-    const { getProjectTree } = require('../exec/exec-file-statistical')
-    return await getProjectTree(dir)
-  })
+  ipcMain.handle(
+    'exec-file-statistical',
+    async (event, dir: string, isUseIgnoredFiles: boolean) => {
+      const { getProjectTree } = await import('../exec/exec-file-statistical')
+      return await getProjectTree(dir, isUseIgnoredFiles)
+    }
+  )
 
-  ipcMain.handle('exec-get-attrs-and-annotation', async (event, dir: string) => {
-    const { getAttributesDescriptionTable } = require('../exec/exec-get-attrs-and-annotation')
-    return await getAttributesDescriptionTable(dir)
-  })
+  ipcMain.handle(
+    'exec-get-attrs-and-annotation',
+    async (event, dir: string, isUseIgnoredFiles: boolean) => {
+      const { getAttributesDescriptionTable } = await import(
+        '../exec/exec-get-attrs-and-annotation'
+      )
+      return await getAttributesDescriptionTable(dir, isUseIgnoredFiles)
+    }
+  )
 
   ipcMain.handle(
     'exec-modify-file-names-batch-priview',
-    async (event, dir: string, modifyFilenameOptions) => {
-      const { useModifyFilenameExecPreset } = require('../exec/exec-modify-file-names-batch')
-      return await useModifyFilenameExecPreset(dir, 'preview', modifyFilenameOptions)
+    async (event, dir: string, modifyFilenameOptions, isUseIgnoredFiles: boolean) => {
+      const { useModifyFilenameExecPreset } = await import('../exec/exec-modify-file-names-batch')
+      return await useModifyFilenameExecPreset(
+        dir,
+        'preview',
+        modifyFilenameOptions,
+        isUseIgnoredFiles
+      )
     }
   )
 
   ipcMain.handle(
     'exec-modify-file-names-batch',
-    async (event, dir: string, modifyFilenameOptions) => {
-      const { useModifyFilenameExecPreset } = require('../exec/exec-modify-file-names-batch')
-      return await useModifyFilenameExecPreset(dir, 'exec', modifyFilenameOptions)
+    async (event, dir: string, modifyFilenameOptions, isUseIgnoredFiles: boolean) => {
+      const { useModifyFilenameExecPreset } = await import('../exec/exec-modify-file-names-batch')
+      return await useModifyFilenameExecPreset(
+        dir,
+        'exec',
+        modifyFilenameOptions,
+        isUseIgnoredFiles
+      )
     }
   )
 
@@ -62,11 +90,18 @@ export default function mainWindowHandleEvents() {
       event,
       dir: string,
       queryReg: RegExp,
-      ignoreReg?: Array<RegExp>,
-      isAddSourcePath?: boolean
+      ignoreReg: RegExp[],
+      isAddSourcePath: boolean,
+      isUseIgnoredFiles: boolean
     ) => {
-      const { batchRegQueryAndReturnResult } = require('../exec/exec-reg-query-batch')
-      return await batchRegQueryAndReturnResult(dir, queryReg, ignoreReg, isAddSourcePath)
+      const { batchRegQueryAndReturnResult } = await import('../exec/exec-reg-query-batch')
+      return await batchRegQueryAndReturnResult(
+        dir,
+        queryReg,
+        ignoreReg,
+        isAddSourcePath,
+        isUseIgnoredFiles
+      )
     }
   )
 }

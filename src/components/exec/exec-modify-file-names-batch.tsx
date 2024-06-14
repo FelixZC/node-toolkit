@@ -5,7 +5,8 @@ import {
   CheckSquareOutlined,
   CloseSquareOutlined,
   ClockCircleOutlined,
-  CalendarOutlined
+  CalendarOutlined,
+  SettingOutlined
 } from '@ant-design/icons'
 import { ipcRendererInvoke } from '../../utils/desktop-utils'
 import { getIgnorePatterns, convertToReg } from '@src/utils/common'
@@ -35,6 +36,7 @@ const FeatureListPage: React.FC = () => {
 
   const [addTimeStamp, setAddTimeStamp] = useState(false) // 文件名是否添加时间戳
   const [addDateTime, setAddDateTime] = useState(false) //文件名是否添加时间秒onds
+  const [isUseIgnoredFiles, setIsUseIgnoredFiles] = useState(false)
 
   //处理预览结果
   const handlePreview = async () => {
@@ -85,7 +87,8 @@ const FeatureListPage: React.FC = () => {
           ignoreFilesPatterns,
           addTimeStamp,
           addDateTime
-        }
+        },
+        isUseIgnoredFiles
       )
       const { changeCount, changeRecords } = result
       let str = ''
@@ -164,7 +167,8 @@ const FeatureListPage: React.FC = () => {
               ignoreFilesPatterns,
               addTimeStamp,
               addDateTime
-            }
+            },
+            isUseIgnoredFiles
           )
           const { changeCount, changeRecords } = result
           let str = ''
@@ -240,6 +244,10 @@ const FeatureListPage: React.FC = () => {
     setAddDateTime(!addDateTime)
   }
 
+  const handleUseIgnoreFiles = () => {
+    setIsUseIgnoredFiles(!isUseIgnoredFiles)
+  }
+
   return (
     <div style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
       <h1>Modify Filename Batch</h1>
@@ -251,6 +259,14 @@ const FeatureListPage: React.FC = () => {
             readOnly
             onSearch={handleChooseDirectory}
             style={{ width: '100%' }}
+            suffix={
+              <Tooltip title="Use Ignore Files">
+                <SettingOutlined
+                  className={`icon-base ${isUseIgnoredFiles ? 'icon-selected' : ''}`}
+                  onClick={handleUseIgnoreFiles}
+                />
+              </Tooltip>
+            }
           />
         </Col>
       </Row>

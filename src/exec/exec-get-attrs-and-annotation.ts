@@ -7,9 +7,9 @@ import { writeFile } from '../utils/fs'
  * @param {string} dir - 项目目录路径
  * @returns {string} attributesDescriptionTable - 属性描述表的字符串
  */
-export async function getAttributesDescriptionTable(dir: string) {
+export async function getAttributesDescriptionTable(dir: string, isUseIgnoredFiles: boolean) {
   // 创建Exec实例
-  const exec = new Exec(dir)
+  const exec = new Exec(dir, isUseIgnoredFiles)
 
   // 获取属性和注释
   const attributesDescriptionTable = await exec.getAttrsAndAnnotation()
@@ -20,7 +20,7 @@ export async function getAttributesDescriptionTable(dir: string) {
 // 使用示例
 export async function test() {
   const dir = path.join('src copy')
-  const attributesDescriptionTable = await getAttributesDescriptionTable(dir)
+  const attributesDescriptionTable = await getAttributesDescriptionTable(dir, true)
   const out = path.join('src/query/md/attributes-description-table.md')
   writeFile(out, attributesDescriptionTable)
 }

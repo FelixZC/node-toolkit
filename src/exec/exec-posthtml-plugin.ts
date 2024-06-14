@@ -7,8 +7,12 @@ import type { Plugin as PosthtmlPlugin } from 'posthtml'
  * @param dir {string} - 工作目录的路径，插件将在该目录下执行。
  * @param pluginsPathList {string[]} - PostHTML插件的路径列表，每个路径都是一个Node.js模块的路径。
  */
-export async function executePosthtmlPlugins(dir: string, pluginsPathList: string[]) {
-  const exec = new Exec(dir)
+export async function executePosthtmlPlugins(
+  dir: string,
+  pluginsPathList: string[],
+  isUseIgnoredFiles: boolean
+) {
+  const exec = new Exec(dir, isUseIgnoredFiles)
 
   try {
     const plugins: PosthtmlPlugin<unknown>[] = pluginsPathList.map((pluginPath) => {
@@ -31,5 +35,5 @@ export async function executePosthtmlPlugins(dir: string, pluginsPathList: strin
 // 使用示例
 export function test() {
   const pluginsPathList: string[] = ['../plugins/posthtml-plugins/property-sort']
-  executePosthtmlPlugins(path.join('src copy'), pluginsPathList)
+  executePosthtmlPlugins(path.join('src copy'), pluginsPathList, true)
 }

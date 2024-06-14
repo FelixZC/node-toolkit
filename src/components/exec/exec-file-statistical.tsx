@@ -2,14 +2,15 @@ import React, { useState, useEffect } from 'react'
 import { Input, Button, message, Tooltip } from 'antd'
 import { ipcRendererInvoke } from '../../utils/desktop-utils'
 import MonacoEditor from 'react-monaco-editor'
-import { SwapOutlined } from '@ant-design/icons'
-
+import { SwapOutlined, SettingOutlined } from '@ant-design/icons'
+import '@src/style/less/icon.less'
 const FeatureListPage: React.FC = () => {
   const [directoryPath, setDirectoryPath] = useState('') // 存储目录路径
   const [output, setOutput] = useState('') // 存储执行结果
   const [isShowInJson, setIsShowInJson] = useState(false)
   const [resultJson, setResultJson] = useState('')
   const [resultMd, setResultMd] = useState('')
+  const [isUseIgnoredFiles, setIsUseIgnoredFiles] = useState(false)
   // 执行选中的功能
   const handleExecute = async () => {
     if (!directoryPath.length) {
@@ -18,7 +19,11 @@ const FeatureListPage: React.FC = () => {
     }
     try {
       // 假设这里是执行功能并返回结果的代码
-      const result = await ipcRendererInvoke('exec-file-statistical', directoryPath)
+      const result = await ipcRendererInvoke(
+        'exec-file-statistical',
+        directoryPath,
+        isUseIgnoredFiles
+      )
       setResultJson(result.resultJson)
       setResultMd(result.resultMd)
       setOutput(isShowInJson ? result.resultJson : result.resultMd) // 设置执行结果到状态
@@ -56,6 +61,10 @@ const FeatureListPage: React.FC = () => {
     setOutput(isShowInJson ? resultJson : resultMd)
   }, [isShowInJson])
 
+  const handleUseIgnoreFiles = () => {
+    setIsUseIgnoredFiles(!isUseIgnoredFiles)
+  }
+
   return (
     <div style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
       <h1>File Statistical</h1>
@@ -68,6 +77,14 @@ const FeatureListPage: React.FC = () => {
           readOnly
           onSearch={handleChooseDirectory}
           style={{ flex: 1 }}
+          suffix={
+            <Tooltip title="Use Ignore Files">
+              <SettingOutlined
+                className={`icon-base ${isUseIgnoredFiles ? 'icon-selected' : ''}`}
+                onClick={handleUseIgnoreFiles}
+              />
+            </Tooltip>
+          }
         />
         <Button onClick={handleExecute} style={{ marginLeft: '10px' }}>
           Exec

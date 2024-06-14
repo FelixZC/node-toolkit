@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { Input, Tooltip, Checkbox, Button, Row, Col, message } from 'antd'
-import { SearchOutlined, CheckSquareOutlined, CloseSquareOutlined } from '@ant-design/icons'
+import {
+  SearchOutlined,
+  CheckSquareOutlined,
+  CloseSquareOutlined,
+  SettingOutlined
+} from '@ant-design/icons'
 import { ipcRendererInvoke } from '../../utils/desktop-utils'
 import { getIgnorePatterns, convertToReg } from '@src/utils/common'
 import '@src/style/less/markdown-styles.less'
@@ -16,6 +21,7 @@ const FeatureListPage: React.FC = () => {
   const [matchWholeWord, setMatchWholeWord] = useState(false) // 是否匹配整个单词
   const [matchReg, setMatchReg] = useState(false) // 是否使用正则表达式
   const [filesToExclude, setFilesToExclude] = useState('') // 要排除的文件列表
+  const [isUseIgnoredFiles, setIsUseIgnoredFiles] = useState(false)
 
   // 执行选中的功能
   const handleExecute = async () => {
@@ -34,7 +40,8 @@ const FeatureListPage: React.FC = () => {
         directoryPath,
         regExp,
         ignoreFilesPatterns,
-        isAddSourcePath
+        isAddSourcePath,
+        isUseIgnoredFiles
       )
       setOutput(result) // 设置执行结果到状态
       message.success('Executed successfully.')
@@ -75,7 +82,9 @@ const FeatureListPage: React.FC = () => {
   const handleUseRegExpChange = () => {
     setMatchReg(!matchReg)
   }
-
+  const handleUseIgnoreFiles = () => {
+    setIsUseIgnoredFiles(!isUseIgnoredFiles)
+  }
   return (
     <div style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
       <h1>File Content Query</h1>
@@ -88,6 +97,14 @@ const FeatureListPage: React.FC = () => {
             readOnly
             onSearch={handleChooseDirectory}
             style={{ width: '100%' }}
+            suffix={
+              <Tooltip title="Use Ignore Files">
+                <SettingOutlined
+                  className={`icon-base ${isUseIgnoredFiles ? 'icon-selected' : ''}`}
+                  onClick={handleUseIgnoreFiles}
+                />
+              </Tooltip>
+            }
           />
         </Col>
       </Row>

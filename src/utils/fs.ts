@@ -2,10 +2,11 @@ import * as fs from 'fs-extra'
 import { ParsedPath } from 'path'
 import * as os from 'os'
 import * as path from 'path'
+import { app } from 'electron'
 import { LRUCache } from 'lru-cache'
 import { logDecorator } from '../utils/log'
 import { FileType, classifyFileTypeByExt } from './common'
-
+import ignore from 'ignore' // 导入默认导出的 ignore 函数
 /**
  * fs.ts使用读异步，写同步
  * TODO 添加缓存功能操作
@@ -173,36 +174,44 @@ export function renameFile(
   }
 }
 /******************************************************************************************************************** */
-// 定义一个类型来表示忽略规则
-type IgnoreRule = (filePath: string) => boolean
-export function useIgnored(): Array<IgnoreRule> {
-  const gitIgnorePath = path.join(process.cwd(), '.gitignore') // 假设 .gitignore 文件在当前目录
-  const gitIgnoreContent = fs.readFileSync(gitIgnorePath, 'utf-8')
-  const rules = gitIgnoreContent.split(/\r?\n/).map((line) => {
-    // 去除行首尾空白字符，并忽略注释行和空行
-    const trimmedLine = line.trim()
-    if (trimmedLine === '' || trimmedLine.startsWith('#')) {
-      return () => false // 忽略无效规则
+export function getIgnorePath(): string {
+  const basePath = process.env.NODE_ENV === 'production' ? app.getPath('appData') : process.cwd()
+  return path.join(basePath, '.gitignore')
+}
+class GitIgnoreParser {
+  private ignoreRules: ReturnType<typeof ignore>
+
+  constructor() {
+    this.ignoreRules = ignore()
+  }
+  loadFromFile() {
+    const gitIgnorePath = getIgnorePath()
+    if (fs.existsSync(gitIgnorePath)) {
+      const gitIgnoreContent = fs.readFileSync(gitIgnorePath, 'utf-8')
+      this.ignoreRules.add(gitIgnoreContent)
+    } else {
+      fs.ensureFileSync(gitIgnorePath)
     }
-    // 返回一个函数，该函数根据规则判断文件路径是否被忽略
-    return (filePath: string) => {
-      return new RegExp(
-        `^${path
-          .normalize(trimmedLine)
-          .replace(/([\\/.*+?^=!:${}|[]()])/g, '\\$1')
-          .replace(/\*\*$/, '(.+/)?')
-          .replace(/\*/g, '[^/]*')}$`
-      ).test(filePath)
-    }
-  })
-  return rules
+  }
+
+  test(filePath: string): boolean {
+    // 传入的 filePath 应该是相对于项目根目录的相对路径
+    return this.ignoreRules.ignores(filePath)
+  }
 }
 
+export function useIgnored(): { ignore: (filePath: string) => boolean } {
+  const parser = new GitIgnoreParser()
+  parser.loadFromFile()
+
+  return {
+    ignore: (filePath: string) => parser.test(filePath)
+  }
+}
 /******************************************************************************************************************** */
 // FsInstance接口
 export interface FsInstance {
   rootPath: string
-  folderPath: string
   filePathList: string[]
   dirPathList: string[]
   eol: string
@@ -218,25 +227,23 @@ export interface FsInstance {
 
 // 文件夹操作类
 class fsUtils implements FsInstance {
-  folderPath: string
+  rootPath: string
   filePathList: string[] = []
   dirPathList: string[] = []
   eol: string
-  constructor(public rootPath: string, isUseIgnore?: boolean) {
-    this.rootPath = rootPath
+  constructor(public inputRootPath: string, isUseIgnore?: boolean) {
     this.eol = os.EOL
-    this.folderPath = path.resolve(rootPath)
+    this.rootPath = path.resolve(inputRootPath)
     if (isUseIgnore) {
       this.refreshFileListsUseIgnore()
     } else {
       this.refreshFileLists()
     }
   }
-
   // 刷新文件列表和目录列表
   private refreshFileLists() {
     this.filePathList = []
-    this.dirPathList = [this.folderPath]
+    this.dirPathList = [this.rootPath]
     const walk = async (dir: string): Promise<void> => {
       const dirents = fs.readdirSync(dir, { withFileTypes: true })
       for (const dirent of dirents) {
@@ -250,21 +257,21 @@ class fsUtils implements FsInstance {
       }
     }
 
-    walk(this.folderPath)
+    walk(this.rootPath)
   }
 
   // 刷新文件列表和目录列表，使用忽略文件.gitignore
   private refreshFileListsUseIgnore() {
     this.filePathList = []
-    this.dirPathList = [this.folderPath]
-    const ignoreRules = useIgnored()
+    this.dirPathList = [this.rootPath]
+    const { ignore } = useIgnored()
     const walk = (dir: string): void => {
       const dirents = fs.readdirSync(dir, { withFileTypes: true })
       for (const dirent of dirents) {
         const newDir = path.resolve(dir, dirent.name)
-        const relativePath = path.relative(this.rootPath, newDir).replace(/\\/g, '/')
+        const relativePath = path.relative(this.rootPath, newDir)
         // 检查是否应该忽略该文件或目录
-        if (ignoreRules.some((rule) => rule(relativePath))) {
+        if (ignore(relativePath)) {
           continue
         }
         if (dirent.isDirectory()) {
@@ -275,7 +282,7 @@ class fsUtils implements FsInstance {
         }
       }
     }
-    walk(this.folderPath)
+    walk(this.rootPath)
   }
   getFileInfoList(): FileInfo[] {
     return this.filePathList.map((filePath) => getFileInfo(filePath))
@@ -299,7 +306,7 @@ class fsUtils implements FsInstance {
   // 新增文件操作
   @logDecorator
   async addFile(filePath: string, content: string): Promise<void> {
-    const newFilePath = path.resolve(this.folderPath, filePath)
+    const newFilePath = path.resolve(this.rootPath, filePath)
     await writeFile(newFilePath, content)
     this.updateFileListsAfterChange(undefined, newFilePath)
   }
@@ -307,7 +314,7 @@ class fsUtils implements FsInstance {
   // 删除文件操作
   @logDecorator
   async deleteFile(filePath: string): Promise<void> {
-    const oldFilePath = path.resolve(this.folderPath, filePath)
+    const oldFilePath = path.resolve(this.rootPath, filePath)
     await deleteFile(oldFilePath)
     this.updateFileListsAfterChange(oldFilePath)
   }

@@ -6,8 +6,12 @@ import type { BabelPlugin } from '../plugins/use-babel-plugin'
  * 执行 Babel 插件的公共方法。
  * @param babelPluginPathList 需要执行的 Babel 插件路径列表。
  */
-export const executeBabelPlugins = async (dir: string, babelPluginPathList: string[]) => {
-  const exec = new Exec(dir)
+export const executeBabelPlugins = async (
+  dir: string,
+  babelPluginPathList: string[],
+  isUseIgnoredFiles: boolean
+) => {
+  const exec = new Exec(dir, isUseIgnoredFiles)
 
   try {
     // 将插件路径列表映射为具体的插件实例数组
@@ -38,6 +42,6 @@ export function test() {
     // '../plugins/babel-plugins/depart-default-export-object-express'
     // '../plugins/babel-plugins/replace-memberExpress-object-or-property'
   ]
-  executeBabelPlugins(path.join('src copy'), babelPluginPathList)
+  executeBabelPlugins(path.join('src copy'), babelPluginPathList, true)
 }
 // test()

@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { List, Input, Button, Switch, message } from 'antd'
+import { List, Input, Button, Switch, message, Tooltip } from 'antd'
 import { ipcRendererInvoke } from '../../utils/desktop-utils'
+import { SettingOutlined } from '@ant-design/icons'
+import '@src/style/less/icon.less'
+
 interface Feature {
   id: number
   name: string
@@ -56,6 +59,7 @@ const initialFeatures: Feature[] = [
 const FeatureListPage: React.FC = () => {
   const [features, setFeatures] = useState(initialFeatures)
   const [directoryPath, setDirectoryPath] = useState('') // 存储目录路径
+  const [isUseIgnoredFiles, setIsUseIgnoredFiles] = useState(false)
 
   // 切换所有功能的选中状态
   const handleSelectRevert = () => {
@@ -90,7 +94,7 @@ const FeatureListPage: React.FC = () => {
     }
     const babelPathList = selectedFeatures.map((f) => f.path)
     try {
-      await ipcRendererInvoke('exec-babel', directoryPath, babelPathList)
+      await ipcRendererInvoke('exec-babel', directoryPath, babelPathList, isUseIgnoredFiles)
       message.success(`Executing: ${selectedFeatures.map((f) => f.name).join(', ')}`)
     } catch (error) {
       message.error('Failed to execute: ' + error)
@@ -110,6 +114,9 @@ const FeatureListPage: React.FC = () => {
       message.error('Failed to choose directory: ' + error)
     }
   }
+  const handleUseIgnoreFiles = () => {
+    setIsUseIgnoredFiles(!isUseIgnoredFiles)
+  }
 
   // 组件加载完毕后执行的方法
   useEffect(() => {
@@ -125,6 +132,14 @@ const FeatureListPage: React.FC = () => {
         value={directoryPath}
         readOnly
         onSearch={handleChooseDirectory}
+        suffix={
+          <Tooltip title="Use Ignore Files">
+            <SettingOutlined
+              className={`icon-base ${isUseIgnoredFiles ? 'icon-selected' : ''}`}
+              onClick={handleUseIgnoreFiles}
+            />
+          </Tooltip>
+        }
       />
       <div style={{ marginTop: '10px', marginBottom: '10px' }}>
         <Button onClick={handleSelectRevert}>Toggle Select Revert</Button>
