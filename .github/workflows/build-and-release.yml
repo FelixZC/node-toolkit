@@ -1,0 +1,47 @@
+name: Build and Release Node Toolkit
+
+on:
+  push:
+    branches:
+      - publish
+  # 您还可以添加其他触发条件，例如在创建标签时触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14' # 或者您项目所需的 Node.js 版本
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Lint
+      run: |
+        npm run lint:eslint
+        npm run lint:prettier
+
+    - name: Compile TypeScript
+      run: npm run compile
+
+    - name: Build Electron App for Windows
+      run: npm run build-win64
+
+    - name: Build Electron App for macOS
+      run: npm run build-mac64
+
+    - name: Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          dist/win/*.exe
+          dist/mac/*.dmg
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
