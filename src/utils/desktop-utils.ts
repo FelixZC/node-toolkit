@@ -1,3 +1,5 @@
+import type { IpcRendererEvent } from 'electron'
+
 /**
  * 扩展了Window接口，添加了ipcRenderer和process属性。
  * ipcRenderer用于与电子应用程序的主进程进行通信。
@@ -7,9 +9,12 @@ declare global {
   interface Window {
     ipcRenderer: {
       send: (...args: any[]) => void // 发送异步消息到主进程
-      on: (channel: string, listener: (...args: any[]) => void) => void // 监听ipcRenderer事件
-      once: (channel: string, listener: (...args: any[]) => void) => void // 监听一次ipcRenderer事件
-      removeListener: (channel: string, listener: (...args: any[]) => void) => void // 移除ipcRenderer事件监听器
+      on: (channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void) => void // 监听ipcRenderer事件
+      once: (channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void) => void // 监听一次ipcRenderer事件
+      removeListener: (
+        channel: string,
+        listener: (event: IpcRendererEvent, ...args: any[]) => void
+      ) => void // 移除ipcRenderer事件监听器
       sendSync: (...args: any[]) => any // 发送同步消息到主进程
       invoke: (...args: any[]) => Promise<any> // 发送异步消息到主进程并等待回应
     }
@@ -74,7 +79,10 @@ export const ipcRendererInvoke = (eventName: string, ...args: any[]) => {
  * @param {string} eventName - 事件名称。
  * @param {(...args: any[]) => void} listener - 事件触发时执行的回调函数。
  */
-export const ipcRendererOn = (eventName: string, listener: (...args: any[]) => void) => {
+export const ipcRendererOn = (
+  eventName: string,
+  listener: (event: IpcRendererEvent, ...args: any[]) => void
+) => {
   window.ipcRenderer?.on(eventName, listener)
 }
 
@@ -83,7 +91,10 @@ export const ipcRendererOn = (eventName: string, listener: (...args: any[]) => v
  * @param {string} eventName - 事件名称。
  * @param {(...args: any[]) => void} listener - 事件触发时执行的回调函数。
  */
-export const ipcRendererOnce = (eventName: string, listener: (...args: any[]) => void) => {
+export const ipcRendererOnce = (
+  eventName: string,
+  listener: (event: IpcRendererEvent, ...args: any[]) => void
+) => {
   window.ipcRenderer?.once(eventName, listener)
 }
 

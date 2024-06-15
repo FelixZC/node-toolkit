@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom/client'
 import { HashRouter as Router } from 'react-router-dom' // 引入 useNavigate 钩子
 import store from '@src/store'
 import '../utils/svg-icons'
+import openRendererListenEvents from './listen'
 // 主进程代码 (main.js 或者 index.js)
 
 const rootElement = document.getElementById('root') as HTMLElement
@@ -18,3 +19,4 @@ root.render(
     </Provider>
   </React.StrictMode>
 )
+openRendererListenEvents()

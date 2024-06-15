@@ -1,6 +1,5 @@
 // progressSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { useDispatch, useSelector } from 'react-redux'
 interface ProgressState {
   value: number
   isVisible: boolean
@@ -11,7 +10,7 @@ const initialState: ProgressState = {
   isVisible: false,
   isReset: false
 }
-const progressSlice = createSlice({
+export const progressSlice = createSlice({
   name: 'progress',
   initialState,
   reducers: {
@@ -30,31 +29,5 @@ const progressSlice = createSlice({
     }
   }
 })
-// 自定义 Hooks
-export const useProgress = () => {
-  const dispatch = useDispatch()
-  const { value, isVisible, isReset } = useSelector<
-    {
-      progress: ProgressState
-    },
-    ProgressState
-  >((state) => state.progress)
-  const updateProgress = (newValue: number) => {
-    dispatch(progressSlice.actions.updateProgress(newValue))
-  }
-  const toggleVisibility = () => {
-    dispatch(progressSlice.actions.toggleVisibility())
-  }
-  const resetProgress = () => {
-    dispatch(progressSlice.actions.resetProgress())
-  }
-  return {
-    value,
-    isVisible,
-    isReset,
-    updateProgress,
-    toggleVisibility,
-    resetProgress
-  }
-}
+
 export default progressSlice.reducer

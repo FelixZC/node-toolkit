@@ -1,9 +1,13 @@
 import { contextBridge, ipcRenderer } from 'electron'
+import type { IpcRendererEvent } from 'electron'
 type ExposedInMainWorld = {
   send: (channel: string, ...args: any[]) => void
-  on: (channel: string, func: (event: any, ...args: any[]) => void) => void
-  once: (channel: string, func: (event: any, ...args: any[]) => void) => void
-  removeListener: (channel: string, func: (event: any, ...args: any[]) => void) => void
+  on: (channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void) => void
+  once: (channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void) => void
+  removeListener: (
+    channel: string,
+    listener: (event: IpcRendererEvent, ...args: any[]) => void
+  ) => void
   sendSync: (channel: string, ...args: any[]) => any
   invoke: (channel: string, ...args: any[]) => Promise<any>
 }
@@ -21,14 +25,17 @@ const exposedIpcRenderer: ExposedInMainWorld = {
       ipcRenderer.send(channel)
     }
   },
-  on: (channel: string, func: (event: any, ...args: any[]) => void) => {
-    ipcRenderer.on(channel, func)
+  on: (channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void) => {
+    ipcRenderer.on(channel, listener)
   },
-  once: (channel: string, func: (event: any, ...args: any[]) => void) => {
-    ipcRenderer.once(channel, func)
+  once: (channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void) => {
+    ipcRenderer.once(channel, listener)
   },
-  removeListener: (channel: string, func: (event: any, ...args: any[]) => void) => {
-    ipcRenderer.removeListener(channel, func)
+  removeListener: (
+    channel: string,
+    listener: (event: IpcRendererEvent, ...args: any[]) => void
+  ) => {
+    ipcRenderer.removeListener(channel, listener)
   },
   sendSync: (channel: string, ...args: any[]) => {
     if (args.length > 0) {

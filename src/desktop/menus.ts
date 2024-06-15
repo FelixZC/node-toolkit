@@ -1,3 +1,4 @@
+//menus.ts
 import { clearCacheAll } from '../utils/fs'
 import { getIgnorePath } from '../utils/ignore'
 import { logger } from '../utils/log'
@@ -10,6 +11,18 @@ const getMenuTemplate = (mainWindow: Electron.BrowserWindow): Array<MenuItemCons
     {
       label: 'File',
       submenu: [
+        {
+          label: 'Open Folder',
+          accelerator: 'CmdOrCtrl+O',
+          click: async () => {
+            const result = await dialog.showOpenDialog({
+              properties: ['openDirectory'] // 设定为只选择目录
+            })
+            if (result.filePaths.length > 0) {
+              mainWindow.webContents.send('open-directory', result.filePaths[0])
+            }
+          }
+        },
         {
           label: 'Clear Files Cache',
           accelerator: 'CmdOrCtrl+F5',

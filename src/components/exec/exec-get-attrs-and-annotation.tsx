@@ -1,22 +1,23 @@
 import AceEditor from 'react-ace'
-import { Button, Input, message, Tooltip } from 'antd'
+import { Button, message, Tooltip } from 'antd'
 import { ipcRendererInvoke } from '../../utils/desktop-utils'
 import React, { useEffect, useRef, useState } from 'react'
 import 'ace-builds/src-noconflict/ext-searchbox'
 import 'ace-builds/src-noconflict/theme-github'
 import 'ace-builds/src-noconflict/mode-markdown'
 import 'ace-builds/src-noconflict/ext-language_tools'
-import { EditOutlined, EyeOutlined, SettingOutlined, SplitCellsOutlined } from '@ant-design/icons'
+import { EditOutlined, EyeOutlined, SplitCellsOutlined } from '@ant-design/icons'
 import gfm from 'remark-gfm'
 import ReactMarkdown from 'react-markdown'
 import '@src/style/less/markdown-styles.less'
 import 'github-markdown-css/github-markdown.css'
 import '@src/style/less/icon.less'
+import Directory from '@src/components/file-manage/directory'
+import useDirectory from '@src/store/use-directory'
 const FeatureListPage: React.FC = () => {
-  const [directoryPath, setDirectoryPath] = useState('') // 存储目录路径
   const [output, setOutput] = useState('') // 存储执行结果
   const [mode, setMode] = useState('split') // 控制编辑器和预览器的显示模式
-  const [isUseIgnoredFiles, setIsUseIgnoredFiles] = useState(false)
+  const { directoryPath, isUseIgnoredFiles } = useDirectory()
 
   // 执行选中的功能
   const handleExecute = async () => {
@@ -39,20 +40,6 @@ const FeatureListPage: React.FC = () => {
     }
   }
 
-  // 选择目录
-  const handleChooseDirectory = async () => {
-    try {
-      const filePaths = await ipcRendererInvoke('choose-directory')
-      if (filePaths && filePaths.length > 0) {
-        setDirectoryPath(filePaths[0]) // 设置目录路径到状态
-        message.success('Directory chosen: ' + filePaths[0])
-        sessionStorage.setItem('directoryPath', filePaths[0])
-      }
-    } catch (error) {
-      message.error('Failed to choose directory: ' + error)
-    }
-  }
-
   // 组件加载完毕后执行的方法
   useEffect(() => {
     const editor = editorRef.current?.editor
@@ -60,8 +47,6 @@ const FeatureListPage: React.FC = () => {
       editor.renderer.setShowGutter(true)
       editor.session.setMode('ace/mode/markdown')
     }
-    setDirectoryPath(sessionStorage.getItem('directoryPath') || '')
-    setIsUseIgnoredFiles(sessionStorage.getItem('isUseIgnoredFiles') === 'true')
   }, []) // 空依赖数组表示这个effect只在挂载时运行一次
 
   const editorRef = useRef<AceEditor>(null)
@@ -72,10 +57,7 @@ const FeatureListPage: React.FC = () => {
   const handleModeChange = (value: string) => {
     setMode(value)
   }
-  const handleUseIgnoreFiles = () => {
-    setIsUseIgnoredFiles(!isUseIgnoredFiles)
-    sessionStorage.setItem('isUseIgnoredFiles', String(!isUseIgnoredFiles))
-  }
+
   return (
     <div
       style={{
@@ -85,8 +67,6 @@ const FeatureListPage: React.FC = () => {
       }}
     >
       <h1>Get Project Attribute Annotation</h1>
-
-      {/* 显示目录路径的Input组件 */}
       <div
         style={{
           display: 'flex',
@@ -94,23 +74,9 @@ const FeatureListPage: React.FC = () => {
           width: '100%'
         }}
       >
-        <Input.Search
-          placeholder="Directory Path"
-          value={directoryPath}
-          readOnly
-          onSearch={handleChooseDirectory}
-          style={{
-            flex: 1
-          }}
-          suffix={
-            <Tooltip title="Use Ignore Files">
-              <SettingOutlined
-                className={`icon-base ${isUseIgnoredFiles ? 'icon-selected' : ''}`}
-                onClick={handleUseIgnoreFiles}
-              />
-            </Tooltip>
-          }
-        />
+        <div style={{ flex: 1 }}>
+          <Directory />
+        </div>
         <Button
           onClick={handleExecute}
           style={{

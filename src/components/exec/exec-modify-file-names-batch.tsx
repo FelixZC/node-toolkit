@@ -4,21 +4,21 @@ import {
   CheckSquareOutlined,
   ClockCircleOutlined,
   CloseSquareOutlined,
-  SearchOutlined,
-  SettingOutlined
+  SearchOutlined
 } from '@ant-design/icons'
 import { convertToReg, getIgnorePatterns } from '@src/utils/common'
 import { ipcRendererInvoke } from '../../utils/desktop-utils'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import '@src/style/less/markdown-styles.less'
 import '@src/style/less/icon.less'
 import '@src/style/less/pre.less'
+import Directory from '@src/components/file-manage/directory'
+import useDirectory from '@src/store/use-directory'
 import type {
   ModifyResultReturnType,
   PriviewResultReturnType
 } from '@src/exec/exec-modify-file-names-batch'
 const FeatureListPage: React.FC = () => {
-  const [directoryPath, setDirectoryPath] = useState('') // 存储目录路径
   const [output, setOutput] = useState('') // 存储执行结果
   const [filenameQuery, setFilenameQuery] = useState('') // 用户输入的搜索内容
   const [replaceFilename, setReplaceFilename] = useState('') //用户想要替换的内容
@@ -36,7 +36,7 @@ const FeatureListPage: React.FC = () => {
 
   const [addTimeStamp, setAddTimeStamp] = useState(false) // 文件名是否添加时间戳
   const [addDateTime, setAddDateTime] = useState(false) //文件名是否添加时间秒onds
-  const [isUseIgnoredFiles, setIsUseIgnoredFiles] = useState(false)
+  const { directoryPath, isUseIgnoredFiles } = useDirectory()
 
   //处理预览结果
   const handlePreview = async () => {
@@ -190,26 +190,6 @@ const FeatureListPage: React.FC = () => {
     })
   }
 
-  // 选择目录
-  const handleChooseDirectory = async () => {
-    try {
-      const filePaths = await ipcRendererInvoke('choose-directory')
-      if (filePaths && filePaths.length > 0) {
-        setDirectoryPath(filePaths[0]) // 设置目录路径到状态
-        message.success('Directory chosen: ' + filePaths[0])
-        sessionStorage.setItem('directoryPath', filePaths[0])
-      }
-    } catch (error) {
-      message.error('Failed to choose directory: ' + error)
-    }
-  }
-
-  // 组件加载完毕后执行的方法
-  useEffect(() => {
-    setDirectoryPath(sessionStorage.getItem('directoryPath') || '')
-    setIsUseIgnoredFiles(sessionStorage.getItem('isUseIgnoredFiles') === 'true')
-  }, []) // 空依赖数组表示这个effect只在挂载时运行一次
-
   // 图标点击事件处理函数
   const handleFilenameMatchCaseChange = () => {
     setFilenameMatchCase(!filenameMatchCase)
@@ -237,10 +217,6 @@ const FeatureListPage: React.FC = () => {
   const handleAddDateTime = () => {
     setAddDateTime(!addDateTime)
   }
-  const handleUseIgnoreFiles = () => {
-    setIsUseIgnoredFiles(!isUseIgnoredFiles)
-    sessionStorage.setItem('isUseIgnoredFiles', String(!isUseIgnoredFiles))
-  }
   return (
     <div
       style={{
@@ -258,23 +234,7 @@ const FeatureListPage: React.FC = () => {
         }}
       >
         <Col span={16}>
-          <Input.Search
-            placeholder="Directory Path"
-            value={directoryPath}
-            readOnly
-            onSearch={handleChooseDirectory}
-            style={{
-              width: '100%'
-            }}
-            suffix={
-              <Tooltip title="Use Ignore Files">
-                <SettingOutlined
-                  className={`icon-base ${isUseIgnoredFiles ? 'icon-selected' : ''}`}
-                  onClick={handleUseIgnoreFiles}
-                />
-              </Tooltip>
-            }
-          />
+          <Directory />
         </Col>
       </Row>
 

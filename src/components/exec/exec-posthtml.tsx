@@ -1,7 +1,8 @@
-import { Button, Input, List, message, Switch, Tooltip } from 'antd'
+import { Button, List, message, Switch } from 'antd'
 import { ipcRendererInvoke } from '../../utils/desktop-utils'
-import React, { useEffect, useState } from 'react'
-import { SettingOutlined } from '@ant-design/icons'
+import React, { useState } from 'react'
+import Directory from '@src/components/file-manage/directory'
+import useDirectory from '@src/store/use-directory'
 import '@src/style/less/icon.less'
 interface Feature {
   id: number
@@ -19,8 +20,7 @@ const initialFeatures: Feature[] = [
 ]
 const FeatureListPage: React.FC = () => {
   const [features, setFeatures] = useState(initialFeatures)
-  const [directoryPath, setDirectoryPath] = useState('') // 存储目录路径
-  const [isUseIgnoredFiles, setIsUseIgnoredFiles] = useState(false)
+  const { directoryPath, isUseIgnoredFiles } = useDirectory()
 
   // 切换所有功能的选中状态
   const handleSelectRevert = () => {
@@ -77,30 +77,6 @@ const FeatureListPage: React.FC = () => {
       message.error('Failed to execute: ' + error)
     }
   }
-  // 选择目录
-  const handleChooseDirectory = async () => {
-    try {
-      const filePaths = await ipcRendererInvoke('choose-directory')
-      if (filePaths && filePaths.length > 0) {
-        setDirectoryPath(filePaths[0]) // 设置目录路径到状态
-        message.success('Directory chosen: ' + filePaths[0])
-        sessionStorage.setItem('directoryPath', filePaths[0])
-      }
-    } catch (error) {
-      message.error('Failed to choose directory: ' + error)
-    }
-  }
-  const handleUseIgnoreFiles = () => {
-    setIsUseIgnoredFiles(!isUseIgnoredFiles)
-    sessionStorage.setItem('isUseIgnoredFiles', String(!isUseIgnoredFiles))
-  }
-
-  // 组件加载完毕后执行的方法
-  useEffect(() => {
-    setDirectoryPath(sessionStorage.getItem('directoryPath') || '')
-    setIsUseIgnoredFiles(sessionStorage.getItem('isUseIgnoredFiles') === 'true')
-  }, []) // 空依赖数组表示这个effect只在挂载时运行一次
-
   return (
     <div
       style={{
@@ -109,20 +85,7 @@ const FeatureListPage: React.FC = () => {
     >
       <h1>Posthtml Plugin List Execution Page</h1>
       {/* 显示目录路径的Input组件 */}
-      <Input.Search
-        placeholder="Directory Path"
-        value={directoryPath}
-        readOnly
-        onSearch={handleChooseDirectory}
-        suffix={
-          <Tooltip title="Use Ignore Files">
-            <SettingOutlined
-              className={`icon-base ${isUseIgnoredFiles ? 'icon-selected' : ''}`}
-              onClick={handleUseIgnoreFiles}
-            />
-          </Tooltip>
-        }
-      />
+      <Directory />
       <div
         style={{
           marginTop: '10px',

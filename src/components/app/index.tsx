@@ -1,5 +1,5 @@
 import '../../style/less/app.less'
-// import DesktopHeader from '@src/components/desktop-header'
+// import DesktopHeader from '@src/components/desktop-header/index'
 import { getProcessNodeEnv, ipcRendererSend, isDesktop } from '@src/utils/desktop-utils'
 import MineLayout from '@src/layout/index'
 /**
