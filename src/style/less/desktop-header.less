@@ -1,45 +1,45 @@
 .desktop-header {
-    width: 100%;
-    height: 32px;
     -webkit-app-region: drag;
     box-shadow: inset 0 -1px 0 0 #E9EAED;
     display: flex;
+    height: 32px;
     justify-content: space-between;
+    width: 100%;
 
     .header-logo-box {
-        height: 100%;
-        padding-left: 8px;
-        display: flex;
+        -webkit-app-region: no-drag;
         align-items: center;
         color: #222;
+        display: flex;
         font-size: 12px;
-        -webkit-app-region: no-drag;
+        height: 100%;
+        padding-left: 8px;
 
         img {
-            width: 24px;
             height: 24px;
             margin-right: 8px;
+            width: 24px;
         }
     }
 
     .header-handle-box {
-        height: 100%;
-        display: flex;
-        align-items: center;
         -webkit-app-region: no-drag;
+        align-items: center;
+        display: flex;
+        height: 100%;
 
         .open-devtool {
+            cursor: pointer;
+            font-size: 12px;
             height: 24px;
             margin-right: 8px;
-            font-size: 12px;
             padding: 0 6px;
-            cursor: pointer;
         }
 
         .handle-icon-box {
-            width: 36px;
             height: 32px;
             padding: 4px 6px;
+            width: 36px;
         }
 
         .handle-icon-box:hover {

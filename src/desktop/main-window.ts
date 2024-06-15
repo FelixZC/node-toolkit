@@ -3,15 +3,14 @@
  * 使用Electron框架，配置窗口属性，并处理窗口事件。
  */
 import { BrowserWindow } from 'electron'
+import { createMenu } from './menus'
+// 判断是否为开发环境
+import { initTray } from './system-tray'
 import mainWindowHandleEvents from './handle'
 import mainWindowListenEvents from './listen'
 import * as path from 'path'
-import { initTray } from './system-tray'
-import { createMenu } from './menus'
-// 判断是否为开发环境
 type DevelopmentOrProduction = 'development' | 'production'
 const isDevelopment: DevelopmentOrProduction = process.env.NODE_ENV! as DevelopmentOrProduction
-
 let mainWindow: BrowserWindow | null = null // 全局变量，用于存储主窗口对象
 
 /**
@@ -34,14 +33,12 @@ function createMainWindow(): void {
     },
     icon: path.resolve(__dirname, '../../../build/electron-logo1.ico')
   })
-
   if (isDevelopment === 'development') {
     mainWindow.loadURL('http://localhost:8848/home')
   } else {
     const entryPath = path.join(__dirname, '../../../build/index.html')
     mainWindow.loadFile(entryPath)
   }
-
   mainWindow.once('ready-to-show', () => {
     initTray()
     createMenu(mainWindow!)

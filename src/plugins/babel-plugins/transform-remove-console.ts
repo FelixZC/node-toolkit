@@ -133,7 +133,6 @@ export default declare((babel) => {
           path.replaceWith(createNoop())
         }
       },
-
       MemberExpression: {
         exit(path, state) {
           // 移除或替换符合条件的console属性

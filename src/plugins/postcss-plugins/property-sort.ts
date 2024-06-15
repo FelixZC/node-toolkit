@@ -1,5 +1,4 @@
-import { AcceptedPlugin, Rule, AtRule, Comment, Root, Declaration } from 'postcss'
-
+import { AcceptedPlugin, AtRule, Comment, Declaration, Root, Rule } from 'postcss'
 const pluginName = 'postcss-sort-props-alphabetically'
 
 // 辅助函数，用于在给定的 Rule 中排序属性

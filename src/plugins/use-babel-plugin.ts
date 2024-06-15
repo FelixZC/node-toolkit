@@ -1,14 +1,14 @@
 import * as babel from '@babel/core'
 import generator from '@babel/generator'
 import { getGeneratorOption, getParserOption } from './babel-plugins/ast-utils'
+import { logger } from '../utils/log'
+// 导出 Babel 核心 API 类型
 import * as parser from '@babel/parser'
 import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
 import traverse from '@babel/traverse'
 import type * as Babel from '@babel/core'
 import type { PluginObj, Visitor } from '@babel/core'
 import type { ExecFileInfo } from '../../types/common'
-import { logger } from '../utils/log'
-// 导出 Babel 核心 API 类型
 export type BabelAPI = typeof Babel
 // 定义一个自定义插件对象接口，扩展 Babel 插件对象，添加 getExtra 方法和 visitor
 export interface CustomPluginObj extends PluginObj {
@@ -38,7 +38,10 @@ const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
 
       // 如果插件定义了 getExtra 方法，则调用并合并返回的额外信息到 execFileInfo.extra
       if (typeof pluginObj.getExtra === 'function') {
-        execFileInfo.extra = { ...execFileInfo.extra, ...pluginObj.getExtra() }
+        execFileInfo.extra = {
+          ...execFileInfo.extra,
+          ...pluginObj.getExtra()
+        }
       }
     }
 
@@ -90,7 +93,6 @@ const runBabelPlugin = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) 
     execFileInfo.source = descriptor.script.content
     descriptor.script.content = transform(execFileInfo, pluginsList)
   }
-
   if (descriptor.scriptSetup && descriptor.scriptSetup.content) {
     execFileInfo.source = descriptor.scriptSetup.content
     descriptor.scriptSetup.content = transform(execFileInfo, pluginsList)
@@ -99,5 +101,4 @@ const runBabelPlugin = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) 
   // 将更新后的 descriptor 字符串化并返回
   return stringifySFC(descriptor)
 }
-
 export default runBabelPlugin

@@ -23,7 +23,6 @@ const propertySort: PostHTML.Plugin<unknown> = (tree) => {
           }
         }
       }
-
       const urlReg = /(?:url|require)\(['"`]?([\s\S]*?)['"`]?\)/
 
       // 检查并处理属性值中的路径
@@ -45,9 +44,7 @@ const propertySort: PostHTML.Plugin<unknown> = (tree) => {
         }
       }
     }
-
     return node
   })
 }
-
 export default propertySort

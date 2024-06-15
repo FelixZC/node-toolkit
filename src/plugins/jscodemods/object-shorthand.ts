@@ -22,14 +22,12 @@
  * }
  */
 import { Transform } from 'jscodeshift'
-
 const transformer: Transform = (file, api, options) => {
   const j = api.jscodeshift
   const printOptions = options.printOptions || {
     quote: 'single'
   }
   const root = j(file.source)
-
   const isRecursive = (value) => {
     return !!(
       value.id &&
@@ -39,7 +37,6 @@ const transformer: Transform = (file, api, options) => {
         .size() !== 0
     )
   }
-
   const canBeSimplified = (key, value) => {
     // Can be simplified if both key and value are the same identifier or if the
     // property is a method that is not recursive
@@ -54,10 +51,8 @@ const transformer: Transform = (file, api, options) => {
     if (key.type === 'Literal') {
       return value.type === 'Identifier' && key.value === value.name
     }
-
     return false
   }
-
   root
     .find(j.Property, {
       computed: false,
@@ -69,7 +64,6 @@ const transformer: Transform = (file, api, options) => {
       if (p.value.key.type === 'Literal') {
         p.value.key = p.value.value
       }
-
       if (p.value.value.type === 'Identifier') {
         p.value.shorthand = true
       } else if (p.value.value.type === 'FunctionExpression') {
@@ -78,5 +72,4 @@ const transformer: Transform = (file, api, options) => {
     })
   return root.toSource(printOptions)
 }
-
 export default transformer

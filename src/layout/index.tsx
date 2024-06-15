@@ -1,11 +1,10 @@
-import React from 'react'
-import { Routes, Route, useNavigate } from 'react-router-dom' // 引入 useNavigate 钩子
+// 引入 useNavigate 钩子
 import { Layout, Menu } from 'antd'
+import React from 'react'
 import rootRouter from '@src/routers'
+import { Route, Routes, useNavigate } from 'react-router-dom'
 import type { RouteObject } from '@src/routers'
-
 const { Content, Sider } = Layout
-
 function filterMenuItems(routes: RouteObject[]) {
   return routes
     .filter((route) => route.index)
@@ -14,17 +13,13 @@ function filterMenuItems(routes: RouteObject[]) {
         label: route.name,
         ...route
       }
-
       if (route.children) {
         item.children = filterMenuItems(route.children) // 递归调用以处理子路由
       }
-
       return item
     })
 }
-
 const menuItems = filterMenuItems(rootRouter)
-
 const rootRouterFlattenArray = rootRouter.reduce((acc: RouteObject[], cur) => {
   acc.push(cur)
   if (cur.children) {
@@ -41,15 +36,21 @@ const Lay: React.FC = () => {
       navigate(targetRoute.path)
     }
   }
-
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout
+      style={{
+        minHeight: '100vh'
+      }}
+    >
       <Sider width={200}>
         <Menu
           mode="inline"
           defaultSelectedKeys={['/']}
           defaultOpenKeys={['/']}
-          style={{ height: '100%', borderRight: 0 }}
+          style={{
+            height: '100%',
+            borderRight: 0
+          }}
           items={menuItems}
           onClick={onMenuItemClick}
         />
@@ -66,5 +67,4 @@ const Lay: React.FC = () => {
     </Layout>
   )
 }
-
 export default Lay

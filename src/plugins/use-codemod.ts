@@ -2,14 +2,14 @@ import { ExecFileInfo } from '../../types/common'
 //@ts-ignore
 import getParser from 'jscodeshift/src/getParser'
 import jscodeshift, { Options, Parser, Transform } from 'jscodeshift'
-import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
-import type { SFCDescriptor } from '@vue/compiler-sfc'
 import { logger } from '../utils/log'
 
 /**
  * parser可传的值有 babylon、flow、ts、tsx、babel,会去获取对应的解析器
  * 定义一个代码转换器的类型，它扩展了jscodeshift的Transform类型，并可选地包含一个parser属性。
  */
+import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
+import type { SFCDescriptor } from '@vue/compiler-sfc'
 export type Codemod = Transform & {
   parser?: string | Parser
 }
@@ -51,7 +51,6 @@ const transform = (
         if (lang.startsWith('ts')) {
           parserOption = 'ts'
         }
-
         if (lang.startsWith('tsx')) {
           parserOption = 'tsx'
         }
@@ -62,7 +61,6 @@ const transform = (
         parser =
           typeof parserOption === 'string' ? getParser(parserOption, formatOptions) : parserOption
       }
-
       const j = jscodeshift.withParser(parser)
       const api = {
         j,
@@ -72,12 +70,10 @@ const transform = (
       }
       // 执行转换器，并在有返回值时更新源代码
       const out = codemod(execFileInfo, api, options)
-
       if (out) {
         execFileInfo.source = out
       }
     }
-
     return execFileInfo.source
   } catch (e) {
     logger.error(e)
@@ -102,7 +98,6 @@ export default function runCodemod(
   if (!codemodList.length) {
     return execFileInfo.source
   }
-
   const { path, source } = execFileInfo
   const extension = (/\.([^.]*)$/.exec(path) || [])[0]
   let lang = extension?.slice(1)
@@ -122,13 +117,11 @@ export default function runCodemod(
   if (!descriptor.script?.content && !descriptor.scriptSetup?.content) {
     return source
   }
-
   if (descriptor.script && descriptor.script.content) {
     lang = descriptor.script.lang || 'js'
     execFileInfo.source = descriptor.script.content
     descriptor.script.content = transform(execFileInfo, codemodList, options, lang)
   }
-
   if (descriptor.scriptSetup && descriptor.scriptSetup.content) {
     lang = descriptor.scriptSetup.lang || 'js'
     execFileInfo.source = descriptor.scriptSetup.content

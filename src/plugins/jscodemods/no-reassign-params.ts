@@ -1,85 +1,66 @@
 //@ts-nocheck
 import { Transform } from 'jscodeshift'
-
 const transformer: Transform = (file, api) => {
   const j = api.jscodeshift
   const { statement } = j.template
   const FUNCTION_TYPES = [j.FunctionDeclaration, j.ArrowFunctionExpression, j.FunctionExpression]
   let updated = false
-
   function getNewName(paramName) {
     const firstChar = paramName.charAt(0)
     const isUpperCase = paramName.charAt(0).toUpperCase() === firstChar
-
     if (isUpperCase) {
       return `Local${paramName}`
     }
-
     const upperCase = paramName.charAt(0).toUpperCase() + paramName.slice(1)
     return `local${upperCase}`
   }
-
   function getLocalVarStatement(paramName, newName) {
     const localVar = statement`let ${j.identifier(newName)} = ${paramName};\n`
     return localVar
   }
-
   function definedInParentScope(identifierName, scope) {
     let localScope = scope
-
     while (localScope) {
       if (localScope.declares(identifierName)) {
         return true
       }
-
       localScope = localScope.parent
     }
-
     return false
   }
-
   function getParamNames(params) {
     return [].concat(
       ...params.map((param) => {
         if (param === null) {
           return null
         }
-
         if (param.type === 'Identifier') {
           return param.name
         }
-
         if (param.type === 'ObjectPattern') {
           return param.properties.map((property) => {
             if (j.Property.check(property)) {
               return property.value.name
             }
-
             if (j.SpreadProperty.check(property) || j.RestProperty.check(property)) {
               return property.argument.name
             }
-
             throw new Error(`Unexpected Property Type ${property.type} ${j(property).toSource()}`)
           })
         }
-
         if (param.type === 'RestElement') {
           return param.argument.name
         }
-
         if (j.AssignmentPattern.check(param)) {
           return param.left.name
         }
-
         if (j.ArrayPattern.check(param)) {
           return [].concat(...getParamNames(param.elements))
         }
-
         throw new Error(`Unexpected Param Type ${param.type} ${j(param).toSource()}`)
       })
     )
   }
-
   function updateFunction(func) {
     const params = func.get('params')
     const functionScope = func.scope
@@ -94,21 +75,17 @@ const transformer: Transform = (file, api) => {
           if (j.Identifier.check(left)) {
             return left.name === paramName
           }
-
           if (j.ObjectPattern.check(left)) {
             return left.properties.some((property) => {
               if (j.Property.check(property)) {
                 return property.key.name === paramName
               }
-
               if (j.RestProperty.check(property)) {
                 return property.argument.name === paramName
               }
-
               throw new Error(`Unexpected Property Type ${property.type} ${j(property).toSource()}`)
             })
           }
-
           return false
         }).length
       const numUpdated = j(func).find(j.UpdateExpression, {
@@ -118,27 +95,22 @@ const transformer: Transform = (file, api) => {
       }).length
       return numAssignments > 0 || numUpdated > 0
     })
-
     if (reassignedParamNames.length === 0) {
       return
     }
-
     reassignedParamNames.forEach((paramName) => {
       const oldName = paramName
       const newName = getNewName(paramName)
       const localVar = getLocalVarStatement(paramName, newName)
-
       if (definedInParentScope(newName, func.scope)) {
         return
       }
-
       j(func.get('body'))
         .find(j.Identifier, {
           name: paramName
         })
         .forEach((identifier) => {
           const parent = identifier.parent.node
-
           if (
             j.MemberExpression.check(parent) &&
             parent.property === identifier.node &&
@@ -147,7 +119,6 @@ const transformer: Transform = (file, api) => {
             // obj.oldName
             return
           }
-
           if (j.Property.check(parent) && parent.key === identifier.node && !parent.computed) {
             // { oldName: 3 }
             const closestAssignment = j(identifier).closest(j.AssignmentExpression)
@@ -158,13 +129,11 @@ const transformer: Transform = (file, api) => {
                   assignment.node.left.properties.includes(parent)
                 )
               }).length > 0
-
             if (!assignmentHasProperty) {
               // ({oldName} = x);
               return
             }
           }
-
           if (
             j.MethodDefinition.check(parent) &&
             parent.key === identifier.node &&
@@ -173,20 +142,15 @@ const transformer: Transform = (file, api) => {
             // class A { oldName() {} }
             return
           }
-
           if (j.JSXAttribute.check(parent)) {
             // <Foo oldName={oldName} />
             return
           }
-
           let { scope } = identifier
-
           if (scope === functionScope) {
             const bindings = scope.getBindings()[oldName]
-
             if (bindings) {
               const recentBinding = bindings[bindings.length - 1]
-
               if (recentBinding.name === 'id') {
                 return
               }
@@ -196,11 +160,9 @@ const transformer: Transform = (file, api) => {
               if (scope.declares(oldName)) {
                 return
               }
-
               scope = scope.parent
             }
           }
-
           if (scope) {
             newBindings.add(localVar) // ObjectPattern
 
@@ -227,19 +189,15 @@ const transformer: Transform = (file, api) => {
   if (file.source.includes('@' + 'generated')) {
     return null
   }
-
   const root = j(file.source)
   FUNCTION_TYPES.forEach((type) => {
     root.find(type).forEach(updateFunction)
   })
-
   if (updated) {
     return root.toSource({
       quote: 'single'
     })
   }
-
   return null
 }
-
 export default transformer

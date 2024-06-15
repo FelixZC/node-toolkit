@@ -1,5 +1,5 @@
-import { logger } from '../utils/log'
 import { Exec } from './index'
+import { logger } from '../utils/log'
 import path from 'path'
 import type { Plugin as PosthtmlPlugin } from 'posthtml'
 /**
@@ -14,18 +14,14 @@ export async function executePosthtmlPlugins(
   isUseIgnoredFiles: boolean
 ) {
   const exec = new Exec(dir, isUseIgnoredFiles)
-
   try {
     const plugins: PosthtmlPlugin<unknown>[] = pluginsPathList.map((pluginPath) => {
       const result = require(pluginPath)
-
       if (result.default) {
         return result.default
       }
-
       return result
     })
-
     await exec.execPosthtmlPlugin(plugins)
   } catch (e) {
     // 可以在这里添加更详细的错误处理逻辑

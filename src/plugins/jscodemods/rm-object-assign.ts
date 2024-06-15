@@ -34,12 +34,17 @@ const transformer: Transform = (file, api, options) => {
             if (properties.length > 0 && comments && comments.length > 0) {
               properties[0].comments = [...(properties[0].comments || []), ...(comments || [])]
             }
-
             return [...allProperties, ...properties]
           }
 
           // 对于非对象表达式的参数，使用spreadProperty来保持它们
-          return [...allProperties, { ...j.spreadProperty(argument), comments }]
+          return [
+            ...allProperties,
+            {
+              ...j.spreadProperty(argument),
+              comments
+            }
+          ]
         }, [])
       )
     )
@@ -68,5 +73,4 @@ const transformer: Transform = (file, api, options) => {
   // 返回转换后的源代码
   return root.toSource(printOptions)
 }
-
 export default transformer

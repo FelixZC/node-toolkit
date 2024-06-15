@@ -1,10 +1,10 @@
+import { classifyFileTypeByExt, FileType } from './common'
 import * as fs from 'fs-extra'
-import { ParsedPath } from 'path'
-import * as os from 'os'
-import * as path from 'path'
-import { LRUCache } from 'lru-cache'
 import { logDecorator, logger } from '../utils/log'
-import { FileType, classifyFileTypeByExt } from './common'
+import { LRUCache } from 'lru-cache'
+import * as os from 'os'
+import { ParsedPath } from 'path'
+import * as path from 'path'
 import { useIgnored } from '../utils/ignore'
 /**
  * fs.ts使用读异步，写同步
@@ -14,7 +14,6 @@ import { useIgnored } from '../utils/ignore'
 export interface FileInfo extends ParsedPath {
   filePath: string
 }
-
 export interface FileInfoWithStats extends ParsedPath, fs.Stats {
   filePath: string
   type: FileType
@@ -25,7 +24,6 @@ const fileContentCache = new LRUCache<string, string>({
   max: 1000,
   ttl: 10 * 60 * 1000 // 10 minutes
 })
-
 const fileStatsCache = new LRUCache<string, fs.Stats>({
   max: 1000,
   ttl: 10 * 60 * 1000 // 10 minutes
@@ -44,7 +42,6 @@ export const writeFile = async (filePath: string, content: string) => {
   // 然后写入文件系统
   await fs.outputFile(filePath, content, 'utf-8')
 }
-
 export const readFile = (filePath: string): Promise<string> => {
   // 检查缓存中是否存在内容
   const cachedContent = fileContentCache.get(filePath)
@@ -73,7 +70,6 @@ export const readFileStats = async (filePath: string): Promise<fs.Stats> => {
     return stats
   }
 }
-
 export function getFileInfo(filePath: string): FileInfo {
   const parsedPath = path.parse(filePath)
   return {
@@ -81,7 +77,6 @@ export function getFileInfo(filePath: string): FileInfo {
     ...parsedPath
   }
 }
-
 export async function getFileInfoWithStats(filePath: string): Promise<FileInfoWithStats> {
   const stats = await readFileStats(filePath)
   const parsedPath = path.parse(filePath)
@@ -92,18 +87,20 @@ export async function getFileInfoWithStats(filePath: string): Promise<FileInfoWi
     type: stats.isDirectory() ? 'Folder' : classifyFileTypeByExt(parsedPath.ext) // 文件类型
   }
 }
-
 function generateUniquePath(filePath: string): string {
   let uniquePath = filePath
   while (fs.existsSync(uniquePath)) {
     const { dir, name, ext } = path.parse(uniquePath)
     const pre = name.split('(')[0] // Handle file names with counters like 'example(1)'
     const counter = parseInt(name.match(/\((\d+)\)/)?.[1] || '0')
-    uniquePath = path.format({ dir, name: `${pre}(${counter + 1})`, ext })
+    uniquePath = path.format({
+      dir,
+      name: `${pre}(${counter + 1})`,
+      ext
+    })
   }
   return uniquePath
 }
-
 export function generateUniquePathWithoutFs(filePath: string, oldFilePathSet: Set<string>): string {
   let uniquePath = filePath
   while (oldFilePathSet.has(uniquePath)) {
@@ -111,27 +108,26 @@ export function generateUniquePathWithoutFs(filePath: string, oldFilePathSet: Se
     const pre = name.split('(')[0]
     const matchResult = name.match(/\((\d+)\)/)
     const counter = parseInt(matchResult ? matchResult[1] : '0', 10)
-    uniquePath = path.format({ dir, name: `${pre}(${counter + 1})`, ext })
+    uniquePath = path.format({
+      dir,
+      name: `${pre}(${counter + 1})`,
+      ext
+    })
   }
-
   return uniquePath
 }
-
 function generateUniquePathForCopy(filePath: string): string {
   const { dir, name, ext } = path.parse(filePath)
   let newBaseName = `${name} copy${ext}`
   let newFilePath = path.resolve(dir, newBaseName)
   let renameCount = 1
-
   while (fs.existsSync(newFilePath)) {
     newBaseName = `${name} copy ${renameCount}${ext}`
     newFilePath = path.resolve(dir, newBaseName)
     renameCount++
   }
-
   return newFilePath
 }
-
 export async function copyFile(filePath: string): Promise<string> {
   const newFilePath = generateUniquePathForCopy(filePath)
   try {
@@ -143,7 +139,6 @@ export async function copyFile(filePath: string): Promise<string> {
     throw err
   }
 }
-
 export async function deleteFile(filePath: string): Promise<void> {
   try {
     await fs.remove(filePath)
@@ -154,19 +149,27 @@ export async function deleteFile(filePath: string): Promise<void> {
     throw err
   }
 }
-
 export function renameFile(
   oldFilePath: string,
   newFilePath: string
-): { isChange: boolean; uniqueNewFilePath: string } {
+): {
+  isChange: boolean
+  uniqueNewFilePath: string
+} {
   if (oldFilePath === newFilePath) {
-    return { isChange: false, uniqueNewFilePath: oldFilePath }
+    return {
+      isChange: false,
+      uniqueNewFilePath: oldFilePath
+    }
   }
   const uniqueNewFilePath = generateUniquePath(newFilePath)
   try {
     fs.renameSync(oldFilePath, uniqueNewFilePath)
     fileContentCache.set(uniqueNewFilePath, fileContentCache.get(oldFilePath))
-    return { isChange: true, uniqueNewFilePath }
+    return {
+      isChange: true,
+      uniqueNewFilePath
+    }
   } catch (err) {
     logger.error(`Error renaming file from ${oldFilePath} to ${uniqueNewFilePath}:`, err)
     throw err
@@ -188,7 +191,10 @@ export interface FsInstance {
   renameFile(
     oldFilePath: string,
     newFilePath: string
-  ): { isChange: boolean; uniqueNewFilePath: string }
+  ): {
+    isChange: boolean
+    uniqueNewFilePath: string
+  }
 }
 
 // 文件夹操作类
@@ -197,7 +203,10 @@ class fsUtils implements FsInstance {
   filePathList: string[] = []
   dirPathList: string[] = []
   eol: string
-  constructor(public inputRootPath: string, isUseIgnore?: boolean) {
+  constructor(
+    public inputRootPath: string,
+    isUseIgnore?: boolean
+  ) {
     this.eol = os.EOL
     this.rootPath = path.resolve(inputRootPath)
     if (isUseIgnore) {
@@ -211,7 +220,9 @@ class fsUtils implements FsInstance {
     this.filePathList = []
     this.dirPathList = [this.rootPath]
     const walk = async (dir: string): Promise<void> => {
-      const dirents = fs.readdirSync(dir, { withFileTypes: true })
+      const dirents = fs.readdirSync(dir, {
+        withFileTypes: true
+      })
       for (const dirent of dirents) {
         const newDir = path.resolve(dir, dirent.name)
         if (dirent.isDirectory()) {
@@ -222,7 +233,6 @@ class fsUtils implements FsInstance {
         }
       }
     }
-
     walk(this.rootPath)
   }
 
@@ -232,7 +242,9 @@ class fsUtils implements FsInstance {
     this.dirPathList = [this.rootPath]
     const { ignore } = useIgnored()
     const walk = (dir: string): void => {
-      const dirents = fs.readdirSync(dir, { withFileTypes: true })
+      const dirents = fs.readdirSync(dir, {
+        withFileTypes: true
+      })
       for (const dirent of dirents) {
         const newDir = path.resolve(dir, dirent.name)
         const relativePath = path.relative(this.rootPath, newDir)
@@ -292,9 +304,11 @@ class fsUtils implements FsInstance {
     if (isChange) {
       this.updateFileListsAfterChange(oldFilePath, uniqueNewFilePath)
     }
-    return { isChange, uniqueNewFilePath }
+    return {
+      isChange,
+      uniqueNewFilePath
+    }
   }
-
   @logDecorator
   async copyFile(oldFilePath: string) {
     const newFilePath = await copyFile(oldFilePath)
@@ -302,5 +316,4 @@ class fsUtils implements FsInstance {
     return newFilePath
   }
 }
-
 export default fsUtils

@@ -35,15 +35,12 @@ const propertySort: PostHTML.Plugin<unknown> = (tree) => {
           case key.startsWith('v-'):
             directiveAttrs[key] = value
             break
-
           case key.startsWith(':'):
             refAttrs[key] = value
             break
-
           case key.startsWith('@'):
             methodAttrs[key] = value
             break
-
           default:
             normalAttrs[key] = value
             break
@@ -58,9 +55,7 @@ const propertySort: PostHTML.Plugin<unknown> = (tree) => {
         ...sortObjAttr(methodAttrs)
       }
     }
-
     return node
   })
 }
-
 export default propertySort

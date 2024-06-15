@@ -6,11 +6,9 @@ import progressReducer from '@src/slices/progress-slice'
 export interface RootState {
   progress: ReturnType<typeof progressReducer>
 }
-
 const store = configureStore<RootState>({
   reducer: {
     progress: progressReducer
   }
 })
-
 export default store

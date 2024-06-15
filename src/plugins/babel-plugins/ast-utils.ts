@@ -18,7 +18,6 @@ export type ImportInfo = Array<SpecifierInfo>
  */
 export const getImportInfo = (item: t.ImportDeclaration) => {
   const importInfo: ImportInfo = []
-
   for (const specifier of item.specifiers) {
     const specifierInfo: SpecifierInfo = {
       source: '',
@@ -56,10 +55,8 @@ export const getImportInfo = (item: t.ImportDeclaration) => {
     if (item.importKind) {
       specifierInfo.importKind = item.importKind
     }
-
     importInfo.push(specifierInfo)
   }
-
   return importInfo
 }
 /**
@@ -79,7 +76,6 @@ export const findObjectPropertyWithKey = (target: t.ObjectExpression, key: strin
       const taget = (item.key as t.Identifier).name || (item.key as t.StringLiteral).value
       return taget === key
     }
-
     return false
   })
   return result as t.ObjectProperty
@@ -128,7 +124,6 @@ export const filterSameObject = (elements: t.ObjectExpression[], key = 'prop') =
   // 遍历元素数组，寻找具有相同键值的对象
   for (const item of elements) {
     const target = findObjectPropertyWithKey(item, key)
-
     if (target) {
       const key = (target.key as t.Identifier).name || (target.key as t.StringLiteral).value
       const value = (target.value as t.StringLiteral).value
@@ -138,7 +133,6 @@ export const filterSameObject = (elements: t.ObjectExpression[], key = 'prop') =
         if (Reflect.has(cache, key + value)) {
           samePropItems.push(cache[key + value])
         }
-
         cache[key + value] = item
       }
     }
@@ -148,7 +142,6 @@ export const filterSameObject = (elements: t.ObjectExpression[], key = 'prop') =
   for (const item of samePropItems) {
     elements.splice(elements.indexOf(item), 1)
   }
-
   return elements
 }
 
@@ -170,7 +163,6 @@ export const filterSameProperty = (element: t.ObjectExpression) => {
       if (Reflect.has(cache, key)) {
         sameProperty.push(cache[key])
       }
-
       cache[key] = property
     }
   }
@@ -179,7 +171,6 @@ export const filterSameProperty = (element: t.ObjectExpression) => {
   for (const property of sameProperty) {
     element.properties.splice(element.properties.indexOf(property), 1)
   }
-
   return element
 }
 
@@ -205,11 +196,9 @@ export const getFunctionName = (path: NodePath<t.Function>) => {
       case 'Identifier':
         result = path.node.key.name
         break
-
       case 'NumericLiteral':
         result = path.node.key.value
         break
-
       case 'StringLiteral':
         result = path.node.key.value
         break
@@ -217,7 +206,6 @@ export const getFunctionName = (path: NodePath<t.Function>) => {
   } else {
     result = path.node.id?.name || ''
   }
-
   return result
 }
 
@@ -241,7 +229,6 @@ export const getParentFunctionName = (startPath: NodePath) => {
       functionName = 'none'
     }
   }
-
   return {
     functionName,
     parentFunctionPath
@@ -278,11 +265,9 @@ export const matchObjectExpress = (
  */
 export const createObjectTemplateNode = (input: Record<string, any> | string) => {
   let newObjectExpression: t.ObjectExpression
-
   if (typeof input === 'string') {
     // 如果输入是字符串，解析字符串为AST节点
     let astCode = parser.parseExpression(input)
-
     if (t.isObjectExpression(astCode)) {
       newObjectExpression = astCode
     } else {
@@ -300,26 +285,21 @@ export const createObjectTemplateNode = (input: Record<string, any> | string) =>
           case 'boolean':
             valueNode = t.booleanLiteral(value)
             break
-
           case 'number':
             valueNode = t.numericLiteral(value)
             break
-
           case 'string':
             valueNode = t.stringLiteral(value)
             break
-
           default:
             // 对于未知类型，默认创建null字面量节点
             valueNode = t.nullLiteral()
             break
         }
-
         return t.objectProperty(t.identifier(key), valueNode)
       })
     )
   }
-
   return newObjectExpression
 }
 /**
@@ -343,7 +323,6 @@ export const replaceExpressionProperty = (
   if (matchObjIndex > -1) {
     elements[matchObjIndex] = addObjectNewProperty(elements[matchObjIndex], newProperty)
   }
-
   return elements
 }
 
@@ -403,6 +382,5 @@ export const resetIndexObjectProperty = (elements: t.ObjectExpression[]) => {
     // 更新索引计数器
     count++
   }
-
   return elements
 }

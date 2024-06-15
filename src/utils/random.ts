@@ -1,5 +1,4 @@
 import { randomBytes } from 'crypto'
-
 export function generateSimpleRandomString(): string {
   const randomPart = Math.floor((1 + Math.random()) * 0x10000).toString(16)
   return randomPart
@@ -20,7 +19,6 @@ export function generateUUID(): string {
     return v.toString(16)
   })
 }
-
 export function generateCryptoSafeRandomString(length: number): string {
   const bytes = randomBytes(length)
   let result = ''

@@ -51,7 +51,6 @@ export default declare(
       /** 是否为匹配属性 */
 
       const replaceObj = (options.replaceObjectList || []).find((item) => item.property === ref)
-
       if (replaceObj) {
         const parentPath = path.parentPath
 
@@ -86,7 +85,6 @@ export default declare(
     const replaceMemberExpressionProperty = (path: NodePath<t.MemberExpression>) => {
       let ref = generator(path.node.property).code
       const replaceObj = (options.replacePropertyList || []).find((item) => item.property === ref)
-
       if (replaceObj) {
         // 如果满足特定条件，则替换节点的属性。
         if (
@@ -115,7 +113,6 @@ export default declare(
           replaceMemberExpressionObject(memberExpressionPath)
           replaceMemberExpressionProperty(memberExpressionPath)
         },
-
         Program: {
           exit(path) {
             // 如果没有需要替换的引用，则直接返回。
@@ -143,7 +140,6 @@ export default declare(
             const valueLocalreplaceObjectList = normalreplaceObjectList
               .map((item) => getImportInfo(item))
               .flat()
-
             for (const ref of refList) {
               const isExist = valueLocalreplaceObjectList.some((item) => item.localName === ref)
 
@@ -152,7 +148,6 @@ export default declare(
                 const source = (options.replaceObjectList || []).find(
                   (item) => item.property === ref
                 )
-
                 if (source && source.express) {
                   const newImport = template(source.express)()
 
@@ -165,7 +160,6 @@ export default declare(
                 }
               }
             }
-
             refList = []
             // 更新AST的body部分。
             path.node.body = [

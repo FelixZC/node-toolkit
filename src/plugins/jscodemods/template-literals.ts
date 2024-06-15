@@ -24,27 +24,22 @@
  *   a unicode escape sequence or a unicode character.
  */
 import { Transform } from 'jscodeshift'
-
 const transformer: Transform = (file, api, options) => {
   const j = api.jscodeshift
   const printOptions = options.printOptions || {
     quote: 'single'
   }
-
   function extractNodes(node, comments, topLevel = false) {
     if (comments) {
       node.comments = node.comments || []
       node.comments.push(...comments)
     }
-
     if (node.type !== 'BinaryExpression') {
       return [node]
     }
-
     if (node.operator !== '+') {
       return [node]
     }
-
     if (!topLevel && node.parenthesizedExpression) {
       return [node]
     } // We need to be careful about not having a stringish node on the left to
@@ -56,11 +51,9 @@ const transformer: Transform = (file, api, options) => {
       ...extractNodes(node.right, node.comments)
     ]
   }
-
   function isStringNode(node) {
     return node.type === 'Literal' && typeof node.value === 'string'
   }
-
   function isCastToStringNode(node) {
     // foo.toString()
     if (
@@ -79,33 +72,25 @@ const transformer: Transform = (file, api, options) => {
     ) {
       return true
     }
-
     return false
   }
-
   function isTemplateLiteralNode(node) {
     return node.type === 'TemplateLiteral'
   }
-
   function isBinaryExpressionNode(node) {
     return node.type === 'BinaryExpression'
   }
-
   function isStringishNode(node) {
     return isStringNode(node) || isTemplateLiteralNode(node) || isCastToStringNode(node)
   }
-
   function hasStringish(node) {
     if (isBinaryExpressionNode(node)) {
       return hasStringish(node.left) || hasStringish(node.right)
     }
-
     return isStringishNode(node)
   }
-
   function joinQuasis(leftQuasis, rightQuasis) {
     const lastQuasi = leftQuasis.pop()
-
     if (lastQuasi) {
       rightQuasis[0] = j.templateElement(
         {
@@ -115,10 +100,8 @@ const transformer: Transform = (file, api, options) => {
         false
       )
     }
-
     return leftQuasis.concat(rightQuasis)
   }
-
   function buildTL(nodes, quasis = [], expressions = [], comments = []) {
     if (nodes.length === 0) {
       return {
@@ -127,14 +110,11 @@ const transformer: Transform = (file, api, options) => {
         quasis
       }
     }
-
     const [node, ...rest] = nodes
     const newComments = comments.concat(node.comments || [])
-
     if (node.type === 'Literal') {
       const cooked = node.value.toString()
       let raw = node.raw.toString()
-
       if (typeof node.value === 'string') {
         // We need to remove the opening and trailing quote from the raw value
         // of the string.
@@ -142,7 +122,6 @@ const transformer: Transform = (file, api, options) => {
 
         raw = raw.replace(/\$\{/g, '\\${')
       }
-
       const newQuasi = j.templateElement(
         {
           cooked,
@@ -153,7 +132,6 @@ const transformer: Transform = (file, api, options) => {
       const newQuasis = joinQuasis(quasis, [newQuasi])
       return buildTL(rest, newQuasis, expressions, newComments)
     }
-
     if (node.type === 'TemplateLiteral') {
       const nodeQuasis = node.quasis.map((q) =>
         j.templateElement(
@@ -170,7 +148,6 @@ const transformer: Transform = (file, api, options) => {
       const newExpressions = expressions.concat(node.expressions)
       return buildTL(rest, newQuasis, newExpressions, newComments)
     }
-
     const newQuasis = joinQuasis(quasis, [
       j.templateElement(
         {
@@ -190,17 +167,13 @@ const transformer: Transform = (file, api, options) => {
     const newExpressions = expressions.concat(node)
     return buildTL(rest, newQuasis, newExpressions, newComments)
   }
-
   function convertToTemplateString(p) {
     const tempNodes = extractNodes(p.node, null, true)
-
     if (!tempNodes.some(isStringishNode)) {
       return p.node
     }
-
     const tlOptions = buildTL(tempNodes)
     const tl = j.templateLiteral(tlOptions.quasis, tlOptions.expressions)
-
     if (tl.expressions.length > 0) {
       tl.comments = tlOptions.comments
       return tl
@@ -212,7 +185,6 @@ const transformer: Transform = (file, api, options) => {
     strLiteral.comments = tlOptions.comments
     return strLiteral
   }
-
   return j(file.source)
     .find(j.BinaryExpression, {
       operator: '+'
@@ -220,5 +192,4 @@ const transformer: Transform = (file, api, options) => {
     .replaceWith(convertToTemplateString)
     .toSource(printOptions)
 }
-
 export default transformer

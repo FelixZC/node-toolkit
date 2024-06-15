@@ -1,5 +1,4 @@
 import { contextBridge, ipcRenderer } from 'electron'
-
 type ExposedInMainWorld = {
   send: (channel: string, ...args: any[]) => void
   on: (channel: string, func: (event: any, ...args: any[]) => void) => void
@@ -45,7 +44,6 @@ const exposedIpcRenderer: ExposedInMainWorld = {
     })
   }
 }
-
 contextBridge.exposeInMainWorld('ipcRenderer', exposedIpcRenderer)
 
 // 将 process 作为对象暴露，而非直接修改全局 process 对象

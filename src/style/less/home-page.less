@@ -1,25 +1,25 @@
 .home-container {
+  background: linear-gradient(to right, #6dd5ed, #2193b0);
   display: grid;
+  gap: 20px;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  gap: 20px;
   height: 100vh;
-  background: linear-gradient(to right, #6dd5ed, #2193b0);
   overflow: hidden;
   padding: 20px;
 }
 
 .welcome-title {
-  font-size: 3rem;
-  color: white;
-  opacity: 0;
+  align-items: center;
   animation: fadeInDown 2s ease forwards;
-  margin-bottom: 20px;
+  color: white;
+  display: flex;
+  font-size: 3rem;
   grid-column: 2;
   grid-row: 2;
-  display: flex;
   justify-content: center;
-  align-items: center;
+  margin-bottom: 20px;
+  opacity: 0;
 }
 
 
@@ -31,12 +31,12 @@
 }
 
 .icon-links {
-  grid-row: 3;
-  grid-column: 2;
-  gap: 10px; /* 间距设置在容器上 */
-  display: flex;
-  justify-content: center;
   align-items: end;
+  display: flex;
+  gap: 10px; /* 间距设置在容器上 */
+  grid-column: 2;
+  grid-row: 3;
+  justify-content: center;
 }
 .icon-link {
   color: #333;
@@ -47,9 +47,9 @@
     color: #007bff;
   }
   svg {
-    margin-right: 6px;
     fill: currentColor;
-    width: 24px;
     height: 24px;
+    margin-right: 6px;
+    width: 24px;
   }
 }

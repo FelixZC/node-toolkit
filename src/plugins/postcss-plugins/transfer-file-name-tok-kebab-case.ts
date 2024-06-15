@@ -1,6 +1,5 @@
-import { AcceptedPlugin, Root, Rule, AtRule, Declaration } from 'postcss'
+import { AcceptedPlugin, AtRule, Declaration, Root, Rule } from 'postcss'
 import { isPath, transferRef } from '../../utils/common'
-
 const transferHandler = (node: Rule | AtRule) => {
   // 检查节点是否具有 'walkDecls' 方法
   if ('walkDecls' in node) {
@@ -24,9 +23,9 @@ const transferHandler = (node: Rule | AtRule) => {
     node.params = transferRef(node.params)
   }
 }
-
 const plugin = (): AcceptedPlugin => ({
-  postcssPlugin: 'postcss-reverse-props', // 指定插件名称
+  postcssPlugin: 'postcss-reverse-props',
+  // 指定插件名称
 
   Once(root: Root) {
     // 遍历根节点下的所有规则和 @ 规则，应用 transferHandler 函数进行处理
@@ -37,5 +36,4 @@ const plugin = (): AcceptedPlugin => ({
 
 // 标记为 PostCSS 插件
 plugin.postcss = true
-
 export default plugin

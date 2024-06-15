@@ -1,22 +1,22 @@
-import React, { useState, useEffect } from 'react'
-import { Input, Tooltip, Button, Row, Col, message, Modal } from 'antd'
+import { Button, Col, Input, message, Modal, Row, Tooltip } from 'antd'
 import {
-  SearchOutlined,
-  CheckSquareOutlined,
-  CloseSquareOutlined,
-  ClockCircleOutlined,
   CalendarOutlined,
+  CheckSquareOutlined,
+  ClockCircleOutlined,
+  CloseSquareOutlined,
+  SearchOutlined,
   SettingOutlined
 } from '@ant-design/icons'
+import { convertToReg, getIgnorePatterns } from '@src/utils/common'
 import { ipcRendererInvoke } from '../../utils/desktop-utils'
-import { getIgnorePatterns, convertToReg } from '@src/utils/common'
+import React, { useEffect, useState } from 'react'
+import '@src/style/less/markdown-styles.less'
+import '@src/style/less/icon.less'
+import '@src/style/less/pre.less'
 import type {
   ModifyResultReturnType,
   PriviewResultReturnType
 } from '@src/exec/exec-modify-file-names-batch'
-import '@src/style/less/markdown-styles.less'
-import '@src/style/less/icon.less'
-import '@src/style/less/pre.less'
 const FeatureListPage: React.FC = () => {
   const [directoryPath, setDirectoryPath] = useState('') // 存储目录路径
   const [output, setOutput] = useState('') // 存储执行结果
@@ -177,7 +177,6 @@ const FeatureListPage: React.FC = () => {
             const { oldFilePath, newFilePath } = record
             return `${oldFilePath} \n -> ${newFilePath}\n\n`
           })
-
           setOutput(str) // 设置执行结果到状态
           message.success('Executed successfully.')
         } catch (error) {
@@ -215,23 +214,18 @@ const FeatureListPage: React.FC = () => {
   const handleFilenameMatchCaseChange = () => {
     setFilenameMatchCase(!filenameMatchCase)
   }
-
   const handleFilenameMatchWholeWordChange = () => {
     setFilenameMatchWholeWord(!filenameMatchWholeWord)
   }
-
   const handleFilenameMatchRegChange = () => {
     setFilenameMatchReg(!filenameMatchReg)
   }
-
   const handleExtnameMatchCaseChange = () => {
     setExtnameMatchCase(!extnameMatchCase)
   }
-
   const handleExtnameMatchWholeWordChange = () => {
     setExtnameMatchWholeWord(!extnameMatchWholeWord)
   }
-
   const handleExtnameMatchRegChange = () => {
     setExtnameMatchReg(!extnameMatchReg)
   }
@@ -240,27 +234,38 @@ const FeatureListPage: React.FC = () => {
   const handleAddTimeStamp = () => {
     setAddTimeStamp(!addTimeStamp)
   }
-
   const handleAddDateTime = () => {
     setAddDateTime(!addDateTime)
   }
-
   const handleUseIgnoreFiles = () => {
     setIsUseIgnoredFiles(!isUseIgnoredFiles)
     sessionStorage.setItem('isUseIgnoredFiles', String(!isUseIgnoredFiles))
   }
-
   return (
-    <div style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
+    <div
+      style={{
+        padding: '20px',
+        display: 'flex',
+        flexDirection: 'column'
+      }}
+    >
       <h1>Modify Filename Batch</h1>
-      <Row gutter={16} style={{ marginBottom: '10px', alignItems: 'center' }}>
+      <Row
+        gutter={16}
+        style={{
+          marginBottom: '10px',
+          alignItems: 'center'
+        }}
+      >
         <Col span={16}>
           <Input.Search
             placeholder="Directory Path"
             value={directoryPath}
             readOnly
             onSearch={handleChooseDirectory}
-            style={{ width: '100%' }}
+            style={{
+              width: '100%'
+            }}
             suffix={
               <Tooltip title="Use Ignore Files">
                 <SettingOutlined
@@ -273,7 +278,13 @@ const FeatureListPage: React.FC = () => {
         </Col>
       </Row>
 
-      <Row gutter={16} style={{ marginBottom: '10px', alignItems: 'center' }}>
+      <Row
+        gutter={16}
+        style={{
+          marginBottom: '10px',
+          alignItems: 'center'
+        }}
+      >
         <Col span={16}>
           <Input
             placeholder="Search Filename"
@@ -301,11 +312,19 @@ const FeatureListPage: React.FC = () => {
                 </Tooltip>
               </div>
             }
-            style={{ width: '100%' }}
+            style={{
+              width: '100%'
+            }}
           />
         </Col>
       </Row>
-      <Row gutter={16} style={{ marginBottom: '10px', alignItems: 'center' }}>
+      <Row
+        gutter={16}
+        style={{
+          marginBottom: '10px',
+          alignItems: 'center'
+        }}
+      >
         <Col span={16}>
           <Input
             placeholder="Replace"
@@ -330,7 +349,13 @@ const FeatureListPage: React.FC = () => {
           />
         </Col>
       </Row>
-      <Row gutter={16} style={{ marginBottom: '10px', alignItems: 'center' }}>
+      <Row
+        gutter={16}
+        style={{
+          marginBottom: '10px',
+          alignItems: 'center'
+        }}
+      >
         <Col span={16}>
           <Input
             placeholder="Search Extname"
@@ -361,7 +386,13 @@ const FeatureListPage: React.FC = () => {
           />
         </Col>
       </Row>
-      <Row gutter={16} style={{ marginBottom: '10px', alignItems: 'center' }}>
+      <Row
+        gutter={16}
+        style={{
+          marginBottom: '10px',
+          alignItems: 'center'
+        }}
+      >
         <Col span={16}>
           <Input
             placeholder="Replace"
@@ -370,7 +401,13 @@ const FeatureListPage: React.FC = () => {
           />
         </Col>
       </Row>
-      <Row gutter={16} style={{ marginBottom: '10px', alignItems: 'center' }}>
+      <Row
+        gutter={16}
+        style={{
+          marginBottom: '10px',
+          alignItems: 'center'
+        }}
+      >
         <Col span={16}>
           <Input
             placeholder="Files to Exclude (comma separated)"
@@ -382,7 +419,13 @@ const FeatureListPage: React.FC = () => {
           <Button onClick={handlePreview} type="primary">
             Preview
           </Button>
-          <Button onClick={handleExecute} type="primary" style={{ marginLeft: '10px' }}>
+          <Button
+            onClick={handleExecute}
+            type="primary"
+            style={{
+              marginLeft: '10px'
+            }}
+          >
             Replace
           </Button>
         </Col>
@@ -406,5 +449,4 @@ const FeatureListPage: React.FC = () => {
     </div>
   )
 }
-
 export default FeatureListPage

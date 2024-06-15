@@ -105,7 +105,6 @@ const transformer: Transform = (file, api, options) => {
       .forEach((path) => {
         // 合并相关注释
         const comments = path.value.comments || []
-
         for (const node of [
           path.value.callee,
           path.value.callee.property,
@@ -117,7 +116,6 @@ const transformer: Transform = (file, api, options) => {
             comments.push(comment)
           }
         }
-
         const arrowFunction = createArrowFunctionExpression(path.value.callee.object)
         arrowFunction.comments = (arrowFunction.comments || []).concat(comments)
         j(path).replaceWith(arrowFunction)
@@ -152,5 +150,4 @@ const transformer: Transform = (file, api, options) => {
   // 根据是否进行了替换，返回转换后的源代码或null
   return replacedBoundFunctions || replacedCallbacks ? root.toSource(printOptions) : null
 }
-
 export default transformer

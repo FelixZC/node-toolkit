@@ -32,7 +32,6 @@ const runPosthtmlPlugin = async (
             execFileInfo.extra[key] = message[key]
           }
           break
-
         case 'string':
           // 添加字符串消息
           execFileInfo.extra[message] = message
@@ -44,8 +43,6 @@ const runPosthtmlPlugin = async (
       }
     }
   }
-
   return result.html // 返回处理后的HTML字符串
 }
-
 export default runPosthtmlPlugin

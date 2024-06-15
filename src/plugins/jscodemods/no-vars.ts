@@ -1,6 +1,5 @@
 //@ts-nocheck
 import { Transform } from 'jscodeshift'
-
 const transformer: Transform = (file, api) => {
   const j = api.jscodeshift
   const root = j(file.source)
@@ -12,42 +11,33 @@ const transformer: Transform = (file, api) => {
     'Program'
   ]
   const FOR_STATEMENTS = ['ForInStatement', 'ForOfStatement', 'ForStatement']
-
   const getScopeNode = (blockScopeNode) => {
     let scopeNode = blockScopeNode
     let isInFor = FOR_STATEMENTS.indexOf(blockScopeNode.value.type) !== -1
-
     while (TOP_LEVEL_TYPES.indexOf(scopeNode.node.type) === -1) {
       scopeNode = scopeNode.parentPath
       isInFor = isInFor || FOR_STATEMENTS.indexOf(scopeNode.value.type) !== -1
     }
-
     return {
       isInFor,
       scopeNode
     }
   }
-
   const findFunctionDeclaration = (node, container) => {
     let localNode = node
-
     while (localNode.value.type !== 'FunctionDeclaration' && localNode !== container) {
       localNode = localNode.parentPath
     }
-
     return localNode !== container ? localNode : null
   }
-
   const isForLoopDeclarationWithoutInit = (declaration) => {
     const parentType = declaration.parentPath.value.type
     return parentType === 'ForOfStatement' || parentType === 'ForInStatement'
   }
-
   const extractNamesFromIdentifierLike = (id) => {
     if (!id) {
       return []
     }
-
     if (id.type === 'ObjectPattern') {
       return id.properties
         .map((d) =>
@@ -55,36 +45,28 @@ const transformer: Transform = (file, api) => {
         )
         .reduce((acc, val) => acc.concat(val), [])
     }
-
     if (id.type === 'ArrayPattern') {
       return id.elements
         .map(extractNamesFromIdentifierLike)
         .reduce((acc, val) => acc.concat(val), [])
     }
-
     if (id.type === 'Identifier') {
       return [id.name]
     }
-
     if (id.type === 'RestElement') {
       return [id.argument.name]
     }
-
     return []
   }
-
   const getDeclaratorNames = (declarator) => {
     return extractNamesFromIdentifierLike(declarator.id)
   }
-
   const isIdInDeclarator = (declarator, name) => {
     return getDeclaratorNames(declarator).indexOf(name) !== -1
   }
-
   const getLocalScope = (scope, parentScope) => {
     let localScope = scope
     const names = []
-
     while (localScope !== parentScope) {
       if (Array.isArray(localScope.value.body)) {
         localScope.value.body.forEach((node) => {
@@ -99,7 +81,6 @@ const transformer: Transform = (file, api) => {
           }
         })
       }
-
       if (Array.isArray(localScope.value.params)) {
         localScope.value.params.forEach((id) => {
           extractNamesFromIdentifierLike(id).forEach((name) => {
@@ -109,17 +90,13 @@ const transformer: Transform = (file, api) => {
           })
         })
       }
-
       localScope = localScope.parentPath
     }
-
     return names
   }
-
   const hasLocalDeclarationFor = (nodePath, parentScope, name) => {
     return getLocalScope(nodePath, parentScope).indexOf(name) !== -1
   }
-
   const isTruelyVar = (node, declarator) => {
     const blockScopeNode = node.parentPath
     const { isInFor, scopeNode } = getScopeNode(blockScopeNode) // if we are in a for loop of some kind, and the variable
@@ -179,13 +156,10 @@ const transformer: Transform = (file, api) => {
                 )
               })
               .size() !== 0
-
           if (isCalledInHoistedFunction) {
             return true
           }
-
           const referenceScope = getScopeNode(n.parent).scopeNode
-
           if (referenceScope === scopeNode || !hasLocalDeclarationFor(n, scopeNode, n.value.name)) {
             // if the variable is referenced outside the current block
             // scope, revert to using `var`
@@ -236,7 +210,6 @@ const transformer: Transform = (file, api) => {
         .size() > 0
     return hasAssignmentMutation || hasUpdateMutation
   }
-
   const updatedAnything =
     root
       .find(j.VariableDeclaration)
@@ -248,7 +221,6 @@ const transformer: Transform = (file, api) => {
       })
       .forEach((declaration) => {
         const forLoopWithoutInit = isForLoopDeclarationWithoutInit(declaration)
-
         if (
           declaration.value.declarations.some((declarator) => {
             return (!declarator.init && !forLoopWithoutInit) || isMutated(declaration, declarator)
@@ -262,5 +234,4 @@ const transformer: Transform = (file, api) => {
       .size() !== 0
   return updatedAnything ? root.toSource() : null
 }
-
 export default transformer

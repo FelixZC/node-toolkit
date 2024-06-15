@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react'
-import { Input, Button, message, Tooltip } from 'antd'
+import { Button, Input, message, Tooltip } from 'antd'
 import { ipcRendererInvoke } from '../../utils/desktop-utils'
 import MonacoEditor from 'react-monaco-editor'
-import { SwapOutlined, SettingOutlined } from '@ant-design/icons'
+import React, { useEffect, useState } from 'react'
+import { SettingOutlined, SwapOutlined } from '@ant-design/icons'
 import '@src/style/less/icon.less'
 const FeatureListPage: React.FC = () => {
   const [directoryPath, setDirectoryPath] = useState('') // 存储目录路径
@@ -57,28 +57,39 @@ const FeatureListPage: React.FC = () => {
   const toggleOutputFormat = () => {
     setIsShowInJson(!isShowInJson)
   }
-
   useEffect(() => {
     setOutput(isShowInJson ? resultJson : resultMd)
   }, [isShowInJson])
-
   const handleUseIgnoreFiles = () => {
     setIsUseIgnoredFiles(!isUseIgnoredFiles)
     sessionStorage.setItem('isUseIgnoredFiles', String(!isUseIgnoredFiles))
   }
-
   return (
-    <div style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
+    <div
+      style={{
+        padding: '20px',
+        display: 'flex',
+        flexDirection: 'column'
+      }}
+    >
       <h1>File Statistical</h1>
 
       {/* 显示目录路径的Input组件 */}
-      <div style={{ display: 'flex', marginBottom: '10px', width: '100%' }}>
+      <div
+        style={{
+          display: 'flex',
+          marginBottom: '10px',
+          width: '100%'
+        }}
+      >
         <Input.Search
           placeholder="Directory Path"
           value={directoryPath}
           readOnly
           onSearch={handleChooseDirectory}
-          style={{ flex: 1 }}
+          style={{
+            flex: 1
+          }}
           suffix={
             <Tooltip title="Use Ignore Files">
               <SettingOutlined
@@ -88,13 +99,22 @@ const FeatureListPage: React.FC = () => {
             </Tooltip>
           }
         />
-        <Button onClick={handleExecute} style={{ marginLeft: '10px' }}>
+        <Button
+          onClick={handleExecute}
+          style={{
+            marginLeft: '10px'
+          }}
+        >
           Exec
         </Button>
         <Tooltip title="Toggle Output Format">
           <Button
             onClick={toggleOutputFormat}
-            style={{ marginLeft: '10px', color: '#1890ff', borderColor: '#1890ff' }}
+            style={{
+              marginLeft: '10px',
+              color: '#1890ff',
+              borderColor: '#1890ff'
+            }}
             icon={<SwapOutlined />}
           ></Button>
         </Tooltip>
@@ -107,35 +127,62 @@ const FeatureListPage: React.FC = () => {
         theme="vs" // 编辑器主题
         value={output}
         options={{
-          readOnly: true, // 使编辑器只读
-          minimap: { enabled: true }, // 禁用迷你地图
-          folding: true, // 启用代码折叠
-          showFoldingControls: 'always', // 总是显示折叠控件
-          foldingStrategy: 'auto', // 根据缩进进行折叠策略
-          scrollBeyondLastLine: false, // 禁用滚动到文档末尾之后
-          overviewRulerLanes: 3, // 预览标尺的行数
-          overviewRulerBorder: false, // 预览标尺的边框
-          glyphMargin: true, // 启用字形边距，用于显示断点等
-          lineDecorationsWidth: 10, // 行装饰的宽度
-          lineNumbers: 'on', // 行号显示
-          lineNumbersMinChars: 4, // 行号最少字符数
-          fixedOverflowWidgets: true, // 溢出的部件（如缩进线）固定
-          renderLineHighlight: 'all', // 整行高亮显示
+          readOnly: true,
+          // 使编辑器只读
+          minimap: {
+            enabled: true
+          },
+          // 禁用迷你地图
+          folding: true,
+          // 启用代码折叠
+          showFoldingControls: 'always',
+          // 总是显示折叠控件
+          foldingStrategy: 'auto',
+          // 根据缩进进行折叠策略
+          scrollBeyondLastLine: false,
+          // 禁用滚动到文档末尾之后
+          overviewRulerLanes: 3,
+          // 预览标尺的行数
+          overviewRulerBorder: false,
+          // 预览标尺的边框
+          glyphMargin: true,
+          // 启用字形边距，用于显示断点等
+          lineDecorationsWidth: 10,
+          // 行装饰的宽度
+          lineNumbers: 'on',
+          // 行号显示
+          lineNumbersMinChars: 4,
+          // 行号最少字符数
+          fixedOverflowWidgets: true,
+          // 溢出的部件（如缩进线）固定
+          renderLineHighlight: 'all',
+          // 整行高亮显示
           scrollbar: {
             // 滚动条的配置
-            vertical: 'auto', // 垂直滚动条为自动
-            horizontal: 'auto', // 水平滚动条为自动
-            useShadows: true, // 滚动条阴影
-            verticalHasArrows: false, // 垂直滚动条箭头
-            horizontalHasArrows: false, // 水平滚动条箭头
+            vertical: 'auto',
+            // 垂直滚动条为自动
+            horizontal: 'auto',
+            // 水平滚动条为自动
+            useShadows: true,
+            // 滚动条阴影
+            verticalHasArrows: false,
+            // 垂直滚动条箭头
+            horizontalHasArrows: false,
+            // 水平滚动条箭头
             alwaysConsumeMouseWheel: false // 总是响应鼠标滚轮
           },
-          mouseWheelZoom: false, // 禁用鼠标滚轮缩放
-          quickSuggestions: false, // 禁用快速建议
-          formatOnType: false, // 输入时不自动格式化
-          formatOnPaste: false, // 粘贴时不自动格式化
-          autoClosingBrackets: 'always', // 自动补全括号
-          autoIndent: 'full', // 自动缩进
+          mouseWheelZoom: false,
+          // 禁用鼠标滚轮缩放
+          quickSuggestions: false,
+          // 禁用快速建议
+          formatOnType: false,
+          // 输入时不自动格式化
+          formatOnPaste: false,
+          // 粘贴时不自动格式化
+          autoClosingBrackets: 'always',
+          // 自动补全括号
+          autoIndent: 'full',
+          // 自动缩进
           dragAndDrop: true // 启用拖放功能
         }}
         onChange={(editorValue) => {
@@ -145,5 +192,4 @@ const FeatureListPage: React.FC = () => {
     </div>
   )
 }
-
 export default FeatureListPage

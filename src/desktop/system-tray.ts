@@ -1,15 +1,14 @@
 /*
  * 引入Electron和Node.js模块
  */
-import { app, Tray, Menu } from 'electron'
-import * as path from 'path'
-
+import { app, Menu, Tray } from 'electron'
 /*
  * 引入自定义的窗口管理器模块
  */
 import { getMainWindow, mainWindowIsExist } from './main-window'
 
 // 全局Tray实例变量
+import * as path from 'path'
 let tray: Tray | null = null
 
 /*

@@ -40,7 +40,6 @@ const transformer: Transform = (file, api, options) => {
           unchainedDeclaration.comments = declaration.comments
           declaration.comments = null
         }
-
         return unchainedDeclaration
       })
     )
@@ -49,5 +48,4 @@ const transformer: Transform = (file, api, options) => {
   // 如果进行了转换，则返回转换后的源码；否则，返回null。
   return chainedDeclarations.size() ? chainedDeclarations.toSource(printOptions) : null
 }
-
 export default transformer

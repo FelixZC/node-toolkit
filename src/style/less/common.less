@@ -1,9 +1,9 @@
-// 定义断点
+/* 定义断点*/
 @breakpoint-small: 480px;
 @breakpoint-medium: 768px;
 @breakpoint-large: 1024px;
 
-// 媒体查询
+/* 媒体查询*/
 .small(@rules) {
   @media (max-width: @breakpoint-small) {
     @rules();
@@ -22,38 +22,15 @@
   }
 }
 
-// 使用
-.container {
-  padding: 0 15px;
-
-  .small( {
-      width: 100%;
-    }
-
-  );
-
-  .medium( {
-      width: 90%;
-    }
-
-  );
-
-  .large( {
-      width: 80%;
-    }
-
-  );
-}
-
 .flex-container {
+  align-items: center; /* flex-start | flex-end | center | baseline | stretch*/
   display: flex;
-  flex-direction: row; // row | row-reverse | column | column-reverse
-  justify-content: center; // flex-start | flex-end | center | space-between | space-around
-  align-items: center; // flex-start | flex-end | center | baseline | stretch
+  flex-direction: row; /* row | row-reverse | column | column-reverse*/
+  justify-content: center; /* flex-start | flex-end | center | space-between | space-around*/
 }
 
 .flex-item {
-  flex: 1; // 可以设置flex-grow, flex-shrink, flex-basis
+  flex: 1; /* 可以设置flex-grow, flex-shrink, flex-basis*/
 }
 
 .center-horizontal {
@@ -62,30 +39,30 @@
 }
 
 .center-vertical-flex {
-  .flex-container();
   align-items: center;
+  @flex-container();
 }
 
 .center-vertical-item {
-  flex: none; // 不伸缩
+  flex: none; /* 不伸缩*/
 }
 
 .center-absolute {
+  left: 50%;
   position: absolute;
   top: 50%;
-  left: 50%;
   transform: translate(-50%, -50%);
 }
 
 .center-table {
   display: table;
-  width: 100%;
   height: 100%;
+  width: 100%;
 
   .center-table-cell {
     display: table-cell;
-    vertical-align: middle;
     text-align: center;
+    vertical-align: middle;
   }
 }
 

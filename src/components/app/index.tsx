@@ -1,7 +1,6 @@
 import '../../style/less/app.less'
-import React, { useEffect, useRef, useCallback, ChangeEvent } from 'react'
 // import DesktopHeader from '@src/components/desktop-header'
-import { isDesktop, getProcessNodeEnv, ipcRendererSend } from '@src/utils/desktop-utils'
+import { getProcessNodeEnv, ipcRendererSend, isDesktop } from '@src/utils/desktop-utils'
 import MineLayout from '@src/layout/index'
 /**
  * 主应用组件
@@ -9,6 +8,7 @@ import MineLayout from '@src/layout/index'
  * 对于开发环境，支持使用Ctrl + F12直接打开开发者工具；
  * 对于生产环境，支持一种特殊的快捷键组合来激活一个输入框，并通过输入'openDevtool'来打开开发者工具。
  */
+import React, { ChangeEvent, useCallback, useEffect, useRef } from 'react'
 function App() {
   // 用于引用打开开发者工具的输入框DOM元素
   const openDevtoolInput = useRef<HTMLInputElement>(null)
@@ -70,5 +70,4 @@ function App() {
     </div>
   )
 }
-
 export default App

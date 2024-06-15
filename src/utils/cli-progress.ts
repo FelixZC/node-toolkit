@@ -7,17 +7,14 @@ export const useCliProgress = (total: number = 0) => {
   const updateBar = () => {
     count++
     bar1.update(count)
-
     if (count >= total) {
       bar1.stop()
       count = 0
     }
   }
-
   if (total > 0) {
     bar1.start(total, count)
   }
-
   return {
     updateBar
   }

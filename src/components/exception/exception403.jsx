@@ -1,7 +1,6 @@
+import { Button, Result } from 'antd'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Result, Button } from 'antd'
-
 const Exception403 = () => {
   const navigate = useNavigate()
   return (
@@ -16,5 +15,4 @@ const Exception403 = () => {
     />
   )
 }
-
 export default Exception403

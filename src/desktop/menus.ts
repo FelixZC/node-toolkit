@@ -1,10 +1,10 @@
-import { Menu, MenuItemConstructorOptions } from 'electron'
 import { clearCacheAll } from '../utils/fs'
-import { shell } from 'electron'
-import { dialog } from 'electron'
+import { getIgnorePath } from '../utils/ignore'
 import { logger } from '../utils/log'
 import { getLogPath } from '../utils/log'
-import { getIgnorePath } from '../utils/ignore'
+import { Menu, MenuItemConstructorOptions } from 'electron'
+import { shell } from 'electron'
+import { dialog } from 'electron'
 const getMenuTemplate = (mainWindow: Electron.BrowserWindow): Array<MenuItemConstructorOptions> => {
   const menuTemplate: Array<MenuItemConstructorOptions> = [
     {
@@ -66,45 +66,90 @@ const getMenuTemplate = (mainWindow: Electron.BrowserWindow): Array<MenuItemCons
     {
       label: 'Edit',
       submenu: [
-        { role: 'undo' },
-        { role: 'redo' },
-        { type: 'separator' },
-        { role: 'cut' },
-        { role: 'copy' },
-        { role: 'paste' },
-        { role: 'delete' },
-        { type: 'separator' },
-        { role: 'selectAll' }
+        {
+          role: 'undo'
+        },
+        {
+          role: 'redo'
+        },
+        {
+          type: 'separator'
+        },
+        {
+          role: 'cut'
+        },
+        {
+          role: 'copy'
+        },
+        {
+          role: 'paste'
+        },
+        {
+          role: 'delete'
+        },
+        {
+          type: 'separator'
+        },
+        {
+          role: 'selectAll'
+        }
       ]
     },
     {
       label: 'View',
       submenu: [
-        { role: 'reload' },
-        { role: 'forceReload' },
-        { role: 'toggleDevTools' },
-        { type: 'separator' },
-        { role: 'resetZoom' },
-        { role: 'zoomIn' },
-        { role: 'zoomOut' },
-        { type: 'separator' },
-        { role: 'togglefullscreen' }
+        {
+          role: 'reload'
+        },
+        {
+          role: 'forceReload'
+        },
+        {
+          role: 'toggleDevTools'
+        },
+        {
+          type: 'separator'
+        },
+        {
+          role: 'resetZoom'
+        },
+        {
+          role: 'zoomIn'
+        },
+        {
+          role: 'zoomOut'
+        },
+        {
+          type: 'separator'
+        },
+        {
+          role: 'togglefullscreen'
+        }
       ]
     },
     {
       label: 'Window',
       submenu: [
-        { role: 'minimize' },
-        { role: 'zoom' },
-        { role: 'close' },
-        { type: 'separator' },
-        { role: 'front' }
+        {
+          role: 'minimize'
+        },
+        {
+          role: 'zoom'
+        },
+        {
+          role: 'close'
+        },
+        {
+          type: 'separator'
+        },
+        {
+          role: 'front'
+        }
       ]
     }
   ]
   return menuTemplate
 }
-
 export const createMenu = (mainWindow: Electron.BrowserWindow) => {
   const menuTemplate = getMenuTemplate(mainWindow)
   const applicationMenu = Menu.buildFromTemplate(menuTemplate)

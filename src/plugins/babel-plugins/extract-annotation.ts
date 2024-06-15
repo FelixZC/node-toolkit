@@ -46,11 +46,9 @@ export default declare((babel) => {
       if (t.isObjectProperty(node) || t.isObjectMethod(node) || t.isTSPropertySignature(node)) {
         key = (node.key as t.Identifier).name || (node.key as t.StringLiteral).value
       }
-
       if (t.isFunctionDeclaration(node) && node.id) {
         key = node.id.name
       }
-
       if (t.isVariableDeclaration(node)) {
         key = (node.declarations[0].id as t.Identifier).name
       }
@@ -71,26 +69,21 @@ export default declare((babel) => {
     getExtra() {
       return extra
     },
-
     name: 'ast-transform',
     visitor: {
       // 定义访问器处理不同类型的 AST 节点
       FunctionDeclaration(path) {
         getAnnatation(path)
       },
-
       ObjectMethod(path) {
         getAnnatation(path)
       },
-
       ObjectProperty(path) {
         getAnnatation(path)
       },
-
       TSPropertySignature(path) {
         getAnnatation(path)
       },
-
       VariableDeclaration(path) {
         getAnnatation(path)
       }

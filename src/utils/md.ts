@@ -1,3 +1,4 @@
+import { getDataType, sortArray, sortObjAttr } from './common'
 /**
  * Markdown 文件生成工具类，持续完善中...
  * @author pzc
@@ -5,8 +6,6 @@
  */
 
 import * as os from 'os'
-import { getDataType, sortArray, sortObjAttr } from './common'
-
 const br = os.EOL // 行分隔符
 
 /**
@@ -36,7 +35,6 @@ function queryContentByReg(
   if (customHandel && typeof customHandel !== 'function') {
     throw new Error('CustomHandel must be a function.')
   }
-
   let queryResult
   let str = ''
 
@@ -44,7 +42,6 @@ function queryContentByReg(
   if (!queryReg.global) {
     queryReg = new RegExp(queryReg.source, queryReg.flags + 'g')
   }
-
   let lastIndex = 0 // 记录上次匹配的结束位置
   while ((queryResult = queryReg.exec(content))) {
     // 处理匹配结果
@@ -61,7 +58,6 @@ function queryContentByReg(
       str += br
     }
   }
-
   return str
 }
 /**
@@ -72,14 +68,11 @@ function queryContentByReg(
 function createdAttributesGroupTable(attrGroup: Record<string, any>) {
   let localAttrGroup = attrGroup
   const dataType = getDataType(localAttrGroup)
-
   if (dataType !== 'Object') {
     throw new Error('createdAttributesGroupTable数据类型错误')
   }
-
   localAttrGroup = sortObjAttr(localAttrGroup)
   let attributesDescriptionTable = ''
-
   for (const attrGroupItem of Object.values(localAttrGroup)) {
     if (Reflect.get(attrGroupItem, 'groupKey') && Reflect.get(attrGroupItem, 'group')) {
       const title = Reflect.get(attrGroupItem.group[0], attrGroupItem.groupKey)
@@ -87,7 +80,6 @@ function createdAttributesGroupTable(attrGroup: Record<string, any>) {
       attributesDescriptionTable += `|字段|描述|位置|${br}`
       attributesDescriptionTable += `|-|-|-|${br}`
       const group = sortArray(attrGroupItem.group, 'key')
-
       for (const groupItem of group) {
         const [name, position] = groupItem.key.split('->')
         const description = groupItem.value
@@ -95,7 +87,6 @@ function createdAttributesGroupTable(attrGroup: Record<string, any>) {
       }
     }
   }
-
   return attributesDescriptionTable
 }
 
@@ -115,39 +106,30 @@ function createdStoreTable(
 ) {
   let localStateInStore = stateInStore
   const dataType = getDataType(localStateInStore)
-
   if (dataType !== 'Object') {
     throw new Error('createdStoreTable数据类型错误')
   }
-
   localStateInStore = sortObjAttr(localStateInStore)
   let createdStoreTableStr = ''
-
   if (typeof localStateInStore !== 'object') {
     return ''
   }
-
   if (localStateInStore.title) {
     createdStoreTableStr += `### ${localStateInStore.title}${br}`
   }
-
   if (leavl === 1) {
     createdStoreTableStr += `## root${br}`
   }
-
   createdStoreTableStr += `|字段|类型|默认|注释|${br}`
   createdStoreTableStr += `|-|-|-|-|${br}`
-
   for (const key in localStateInStore) {
     const type = getDataType(localStateInStore[key])
     const value = JSON.stringify(localStateInStore[key])
     const descript = annotationObj[key] || ''
-
     if (type === 'Object' && Object.keys(localStateInStore[key]).length) {
       const storeModule = localStateInStore[key]
       storeModule.title = key
       const nextLeavl = leavl + 1
-
       if (nextLeavl <= 2) {
         createdStoreTable(storeModule, annotationObj, nextLeavl, cache)
       }
@@ -155,16 +137,13 @@ function createdStoreTable(
       createdStoreTableStr += `${key}|${type}|${value}|${descript}|${br}`
     }
   }
-
   if (leavl === 1) {
     cache.unshift(createdStoreTableStr) // 添加根记录
   } else {
     cache.push(createdStoreTableStr)
   }
-
   return cache.join(br)
 }
-
 interface NodeWithId {
   base: string
   comment?: string
@@ -219,7 +198,6 @@ function generateProjectTree(
   })
   return treeString
 }
-
 export default {
   createdAttributesGroupTable,
   createdStoreTable,

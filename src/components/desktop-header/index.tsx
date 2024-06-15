@@ -1,15 +1,14 @@
 import '../../style/less/desktop-header.less'
-import React, { memo, useState, useEffect } from 'react'
-import SvgIcon from '@src/components/svg-icon'
-import { ipcRendererSend, ipcRendererOn, ipcRendererRemoveListener } from '@src/utils/desktop-utils'
+import { ipcRendererOn, ipcRendererRemoveListener, ipcRendererSend } from '@src/utils/desktop-utils'
 import logoImage from '@assets/images/electron-img.png'
 /**
  * DesktopHeader组件用于渲染桌面头部栏。
  * 该组件通过ipcRenderer与主进程进行通信，获取和设置窗口最大化状态，并提供窗口最小化、最大化和关闭功能。
  */
+import React, { memo, useEffect, useState } from 'react'
+import SvgIcon from '@src/components/svg-icon'
 function DesktopHeader() {
   const [windowIsMax, setWindowIsMax] = useState(false)
-
   useEffect(() => {
     const handleSetIsMax = (event: any, isMax: boolean) => {
       setWindowIsMax(isMax)
@@ -19,11 +18,9 @@ function DesktopHeader() {
       ipcRendererRemoveListener('mainWindowIsMax', handleSetIsMax)
     }
   }, [])
-
   const handleWindowOperation = (operation: 'min' | 'max' | 'restore' | 'close') => {
     ipcRendererSend(`mainWindow-${operation}`)
   }
-
   return (
     <div>
       <div className="desktop-header">
@@ -62,5 +59,4 @@ function DesktopHeader() {
     </div>
   )
 }
-
 export default memo(DesktopHeader)

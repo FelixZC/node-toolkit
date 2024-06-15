@@ -1,11 +1,11 @@
-import { createLogger, format, transports, Logger as WinstonLogger } from 'winston'
-import DailyRotateFile from 'winston-daily-rotate-file'
 import { app } from 'electron'
-import * as path from 'path'
-import * as os from 'os'
+import { createLogger, format, Logger as WinstonLogger, transports } from 'winston'
+import DailyRotateFile from 'winston-daily-rotate-file'
 import * as fs from 'fs-extra'
 import { getCurrentDateFormatted } from './time'
 // import express, { Request, Response, NextFunction } from 'express';
+import * as os from 'os'
+import * as path from 'path'
 const userInfo = os.userInfo()
 interface LogRecord {
   methodName: string
@@ -14,7 +14,6 @@ interface LogRecord {
   result: any
   user: string
 }
-
 interface ErrorRecord {
   methodName: string
   arguments: unknown[]
@@ -25,11 +24,8 @@ interface ErrorRecord {
   timestamp: Date
   user?: string
 }
-
 let logDirectory = path.join(app.getPath('userData'), 'logs')
-
 fs.ensureDirSync(logDirectory)
-
 export const getFilename = () => {
   return `operate-${getCurrentDateFormatted()}.log`
 }
@@ -66,19 +62,21 @@ export const logger: WinstonLogger = createLogger({
     })
   ]
 })
-
 function saveOperateLog(record: LogRecord | ErrorRecord) {
   const { methodName, arguments: args, timestamp, ...rest } = record
   const logMessage = `${methodName} called at ${timestamp.toISOString()} with arguments: ${JSON.stringify(
     args
   )}`
   if ('result' in rest) {
-    logger.info(logMessage, { ...rest })
+    logger.info(logMessage, {
+      ...rest
+    })
   } else {
-    logger.error(logMessage, { ...rest })
+    logger.error(logMessage, {
+      ...rest
+    })
   }
 }
-
 export function logDecorator(target: any, name: string, descriptor: PropertyDescriptor) {
   const originalMethod = descriptor.value
   descriptor.value = function (...args: unknown[]) {
@@ -117,7 +115,6 @@ process.on('uncaughtException', (error) => {
   logger.error('Uncaught Exception:', error)
   process.exit(1)
 })
-
 process.on('unhandledRejection', (reason, promise) => {
   logger.error('Unhandled Rejection:', promise, 'reason:', reason)
 })

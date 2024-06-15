@@ -1,18 +1,17 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { Tooltip, Input, Button, message } from 'antd'
-import { ipcRendererInvoke } from '../../utils/desktop-utils'
 import AceEditor from 'react-ace'
+import { Button, Input, message, Tooltip } from 'antd'
+import { ipcRendererInvoke } from '../../utils/desktop-utils'
+import React, { useEffect, useRef, useState } from 'react'
 import 'ace-builds/src-noconflict/ext-searchbox'
 import 'ace-builds/src-noconflict/theme-github'
 import 'ace-builds/src-noconflict/mode-markdown'
 import 'ace-builds/src-noconflict/ext-language_tools'
-import ReactMarkdown from 'react-markdown'
+import { EditOutlined, EyeOutlined, SettingOutlined, SplitCellsOutlined } from '@ant-design/icons'
 import gfm from 'remark-gfm'
+import ReactMarkdown from 'react-markdown'
 import '@src/style/less/markdown-styles.less'
 import 'github-markdown-css/github-markdown.css'
-import { EditOutlined, SplitCellsOutlined, EyeOutlined, SettingOutlined } from '@ant-design/icons'
 import '@src/style/less/icon.less'
-
 const FeatureListPage: React.FC = () => {
   const [directoryPath, setDirectoryPath] = useState('') // 存储目录路径
   const [output, setOutput] = useState('') // 存储执行结果
@@ -70,28 +69,39 @@ const FeatureListPage: React.FC = () => {
     // 更新组件状态以反映编辑器中的内容
     setOutput(newContent)
   }
-
   const handleModeChange = (value: string) => {
     setMode(value)
   }
-
   const handleUseIgnoreFiles = () => {
     setIsUseIgnoredFiles(!isUseIgnoredFiles)
     sessionStorage.setItem('isUseIgnoredFiles', String(!isUseIgnoredFiles))
   }
-
   return (
-    <div style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
+    <div
+      style={{
+        padding: '20px',
+        display: 'flex',
+        flexDirection: 'column'
+      }}
+    >
       <h1>Get Project Attribute Annotation</h1>
 
       {/* 显示目录路径的Input组件 */}
-      <div style={{ display: 'flex', marginBottom: '10px', width: '100%' }}>
+      <div
+        style={{
+          display: 'flex',
+          marginBottom: '10px',
+          width: '100%'
+        }}
+      >
         <Input.Search
           placeholder="Directory Path"
           value={directoryPath}
           readOnly
           onSearch={handleChooseDirectory}
-          style={{ flex: 1 }}
+          style={{
+            flex: 1
+          }}
           suffix={
             <Tooltip title="Use Ignore Files">
               <SettingOutlined
@@ -101,30 +111,45 @@ const FeatureListPage: React.FC = () => {
             </Tooltip>
           }
         />
-        <Button onClick={handleExecute} style={{ marginLeft: '10px' }}>
+        <Button
+          onClick={handleExecute}
+          style={{
+            marginLeft: '10px'
+          }}
+        >
           Exec
         </Button>
         {/* 自定义模式切换工具栏 */}
-        <div style={{ marginLeft: '10px' }}>
+        <div
+          style={{
+            marginLeft: '10px'
+          }}
+        >
           <Tooltip title="编辑模式">
             <Button
               icon={<EditOutlined />}
               onClick={() => handleModeChange('edit')}
-              style={{ marginLeft: '5px' }}
+              style={{
+                marginLeft: '5px'
+              }}
             />
           </Tooltip>
           <Tooltip title="拆分模式">
             <Button
               icon={<SplitCellsOutlined />}
               onClick={() => handleModeChange('split')}
-              style={{ marginLeft: '5px' }}
+              style={{
+                marginLeft: '5px'
+              }}
             />
           </Tooltip>
           <Tooltip title="预览模式">
             <Button
               icon={<EyeOutlined />}
               onClick={() => handleModeChange('preview')}
-              style={{ marginLeft: '5px' }}
+              style={{
+                marginLeft: '5px'
+              }}
             />
           </Tooltip>
         </div>
@@ -153,12 +178,25 @@ const FeatureListPage: React.FC = () => {
               showLineNumbers: true,
               tabSize: 2
             }}
-            style={{ flex: 1, height: '100%', width: '100%' }}
-            editorProps={{ $blockScrolling: true }}
+            style={{
+              flex: 1,
+              height: '100%',
+              width: '100%'
+            }}
+            editorProps={{
+              $blockScrolling: true
+            }}
           />
         )}
         {(mode == 'split' || mode == 'preview') && (
-          <div style={{ flex: 1, height: '100%', width: '100%', overflow: 'auto' }}>
+          <div
+            style={{
+              flex: 1,
+              height: '100%',
+              width: '100%',
+              overflow: 'auto'
+            }}
+          >
             <ReactMarkdown remarkPlugins={[gfm]} className="markdown-body">
               {output}
             </ReactMarkdown>
@@ -168,5 +206,4 @@ const FeatureListPage: React.FC = () => {
     </div>
   )
 }
-
 export default FeatureListPage

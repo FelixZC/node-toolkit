@@ -24,7 +24,6 @@ export default declare((babel) => {
         if (t.isImportDefaultSpecifier(v1) || t.isImportNamespaceSpecifier(v1)) {
           return -1
         }
-
         if (t.isImportDefaultSpecifier(v2) || t.isImportNamespaceSpecifier(v2)) {
           return 1
         }
@@ -37,7 +36,6 @@ export default declare((babel) => {
             v1Name = v1.imported.value
           }
         }
-
         if (t.isImportSpecifier(v2)) {
           if (t.isIdentifier(v2.imported)) {
             v2Name = v2.imported.name
@@ -45,7 +43,6 @@ export default declare((babel) => {
             v2Name = v2.imported.value
           }
         }
-
         return v1Name.localeCompare(v2Name)
       })
     })
@@ -63,26 +60,21 @@ export default declare((babel) => {
       const v2ImportInfo = importInfoList.find(
         (importObjList) => importObjList[0]?.source === v2?.source?.value
       )
-
       if (!v1ImportInfo || !v2ImportInfo) {
         return 0
       }
-
       let v1Name = '@'
       let v2Name = '@'
 
       // 如果存在默认导入，按默认导入排序
       if (v1ImportInfo.length > 1) {
         const target = v1ImportInfo.find((item) => item.importedName)
-
         if (target) {
           v1Name = target.importedName!
         }
       }
-
       if (v2ImportInfo.length > 1) {
         const target = v2ImportInfo.find((item) => item.importedName)
-
         if (target) {
           v2Name = target.importedName!
         }

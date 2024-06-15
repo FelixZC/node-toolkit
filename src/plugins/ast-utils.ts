@@ -39,6 +39,5 @@ export const traverserTemplateAst = (ast: ElementNode, visitor: TemplateVisitor)
     // 离开节点时的通用处理
     visitor.exit && visitor.exit(node, parent)
   }
-
   traverseNode(ast) // 从根节点开始遍历
 }

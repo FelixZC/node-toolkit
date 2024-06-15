@@ -1,16 +1,14 @@
-import React, { useState, useEffect } from 'react'
-import { List, Input, Button, Switch, message, Tooltip } from 'antd'
+import { Button, Input, List, message, Switch, Tooltip } from 'antd'
 import { ipcRendererInvoke } from '../../utils/desktop-utils'
+import React, { useEffect, useState } from 'react'
 import { SettingOutlined } from '@ant-design/icons'
 import '@src/style/less/icon.less'
-
 interface Feature {
   id: number
   name: string
   isSelected: boolean
   path: string
 }
-
 const initialFeatures: Feature[] = [
   {
     id: 0,
@@ -19,7 +17,6 @@ const initialFeatures: Feature[] = [
     path: '../plugins/postcss-plugins/property-sort'
   }
 ]
-
 const FeatureListPage: React.FC = () => {
   const [features, setFeatures] = useState(initialFeatures)
   const [directoryPath, setDirectoryPath] = useState('') // 存储目录路径
@@ -27,21 +24,37 @@ const FeatureListPage: React.FC = () => {
 
   // 切换所有功能的选中状态
   const handleSelectRevert = () => {
-    const newFeatures = features.map((f) => ({ ...f, isSelected: !f.isSelected }))
+    const newFeatures = features.map((f) => ({
+      ...f,
+      isSelected: !f.isSelected
+    }))
     setFeatures(newFeatures)
   }
   const handleSelectAll = () => {
-    const newFeatures = features.map((f) => ({ ...f, isSelected: true }))
+    const newFeatures = features.map((f) => ({
+      ...f,
+      isSelected: true
+    }))
     setFeatures(newFeatures)
   }
   const handleSelectNone = () => {
-    const newFeatures = features.map((f) => ({ ...f, isSelected: false }))
+    const newFeatures = features.map((f) => ({
+      ...f,
+      isSelected: false
+    }))
     setFeatures(newFeatures)
   }
 
   // 切换单个功能的选中状态
   const handleSelectFeature = (featureId: number, isSelected: boolean) => {
-    const newFeatures = features.map((f) => (f.id === featureId ? { ...f, isSelected } : f))
+    const newFeatures = features.map((f) =>
+      f.id === featureId
+        ? {
+            ...f,
+            isSelected
+          }
+        : f
+    )
     setFeatures(newFeatures)
   }
 
@@ -77,7 +90,6 @@ const FeatureListPage: React.FC = () => {
       message.error('Failed to choose directory: ' + error)
     }
   }
-
   const handleUseIgnoreFiles = () => {
     setIsUseIgnoredFiles(!isUseIgnoredFiles)
     sessionStorage.setItem('isUseIgnoredFiles', String(!isUseIgnoredFiles))
@@ -90,7 +102,11 @@ const FeatureListPage: React.FC = () => {
   }, []) // 空依赖数组表示这个effect只在挂载时运行一次
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div
+      style={{
+        padding: '20px'
+      }}
+    >
       <h1>Postcss Plugin List Execution Page</h1>
       {/* 显示目录路径的Input组件 */}
       <Input.Search
@@ -107,7 +123,12 @@ const FeatureListPage: React.FC = () => {
           </Tooltip>
         }
       />
-      <div style={{ marginTop: '10px', marginBottom: '10px' }}>
+      <div
+        style={{
+          marginTop: '10px',
+          marginBottom: '10px'
+        }}
+      >
         <Button onClick={handleSelectRevert}>Toggle Select Revert</Button>
         <Button onClick={handleSelectAll}>Toggle Select on </Button>
         <Button onClick={handleSelectNone}>Toggle Select off</Button>
@@ -140,5 +161,4 @@ const FeatureListPage: React.FC = () => {
     </div>
   )
 }
-
 export default FeatureListPage

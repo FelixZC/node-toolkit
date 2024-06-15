@@ -41,7 +41,7 @@ export function stringify(sfcDescriptor: SFCDescriptor) {
       [template, script, scriptSetup, ...styles, ...customBlocks].filter(
         (block) => block != null
       ) as Array<NonNullable<SFCBlock>>
-    ) // 根据块的源位置进行排序
+    ) /* 根据块的源位置进行排序*/
       .sort((a, b) => a.loc.start.offset - b.loc.start.offset)
       // 为每个块生成打开和关闭标签，并计算相关位置信息
       .map((block) => {
@@ -68,7 +68,6 @@ export function stringify(sfcDescriptor: SFCDescriptor) {
           const prevBlock = array[index - 1]
           newlinesBefore = block.startOfOpenTag - prevBlock.endOfCloseTag
         }
-
         newlinesBefore = newlinesBefore < 0 ? 0 : newlinesBefore
         // 按计算出的新行数和块内容生成SFC代码字符串
         return (
@@ -94,7 +93,6 @@ function makeOpenTag(block: SFCBlock) {
       if (value === true) {
         return name
       }
-
       return `${name}="${value}"`
     })
     .map((attr) => ` ${attr}`)

@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react'
-import { Input, Tooltip, Checkbox, Button, Row, Col, message } from 'antd'
+import { Button, Checkbox, Col, Input, message, Row, Tooltip } from 'antd'
 import {
-  SearchOutlined,
   CheckSquareOutlined,
   CloseSquareOutlined,
+  SearchOutlined,
   SettingOutlined
 } from '@ant-design/icons'
+import { convertToReg, getIgnorePatterns } from '@src/utils/common'
 import { ipcRendererInvoke } from '../../utils/desktop-utils'
-import { getIgnorePatterns, convertToReg } from '@src/utils/common'
+import React, { useEffect, useState } from 'react'
 import '@src/style/less/markdown-styles.less'
 import '@src/style/less/icon.less'
 import '@src/style/less/pre.less'
@@ -75,11 +75,9 @@ const FeatureListPage: React.FC = () => {
   const handleMatchCaseChange = () => {
     setMatchCase(!matchCase)
   }
-
   const handleMatchWholeWordChange = () => {
     setMatchWholeWord(!matchWholeWord)
   }
-
   const handleUseRegExpChange = () => {
     setMatchReg(!matchReg)
   }
@@ -88,17 +86,31 @@ const FeatureListPage: React.FC = () => {
     sessionStorage.setItem('isUseIgnoredFiles', String(!isUseIgnoredFiles))
   }
   return (
-    <div style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
+    <div
+      style={{
+        padding: '20px',
+        display: 'flex',
+        flexDirection: 'column'
+      }}
+    >
       <h1>File Content Query</h1>
 
-      <Row gutter={16} style={{ marginBottom: '10px', alignItems: 'center' }}>
+      <Row
+        gutter={16}
+        style={{
+          marginBottom: '10px',
+          alignItems: 'center'
+        }}
+      >
         <Col span={16}>
           <Input.Search
             placeholder="Directory Path"
             value={directoryPath}
             readOnly
             onSearch={handleChooseDirectory}
-            style={{ width: '100%' }}
+            style={{
+              width: '100%'
+            }}
             suffix={
               <Tooltip title="Use Ignore Files">
                 <SettingOutlined
@@ -111,7 +123,13 @@ const FeatureListPage: React.FC = () => {
         </Col>
       </Row>
 
-      <Row gutter={16} style={{ marginBottom: '10px', alignItems: 'center' }}>
+      <Row
+        gutter={16}
+        style={{
+          marginBottom: '10px',
+          alignItems: 'center'
+        }}
+      >
         <Col span={16}>
           <Input
             placeholder="Search Query"
@@ -139,21 +157,31 @@ const FeatureListPage: React.FC = () => {
                 </Tooltip>
               </div>
             }
-            style={{ width: '100%' }}
+            style={{
+              width: '100%'
+            }}
           />
         </Col>
         <Col span={8}>
           <Checkbox
             checked={isAddSourcePath}
             onChange={(e) => setIsAddSourcePath(e.target.checked)}
-            style={{ marginRight: '10px' }}
+            style={{
+              marginRight: '10px'
+            }}
           >
             Add Source Path
           </Checkbox>
         </Col>
       </Row>
 
-      <Row gutter={16} style={{ marginBottom: '10px', alignItems: 'center' }}>
+      <Row
+        gutter={16}
+        style={{
+          marginBottom: '10px',
+          alignItems: 'center'
+        }}
+      >
         <Col span={16}>
           <Input
             placeholder="Files to Exclude (comma separated)"
@@ -186,5 +214,4 @@ const FeatureListPage: React.FC = () => {
     </div>
   )
 }
-
 export default FeatureListPage

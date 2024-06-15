@@ -8,7 +8,8 @@ import * as t from '@babel/types'
  */
 export default declare((babel) => {
   return {
-    name: 'ast-transform', // 插件名称。
+    name: 'ast-transform',
+    // 插件名称。
     visitor: {
       // 访问器，指定需要转换的AST节点类型。
       Program: {

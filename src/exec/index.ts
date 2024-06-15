@@ -1,23 +1,23 @@
+import { buildTree, groupBy, pickProperties } from '../utils/common'
 import * as cliProgress from '../utils/cli-progress'
-import fsUtils, { writeFile, readFile, getFileInfo } from '../utils/fs'
-import { groupBy, buildTree, pickProperties } from '../utils/common'
+import fsUtils, { getFileInfo, readFile, writeFile } from '../utils/fs'
+import { getMainWindow } from '../desktop/main-window'
+import { logger } from '../utils/log'
+// 定义文件属性集合接口
 import mdUtils from '../utils/md'
+import { Notification } from 'electron'
 import * as path from 'path'
 import runBabelPlugin from '../plugins/use-babel-plugin'
 import runCodemod from '../plugins/use-codemod'
 import runPostcssPlugin from '../plugins/use-postcss-plugin'
 import runPosthtmlPlugin from '../plugins/use-posthtml-plugin'
-import { Notification } from 'electron'
-import { getMainWindow } from '../desktop/main-window'
 import type { BabelPlugin } from '../plugins/use-babel-plugin'
 import type { ExecFileInfo } from '../../types/common'
 import type { FileInfo } from '../utils/fs'
+import type { FsInstance } from '../utils/fs'
 import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
 import type { Plugin as PosthtmlPlugin } from 'posthtml'
 import type { Transform } from 'jscodeshift'
-import type { FsInstance } from '../utils/fs'
-import { logger } from '../utils/log'
-// 定义文件属性集合接口
 interface AttrsCollection {
   key: string | number
   value: string | number
@@ -34,7 +34,6 @@ export interface RegExec {
 export interface FilterConditionType {
   (item: FileInfo): boolean
 }
-
 export type ExecListType = Array<RegExec>
 
 // Exec类定义
@@ -54,19 +53,24 @@ interface ExecInterface {
   ): Promise<string>
   pageRegQuery(regExpression: RegExp, content: string): string
   batchReplaceByReg(execList: ExecListType, filterCondition?: FilterConditionType): Promise<void>
-  execBabelPlugin(
-    babelPlugins: BabelPlugin[]
-  ): Promise<{ successList: string[]; errorList: string[] }>
-  execPosthtmlPlugin(
-    plugins: PosthtmlPlugin<unknown>[]
-  ): Promise<{ successList: string[]; errorList: string[] }>
-  execPostcssPlugin(
-    plugins: PostcssPlugin[]
-  ): Promise<{ successList: string[]; errorList: string[] }>
-  execCodemod(codemodList: Transform[]): Promise<{ successList: string[]; errorList: string[] }>
+  execBabelPlugin(babelPlugins: BabelPlugin[]): Promise<{
+    successList: string[]
+    errorList: string[]
+  }>
+  execPosthtmlPlugin(plugins: PosthtmlPlugin<unknown>[]): Promise<{
+    successList: string[]
+    errorList: string[]
+  }>
+  execPostcssPlugin(plugins: PostcssPlugin[]): Promise<{
+    successList: string[]
+    errorList: string[]
+  }>
+  execCodemod(codemodList: Transform[]): Promise<{
+    successList: string[]
+    errorList: string[]
+  }>
   // 可能还需要添加其他方法...
 }
-
 export class Exec implements ExecInterface {
   fsInstance: fsUtils // 文件系统实例属性
   fileInfoList: FileInfo[] // 文件信息列表属性
@@ -87,7 +91,10 @@ export class Exec implements ExecInterface {
     const result = pickProperties(trees, ['base', 'dir', 'children'])
     const resultJson = JSON.stringify(result, null, 2)
     const resultMd = mdUtils.generateProjectTree(result)
-    return { resultJson, resultMd }
+    return {
+      resultJson,
+      resultMd
+    }
   }
   /**
    * 对文件信息列表进行分类分组，根据文件的扩展名进行分组。
@@ -97,7 +104,6 @@ export class Exec implements ExecInterface {
     const group = groupBy(this.fileInfoList, 'ext')
     return JSON.stringify(group, null, 2)
   }
-
   classifyFilesByBasename = () => {
     const group = groupBy(this.fileInfoList, 'name')
     return JSON.stringify(group, null, 2)
@@ -123,14 +129,11 @@ export class Exec implements ExecInterface {
     // 将插件路径列表转换为插件对象列表
     const plugins: BabelPlugin[] = babelPluginPathList.map((pluginPath) => {
       const result = require(pluginPath)
-
       if (result.default) {
         return result.default
       }
-
       return result
     })
-
     const successList: string[] = [] // 执行改动文件列表
     const errorList: string[] = [] // 执行错误列表
 
@@ -195,12 +198,18 @@ export class Exec implements ExecInterface {
       }
     }
     const vaildList = [
-      '.js', // JavaScript 文件
-      '.jsx', // React JSX 文件
-      '.ts', // TypeScript 文件
-      '.tsx', // TypeScript JSX 文件
-      '.mjs', // ES 模块 JavaScript 文件
-      '.cjs', // CommonJS 模块 JavaScript 文件（通常不需要 Babel 处理，但可以配置）
+      '.js',
+      // JavaScript 文件
+      '.jsx',
+      // React JSX 文件
+      '.ts',
+      // TypeScript 文件
+      '.tsx',
+      // TypeScript JSX 文件
+      '.mjs',
+      // ES 模块 JavaScript 文件
+      '.cjs',
+      // CommonJS 模块 JavaScript 文件（通常不需要 Babel 处理，但可以配置）
       '.vue'
     ]
     const targetList = this.fileInfoList.filter((fileInfo) => vaildList.includes(fileInfo.ext))
@@ -225,7 +234,6 @@ export class Exec implements ExecInterface {
     attributesDescriptionTable = attributesDescriptionTable
       .replace(/\{\{.*\}\}/g, '')
       .replace(/<.*>/g, '')
-
     return attributesDescriptionTable
   }
 
@@ -299,7 +307,6 @@ export class Exec implements ExecInterface {
     if (!reg.global) {
       reg = new RegExp(reg.source, reg.flags + 'g')
     }
-
     let isChange = false // 标识内容是否发生了替换
     let match
 
@@ -310,7 +317,6 @@ export class Exec implements ExecInterface {
         reg.lastIndex++
         continue
       }
-
       const replaceResult = matchContentHandle(match[0])
       if (replaceResult !== match[0]) {
         isChange = true
@@ -319,7 +325,6 @@ export class Exec implements ExecInterface {
       // 构建新的字符串
       content = content.slice(0, match.index) + replaceResult + content.slice(reg.lastIndex)
     }
-
     return {
       isChange,
       content // 返回替换后的内容
@@ -397,7 +402,6 @@ export class Exec implements ExecInterface {
         if (newContent === content || !newContent.length) {
           return
         }
-
         await writeFile(filePath, newContent) // 写入处理后的新内容。
         successList.push(filePath) // 添加到执行改动文件列表
       } catch (e) {
@@ -405,7 +409,6 @@ export class Exec implements ExecInterface {
         errorList.push(filePath) // 添加到执行错误列表
       }
     }
-
     const vaildList = ['.js', '.jsx', '.ts', '.tsx', '.vue'] // 定义有效文件扩展名列表。
     const targetList = this.fileInfoList.filter((fileInfo) => vaildList.includes(fileInfo.ext)) // 筛选出需要处理的文件列表。
     const { updateBar } = cliProgress.useCliProgress(targetList.length) // 初始化进度条。
@@ -422,7 +425,10 @@ export class Exec implements ExecInterface {
         title: '处理完成',
         body: `共扫描${targetList.length}个文件，执行改动文件${successList.length}个，执行失败文件${errorList.length}个`
       }).show()
-    return { successList, errorList }
+    return {
+      successList,
+      errorList
+    }
   }
 
   /**
@@ -472,10 +478,14 @@ export class Exec implements ExecInterface {
     }
     // 否则，处理项目中所有指定扩展名的文件
     const vaildList = [
-      '.html', // HTML 文件
-      '.htm', // HTML 文件的另一种常见后缀
-      '.xml', // XML 文件
-      '.phtml', // PHP 和 HTML 混合文件，通常用于 PHP 模板
+      '.html',
+      // HTML 文件
+      '.htm',
+      // HTML 文件的另一种常见后缀
+      '.xml',
+      // XML 文件
+      '.phtml',
+      // PHP 和 HTML 混合文件，通常用于 PHP 模板
       '.vue'
       // 其他可能的文件后缀，取决于插件的能力
     ]
@@ -496,7 +506,10 @@ export class Exec implements ExecInterface {
         title: '处理完成',
         body: `共扫描${targetList.length}个文件，执行改动文件${successList.length}个，执行失败文件${errorList.length}个`
       }).show()
-    return { successList, errorList }
+    return {
+      successList,
+      errorList
+    }
   }
 
   /**
@@ -536,12 +549,18 @@ export class Exec implements ExecInterface {
 
     // 定义有效文件扩展名列表。
     const vaildList = [
-      '.css', // 标准的 CSS 文件
-      '.less', // LESS 预处理器文件
-      '.scss', // SCSS 预处理器文件
-      '.sass', // Sass 预处理器文件（使用缩进）
-      '.styl', // Stylus 预处理器文件
-      '.pcss', // PostCSS CSS 兼容语法文件
+      '.css',
+      // 标准的 CSS 文件
+      '.less',
+      // LESS 预处理器文件
+      '.scss',
+      // SCSS 预处理器文件
+      '.sass',
+      // Sass 预处理器文件（使用缩进）
+      '.styl',
+      // Stylus 预处理器文件
+      '.pcss',
+      // PostCSS CSS 兼容语法文件
       '.sss' // SugarSS 语法文件
       // '.jsx',  // React JSX 文件，可能包含 CSS-in-JS，太损了
       // '.tsx',   // TypeScript 文件，也可能包含 CSS-in-JS，太损了
@@ -564,7 +583,10 @@ export class Exec implements ExecInterface {
         title: '处理完成',
         body: `共扫描${targetList.length}个文件，执行改动文件${successList.length}个，执行失败文件${errorList.length}个`
       }).show()
-    return { successList, errorList }
+    return {
+      successList,
+      errorList
+    }
   }
 
   /**
@@ -602,12 +624,18 @@ export class Exec implements ExecInterface {
       }
     }
     const vaildList = [
-      '.js', // JavaScript 文件
-      '.jsx', // React JSX 文件
-      '.ts', // TypeScript 文件
-      '.tsx', // TypeScript JSX 文件
-      '.mjs', // ES 模块 JavaScript 文件
-      '.cjs', // CommonJS 模块 JavaScript 文件（通常不需要 Babel 处理，但可以配置）
+      '.js',
+      // JavaScript 文件
+      '.jsx',
+      // React JSX 文件
+      '.ts',
+      // TypeScript 文件
+      '.tsx',
+      // TypeScript JSX 文件
+      '.mjs',
+      // ES 模块 JavaScript 文件
+      '.cjs',
+      // CommonJS 模块 JavaScript 文件（通常不需要 Babel 处理，但可以配置）
       '.vue'
     ]
     // 筛选出符合后缀名条件的文件信息列表
@@ -627,6 +655,9 @@ export class Exec implements ExecInterface {
         title: '处理完成',
         body: `共扫描${targetList.length}个文件，执行改动文件${successList.length}个，执行失败文件${errorList.length}个`
       }).show()
-    return { successList, errorList }
+    return {
+      successList,
+      errorList
+    }
   }
 }

@@ -8,7 +8,8 @@ import { declare } from '@babel/helper-plugin-utils'
  */
 export default declare((babel) => {
   return {
-    name: 'ast-transform', // 插件名称。
+    name: 'ast-transform',
+    // 插件名称。
     visitor: {
       // 针对BlockStatement节点的访问器。
       BlockStatement(path, state) {
@@ -39,7 +40,6 @@ export default declare((babel) => {
           }
         }
       },
-
       // 针对Identifier节点的访问器。
       Identifier(path, state) {
         // 查找包含当前节点的最近的父节点，该父节点可能拥有注释。
@@ -50,7 +50,6 @@ export default declare((babel) => {
               !!path.node.trailingComments ||
               !!path.node.innerComments)
         )
-
         if (parent) {
           // 对父节点的前导注释进行相同的检查和移除操作。
           if (parent.node.leadingComments && parent.node.leadingComments.length) {

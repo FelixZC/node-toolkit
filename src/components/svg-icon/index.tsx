@@ -1,6 +1,5 @@
 import React, { memo, useState } from 'react'
 import { Tooltip } from 'antd'
-
 type SvgIconProps = {
   // 图标名称
   svgName: string
@@ -77,7 +76,13 @@ const SvgIcon = ({
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <svg fill={svgColor} style={{ width: '100%', height: '100%' }}>
+        <svg
+          fill={svgColor}
+          style={{
+            width: '100%',
+            height: '100%'
+          }}
+        >
           <use xlinkHref={`#svg-${svgName}`} />
         </svg>
       </div>

@@ -1,6 +1,5 @@
 //@ts-nocheck
 import { Transform } from 'jscodeshift'
-
 const transformer: Transform = (file, api, options) => {
   const j = api.jscodeshift
   const printOptions = options.printOptions || {
@@ -8,7 +7,6 @@ const transformer: Transform = (file, api, options) => {
   }
   const root = j(file.source)
   const requires = {}
-
   const filterAndTransformRequires = (path) => {
     const varName = path.value.id.name
     const requireName = path.value.init.arguments[0].value
@@ -35,18 +33,15 @@ const transformer: Transform = (file, api, options) => {
         const parent = identifierPath.parent.value
         return !(j.MemberExpression.check(parent) && parent.property === identifierPath.value)
       })
-
     if (!usages.size()) {
       j(path).remove()
       return true
     }
-
     requires[requireName] = {
       scopeNode,
       varName
     }
   }
-
   const didTransform =
     root
       .find(j.VariableDeclarator, {
@@ -63,5 +58,4 @@ const transformer: Transform = (file, api, options) => {
       .size() > 0
   return didTransform ? root.toSource(printOptions) : null
 }
-
 export default transformer

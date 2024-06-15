@@ -24,11 +24,9 @@ export const getDataType = (obj: any) => {
  */
 export function sortObjAttr(target: Record<string, any>) {
   const dataType = getDataType(target)
-
   if (dataType !== 'Object') {
     throw new Error('sortObjAttr数据类型错误')
   }
-
   const newObj = {} as Record<string, any>
   const keys = Object.keys(target).sort((a, b) => {
     return a.localeCompare(b)
@@ -47,16 +45,13 @@ export function sortObjAttr(target: Record<string, any>) {
  */
 export function sortArray(arr: Array<Record<string, any>>, customSort: Function | string) {
   const dataType = getDataType(arr)
-
   if (dataType !== 'Array') {
     throw new Error('sortArray数据类型错误')
   }
-
   return arr.sort((a, b) => {
     if (typeof customSort === 'function') {
       return customSort(a, b)
     }
-
     if (typeof customSort === 'string') {
       return a[customSort].localeCompare(b[customSort])
     }
@@ -77,16 +72,12 @@ export function groupBy<T extends Record<string, any>>(arr: T[], groupKey: strin
   if (!Array.isArray(arr)) {
     throw new Error('非数组类型，无法分类')
   }
-
   const cache = {} as GroupCache<T>
-
   arr.forEach((element) => {
     if (!element.hasOwnProperty(groupKey)) {
       throw new Error(`元素缺少分组键：${groupKey}`)
     }
-
     const cacheKey = element[groupKey]
-
     if (cache[cacheKey]) {
       cache[cacheKey].group.push(element)
       cache[cacheKey].count++
@@ -98,7 +89,6 @@ export function groupBy<T extends Record<string, any>>(arr: T[], groupKey: strin
       }
     }
   })
-
   return cache
 }
 
@@ -173,7 +163,6 @@ export const transferRef = (str: string, seperator = '/') => {
   if (!str) {
     return str
   }
-
   return str
     .split(seperator)
     .map((item) => {
@@ -218,11 +207,9 @@ export const setValueByKeys = (
   value: any
 ) => {
   let localKeys = keys
-
   if (typeof localKeys === 'string') {
     localKeys = localKeys.split(',')
   }
-
   localKeys.reduce((previousValue, currentKey, currentIndex) => {
     if (currentIndex === localKeys.length - 1) {
       previousValue[currentKey] = value
@@ -248,7 +235,6 @@ export const getValueByKeys = (target: Record<string, any> = {}, keys: string[] 
   if (typeof localKeys === 'string') {
     localKeys = localKeys.split(',')
   }
-
   return localKeys.reduce((previousValue, currentKey) => {
     return previousValue?.[currentKey]
   }, target)
@@ -260,13 +246,14 @@ interface NodeWithId {
   parentId?: string | number | null
   children?: NodeWithId[]
 }
-
 export function buildTree<T extends NodeWithId>(
   nodes: T[],
   idProp: keyof T,
   parentProp: keyof T
 ): T[] {
-  const nodeMap: { [key: string]: T } = {}
+  const nodeMap: {
+    [key: string]: T
+  } = {}
   const rootNodes: T[] = []
 
   // 初始化节点映射
@@ -289,7 +276,6 @@ export function buildTree<T extends NodeWithId>(
       rootNodes.push(nodeMap[String(node[idProp])])
     }
   })
-
   return rootNodes // 返回根节点数组
 }
 
@@ -300,7 +286,6 @@ export function pickProperties<T extends object, K extends keyof T>(
 ): Pick<T, K>[] {
   return (Array.isArray(objects) ? objects : [objects]).map((obj) => {
     const picked: any = {}
-
     for (const propertyKey of propertiesToKeep) {
       const value = obj[propertyKey]
       // 如果属性是对象且存在，则递归调用pickProperties
@@ -316,7 +301,6 @@ export function pickProperties<T extends object, K extends keyof T>(
     return picked as Pick<T, K>
   })
 }
-
 export const getIgnorePatterns = (str: string): RegExp[] => {
   // 将排除文件列表转换为正则表达式数组
   const ignoreFilesPatterns = str
@@ -359,7 +343,6 @@ export const convertToReg = (
 
   // 默认全局搜索
   let flags = ''
-
   if (matchGlobal) {
     flags += 'g'
   }
@@ -367,7 +350,6 @@ export const convertToReg = (
   if (!matchCase) {
     flags += 'i'
   }
-
   try {
     // 创建正则表达式对象，需要将模式和标志作为两个参数传递
     return new RegExp(regExpString, flags)
@@ -376,7 +358,6 @@ export const convertToReg = (
     return null
   }
 }
-
 export type FileType =
   | 'Folder'
   | 'Audio'
@@ -409,7 +390,8 @@ export function classifyFileTypeByExt(ext: string): FileType {
     case '.mid':
     case '.mp2': // MPEG-1 Audio Layer II
     case '.mpa': // MPEG Audio
-    case '.spx': // Speex Audio
+    case '.spx':
+      // Speex Audio
       fileType = 'Audio'
       break
     // 压缩文件
@@ -429,7 +411,8 @@ export function classifyFileTypeByExt(ext: string): FileType {
     case '.lzh': // LZip压缩文件
     case '.xz': // LZMA2压缩文件
     case '.dmg': // Apple磁盘映像，可能包含压缩内容
-    case '.iso': // ISO9660磁盘映像，可能包含压缩内容
+    case '.iso':
+      // ISO9660磁盘映像，可能包含压缩内容
       fileType = 'Compressed File'
       break
     case '.txt':
@@ -456,7 +439,8 @@ export function classifyFileTypeByExt(ext: string): FileType {
     case '.xslt': // XSLT转换
     case '.log': // 日志文件
     case '.msg': // 电子邮件消息
-    case '.eml': // 电子邮件文件
+    case '.eml':
+      // 电子邮件文件
       fileType = 'Document' // 文档
       break
     case '.exe':
@@ -469,7 +453,8 @@ export function classifyFileTypeByExt(ext: string): FileType {
     case '.cmd': // Windows 批处理文件
     case '.vbscript': // Visual Basic Script 文件
     case '.wsf': // Windows Script 文件
-    case '.ps1': // PowerShell 脚本
+    case '.ps1':
+      // PowerShell 脚本
       fileType = 'Executable' // 可执行文件
       break
     case '.jpg':
@@ -495,7 +480,8 @@ export function classifyFileTypeByExt(ext: string): FileType {
     case '.aff': // Adobe Affinity Photo 的图像格式
     case '.pspimage': // PaintShop Pro 图像文件
     case '.kdc': // Kodak Digital Science 相机的 RAW 图像
-    case '.thm': // 缩略图，常用于视频和图像预览
+    case '.thm':
+      // 缩略图，常用于视频和图像预览
       fileType = 'Image' // 图像文件
       break
     case '.mp4':
@@ -555,7 +541,8 @@ export function classifyFileTypeByExt(ext: string): FileType {
     case '.properties': // Java属性文件
     case '.vb': // Visual Basic脚本
     case '.wsdl': // Web服务描述语言
-    case '.dtd': // 文档类型定义
+    case '.dtd':
+      // 文档类型定义
       fileType = 'Source Code'
       break
 
@@ -581,11 +568,13 @@ export function classifyFileTypeByExt(ext: string): FileType {
     case '.otb': // OpenType/CFF字体的二进制版本
     case '.pfr': // PFR字体，也称为TrueDoc
     case '.mac': // Macintosh字体套件
-    case '.dfont': // macOS上的字体文件
+    case '.dfont':
+      // macOS上的字体文件
       fileType = 'Font'
       break
     default:
-      fileType = 'Unknown' // 未知类型
+      fileType = 'Unknown'
+    // 未知类型
   }
   return fileType
 }

@@ -1,4 +1,3 @@
-import { writeFile } from '../utils/fs'
 import { Exec } from './index'
 import path from 'path'
 
@@ -8,6 +7,7 @@ import path from 'path'
  * @param {RegExp} reg - 要应用的正则表达式
  * @returns {string} - 查询结果
  */
+import { writeFile } from '../utils/fs'
 export async function batchRegQueryAndReturnResult(
   dir: string,
   reg: RegExp,

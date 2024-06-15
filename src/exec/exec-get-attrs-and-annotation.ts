@@ -1,5 +1,5 @@
-import path from 'path'
 import { Exec } from '../exec'
+import path from 'path'
 import { writeFile } from '../utils/fs'
 
 /**

@@ -1,4 +1,4 @@
-import { app, Event as ElectronEvent, WebContents, Certificate } from 'electron'
+import { app, Certificate, Event as ElectronEvent, WebContents } from 'electron'
 import { createMainWindow } from './main-window'
 import { getTray } from './system-tray'
 app.on('ready', () => {
@@ -20,31 +20,25 @@ app.on(
     callback(true)
   }
 )
-
 app.on('before-quit', () => {
   console.log('app before-quit')
 })
-
 app.on('window-all-closed', () => {
   console.log('window-all-closed')
   app.quit()
 })
-
 app.on('activate', () => {
   console.log('activate')
 })
-
 app.on('quit', () => {
   console.log('quit')
   if (getTray()) {
     getTray()!.destroy()
   }
 })
-
 app.on('will-quit', () => {
   console.log('will-quit')
 })
-
 app.on('will-finish-launching', () => {
   console.log('will-finish-launching')
 })

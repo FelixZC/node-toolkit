@@ -1,23 +1,23 @@
-import postcss from 'postcss'
-import path from 'path'
+import { logger } from '../utils/log'
 import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
-import type { ExecFileInfo } from '../../types/common'
-import type { AcceptedPlugin } from 'postcss'
+import path from 'path'
+import postcss from 'postcss'
+import postcssHtml from 'postcss-html'
+// @ts-ignore
+import postcssJsx from 'postcss-jsx'
 import postcssLess from 'postcss-less'
+// @ts-ignore
+import postcssMarkdown from 'postcss-markdown'
+import postcssSafeParser from 'postcss-safe-parser'
 import postcssSass from 'postcss-sass'
 import postcssScss from 'postcss-scss'
 // @ts-ignore
 import postcssStyl from 'postcss-styl'
-import postcssSafeParser from 'postcss-safe-parser'
 // @ts-ignore
 import sugarss from 'sugarss'
-import type { Syntax, Parser } from 'postcss'
-import { logger } from '../utils/log'
-import postcssHtml from 'postcss-html'
-// @ts-ignore
-import postcssMarkdown from 'postcss-markdown'
-// @ts-ignore
-import postcssJsx from 'postcss-jsx'
+import type { AcceptedPlugin } from 'postcss'
+import type { Parser, Syntax } from 'postcss'
+import type { ExecFileInfo } from '../../types/common'
 const getDefaultSyntax = (stypeType: string): Syntax | Parser => {
   if (/\.(?:[sx]?html?|[sx]ht|ux|php)$/i.test(stypeType)) {
     return postcssHtml
@@ -78,22 +78,19 @@ const runPostcssPlugin = async (execFileInfo: ExecFileInfo, pluginsList: Accepte
   if (!pluginsList.length) {
     return execFileInfo.source
   }
-
   if (!execFileInfo.path.endsWith('.vue')) {
     return transform(execFileInfo, pluginsList, path.extname(execFileInfo.path).slice(1))
   }
-
-  const { descriptor } = parseSFC(execFileInfo.source, { filename: execFileInfo.path })
+  const { descriptor } = parseSFC(execFileInfo.source, {
+    filename: execFileInfo.path
+  })
   const styles = descriptor.styles
-
   if (styles.length) {
     for (const style of styles) {
       execFileInfo.source = style.content
       style.content = await transform(execFileInfo, pluginsList, style.lang || 'css')
     }
   }
-
   return stringifySFC(descriptor)
 }
-
 export default runPostcssPlugin

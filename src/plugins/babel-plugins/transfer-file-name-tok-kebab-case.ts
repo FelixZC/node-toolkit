@@ -10,7 +10,8 @@ import { isPath, transferRef } from '../../utils/common'
  */
 export default declare((babel) => {
   return {
-    name: 'ast-transform', // 插件名称。
+    name: 'ast-transform',
+    // 插件名称。
     visitor: {
       // 处理ImportDeclaration节点，即导入声明。
       ImportDeclaration(path) {
@@ -19,7 +20,6 @@ export default declare((babel) => {
           path.node.source.value = transferRef(path.node.source.value)
         }
       },
-
       // 处理StringLiteral节点，即字符串字面量。
       StringLiteral(path) {
         // 如果字符串值满足特定条件，则转换该值。

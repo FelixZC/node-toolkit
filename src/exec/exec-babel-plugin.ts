@@ -1,19 +1,18 @@
 import { Exec } from './index'
-import path from 'path'
-import type { BabelPlugin } from '../plugins/use-babel-plugin'
 import { logger } from '../utils/log'
 
 /**
  * 执行 Babel 插件的公共方法。
  * @param babelPluginPathList 需要执行的 Babel 插件路径列表。
  */
+import path from 'path'
+import type { BabelPlugin } from '../plugins/use-babel-plugin'
 export const executeBabelPlugins = async (
   dir: string,
   babelPluginPathList: string[],
   isUseIgnoredFiles: boolean
 ) => {
   const exec = new Exec(dir, isUseIgnoredFiles)
-
   try {
     // 将插件路径列表映射为具体的插件实例数组
     const plugins: BabelPlugin[] = babelPluginPathList.map((pluginPath) => {

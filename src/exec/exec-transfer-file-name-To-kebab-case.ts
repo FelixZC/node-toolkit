@@ -1,21 +1,20 @@
+import { logger } from '../utils/log'
+import * as path from 'path'
+import { transferRef } from '../utils/common'
 /**
  * 批量修改文件命名和引用为驼峰式规范
  * 执行批处理操作，包括使用babel、postcss和posthtml插件转换文件名和引用，
  * 以及修改文件名和目录名以符合驼峰式规范。
  */
 import { useModifyFilenameExec } from './exec-modify-file-names-batch'
-import * as path from 'path'
-import { transferRef } from '../utils/common'
 import type { BabelPlugin } from '../plugins/use-babel-plugin'
 import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
 import type { Plugin as PosthtmlPlugin } from 'posthtml'
-import { logger } from '../utils/log'
 export async function execTransferFileNameToKebabCase() {
   // 定义babel插件路径列表，用于加载插件
   const babelPluginPathList: string[] = [
     '../plugins/babel-plugins/transfer-file-name-tok-kebab-case'
   ]
-
   const dir = path.join('src copy')
   // 实例化Exec类，用于后续执行插件转换和文件名修改操作
   const modifyFilenameExec = useModifyFilenameExec(dir, true)
@@ -32,7 +31,6 @@ export async function execTransferFileNameToKebabCase() {
       if (result.default) {
         return result.default
       }
-
       return result
     })
     await exec.execBabelPlugin(babelplugins)
@@ -53,7 +51,6 @@ export async function execTransferFileNameToKebabCase() {
       if (result.default) {
         return result.default
       }
-
       return result
     })
     await exec.execPostcssPlugin(postcssPlugins)
@@ -74,7 +71,6 @@ export async function execTransferFileNameToKebabCase() {
       if (result.default) {
         return result.default
       }
-
       return result
     })
     await exec.execPosthtmlPlugin(plugins)

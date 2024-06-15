@@ -1,7 +1,6 @@
-import React from 'react'
 import { Progress } from 'antd'
+import React from 'react'
 import { useProgress } from '@src/slices/progress-slice'
-
 const ProgressBar = () => {
   const { value, isVisible, isReset } = useProgress()
   return (
@@ -12,5 +11,4 @@ const ProgressBar = () => {
     </div>
   )
 }
-
 export default ProgressBar

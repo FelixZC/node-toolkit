@@ -1,5 +1,5 @@
-import { logger } from '../utils/log'
 import { Exec } from './index'
+import { logger } from '../utils/log'
 import path from 'path'
 import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
 
@@ -18,18 +18,14 @@ export async function executePostcssPlugins(
   isUseIgnoredFiles: boolean
 ) {
   const exec = new Exec(dir, isUseIgnoredFiles)
-
   try {
     const plugins: PostcssPlugin[] = pluginsPathList.map((pluginPath) => {
       const result = require(pluginPath)
-
       if (result.default) {
         return result.default
       }
-
       return result
     })
-
     await exec.execPostcssPlugin(plugins)
   } catch (e) {
     logger.warn(e)

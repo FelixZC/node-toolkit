@@ -1,15 +1,16 @@
-import React from 'react'
-
-import { useLocation, useNavigate } from 'react-router-dom'
-
 import { Button } from 'antd'
-
+import React from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 const NoMatch = () => {
   const location = useLocation()
   const navigate = useNavigate()
-
   return (
-    <div style={{ margin: 30, textAlign: 'center' }}>
+    <div
+      style={{
+        margin: 30,
+        textAlign: 'center'
+      }}
+    >
       <h3>
         No match for <code>{location.pathname}</code>
       </h3>
@@ -20,5 +21,4 @@ const NoMatch = () => {
     </div>
   )
 }
-
 export default NoMatch

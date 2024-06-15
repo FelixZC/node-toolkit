@@ -1,7 +1,5 @@
 import React from 'react'
-
 import { Result } from 'antd'
-
 const Exception401 = () => (
   <>
     <Result
@@ -11,5 +9,4 @@ const Exception401 = () => (
     />
   </>
 )
-
 export default Exception401

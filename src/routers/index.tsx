@@ -1,8 +1,7 @@
-import React, { Suspense, lazy } from 'react'
-import Loading from '@src/components/loading'
 import { Layout } from 'antd'
+import Loading from '@src/components/loading'
 import { Navigate } from 'react-router-dom'
-
+import React, { lazy, Suspense } from 'react'
 export interface RouteObject {
   path: string
   name: string
@@ -43,6 +42,21 @@ const rootRouter: RouteObject[] = [
     name: '',
     key: '/redirect',
     element: <Navigate replace to="/home" />
+  },
+  {
+    index: false,
+    path: '/403',
+    name: '403',
+    key: '/403',
+    auth: false,
+    element: lazyLoad(Exception403)
+  },
+  {
+    index: false,
+    path: '*',
+    name: 'No Match',
+    key: '*',
+    element: lazyLoad(NoMatch)
   },
   {
     index: true,
@@ -125,22 +139,6 @@ const rootRouter: RouteObject[] = [
         element: lazyLoad(ExecModifyFile)
       }
     ]
-  },
-  {
-    index: false,
-    path: '/403',
-    name: '403',
-    key: '/403',
-    auth: false,
-    element: lazyLoad(Exception403)
-  },
-  {
-    index: false,
-    path: '*',
-    name: 'No Match',
-    key: '*',
-    element: lazyLoad(NoMatch)
   }
 ]
-
 export default rootRouter

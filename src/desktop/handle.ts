@@ -1,4 +1,4 @@
-import { ipcMain, dialog } from 'electron'
+import { dialog, ipcMain } from 'electron'
 export default function mainWindowHandleEvents() {
   ipcMain.handle('choose-directory', async () => {
     const result = await dialog.showOpenDialog({
@@ -15,7 +15,6 @@ export default function mainWindowHandleEvents() {
       await executeBabelPlugins(dir, babelPluginPathList, isUseIgnoredFiles)
     }
   )
-
   ipcMain.handle(
     'exec-jscodemod',
     async (event, dir: string, jscodemodeList: string[], isUseIgnoredFiles: boolean) => {
@@ -23,7 +22,6 @@ export default function mainWindowHandleEvents() {
       await executeJSCodemods(dir, jscodemodeList, isUseIgnoredFiles)
     }
   )
-
   ipcMain.handle(
     'exec-posthtml',
     async (event, dir: string, posthtmlPluginPathList: string[], isUseIgnoredFiles: boolean) => {
@@ -31,7 +29,6 @@ export default function mainWindowHandleEvents() {
       await executePosthtmlPlugins(dir, posthtmlPluginPathList, isUseIgnoredFiles)
     }
   )
-
   ipcMain.handle(
     'exec-postcss',
     async (event, dir: string, postcssPluginPathList: string[], isUseIgnoredFiles: boolean) => {
@@ -39,7 +36,6 @@ export default function mainWindowHandleEvents() {
       await executePostcssPlugins(dir, postcssPluginPathList, isUseIgnoredFiles)
     }
   )
-
   ipcMain.handle(
     'exec-file-statistical',
     async (event, dir: string, isUseIgnoredFiles: boolean) => {
@@ -47,7 +43,6 @@ export default function mainWindowHandleEvents() {
       return await getProjectTree(dir, isUseIgnoredFiles)
     }
   )
-
   ipcMain.handle(
     'exec-get-attrs-and-annotation',
     async (event, dir: string, isUseIgnoredFiles: boolean) => {
@@ -57,7 +52,6 @@ export default function mainWindowHandleEvents() {
       return await getAttributesDescriptionTable(dir, isUseIgnoredFiles)
     }
   )
-
   ipcMain.handle(
     'exec-modify-file-names-batch-priview',
     async (event, dir: string, modifyFilenameOptions, isUseIgnoredFiles: boolean) => {
@@ -70,7 +64,6 @@ export default function mainWindowHandleEvents() {
       )
     }
   )
-
   ipcMain.handle(
     'exec-modify-file-names-batch',
     async (event, dir: string, modifyFilenameOptions, isUseIgnoredFiles: boolean) => {
@@ -83,7 +76,6 @@ export default function mainWindowHandleEvents() {
       )
     }
   )
-
   ipcMain.handle(
     'exec-reg-query-batch',
     async (
