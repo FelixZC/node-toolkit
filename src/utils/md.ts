@@ -91,6 +91,7 @@ function createdAttributesGroupTable(attrGroup: Record<string, any>) {
 }
 
 /**
+ * @deprecated
  * 创建与 Store 中字段相对应的表述表格，需要预先创建包含 Store 所有模块初始数据的文件
  * @param {Object} stateInStore - Store 的初始对象
  * @param {Object} annotationObj - 字段注释对象

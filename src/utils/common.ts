@@ -1,3 +1,5 @@
+import * as mime from 'mime-types'
+
 /**
  * 获取数据类型
  * @param {any} obj - 任意待检测的数据
@@ -130,14 +132,16 @@ export const capitalize = function (str: string) {
  */
 export const isPath = (str: string): boolean => {
   const startsWithList: string[] = [
-    '@',
     'src',
+    '@',
+    '@src',
     'images',
     'img',
     'styles',
     '~',
     '../',
     './',
+    '/',
     'dist',
     'node_modules',
     'assets',
@@ -172,7 +176,7 @@ export const transferRef = (str: string, seperator = '/') => {
         .replace(/(\b\w\b)-(?=\b\w\b)/g, '$1')
 
       /** 当代码管理工具和window组合使用，会出现文件大小写同源问题 */
-      /** to stupid to continue  */
+      /** too stupid to continue  */
       /** this is situation one  */
       // if (!result.includes('-') && item !== result) {
       //   result = '_' + result
@@ -358,223 +362,55 @@ export const convertToReg = (
     return null
   }
 }
+
 export type FileType =
   | 'Folder'
   | 'Audio'
-  | 'Compressed File'
-  | 'Document'
-  | 'Executable'
-  | 'Image'
   | 'Video'
+  | 'Image'
+  | 'Document'
   | 'Source Code'
+  | 'Archive'
+  | 'Executable'
   | 'Font'
+  | 'Plain Text'
   | 'Other'
   | 'Unknown'
-export function classifyFileTypeByExt(ext: string): FileType {
-  let fileType: FileType
-  switch (ext) {
-    // 音频文件
-    case '.mp3':
-    case '.wav':
-    case '.flac':
-    case '.aac':
-    case '.ogg':
-    case '.m4a': // MPEG-4 Audio
-    case '.amr': // Adaptive Multi-Rate Audio
-    case '.wma': // Windows Media Audio
-    case '.alac': // Apple Lossless Audio Codec
-    case '.ape': // Monkey's Audio
-    case '.opus': // Opus Audio
-    case '.ra': // Real Audio
-    case '.ram': // Real Media
-    case '.mid':
-    case '.mp2': // MPEG-1 Audio Layer II
-    case '.mpa': // MPEG Audio
-    case '.spx':
-      // Speex Audio
-      fileType = 'Audio'
-      break
-    // 压缩文件
-    case '.zip':
-    case '.rar':
-    case '.tar':
-    case '.gz':
-    case '.7z':
-    case '.bz2':
-    case '.apk': // Android Package
-    case '.arj': // ARJ压缩文件
-    case '.cab': // Microsoft Cabinet文件
-    case '.deb': // Debian软件包
-    case '.rpm': // Red Hat软件包
-    case '.z': // 压缩的Unix文件
-    case '.lz':
-    case '.lzh': // LZip压缩文件
-    case '.xz': // LZMA2压缩文件
-    case '.dmg': // Apple磁盘映像，可能包含压缩内容
-    case '.iso':
-      // ISO9660磁盘映像，可能包含压缩内容
-      fileType = 'Compressed File'
-      break
-    case '.txt':
-    case '.md':
-    case '.mkd': // Markdown文件的另一种扩展名
-    case '.rtf':
-    case '.pdf':
-    case '.doc':
-    case '.docx':
-    case '.xlsx':
-    case '.xls':
-    case '.ppt':
-    case '.pptx': // PowerPoint演示文稿
-    case '.odt': // OpenDocument文本
-    case '.ods': // OpenDocument电子表格
-    case '.odp': // OpenDocument演示文稿
-    case '.pages': // Apple Pages文档
-    case '.key': // Apple Keynote演示文稿
-    case '.csv': // 逗号分隔值
-    case '.tsv': // 制表符分隔值
-    case '.wpd': // WordPerfect文档
-    case '.wps': // WPS Office文档
-    case '.xsl': // XSL样式表
-    case '.xslt': // XSLT转换
-    case '.log': // 日志文件
-    case '.msg': // 电子邮件消息
-    case '.eml':
-      // 电子邮件文件
-      fileType = 'Document' // 文档
-      break
-    case '.exe':
-    case '.bat':
-    case '.sh':
-    case '.com': // DOS/Windows 可执行命令文件
-    case '.msi': // Windows Installer 软件包
-    case '.app': // macOS 应用程序包（注意：这也可能表示一个字体文件）
-    case '.gadget': // Windows Gadget
-    case '.cmd': // Windows 批处理文件
-    case '.vbscript': // Visual Basic Script 文件
-    case '.wsf': // Windows Script 文件
-    case '.ps1':
-      // PowerShell 脚本
-      fileType = 'Executable' // 可执行文件
-      break
-    case '.jpg':
-    case '.jpeg':
-    case '.png':
-    case '.gif':
-    case '.bmp':
-    case '.svg':
-    case '.tiff':
-    case '.tif': // TIFF 图像的另一种扩展名
-    case '.webp': // WebP 图像格式，现代浏览器支持
-    case '.ico': // ICO 图像，常用于图标文件
-    case '.raw': // RAW 图像，由许多数码相机生成
-    case '.cr2': // Canon RAW 图像
-    case '.nef': // Nikon RAW 图像
-    case '.orf': // Olympus RAW 图像
-    case '.arw': // Sony RAW 图像
-    case '.dng': // Adobe Digital Negative，RAW 图像的数字底片格式
-    case '.psd': // Adobe Photoshop 文档，有时也用于图像存储
-    case '.indd': // Adobe InDesign 文档，有时也包含图像数据
-    case '.ai': // Adobe Illustrator，矢量图形，有时也用于图像存储
-    case '.eps': // EPS（Encapsulated PostScript），矢量图像格式
-    case '.aff': // Adobe Affinity Photo 的图像格式
-    case '.pspimage': // PaintShop Pro 图像文件
-    case '.kdc': // Kodak Digital Science 相机的 RAW 图像
-    case '.thm':
-      // 缩略图，常用于视频和图像预览
-      fileType = 'Image' // 图像文件
-      break
-    case '.mp4':
-    case '.avi':
-    case '.mov':
-    case '.mkv':
-    case '.wmv':
-    case '.flv':
-    case '.m4v':
-    case '.mpg':
-    case '.mpeg':
-    case '.3gp':
-    case '.3g2':
-    case '.webm':
-    case '.ogg':
-    case '.ogv':
-    case '.divx':
-    case '.xvid':
-      fileType = 'Video' // 视频文件
-      break
-    case '.html':
-    case '.htm':
-    case '.xml':
-    case '.css':
-    case '.js':
-    case '.py': // Python
-    case '.pl': // Perl
-    case '.swift': // Swift
-    case '.ts': // TypeScript?
-    case '.dart': // Dart
-    case '.scala': // Scala
-    case '.h':
-    case '.hpp':
-    case '.c':
-    case '.hx': // Haxe
-    case '.lua': // Lua
-    case '.m': // Objective-C
-    case '.f': // Fortran
-    case '.asm': // 汇编语言
-    case '.r': // R语言
-    case '.gradle': // Gradle脚本
-    case '.kotlin': // Kotlin
-    case '.clj': // Clojure
-    case '.cljs': // ClojureScript
-    case '.lisp': // Lisp
-    case '.tex': // LaTeX
-    case '.sass': // SASS
-    case '.scss': // SCSS
-    case '.less': // LESS
-    case '.json': // JSON配置文件，也可以是前端模块
-    case '.yaml':
-    case '.yml':
-    case '.txtxml': // XML文本
-    case '.ini': // 配置文件
-    case '.conf': // 配置文件
-    case '.cfg': // 配置文件
-    case '.properties': // Java属性文件
-    case '.vb': // Visual Basic脚本
-    case '.wsdl': // Web服务描述语言
-    case '.dtd':
-      // 文档类型定义
-      fileType = 'Source Code'
-      break
 
-    // 字体文件
-    case '.ttf':
-    case '.otf':
-    case '.woff':
-    case '.woff2':
-    case '.eot':
-    case '.fnt': // 旧的字体格式，可能与某些游戏或应用相关
-    case '.bdf': // Bitmap Distribution Format，位图字体
-    case '.pfb': // Type 1字体，PostScript字体格式
-    case '.pfa': // Type 1字体，PostScript字体格式
-    case '.mf': // Metafont，TeX排版系统中使用的字体
-    case '.gsf': // Ghostscript字体
-    case '.psfu': // PSF Unicode，Unix系统中的字体
-    case '.bmap': // 位图字体映射
-    case '.cff': // Compact Font Format，用于OpenType字体
-    case '.cce': // 用于Adobe CEF Simple字体
-    case '.inf': // 字体信息文件
-    case '.cid': // CID-keyed OpenType字体
-    case '.otc': // OpenType收集器，包含多个字体
-    case '.otb': // OpenType/CFF字体的二进制版本
-    case '.pfr': // PFR字体，也称为TrueDoc
-    case '.mac': // Macintosh字体套件
-    case '.dfont':
-      // macOS上的字体文件
-      fileType = 'Font'
-      break
+// 将 MIME 类型映射到 FileType 枚举
+function mimeTypeToFileType(mimeType: string): FileType {
+  switch (true) {
+    case mimeType.startsWith('audio/'):
+      return 'Audio'
+    case mimeType.startsWith('video/'):
+      return 'Video'
+    case mimeType.startsWith('image/'):
+      return 'Image'
+    case mimeType.startsWith('text/') || mimeType === 'application/xml':
+      return 'Plain Text'
+    case mimeType.startsWith('application/') &&
+      !mimeType.includes('font') &&
+      !mimeType.includes('octet-stream'):
+      return 'Document'
+    case mimeType.includes('font/') || mimeType.endsWith('+x-woff'):
+      return 'Font'
+    case mimeType.endsWith('x-msdownload') || mimeType.startsWith('application/x-ms-'):
+      return 'Executable'
+    case mimeType.startsWith('application/x-tar') ||
+      mimeType.startsWith('application/zip') ||
+      mimeType.startsWith('application/x-rar-compressed') ||
+      mimeType === 'application/x-7z-compressed':
+      return 'Archive'
     default:
-      fileType = 'Unknown'
-    // 未知类型
+      return 'Other'
   }
-  return fileType
+}
+
+// 使用文件扩展名确定文件类型
+export function classifyFileTypeByExt(ext: string): FileType {
+  const mimeType = mime.lookup(ext)
+  if (mimeType) {
+    return mimeTypeToFileType(mimeType)
+  }
+  return 'Unknown'
 }
