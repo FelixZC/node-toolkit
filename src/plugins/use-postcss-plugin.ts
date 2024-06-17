@@ -17,7 +17,7 @@ import postcssStyl from 'postcss-styl'
 import sugarss from 'sugarss'
 import type { AcceptedPlugin } from 'postcss'
 import type { Parser, Syntax } from 'postcss'
-import type { ExecFileInfo } from '../../types/common'
+import type { ExecFileInfo } from '@src/types/common'
 const getDefaultSyntax = (stypeType: string): Syntax | Parser => {
   if (/\.(?:[sx]?html?|[sx]ht|ux|php)$/i.test(stypeType)) {
     return postcssHtml

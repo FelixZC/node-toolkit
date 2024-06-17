@@ -9,7 +9,7 @@ export interface RouteObject {
   key: string
   auth?: boolean
   element: JSX.Element
-  index?: boolean
+  show: boolean
   children?: RouteObject[]
 }
 
@@ -32,19 +32,20 @@ const ExecGetAttrsAndAnnotation = lazy(
   () => import('@src/components/exec/exec-get-attrs-and-annotation')
 )
 const ExecModifyFile = lazy(() => import('@src/components/exec/exec-modify-file-names-batch'))
+// const FileManager = lazy(() => import('@src/components/file-manage'))
 const Exception403 = lazy(() => import('@src/components/exception/exception403'))
 const NoMatch = lazy(() => import('@src/components/no-match'))
 // 路由配置
 const rootRouter: RouteObject[] = [
   {
     path: '/',
-    index: false,
+    show: false,
     name: '',
-    key: '/redirect',
-    element: <Navigate replace to="/home" />
+    key: '/Redirect',
+    element: <Navigate replace to="/Home" />
   },
   {
-    index: false,
+    show: false,
     path: '/403',
     name: '403',
     key: '/403',
@@ -52,93 +53,101 @@ const rootRouter: RouteObject[] = [
     element: lazyLoad(Exception403)
   },
   {
-    index: false,
+    show: false,
     path: '*',
     name: 'No Match',
     key: '*',
     element: lazyLoad(NoMatch)
   },
   {
-    index: true,
-    path: '/home',
+    show: true,
+    path: '/Home',
     name: '首页',
-    key: '/home',
+    key: '/Home',
     auth: true,
     element: lazyLoad(HomePage)
   },
   {
-    index: true,
-    path: '/exec',
+    show: true,
+    path: '/Exec',
     name: '执行器',
-    key: '/exec',
+    key: '/Exec',
     auth: true,
     element: lazyLoad(Layout),
     children: [
       {
-        index: true,
-        path: '/exec/ExecBabel',
+        show: true,
+        path: '/Exec/ExecBabel',
         name: 'ExecBabel',
-        key: '/exec/ExecBabel',
+        key: '/Exec/ExecBabel',
         auth: true,
         element: lazyLoad(ExecBabel)
       },
       {
-        index: true,
-        path: '/exec/ExecJscodemod',
+        show: true,
+        path: '/Exec/ExecJscodemod',
         name: 'ExecJscodemod',
-        key: '/exec/ExecJscodemod',
+        key: '/Exec/ExecJscodemod',
         auth: true,
         element: lazyLoad(ExecJscodemod)
       },
       {
-        index: true,
-        path: '/exec/ExecPostcss',
+        show: true,
+        path: '/Exec/ExecPostcss',
         name: 'ExecPostcss',
-        key: '/exec/ExecPostcss',
+        key: '/Exec/ExecPostcss',
         auth: true,
         element: lazyLoad(ExecPostcss)
       },
       {
-        index: true,
-        path: '/exec/ExecPosthtml',
+        show: true,
+        path: '/Exec/ExecPosthtml',
         name: 'ExecPosthtml',
-        key: '/exec/ExecPosthtml',
+        key: '/Exec/ExecPosthtml',
         auth: true,
         element: lazyLoad(ExecPosthtml)
       },
       {
-        index: true,
-        path: '/exec/ExecFileStatistical',
+        show: true,
+        path: '/Exec/ExecFileStatistical',
         name: 'ExecFileStatistical',
-        key: '/exec/ExecFileStatistical',
+        key: '/Exec/ExecFileStatistical',
         auth: true,
         element: lazyLoad(ExecFileStatistical)
       },
       {
-        index: true,
-        path: '/exec/ExecGetAttrsAndAnnotation',
+        show: true,
+        path: '/Exec/ExecGetAttrsAndAnnotation',
         name: 'ExecGetAttrsAndAnnotation',
-        key: '/exec/ExecGetAttrsAndAnnotation',
+        key: '/Exec/ExecGetAttrsAndAnnotation',
         auth: true,
         element: lazyLoad(ExecGetAttrsAndAnnotation)
       },
       {
-        index: true,
-        path: '/exec/ExecRegQueryBatch',
+        show: true,
+        path: '/Exec/ExecRegQueryBatch',
         name: 'ExecRegQueryBatch',
-        key: '/exec/ExecRegQueryBatch',
+        key: '/Exec/ExecRegQueryBatch',
         auth: true,
         element: lazyLoad(ExecRegQueryBatch)
       },
       {
-        index: true,
-        path: '/exec/ExecModifyFile',
+        show: true,
+        path: '/Exec/ExecModifyFile',
         name: 'ExecModifyFile',
-        key: '/exec/ExecModifyFile',
+        key: '/Exec/ExecModifyFile',
         auth: true,
         element: lazyLoad(ExecModifyFile)
       }
     ]
   }
+  // {
+  //   show: true,
+  //   path: '/FileManage',
+  //   name: '文件管理',
+  //   key: '/FileManage',
+  //   auth: true,
+  //   element: lazyLoad(FileManager)
+  // }
 ]
 export default rootRouter

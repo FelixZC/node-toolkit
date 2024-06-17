@@ -33,12 +33,13 @@
       "@pages/*": ["src/pages/*"],
       "@language/*": ["src/language/*"],
       "@redux/*": ["src/redux/*"],
-      "@router/*": ["src/router/*"]
+      "@router/*": ["src/router/*"],
+      "@utils/*": ["src/utils/*"],
+      "@store/*": ["src/store/*"]
     }
   },
   "include": [
     "src/**/*",
-    "types/*.d.ts",
   ],
   "exclude": ["dist", "node_modules", ".history"]
 }

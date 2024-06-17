@@ -43,7 +43,6 @@ export function getFormattedDateTime(): string {
   return dayjs().format('YYYY-MM-DDTHH:mm:ss')
 }
 
-// 获取当前日期的月份的第一天
 export function getFirstDateOfMonthFormatted(): string {
   return dayjs().startOf('month').format('YYYY-MM-DD')
 }
@@ -51,4 +50,9 @@ export function getFirstDateOfMonthFormatted(): string {
 // 获取当前日期的月份的最后一天
 export function getLastDateOfMonthFormatted(): string {
   return dayjs().endOf('month').format('YYYY-MM-DD')
+}
+
+// 格式化传入日期时间，包含时间
+export function formatInputDateTime(input: Date): string {
+  return dayjs(input).format('DD/MM/YYYY HH:mm:ss')
 }

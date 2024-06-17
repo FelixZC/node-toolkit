@@ -1,23 +1,17 @@
-import { classifyFileTypeByExt, FileType } from './common'
+import { classifyFileTypeByExt, formatFileSize } from './common'
 import * as fs from 'fs-extra'
 import { logDecorator, logger } from '../utils/log'
 import { LRUCache } from 'lru-cache'
 import * as os from 'os'
-import { ParsedPath } from 'path'
 import * as path from 'path'
 import { useIgnored } from '../utils/ignore'
-/**
+import type { FileInfo, FileInfoWithStats } from '@src/types/file'
+import { nativeImage } from 'electron'
+import { formatInputDateTime } from '../utils/time'
+/**`
  * fs.ts使用读异步，写同步
  * TODO 添加缓存功能操作
  */
-
-export interface FileInfo extends ParsedPath {
-  filePath: string
-}
-export interface FileInfoWithStats extends ParsedPath, fs.Stats {
-  filePath: string
-  type: FileType
-}
 
 // 创建LRU缓存实例，最大容量为1000个缓存项，缓存项在10分钟后过期
 const fileContentCache = new LRUCache<string, string>({
@@ -80,11 +74,25 @@ export function getFileInfo(filePath: string): FileInfo {
 export async function getFileInfoWithStats(filePath: string): Promise<FileInfoWithStats> {
   const stats = await readFileStats(filePath)
   const parsedPath = path.parse(filePath)
+  const image = nativeImage.createFromPath(filePath)
+  const scaleFactors = {
+    small: 0.5,
+    medium: 0.75,
+    large: 1 // 原始尺寸
+  }
   return {
     filePath,
     ...parsedPath,
     ...stats,
-    type: stats.isDirectory() ? 'Folder' : classifyFileTypeByExt(parsedPath.ext) // 文件类型
+    type: stats.isDirectory() ? 'Folder' : classifyFileTypeByExt(parsedPath.ext), // 文件类型
+    iconSmall: image.toDataURL({ scaleFactor: scaleFactors.small }),
+    iconMedium: image.toDataURL({ scaleFactor: scaleFactors.medium }),
+    iconLarge: image.toDataURL({ scaleFactor: scaleFactors.large }),
+    sizeFormat: formatFileSize(stats.size),
+    atimeFormat: formatInputDateTime(stats.atime),
+    mtimeFormat: formatInputDateTime(stats.mtime),
+    ctimeFormat: formatInputDateTime(stats.ctime),
+    birthtimeFormat: formatInputDateTime(stats.birthtime)
   }
 }
 function generateUniquePath(filePath: string): string {
@@ -185,7 +193,9 @@ export interface FsInstance {
   dirPathList: string[]
   eol: string
   getFileInfoList(): FileInfo[]
+  getDirectoryList(): FileInfo[]
   getFileInfoListWithStats(): Promise<FileInfo[]>
+  getDirectoryListWithStats(): Promise<FileInfo[]>
   addFile(filePath: string, content: string): Promise<void>
   deleteFile(filePath: string): Promise<void>
   renameFile(
@@ -267,6 +277,13 @@ class fsUtils implements FsInstance {
   }
   async getFileInfoListWithStats(): Promise<FileInfo[]> {
     return Promise.all(this.filePathList.map((filePath) => getFileInfoWithStats(filePath)))
+  }
+
+  getDirectoryList(): FileInfo[] {
+    return this.dirPathList.map((dirPath) => getFileInfo(dirPath))
+  }
+  async getDirectoryListWithStats(): Promise<FileInfo[]> {
+    return Promise.all(this.dirPathList.map((dirPath) => getFileInfoWithStats(dirPath)))
   }
 
   // 更新文件列表和目录列表

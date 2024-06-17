@@ -39,7 +39,9 @@ module.exports = {
       '@pages': path.resolve(__dirname, '../src/pages'), // 页面目录
       '@language': path.resolve(__dirname, '../src/language'), // 语言包目录
       '@redux': path.resolve(__dirname, '../src/redux'), // Redux相关代码目录
-      '@router': path.resolve(__dirname, '../src/router') // 路由目录
+      '@router': path.resolve(__dirname, '../src/router'), // 路由目录
+      '@store': path.resolve(__dirname, '../src/store'), // 存储目录
+      '@utils': path.resolve(__dirname, '../src/utils') // 工具函数目录
     }
   },
   // 定义入口文件

@@ -7,7 +7,7 @@ import type { RouteObject } from '@src/routers'
 const { Content, Sider } = Layout
 function filterMenuItems(routes: RouteObject[]) {
   return routes
-    .filter((route) => route.index)
+    .filter((route) => route.show)
     .map((route) => {
       const item = {
         label: route.name,

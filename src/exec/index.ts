@@ -12,8 +12,8 @@ import runCodemod from '../plugins/use-codemod'
 import runPostcssPlugin from '../plugins/use-postcss-plugin'
 import runPosthtmlPlugin from '../plugins/use-posthtml-plugin'
 import type { BabelPlugin } from '../plugins/use-babel-plugin'
-import type { ExecFileInfo } from '../../types/common'
-import type { FileInfo } from '../utils/fs'
+import type { ExecFileInfo } from '@src/types/common'
+import type { FileInfo } from '@src/types/file'
 import type { FsInstance } from '../utils/fs'
 import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
 import type { Plugin as PosthtmlPlugin } from 'posthtml'
@@ -74,7 +74,7 @@ interface ExecInterface {
 export class Exec implements ExecInterface {
   fsInstance: fsUtils // 文件系统实例属性
   fileInfoList: FileInfo[] // 文件信息列表属性
-  constructor(rootPath = path.join('src copy'), isUseIgnore: boolean = false) {
+  constructor(rootPath: string, isUseIgnore: boolean = false) {
     /** 项目根目录，在此变更执行目录 */
     this.fsInstance = new fsUtils(rootPath, isUseIgnore)
     this.fileInfoList = this.fsInstance.getFileInfoList()

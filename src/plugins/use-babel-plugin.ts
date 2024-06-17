@@ -8,7 +8,7 @@ import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
 import traverse from '@babel/traverse'
 import type * as Babel from '@babel/core'
 import type { PluginObj, Visitor } from '@babel/core'
-import type { ExecFileInfo } from '../../types/common'
+import type { ExecFileInfo } from '@src/types/common'
 export type BabelAPI = typeof Babel
 // 定义一个自定义插件对象接口，扩展 Babel 插件对象，添加 getExtra 方法和 visitor
 export interface CustomPluginObj extends PluginObj {

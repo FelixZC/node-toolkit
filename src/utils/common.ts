@@ -1,5 +1,5 @@
 import * as mime from 'mime-types'
-
+import { FileType } from '@src/types/file'
 /**
  * 获取数据类型
  * @param {any} obj - 任意待检测的数据
@@ -363,20 +363,6 @@ export const convertToReg = (
   }
 }
 
-export type FileType =
-  | 'Folder'
-  | 'Audio'
-  | 'Video'
-  | 'Image'
-  | 'Document'
-  | 'Source Code'
-  | 'Archive'
-  | 'Executable'
-  | 'Font'
-  | 'Plain Text'
-  | 'Other'
-  | 'Unknown'
-
 // 将 MIME 类型映射到 FileType 枚举
 function mimeTypeToFileType(mimeType: string): FileType {
   switch (true) {
@@ -413,4 +399,16 @@ export function classifyFileTypeByExt(ext: string): FileType {
     return mimeTypeToFileType(mimeType)
   }
   return 'Unknown'
+}
+
+export function formatFileSize(bytes: number, decimalPlaces = 2) {
+  if (bytes === 0) return '0 Bytes'
+
+  const k = 1024
+  const dm = decimalPlaces < 0 ? 0 : decimalPlaces
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
