@@ -9,6 +9,10 @@ import { initTray } from './system-tray'
 import mainWindowHandleEvents from './handle'
 import mainWindowListenEvents from './listen'
 import * as path from 'path'
+import installExtension, {
+  REACT_DEVELOPER_TOOLS,
+  REDUX_DEVTOOLS
+} from 'electron-devtools-installer'
 type DevelopmentOrProduction = 'development' | 'production'
 const isDevelopment: DevelopmentOrProduction = process.env.NODE_ENV! as DevelopmentOrProduction
 let mainWindow: BrowserWindow | null = null // 全局变量，用于存储主窗口对象
@@ -39,10 +43,24 @@ function createMainWindow(): void {
     const entryPath = path.join(__dirname, '../../../build/index.html')
     mainWindow.loadFile(entryPath)
   }
-  mainWindow.once('ready-to-show', () => {
+  mainWindow.once('ready-to-show', async () => {
     initTray()
     createMenu(mainWindow!)
     mainWindow!.show()
+
+    // 安装 React Developer Tools 和 Redux DevTools 扩展，并行处理,
+    const installPromises = [
+      installExtension(REACT_DEVELOPER_TOOLS),
+      installExtension(REDUX_DEVTOOLS)
+    ]
+
+    try {
+      // 等待所有扩展安装完成,访问不了谷歌商城就不用等了,注释掉或者离线下载
+      await Promise.all(installPromises)
+      console.log('All DevTools extensions have been installed.')
+    } catch (err) {
+      console.log('An error occurred while installing extensions:', err)
+    }
   })
   mainWindowListenEvents(mainWindow)
   mainWindowHandleEvents()
