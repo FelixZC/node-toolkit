@@ -6,7 +6,9 @@ import { SwapOutlined } from '@ant-design/icons'
 import Directory from '@src/components/file-manage/directory'
 import useDirectory from '@src/store/use-directory'
 import '@src/style/less/icon.less'
+const MemoizedMonacoEditor = React.memo(MonacoEditor)
 const FeatureListPage: React.FC = () => {
+  console.log('exec-file-statistical重新渲染了')
   const [output, setOutput] = useState('') // 存储执行结果
   const [isShowInJson, setIsShowInJson] = useState(false)
   const [resultJson, setResultJson] = useState('')
@@ -82,7 +84,7 @@ const FeatureListPage: React.FC = () => {
         </Tooltip>
       </div>
       {/* 显示执行结果的Monaco Editor组件 */}
-      <MonacoEditor
+      <MemoizedMonacoEditor
         width="100%"
         height="calc(100vh - 160px)" // 根据需要调整这个值
         language="json" // 可以是json, javascript, css, html等

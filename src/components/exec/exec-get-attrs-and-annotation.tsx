@@ -14,6 +14,8 @@ import 'github-markdown-css/github-markdown.css'
 import '@src/style/less/icon.less'
 import Directory from '@src/components/file-manage/directory'
 import useDirectory from '@src/store/use-directory'
+const MemoizedReactMarkdown = React.memo(ReactMarkdown)
+const MemoizedAceEditor = React.memo(AceEditor)
 const FeatureListPage: React.FC = () => {
   const [output, setOutput] = useState('') // 存储执行结果
   const [mode, setMode] = useState('split') // 控制编辑器和预览器的显示模式
@@ -129,7 +131,7 @@ const FeatureListPage: React.FC = () => {
         }}
       >
         {(mode == 'split' || mode == 'edit') && (
-          <AceEditor
+          <MemoizedAceEditor
             ref={editorRef}
             placeholder="请输入Markdown内容..."
             mode="markdown"
@@ -163,9 +165,9 @@ const FeatureListPage: React.FC = () => {
               overflow: 'auto'
             }}
           >
-            <ReactMarkdown remarkPlugins={[gfm]} className="markdown-body">
+            <MemoizedReactMarkdown remarkPlugins={[gfm]} className="markdown-body">
               {output}
-            </ReactMarkdown>
+            </MemoizedReactMarkdown>
           </div>
         )}
       </div>
