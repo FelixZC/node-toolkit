@@ -32,7 +32,7 @@ const ExecGetAttrsAndAnnotation = lazy(
   () => import('@src/components/exec/exec-get-attrs-and-annotation')
 )
 const ExecModifyFile = lazy(() => import('@src/components/exec/exec-modify-file-names-batch'))
-// const FileManager = lazy(() => import('@src/components/file-manage'))
+const FileManager = lazy(() => import('@src/components/file-manage'))
 const Exception403 = lazy(() => import('@src/components/exception/exception403'))
 const NoMatch = lazy(() => import('@src/components/no-match'))
 // 路由配置
@@ -140,14 +140,14 @@ const rootRouter: RouteObject[] = [
         element: lazyLoad(ExecModifyFile)
       }
     ]
+  },
+  {
+    show: true,
+    path: '/FileManage',
+    name: '文件管理',
+    key: '/FileManage',
+    auth: true,
+    element: lazyLoad(FileManager)
   }
-  // {
-  //   show: true,
-  //   path: '/FileManage',
-  //   name: '文件管理',
-  //   key: '/FileManage',
-  //   auth: true,
-  //   element: lazyLoad(FileManager)
-  // }
 ]
 export default rootRouter

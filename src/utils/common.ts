@@ -1,5 +1,6 @@
 import * as mime from 'mime-types'
 import { FileType } from '@src/types/file'
+import { message } from 'antd'
 /**
  * 获取数据类型
  * @param {any} obj - 任意待检测的数据
@@ -363,42 +364,56 @@ export const convertToReg = (
   }
 }
 
-// 将 MIME 类型映射到 FileType 枚举
 function mimeTypeToFileType(mimeType: string): FileType {
+  // 移除可能的参数，只保留基本 MIME 类型
+  const baseMimeType = mimeType.split(';')[0].trim().toLowerCase()
+
+  // 根据 MIME 类型的基本部分进行分类
   switch (true) {
-    case mimeType.startsWith('audio/'):
+    case baseMimeType.startsWith('audio/'):
       return 'Audio'
-    case mimeType.startsWith('video/'):
+    case baseMimeType.startsWith('video/'):
       return 'Video'
-    case mimeType.startsWith('image/'):
+    case baseMimeType.startsWith('image/'):
       return 'Image'
-    case mimeType.startsWith('text/') || mimeType === 'application/xml':
+    case baseMimeType.startsWith('text/') || baseMimeType === 'application/xml':
       return 'Plain Text'
-    case mimeType.startsWith('application/') &&
-      !mimeType.includes('font') &&
-      !mimeType.includes('octet-stream'):
-      return 'Document'
-    case mimeType.includes('font/') || mimeType.endsWith('+x-woff'):
-      return 'Font'
-    case mimeType.endsWith('x-msdownload') || mimeType.startsWith('application/x-ms-'):
-      return 'Executable'
-    case mimeType.startsWith('application/x-tar') ||
-      mimeType.startsWith('application/zip') ||
-      mimeType.startsWith('application/x-rar-compressed') ||
-      mimeType === 'application/x-7z-compressed':
-      return 'Archive'
+    case baseMimeType === 'application/pdf':
+      return 'Document' // 单独处理 PDF
+    case baseMimeType.startsWith('application/'):
+      if (baseMimeType.startsWith('application/font') || baseMimeType.endsWith('+x-woff')) {
+        return 'Font'
+      } else if (baseMimeType.includes('font/') || baseMimeType.endsWith('+x-woff')) {
+        return 'Font' // 处理 WOFF 字体
+      } else if (
+        baseMimeType.endsWith('x-tar') ||
+        baseMimeType.endsWith('zip') ||
+        baseMimeType.endsWith('x-rar-compressed') ||
+        baseMimeType.endsWith('x-7z-compressed')
+      ) {
+        return 'Archive' // 处理归档文件
+      } else {
+        return 'Application' // 其他 application 类型
+      }
+    case baseMimeType.startsWith('application/x-msdownload') ||
+      baseMimeType.startsWith('application/x-ms-') ||
+      baseMimeType.endsWith('x-msdownload') ||
+      baseMimeType.startsWith('application/x-executable') ||
+      baseMimeType.startsWith('application/x-elf') ||
+      baseMimeType.endsWith('x-mach-o'):
+      return 'Executable' // 处理 Windows 可执行文件
     default:
-      return 'Other'
+      return 'Other' // 默认类别
   }
 }
 
 // 使用文件扩展名确定文件类型
-export function classifyFileTypeByExt(ext: string): FileType {
+export function classifyFileMimeType(ext: string): FileType {
   const mimeType = mime.lookup(ext)
   if (mimeType) {
     return mimeTypeToFileType(mimeType)
   }
-  return 'Unknown'
+  return 'Other'
 }
 
 export function formatFileSize(bytes: number, decimalPlaces = 2) {
@@ -411,4 +426,44 @@ export function formatFileSize(bytes: number, decimalPlaces = 2) {
   const i = Math.floor(Math.log(bytes) / Math.log(k))
 
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
+}
+
+type SortOrder = 'ascend' | 'descend'
+// 定义一个比较函数，用于排序
+export const compare = (
+  a: Record<string, any>,
+  b: Record<string, any>,
+  order: SortOrder,
+  fields: string[]
+) => {
+  let result = 0
+  if (!order) {
+    return 0
+  }
+  fields.forEach((field) => {
+    if (result === 0) {
+      // 仅在前面的比较结果相同的情况下比较下一个字段
+      const aValue = a[field]
+      const bValue = b[field]
+      if (aValue < bValue) {
+        result = -1
+      } else if (aValue > bValue) {
+        result = 1
+      }
+    }
+  })
+  return order === 'ascend' ? result : -result
+}
+
+export async function copyTextToClipboard(text: string): Promise<void> {
+  if (navigator.clipboard && window.isSecureContext) {
+    try {
+      await navigator.clipboard.writeText(text)
+      message.success('复制成功')
+    } catch (err) {
+      message.error('复制失败')
+    }
+  } else {
+    console.error('Clipboard API 不可用')
+  }
 }

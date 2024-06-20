@@ -11,6 +11,11 @@ const store = configureStore<RootState>({
   reducer: {
     progress: progressReducer,
     directory: directoryReducer
+  },
+  middleware: (getDefaultMiddleware) => {
+    return getDefaultMiddleware({
+      serializableCheck: false
+    })
   }
 })
 export default store

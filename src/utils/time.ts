@@ -54,5 +54,5 @@ export function getLastDateOfMonthFormatted(): string {
 
 // 格式化传入日期时间，包含时间
 export function formatInputDateTime(input: Date): string {
-  return dayjs(input).format('DD/MM/YYYY HH:mm:ss')
+  return dayjs(input).format('YYYY/MM/DD HH:mm:ss')
 }

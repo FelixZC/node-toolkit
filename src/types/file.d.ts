@@ -6,13 +6,12 @@ export type FileType =
   | 'Video'
   | 'Image'
   | 'Document'
-  | 'Source Code'
   | 'Archive'
   | 'Executable'
   | 'Font'
   | 'Plain Text'
   | 'Other'
-  | 'Unknown'
+  | 'Application'
 
 export interface FileInfo extends ParsedPath {
   filePath: string
@@ -21,12 +20,15 @@ export interface FileInfo extends ParsedPath {
 export interface FileInfoWithStats extends ParsedPath, Stats {
   filePath: string
   type: FileType
-  iconSmall: string
-  iconMedium: string
-  iconLarge: string
+  fileIcon: string
   sizeFormat: string
   atimeFormat: string
   mtimeFormat: string
   ctimeFormat: string
   birthtimeFormat: string
+}
+
+export interface FileInfoCustom extends FileInfoWithStats {
+  key: string
+  isSelected: boolean
 }

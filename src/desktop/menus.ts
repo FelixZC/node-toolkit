@@ -24,19 +24,6 @@ const getMenuTemplate = (mainWindow: Electron.BrowserWindow): Array<MenuItemCons
           }
         },
         {
-          label: 'Clear Files Cache',
-          accelerator: 'CmdOrCtrl+F5',
-          click: () => {
-            clearCacheAll()
-            dialog.showMessageBox({
-              type: 'info',
-              message: 'Alreadly clear cache all',
-              buttons: ['OK']
-            })
-            console.log('Alreadly clear cache all')
-          }
-        },
-        {
           label: 'Open Operate Log',
           accelerator: 'CmdOrCtrl+L',
           click: () => {
@@ -69,6 +56,19 @@ const getMenuTemplate = (mainWindow: Electron.BrowserWindow): Array<MenuItemCons
                 buttons: ['OK']
               })
             }
+          }
+        },
+        {
+          label: 'Clear Files Cache',
+          accelerator: 'CmdOrCtrl+F5',
+          click: () => {
+            clearCacheAll()
+            dialog.showMessageBox({
+              type: 'info',
+              message: 'Alreadly clear cache all',
+              buttons: ['OK']
+            })
+            console.log('Alreadly clear cache all')
           }
         },
         {

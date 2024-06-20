@@ -43,4 +43,4 @@ const DirectorySelect: React.FC = (Props) => {
     </div>
   )
 }
-export default DirectorySelect
+export default React.memo(DirectorySelect)

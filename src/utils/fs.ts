@@ -1,4 +1,4 @@
-import { classifyFileTypeByExt, formatFileSize } from './common'
+import { classifyFileMimeType, formatFileSize } from './common'
 import * as fs from 'fs-extra'
 import { logDecorator, logger } from '../utils/log'
 import { LRUCache } from 'lru-cache'
@@ -6,7 +6,7 @@ import * as os from 'os'
 import * as path from 'path'
 import { useIgnored } from '../utils/ignore'
 import type { FileInfo, FileInfoWithStats } from '@src/types/file'
-import { nativeImage } from 'electron'
+import { app } from 'electron'
 import { formatInputDateTime } from '../utils/time'
 /**`
  * fs.ts使用读异步，写同步
@@ -74,21 +74,14 @@ export function getFileInfo(filePath: string): FileInfo {
 export async function getFileInfoWithStats(filePath: string): Promise<FileInfoWithStats> {
   const stats = await readFileStats(filePath)
   const parsedPath = path.parse(filePath)
-  const image = nativeImage.createFromPath(filePath)
-  const scaleFactors = {
-    small: 0.5,
-    medium: 0.75,
-    large: 1 // 原始尺寸
-  }
+  const image = await app.getFileIcon(filePath, { size: 'large' })
   return {
     filePath,
     ...parsedPath,
     ...stats,
-    type: stats.isDirectory() ? 'Folder' : classifyFileTypeByExt(parsedPath.ext), // 文件类型
-    iconSmall: image.toDataURL({ scaleFactor: scaleFactors.small }),
-    iconMedium: image.toDataURL({ scaleFactor: scaleFactors.medium }),
-    iconLarge: image.toDataURL({ scaleFactor: scaleFactors.large }),
-    sizeFormat: formatFileSize(stats.size),
+    type: stats.isDirectory() ? 'Folder' : classifyFileMimeType(parsedPath.ext), // 文件类型
+    fileIcon: image.toDataURL({ scaleFactor: 1 }),
+    sizeFormat: stats.isDirectory() ? '' : formatFileSize(stats.size),
     atimeFormat: formatInputDateTime(stats.atime),
     mtimeFormat: formatInputDateTime(stats.mtime),
     ctimeFormat: formatInputDateTime(stats.ctime),
