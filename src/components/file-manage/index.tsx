@@ -4,7 +4,7 @@ import ContextMenu from '@src/components/antd-wrap/menus/index'
 import debounce from 'lodash/debounce'
 import FileManageContext from './context'
 import getMenus from './config/menus'
-import { Input, Layout, Select } from 'antd'
+import { Layout, Select } from 'antd'
 import { ipcRendererInvoke } from '@src/utils/desktop-utils'
 import LargeIconView from './views/large-icon'
 import MediumIconView from './views/medium-icon'
@@ -16,22 +16,80 @@ import TableView from './views/table-view'
 import useContextMenu from '@src/components/antd-wrap/menus/use-context-menu'
 import useDirectory from '@src/store/use-directory'
 import '@src/style/less/file-manage.less'
-import type { FileInfoCustom, FileInfoWithStats } from '@src/types/file'
+import RegExpInput from '../antd-wrap/search/reg-exp-input'
+import type { FileInfoCustom, FileInfoWithStats, FileType } from '@src/types/file'
 import type { TableProps } from 'antd'
+
+type ParametersType<T> = T extends (...args: infer U) => any ? U : never
+type TableChangeType = TableProps<FileInfoCustom>['onChange']
+type ChangeParams = ParametersType<TableChangeType>
+type SortConfigType = ChangeParams[2]
+type FileTypeExtend = FileType | 'All'
+
 const { Header, Content, Footer } = Layout
 const { Option } = Select
+
 const FileManage: React.FC = () => {
   const { directoryPath } = useDirectory()
-  const [searchValue, setSearchValue] = useState('')
+  const [searchReg, setSearchReg] = useState<RegExp | null>(null)
   const [originalData, setOriginalData] = useState<FileInfoCustom[]>([])
-  const [filterResult, setFilterResult] = useState<FileInfoCustom[]>([])
-  const [isSorted, setIsSorted] = useState<boolean>(false)
+  const [showData, setShowData] = useState<FileInfoCustom[]>([])
   const [currentView, setCurrentView] = useState<string>('detail')
   const [isUsePreview, setIsUsePreview] = useState<boolean>(false)
   const [previewFile, setPreviewFile] = useState<FileInfoCustom | null>(null)
   const [currentRow, setCurrentRow] = useState<FileInfoCustom | null>(null)
   const contextContainerRef = useRef<HTMLDivElement>(null)
   const { isMenuVisible, menuPosition, showMenu, hideMenu } = useContextMenu()
+
+  // 添加过滤类型和排序配置的状态
+  const [filterType, setFilterType] = useState<FileTypeExtend>('All')
+  const [sortConfig, setSortConfig] = useState<SortConfigType>([])
+
+  // 处理表格排序变化
+  const handleTableSortChange = (sorter: SortConfigType) => {
+    const localSorter = Array.isArray(sorter) ? sorter : [sorter]
+    setSortConfig(localSorter)
+  }
+
+  const filterDataByFileType = (data: FileInfoCustom[], type: FileTypeExtend) => {
+    if (type === 'All') return data
+    return data.filter((item) => item.type === type)
+  }
+
+  const sortData = (data: FileInfoCustom[], sorter: SortConfigType) => {
+    let localSorter = Array.isArray(sorter) ? sorter : [sorter]
+    const isNeedOrder = localSorter.some((item) => item.order)
+    if (!isNeedOrder) {
+      return data
+    }
+    let sortedData = [...data]
+    localSorter.forEach((curSorter, index) => {
+      if (curSorter.order && typeof curSorter.field === 'string') {
+        sortedData = sortedData.sort((a, b) =>
+          compare(a, b, curSorter.order!, [curSorter.field as string])
+        )
+      } else {
+      }
+    })
+    return sortedData
+  }
+
+  const filterDataByRegExp = (data: FileInfoCustom[]) => {
+    if (!searchReg) {
+      return data
+    }
+    const filtered = data.filter((item) => searchReg.test(item.name))
+    return filtered
+  }
+
+  // 根据过滤类型和排序配置更新展示数据
+  useEffect(() => {
+    const filteredData = filterDataByFileType(originalData, filterType)
+    const sortedData = sortData(filteredData, sortConfig)
+    const Result = filterDataByRegExp(sortedData)
+    setShowData(Result)
+  }, [searchReg, originalData, filterType, sortConfig, searchReg])
+
   const onContextMenu = (e: React.MouseEvent<HTMLDivElement>, record?: FileInfoCustom) => {
     e.preventDefault()
     e.stopPropagation()
@@ -74,52 +132,26 @@ const FileManage: React.FC = () => {
    * @param filters 筛选条件，用于过滤数据。
    * @param sorter 排序条件，用于对数据进行排序。
    */
-  const tableChange: TableProps<FileInfoCustom>['onChange'] = (pagination, filters, sorter) => {
-    let sortedData = [...filterResult]
-    let localSorter = Array.isArray(sorter) ? sorter : [sorter]
-    const isNeedOrder = localSorter.some((item) => item.order)
-    if (!isNeedOrder && isSorted) {
-      setFilterResult(originalData)
-      setIsSorted(false)
-      return
-    }
-    localSorter.forEach((curSorter, index) => {
-      if (curSorter.order && typeof curSorter.field === 'string') {
-        sortedData = sortedData.sort((a, b) =>
-          compare(a, b, curSorter.order!, [curSorter.field as string])
-        )
-      } else {
-      }
-    })
-    setIsSorted(true)
-    setFilterResult(sortedData)
+
+  const tableChange: TableChangeType = (pagination, filters, sorter) => {
+    handleTableSortChange(sorter)
   }
   const currentViewComponent = () => {
     switch (currentView) {
       case 'small-icon':
-        return <SmallIconView className="file-manage-content__left" files={filterResult} />
+        return <SmallIconView className="file-manage-content__left" files={showData} />
       case 'medium-icon':
-        return <MediumIconView className="file-manage-content__left" files={filterResult} />
+        return <MediumIconView className="file-manage-content__left" files={showData} />
       case 'large-icon':
-        return <LargeIconView className="file-manage-content__left" files={filterResult} />
+        return <LargeIconView className="file-manage-content__left" files={showData} />
       case 'detail':
       default:
         return (
-          <TableView className="file-manage-content__left" files={filterResult} columns={columns} />
+          <TableView className="file-manage-content__left" files={showData} columns={columns} />
         )
     }
   }
-  const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(event.target.value)
-  }
-  const handleFilterChange = debounce(() => {
-    if (searchValue.length) {
-      const filtered = originalData.filter((item) => item.name.includes(searchValue))
-      setFilterResult(filtered)
-    } else {
-      setFilterResult(originalData)
-    }
-  }, 300)
+
   const execSearch = async () => {
     if (!directoryPath) {
       return
@@ -139,27 +171,17 @@ const FileManage: React.FC = () => {
       setOriginalData(customResult)
     } catch (error) {}
   }
+
   useEffect(() => {
     execSearch()
   }, [directoryPath])
-  useEffect(() => {
-    handleFilterChange()
-  }, [searchValue, originalData])
-  const handleFilterTypeChange = (value: string) => {
-    let filteredResults: FileInfoCustom[]
-    if (value == 'All') {
-      filteredResults = originalData
-    } else {
-      filteredResults = originalData.filter((item) => item.type === value)
-    }
-    setFilterResult(filteredResults)
-  }
+
   return (
     <FileManageContext.Provider
       value={{
         tableChange,
         currentRow,
-        filterResult,
+        showData,
         onRowClick,
         onContextMenu,
         onDoubleClick,
@@ -174,12 +196,11 @@ const FileManage: React.FC = () => {
           <span className="file-manage-path_result">当前路径：{directoryPath}</span>
         </div>
         <Header className="file-manage-header">
-          <Input
+          <RegExpInput
             className="file-manage-header__search"
-            size="small"
+            setRegExp={debounce(setSearchReg, 300)}
             placeholder="输入搜索内容"
-            value={searchValue}
-            onChange={(e) => onInputChange(e)}
+            size="small"
           />
           <Select
             size="small"
@@ -189,7 +210,7 @@ const FileManage: React.FC = () => {
               marginLeft: 8
             }}
             defaultValue="All"
-            onChange={handleFilterTypeChange}
+            onChange={setFilterType}
           >
             {options.map((option) => (
               <Option key={option.value} value={option.value}>
@@ -216,7 +237,7 @@ const FileManage: React.FC = () => {
         </Content>
         <Footer className="file-manage-footer">
           {/* 显示文件搜索结果 */}
-          <span className="file-manage-footer__result">搜索结果：{filterResult.length}</span>
+          <span className="file-manage-footer__result">搜索结果：{showData.length}</span>
         </Footer>
       </Layout>
     </FileManageContext.Provider>

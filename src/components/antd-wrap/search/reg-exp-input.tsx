@@ -6,11 +6,13 @@ import { convertToReg } from '@src/utils/common'
 import '@src/style/less/icon.less'
 
 interface RegExpInputProps {
-  setRegExp: React.Dispatch<React.SetStateAction<RegExp | null>>
+  setRegExp: (reg: RegExp | null) => void
   placeholder?: string
+  size?: 'small' | 'middle' | 'large' | undefined
+  className?: string
 }
 
-const RegExpInput: React.FC<RegExpInputProps> = ({ setRegExp, placeholder }) => {
+const RegExpInput: React.FC<RegExpInputProps> = ({ setRegExp, placeholder, size, className }) => {
   const [searchQuery, setSearchQuery] = useState('') // 用户输入的搜索内容
   const [matchCase, setMatchCase] = useState(false) // 是否匹配大小写
   const [matchWholeWord, setMatchWholeWord] = useState(false) // 是否匹配整个单词
@@ -22,36 +24,36 @@ const RegExpInput: React.FC<RegExpInputProps> = ({ setRegExp, placeholder }) => 
   }, [searchQuery, matchReg, matchCase, matchWholeWord])
 
   return (
-    <div>
-      <Input
-        placeholder={placeholder ? placeholder : 'Type Some Words'}
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        suffix={
-          <div className="icon-container">
-            <Tooltip title="Match Case">
-              <SearchOutlined
-                className={`icon-base ${matchCase ? 'icon-selected' : ''}`}
-                onClick={() => setMatchCase(!matchCase)}
-              />
-            </Tooltip>
-            <Tooltip title="Match Whole Word">
-              <CheckSquareOutlined
-                className={`icon-base ${matchWholeWord ? 'icon-selected' : ''}`}
-                onClick={() => setMatchWholeWord(!matchWholeWord)}
-              />
-            </Tooltip>
-            <Tooltip title="Use Regular Expression">
-              <CloseSquareOutlined
-                className={`icon-base ${matchReg ? 'icon-selected' : ''}`}
-                onClick={() => setMatchReg(!matchReg)}
-              />
-            </Tooltip>
-          </div>
-        }
-        style={{ width: '100%' }}
-      />
-    </div>
+    <Input
+      className={className}
+      size={size ? size : 'middle'}
+      placeholder={placeholder ? placeholder : 'Type Some Words'}
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+      suffix={
+        <div className="icon-container">
+          <Tooltip title="Match Case">
+            <SearchOutlined
+              className={`icon-base ${matchCase ? 'icon-selected' : ''}`}
+              onClick={() => setMatchCase(!matchCase)}
+            />
+          </Tooltip>
+          <Tooltip title="Match Whole Word">
+            <CheckSquareOutlined
+              className={`icon-base ${matchWholeWord ? 'icon-selected' : ''}`}
+              onClick={() => setMatchWholeWord(!matchWholeWord)}
+            />
+          </Tooltip>
+          <Tooltip title="Use Regular Expression">
+            <CloseSquareOutlined
+              className={`icon-base ${matchReg ? 'icon-selected' : ''}`}
+              onClick={() => setMatchReg(!matchReg)}
+            />
+          </Tooltip>
+        </div>
+      }
+      style={{ width: '100%' }}
+    />
   )
 }
 

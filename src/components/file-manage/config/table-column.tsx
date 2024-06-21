@@ -46,6 +46,7 @@ const columns: TableColumnsType<FileInfoCustom> = [
     title: '修改时间',
     dataIndex: 'mtimeFormat',
     key: 'mtimeFormat',
+    width: 150,
     sorter: true
   }
 ]

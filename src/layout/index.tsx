@@ -41,7 +41,7 @@ const Lay: React.FC = () => {
         minHeight: '100vh'
       }}
     >
-      <Sider width={200}>
+      <Sider width={300}>
         <Menu
           mode="inline"
           defaultSelectedKeys={['/']}

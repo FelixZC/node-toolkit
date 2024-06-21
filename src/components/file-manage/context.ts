@@ -4,7 +4,7 @@ import type { FileInfoCustom } from '@src/types/file'
 import type { TableProps } from 'antd'
 interface FileManageContextType {
   currentRow: FileInfoCustom | null
-  filterResult: FileInfoCustom[]
+  showData: FileInfoCustom[]
   onRowClick: (e: React.MouseEvent<HTMLDivElement>, record: FileInfoCustom) => void
   onDoubleClick: (e: React.MouseEvent<HTMLDivElement>, record: FileInfoCustom) => void
   onContextMenu: (e: React.MouseEvent<HTMLDivElement>, record?: FileInfoCustom) => void

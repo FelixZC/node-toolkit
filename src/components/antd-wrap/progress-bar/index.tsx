@@ -1,8 +1,11 @@
 import { Progress } from 'antd'
 import React from 'react'
-import useProgress from '@src/store/use-progress'
-const ProgressBar = () => {
-  const { value, isVisible, isReset } = useProgress()
+export interface ProgressProps {
+  value: number
+  isVisible: boolean
+  isReset: boolean
+}
+const ProgressBar: React.FC<ProgressProps> = ({ value, isVisible, isReset }) => {
   return (
     <div>
       {isVisible && (
