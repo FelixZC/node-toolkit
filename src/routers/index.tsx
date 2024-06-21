@@ -139,7 +139,7 @@ const rootRouter: RouteObject[] = [
   {
     show: true,
     path: '/FileManage',
-    name: '文件管理',
+    name: '文件查询',
     key: '/FileManage',
     auth: true,
     element: lazyLoad(FileManager)

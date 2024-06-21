@@ -41,7 +41,13 @@ const Lay: React.FC = () => {
         minHeight: '100vh'
       }}
     >
-      <Sider width={300}>
+      <Sider
+        width={250}
+        collapsedWidth={0}
+        zeroWidthTriggerStyle={{ zIndex: 1008611, top: 50 }}
+        theme="light"
+        collapsible={true}
+      >
         <Menu
           mode="inline"
           defaultSelectedKeys={['/']}

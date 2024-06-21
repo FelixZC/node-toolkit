@@ -33,19 +33,33 @@
   flex: 1;
   height: calc(100% - 70px); /* 保持不变*/
   position: relative;
+  table {
+    height: 90vh;
+  }
 }
 
 .file-manage-content__left {
   flex: 1;
   max-height: 100%; /* 添加 max-height 以确保滚动条出现*/
   overflow: auto; /* 保持滚动条设置*/
+
 }
 
 .file-manage-content__right {
-  max-height: 100%; /* 添加 max-height 以确保滚动条出现*/
+  position: relative; /* 为伪元素定位做准备 */
+  max-height: 100%;
   overflow: auto;
 }
 
+.file-manage-content__right::before {
+  content: ""; /* 伪元素需要content属性 */
+  position: absolute; /* 绝对定位相对于其包含块 */
+  left: 0; /* 边界位于最左侧 */
+  top: 0; /* 从顶部开始 */
+  bottom: 0; /* 延伸到底部 */
+  width: 1px; /* 边界的宽度 */
+  background-color: #ccc; /* 边界的颜色 */
+}
 
 .file-manage-path {
   background-color: var(--header-footer-bg-color);

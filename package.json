@@ -91,6 +91,7 @@
     "@babel/preset-env": "^7.24.7",
     "@babel/preset-react": "^7.24.7",
     "@reduxjs/toolkit": "^2.2.5",
+    "@uiw/react-codemirror": "^4.22.2",
     "@vue/compiler-core": "^3.4.29",
     "@vue/compiler-sfc": "^3.4.29",
     "antd": "^5.18.1",

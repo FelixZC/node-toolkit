@@ -2,6 +2,10 @@ import { ipcRendererInvoke } from '@src/utils/desktop-utils'
 import React, { memo, useEffect, useState } from 'react'
 import { Resizable, ResizeCallback } from 're-resizable'
 import type { FileInfoCustom } from '@src/types/file'
+
+import CodeMirror from '@uiw/react-codemirror' // 如果你安装了React包装器
+
+const CodeMirrorMemo = React.memo(CodeMirror)
 interface Props {
   previewFile: FileInfoCustom | null
   className?: string
@@ -34,21 +38,31 @@ const Priview: React.FC<Props> = ({ previewFile, className }) => {
     >
       <div>
         {previewFile ? (
-          <pre
-            style={{
-              margin: 0
-            }}
-          >
-            {fileContent}
-          </pre>
+          // <pre
+          //   style={{
+          //     margin: 0
+          //   }}
+          // >
+          //   {fileContent}
+          // </pre>
+          <CodeMirrorMemo
+            value={fileContent}
+            height="90vh"
+            theme={'light'}
+            readOnly={true}
+            editable={false}
+          />
         ) : (
-          <span
+          <div
             style={{
-              margin: 0
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '90vh'
             }}
           >
-            No Content
-          </span>
+            <p style={{ textAlign: 'center' }}>No Content.</p>
+          </div>
         )}
       </div>
     </Resizable>
