@@ -1,24 +1,18 @@
-import { Button, Checkbox, Col, Input, message, Row, Tooltip } from 'antd'
-import { CheckSquareOutlined, CloseSquareOutlined, SearchOutlined } from '@ant-design/icons'
-import { convertToReg, getIgnorePatterns } from '@src/utils/common'
+import { Button, Checkbox, Col, Input, message, Row } from 'antd'
+import { getIgnorePatterns } from '@src/utils/common'
 import Directory from '@src/components/file-manage/directory'
 import { ipcRendererInvoke } from '../../utils/desktop-utils'
 import React, { useState } from 'react'
 import useDirectory from '@src/store/use-directory'
 import '@src/style/less/markdown-styles.less'
-import '@src/style/less/icon.less'
 import '@src/style/less/pre.less'
+import RegExpInput from '../antd-wrap/search/reg-exp-input'
 const FeatureListPage: React.FC = () => {
   const [output, setOutput] = useState('') // 存储执行结果
   const [isAddSourcePath, setIsAddSourcePath] = useState(false) // 是否添加源路径
-  // 新增搜索相关的状态
-  const [searchQuery, setSearchQuery] = useState('') // 用户输入的搜索内容
-  const [matchCase, setMatchCase] = useState(false) // 是否匹配大小写
-  const [matchWholeWord, setMatchWholeWord] = useState(false) // 是否匹配整个单词
-  const [matchReg, setMatchReg] = useState(false) // 是否使用正则表达式
   const [filesToExclude, setFilesToExclude] = useState('') // 要排除的文件列表
   const { directoryPath, isUseIgnoredFiles } = useDirectory()
-
+  const [regExp, setRegExp] = useState<RegExp | null>(null)
   // 执行选中的功能
   const handleExecute = async () => {
     if (!directoryPath.length) {
@@ -26,7 +20,6 @@ const FeatureListPage: React.FC = () => {
       return
     }
     // 转换搜索查询为正则表达式
-    const regExp = convertToReg(searchQuery, matchReg, matchCase, matchWholeWord)
     if (!regExp) return
     const ignoreFilesPatterns = getIgnorePatterns(filesToExclude)
     try {
@@ -46,16 +39,7 @@ const FeatureListPage: React.FC = () => {
       message.error('Failed to execute: ' + error)
     }
   }
-  // 图标点击事件处理函数
-  const handleMatchCaseChange = () => {
-    setMatchCase(!matchCase)
-  }
-  const handleMatchWholeWordChange = () => {
-    setMatchWholeWord(!matchWholeWord)
-  }
-  const handleUseRegExpChange = () => {
-    setMatchReg(!matchReg)
-  }
+
   return (
     <div
       style={{
@@ -86,36 +70,7 @@ const FeatureListPage: React.FC = () => {
         }}
       >
         <Col span={16}>
-          <Input
-            placeholder="Search Query"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            suffix={
-              <div className="icon-container">
-                <Tooltip title="Match Case">
-                  <SearchOutlined
-                    className={`icon-base ${matchCase ? 'icon-selected' : ''}`}
-                    onClick={handleMatchCaseChange}
-                  />
-                </Tooltip>
-                <Tooltip title="Match Whole Word">
-                  <CheckSquareOutlined
-                    className={`icon-base ${matchWholeWord ? 'icon-selected' : ''}`}
-                    onClick={handleMatchWholeWordChange}
-                  />
-                </Tooltip>
-                <Tooltip title="Use Regular Expression">
-                  <CloseSquareOutlined
-                    className={`icon-base ${matchReg ? 'icon-selected' : ''}`}
-                    onClick={handleUseRegExpChange}
-                  />
-                </Tooltip>
-              </div>
-            }
-            style={{
-              width: '100%'
-            }}
-          />
+          <RegExpInput setRegExp={setRegExp} placeholder="Search Query" />
         </Col>
         <Col span={8}>
           <Checkbox

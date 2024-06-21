@@ -1,12 +1,6 @@
 import { Button, Col, Input, message, Modal, Row, Tooltip } from 'antd'
-import {
-  CalendarOutlined,
-  CheckSquareOutlined,
-  ClockCircleOutlined,
-  CloseSquareOutlined,
-  SearchOutlined
-} from '@ant-design/icons'
-import { convertToReg, getIgnorePatterns } from '@src/utils/common'
+import { CalendarOutlined, ClockCircleOutlined } from '@ant-design/icons'
+import { getIgnorePatterns } from '@src/utils/common'
 import { ipcRendererInvoke } from '../../utils/desktop-utils'
 import React, { useState } from 'react'
 import '@src/style/less/markdown-styles.less'
@@ -14,49 +8,28 @@ import '@src/style/less/icon.less'
 import '@src/style/less/pre.less'
 import Directory from '@src/components/file-manage/directory'
 import useDirectory from '@src/store/use-directory'
+import RegExpInput from '../antd-wrap/search/reg-exp-input'
 import type {
   ModifyResultReturnType,
   PriviewResultReturnType
 } from '@src/exec/exec-modify-file-names-batch'
 const FeatureListPage: React.FC = () => {
   const [output, setOutput] = useState('') // 存储执行结果
-  const [filenameQuery, setFilenameQuery] = useState('') // 用户输入的搜索内容
   const [replaceFilename, setReplaceFilename] = useState('') //用户想要替换的内容
-  const [filenameMatchCase, setFilenameMatchCase] = useState(false) // 是否匹配大小写
-  const [filenameMatchWholeWord, setFilenameMatchWholeWord] = useState(false) // 是否匹配整个单词
-  const [filenameMatchReg, setFilenameMatchReg] = useState(false) // 是否使用正则表达式
-
-  const [extnameQuery, setExtnameQuery] = useState('') // 用户输入的扩展名搜索内容
   const [replaceExtname, setReplaceExtname] = useState('') //用户想要替换的内容
-  const [extnameMatchCase, setExtnameMatchCase] = useState(false) // 是否匹配大小写
-  const [extnameMatchWholeWord, setExtnameMatchWholeWord] = useState(false) // 是否匹配整个单词
-  const [extnameMatchReg, setExtnameMatchReg] = useState(false) // 是否使用正则表达式
-
   const [filesToExclude, setFilesToExclude] = useState('') // 要排除的文件列表
-
   const [addTimeStamp, setAddTimeStamp] = useState(false) // 文件名是否添加时间戳
   const [addDateTime, setAddDateTime] = useState(false) //文件名是否添加时间秒onds
   const { directoryPath, isUseIgnoredFiles } = useDirectory()
 
+  const [filenameReg, setFilenameReg] = useState<RegExp | null>(null)
+  const [extnameReg, setExtnameReg] = useState<RegExp | null>(null)
   //处理预览结果
   const handlePreview = async () => {
     if (!directoryPath.length) {
       message.warning('Please select an exec directory.')
       return
     }
-    // 转换搜索查询为正则表达式
-    const filenameReg = convertToReg(
-      filenameQuery,
-      filenameMatchReg,
-      filenameMatchCase,
-      filenameMatchWholeWord
-    )
-    const extnameReg = convertToReg(
-      extnameQuery,
-      extnameMatchReg,
-      extnameMatchCase,
-      extnameMatchWholeWord
-    )
     const ignoreFilesPatterns = getIgnorePatterns(filesToExclude)
     if (filenameReg && !replaceFilename.length) {
       message.warning('Please enter the filename to replace.')
@@ -113,19 +86,7 @@ const FeatureListPage: React.FC = () => {
       message.warning('Please select an exec directory.')
       return
     }
-    // 转换搜索查询为正则表达式
-    const filenameReg = convertToReg(
-      filenameQuery,
-      filenameMatchReg,
-      filenameMatchCase,
-      filenameMatchWholeWord
-    )
-    const extnameReg = convertToReg(
-      extnameQuery,
-      extnameMatchReg,
-      extnameMatchCase,
-      extnameMatchWholeWord
-    )
+
     const ignoreFilesPatterns = getIgnorePatterns(filesToExclude)
 
     // 检查输入条件
@@ -191,26 +152,6 @@ const FeatureListPage: React.FC = () => {
   }
 
   // 图标点击事件处理函数
-  const handleFilenameMatchCaseChange = () => {
-    setFilenameMatchCase(!filenameMatchCase)
-  }
-  const handleFilenameMatchWholeWordChange = () => {
-    setFilenameMatchWholeWord(!filenameMatchWholeWord)
-  }
-  const handleFilenameMatchRegChange = () => {
-    setFilenameMatchReg(!filenameMatchReg)
-  }
-  const handleExtnameMatchCaseChange = () => {
-    setExtnameMatchCase(!extnameMatchCase)
-  }
-  const handleExtnameMatchWholeWordChange = () => {
-    setExtnameMatchWholeWord(!extnameMatchWholeWord)
-  }
-  const handleExtnameMatchRegChange = () => {
-    setExtnameMatchReg(!extnameMatchReg)
-  }
-
-  // 图标点击事件处理函数
   const handleAddTimeStamp = () => {
     setAddTimeStamp(!addTimeStamp)
   }
@@ -246,36 +187,7 @@ const FeatureListPage: React.FC = () => {
         }}
       >
         <Col span={16}>
-          <Input
-            placeholder="Search Filename"
-            value={filenameQuery}
-            onChange={(e) => setFilenameQuery(e.target.value)}
-            suffix={
-              <div className="icon-container">
-                <Tooltip title="Match Case">
-                  <SearchOutlined
-                    className={`icon-base ${filenameMatchCase ? 'icon-selected' : ''}`}
-                    onClick={handleFilenameMatchCaseChange}
-                  />
-                </Tooltip>
-                <Tooltip title="Match Whole Word">
-                  <CheckSquareOutlined
-                    className={`icon-base ${filenameMatchWholeWord ? 'icon-selected' : ''}`}
-                    onClick={handleFilenameMatchWholeWordChange}
-                  />
-                </Tooltip>
-                <Tooltip title="Use Regular Expression">
-                  <CloseSquareOutlined
-                    className={`icon-base ${filenameMatchReg ? 'icon-selected' : ''}`}
-                    onClick={handleFilenameMatchRegChange}
-                  />
-                </Tooltip>
-              </div>
-            }
-            style={{
-              width: '100%'
-            }}
-          />
+          <RegExpInput setRegExp={setFilenameReg} placeholder="Search Filename" />
         </Col>
       </Row>
       <Row
@@ -317,33 +229,7 @@ const FeatureListPage: React.FC = () => {
         }}
       >
         <Col span={16}>
-          <Input
-            placeholder="Search Extname"
-            value={extnameQuery}
-            onChange={(e) => setExtnameQuery(e.target.value)}
-            suffix={
-              <div className="icon-container">
-                <Tooltip title="Match Case">
-                  <SearchOutlined
-                    className={`icon-base ${extnameMatchCase ? 'icon-selected' : ''}`}
-                    onClick={handleExtnameMatchCaseChange}
-                  />
-                </Tooltip>
-                <Tooltip title="Match Whole Word">
-                  <CheckSquareOutlined
-                    className={`icon-base ${extnameMatchWholeWord ? 'icon-selected' : ''}`}
-                    onClick={handleExtnameMatchWholeWordChange}
-                  />
-                </Tooltip>
-                <Tooltip title="Use Regular Expression">
-                  <CloseSquareOutlined
-                    className={`icon-base ${extnameMatchReg ? 'icon-selected' : ''}`}
-                    onClick={handleExtnameMatchRegChange}
-                  />
-                </Tooltip>
-              </div>
-            }
-          />
+          <RegExpInput setRegExp={setExtnameReg} placeholder="Search Extname" />
         </Col>
       </Row>
       <Row
