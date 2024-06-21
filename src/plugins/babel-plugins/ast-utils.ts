@@ -2,7 +2,7 @@ import { NodePath } from '@babel/core'
 import * as parser from '@babel/parser'
 import * as t from '@babel/types'
 import type { GeneratorOptions, ParserOptions } from '@babel/core'
-// 定义一个结构体，用来保存导入语句的详细信息
+
 interface SpecifierInfo {
   source: string
   type: 'ImportSpecifier' | 'ImportNamespaceSpecifier' | 'ImportDefaultSpecifier'

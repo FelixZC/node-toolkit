@@ -32,7 +32,6 @@ export const executeJSCodemods = async (
   }
 }
 
-// 示例用法：
 export function test() {
   const jscodemodeList = [
     '../plugins/jscodemods/arrow-function',
@@ -46,4 +45,3 @@ export function test() {
   // 调用公共方法执行 JSCodeMod 模板
   executeJSCodemods(path.join('src copy'), jscodemodeList, true)
 }
-// test()

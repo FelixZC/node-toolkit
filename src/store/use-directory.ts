@@ -1,4 +1,3 @@
-// useDirectory.ts
 import { useSelector, useDispatch } from 'react-redux'
 import { RootState } from '@src/store'
 import { directorySlice } from '@src/slices/directory-slice' // 假设你已经导出了 slice

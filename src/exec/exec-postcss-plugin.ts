@@ -32,7 +32,6 @@ export async function executePostcssPlugins(
   }
 }
 
-// 示例：指定插件路径列表，并调用函数执行这些插件。
 export function test() {
   const pluginsPathList = ['../plugins/postcss-plugins/property-sort']
   executePostcssPlugins(path.join('src copy'), pluginsPathList, true)

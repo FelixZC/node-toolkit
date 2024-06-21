@@ -29,7 +29,6 @@ export async function executePosthtmlPlugins(
   }
 }
 
-// 使用示例
 export function test() {
   const pluginsPathList: string[] = ['../plugins/posthtml-plugins/property-sort']
   executePosthtmlPlugins(path.join('src copy'), pluginsPathList, true)

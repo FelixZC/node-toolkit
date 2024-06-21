@@ -53,7 +53,6 @@ const exposedIpcRenderer: ExposedInMainWorld = {
 }
 contextBridge.exposeInMainWorld('ipcRenderer', exposedIpcRenderer)
 
-// 将 process 作为对象暴露，而非直接修改全局 process 对象
 contextBridge.exposeInMainWorld('process', {
   get NODE_ENV(): string {
     return process.env.NODE_ENV || 'development' // 默认为 development，如果 NODE_ENV 未定义

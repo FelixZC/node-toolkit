@@ -90,5 +90,4 @@ const SvgIcon = ({
   )
 }
 
-// 使用memo高阶组件优化SvgIcon组件，避免不必要的重新渲染
 export default memo(SvgIcon)

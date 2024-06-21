@@ -4,7 +4,7 @@ import { getTray } from './system-tray'
 app.on('ready', () => {
   createMainWindow()
 })
-// 正确处理 'certificate-error' 事件
+
 app.on(
   'certificate-error',
   (

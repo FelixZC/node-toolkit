@@ -1,4 +1,3 @@
-// webpack.d.ts
 declare namespace NodeJS {
   interface Require {
     context(

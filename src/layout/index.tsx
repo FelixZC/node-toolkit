@@ -1,4 +1,3 @@
-// 引入 useNavigate 钩子
 import { Layout, Menu } from 'antd'
 import React from 'react'
 import rootRouter from '@src/routers'

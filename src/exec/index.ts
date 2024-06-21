@@ -3,7 +3,7 @@ import * as cliProgress from '../utils/cli-progress'
 import fsUtils, { getFileInfo, readFile, writeFile } from '../utils/fs'
 import { getMainWindow } from '../desktop/main-window'
 import { logger } from '../utils/log'
-// 定义文件属性集合接口
+
 import mdUtils from '../utils/md'
 import { Notification } from 'electron'
 import * as path from 'path'
@@ -24,20 +24,16 @@ interface AttrsCollection {
   standingInitial?: string
 }
 
-// 定义正则表达式匹配结果接口
 export interface RegExec {
   reg: RegExp
   matchContentHandle(content: string): string
 }
 
-// 定义过滤条件类型接口
 export interface FilterConditionType {
   (item: FileInfo): boolean
 }
 export type ExecListType = Array<RegExec>
 
-// Exec类定义
-// 重写ExecInterface接口，去除具体实现，使其成为一个纯接口定义
 interface ExecInterface {
   fsInstance: FsInstance
   fileInfoList: FileInfo[]

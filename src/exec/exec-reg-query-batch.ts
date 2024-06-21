@@ -20,7 +20,6 @@ export async function batchRegQueryAndReturnResult(
   return result
 }
 
-//test
 export async function test() {
   const dirPath = path.join('src copy') // 指定要查询的目录
   // const regexPattern = /(\w+)?(Date|Term)\b/gi; // 指定要使用的正则表达式
@@ -45,4 +44,3 @@ export async function test() {
   const writeFilePath = path.join('src/query/md/query-batch-result.md')
   writeFile(writeFilePath, result)
 }
-// test()

@@ -61,7 +61,6 @@ export function sortArray(arr: Array<Record<string, any>>, customSort: Function 
   })
 }
 
-// 定义GroupCache接口
 interface GroupCache<T> {
   [key: string]: {
     count: number
@@ -70,7 +69,6 @@ interface GroupCache<T> {
   }
 }
 
-// 改进后的groupBy函数
 export function groupBy<T extends Record<string, any>>(arr: T[], groupKey: string): GroupCache<T> {
   if (!Array.isArray(arr)) {
     throw new Error('非数组类型，无法分类')
@@ -245,7 +243,6 @@ export const getValueByKeys = (target: Record<string, any> = {}, keys: string[] 
   }, target)
 }
 
-// 定义一个具体的节点接口，包含 id, parentId 和可选的 children 属性
 interface NodeWithId {
   id?: string | number
   parentId?: string | number | null
@@ -284,7 +281,6 @@ export function buildTree<T extends NodeWithId>(
   return rootNodes // 返回根节点数组
 }
 
-// 使用 Pick 来提取指定的属性
 export function pickProperties<T extends object, K extends keyof T>(
   objects: T[],
   propertiesToKeep: K[]
@@ -323,13 +319,11 @@ export const getIgnorePatterns = (str: string): RegExp[] => {
   return ignoreFilesPatterns
 }
 
-// 辅助函数，用于转义正则表达式中的特殊字符
 export const escapeReg = (string: string) => {
   // 转义正则表达式中的特殊字符，包括 -
   return string.replace(/[.*+?^${}()|[\]\\-]/g, '\\$&')
 }
 
-// 将用户输入的字符串转换为正则表达式，考虑全词匹配和大小写匹配
 export const convertToReg = (
   query: string,
   matchReg: boolean,
@@ -407,7 +401,6 @@ function mimeTypeToFileType(mimeType: string): FileType {
   }
 }
 
-// 使用文件扩展名确定文件类型
 export function classifyFileMimeType(ext: string): FileType {
   const mimeType = mime.lookup(ext)
   if (mimeType) {
@@ -429,7 +422,7 @@ export function formatFileSize(bytes: number, decimalPlaces = 2) {
 }
 
 type SortOrder = 'ascend' | 'descend'
-// 定义一个比较函数，用于排序
+
 export const compare = (
   a: Record<string, any>,
   b: Record<string, any>,
@@ -466,4 +459,26 @@ export async function copyTextToClipboard(text: string): Promise<void> {
   } else {
     console.error('Clipboard API 不可用')
   }
+}
+
+export function getArrayDepth<T>(arr: T[]): number {
+  if (arr.length === 0) {
+    return 1 // 空数组的深度为1
+  }
+
+  let maxDepth = 1 // 初始深度为1
+
+  // 遍历数组中的每个元素
+  arr.forEach((element: T) => {
+    // 检查元素是否是数组
+    if (Array.isArray(element)) {
+      // 递归调用getArrayDepth，计算子数组的深度
+      const depth = getArrayDepth(element)
+      // 更新最大深度
+      maxDepth = Math.max(maxDepth, depth)
+    }
+  })
+
+  // 加上当前层级
+  return maxDepth + 1
 }

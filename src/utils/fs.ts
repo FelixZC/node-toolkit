@@ -13,7 +13,6 @@ import { formatInputDateTime } from '../utils/time'
  * TODO 添加缓存功能操作
  */
 
-// 创建LRU缓存实例，最大容量为1000个缓存项，缓存项在10分钟后过期
 const fileContentCache = new LRUCache<string, string>({
   max: 1000,
   ttl: 10 * 60 * 1000 // 10 minutes
@@ -23,13 +22,11 @@ const fileStatsCache = new LRUCache<string, fs.Stats>({
   ttl: 10 * 60 * 1000 // 10 minutes
 })
 
-// 清除所有缓存
 export const clearCacheAll = () => {
   fileContentCache.clear() // 清除所有缓存项
   fileStatsCache.clear() // 清除所有缓存项
 }
 
-// writeFile 函数添加缓存逻辑
 export const writeFile = async (filePath: string, content: string) => {
   // 先更新缓存
   fileContentCache.set(filePath, content)
@@ -179,7 +176,7 @@ export function renameFile(
 /******************************************************************************************************************** */
 
 /******************************************************************************************************************** */
-// FsInstance接口
+
 export interface FsInstance {
   rootPath: string
   filePathList: string[]
@@ -200,7 +197,6 @@ export interface FsInstance {
   }
 }
 
-// 文件夹操作类
 class fsUtils implements FsInstance {
   rootPath: string
   filePathList: string[] = []

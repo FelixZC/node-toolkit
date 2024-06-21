@@ -1,4 +1,3 @@
-//menus.ts
 import { clearCacheAll } from '../utils/fs'
 import { getIgnorePath } from '../utils/ignore'
 import { logger } from '../utils/log'

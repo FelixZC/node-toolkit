@@ -17,7 +17,7 @@ export async function getAttributesDescriptionTable(dir: string, isUseIgnoredFil
   // 返回属性描述表
   return attributesDescriptionTable
 }
-// 使用示例
+
 export async function test() {
   const dir = path.join('src copy')
   const attributesDescriptionTable = await getAttributesDescriptionTable(dir, true)

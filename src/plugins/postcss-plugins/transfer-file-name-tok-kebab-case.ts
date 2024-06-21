@@ -34,6 +34,5 @@ const plugin = (): AcceptedPlugin => ({
   }
 })
 
-// 标记为 PostCSS 插件
 plugin.postcss = true
 export default plugin

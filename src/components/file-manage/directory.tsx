@@ -1,19 +1,16 @@
-//directory.tsx
 import { Input, message, Tooltip } from 'antd'
 import { ipcRendererInvoke } from '../../utils/desktop-utils'
 import React from 'react'
 import { SettingOutlined } from '@ant-design/icons'
 import useDirectory from '@src/store/use-directory'
 import '@src/style/less/icon.less'
-
 const DirectorySelect: React.FC = (Props) => {
   const { directoryPath, isUseIgnoredFiles, setDirectoryPath, setUseIgnoredFiles } = useDirectory()
-  // 选择目录
   const handleChooseDirectory = async () => {
     try {
       const filePaths = await ipcRendererInvoke('choose-directory')
       if (filePaths && filePaths.length > 0) {
-        setDirectoryPath(filePaths[0]) // 设置目录路径到状态
+        setDirectoryPath(filePaths[0])
         message.success('Directory chosen: ' + filePaths[0])
       }
     } catch (error) {
@@ -25,7 +22,6 @@ const DirectorySelect: React.FC = (Props) => {
   }
   return (
     <div>
-      {/* 显示目录路径的Input组件 */}
       <Input.Search
         placeholder="Directory Path"
         value={directoryPath}

@@ -4,7 +4,7 @@ import { Exec } from './index'
  * 公共方法，用于对指定目录进行文件分类，并输出分类结果
  * @param {string} dirPath - 需要分类的目录路径
  */
-// 导入所需模块
+
 import path from 'path'
 import { writeFile } from '../utils/fs'
 export function getProjectTree(dir: string, isUseIgnoredFiles: boolean) {
@@ -27,11 +27,9 @@ export function classifyFilesFirstBasenameThenExtname(dir: string) {
   return result
 }
 
-//使用示例
 export function test() {
   const result = getProjectTree(path.join('src copy'), true).resultMd
   // const result = classifyFilesByExtname(path.join('src copy'))
   const outputPath = path.join('src/query/json/files-group.json')
   writeFile(outputPath, result)
 }
-// test()

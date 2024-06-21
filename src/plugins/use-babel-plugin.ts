@@ -2,7 +2,7 @@ import * as babel from '@babel/core'
 import generator from '@babel/generator'
 import { getGeneratorOption, getParserOption } from './babel-plugins/ast-utils'
 import { logger } from '../utils/log'
-// 导出 Babel 核心 API 类型
+
 import * as parser from '@babel/parser'
 import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
 import traverse from '@babel/traverse'
@@ -10,12 +10,12 @@ import type * as Babel from '@babel/core'
 import type { PluginObj, Visitor } from '@babel/core'
 import type { ExecFileInfo } from '@src/types/common'
 export type BabelAPI = typeof Babel
-// 定义一个自定义插件对象接口，扩展 Babel 插件对象，添加 getExtra 方法和 visitor
+
 export interface CustomPluginObj extends PluginObj {
   getExtra?: () => Record<string, any>
   visitor: Visitor
 }
-// 定义一个 Babel 插件类型，接受 Babel API、选项和目录名，返回自定义插件对象
+
 export interface BabelPlugin {
   (babel: BabelAPI, options?: Record<string, any>, dirname?: string): CustomPluginObj
 }

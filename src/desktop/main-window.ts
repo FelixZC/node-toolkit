@@ -4,7 +4,7 @@
  */
 import { BrowserWindow } from 'electron'
 import { createMenu } from './menus'
-// 判断是否为开发环境
+
 import { initTray } from './system-tray'
 import mainWindowHandleEvents from './handle'
 import mainWindowListenEvents from './listen'
@@ -82,5 +82,4 @@ function getMainWindow(): BrowserWindow | null {
   return mainWindow
 }
 
-// 导出模块方法
 export { createMainWindow, getMainWindow, mainWindowIsExist }

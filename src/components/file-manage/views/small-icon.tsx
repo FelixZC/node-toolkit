@@ -7,7 +7,6 @@ interface ViewProps<T> {
   onDoubleClick: (event: React.MouseEvent<any, MouseEvent>, record: T) => void
   onContextMenu: (event: React.MouseEvent<any, MouseEvent>, record: T) => void
 }
-
 const SmallIconView: React.FC<ViewProps<FileInfoCustom>> = ({
   files,
   className,
@@ -30,5 +29,4 @@ const SmallIconView: React.FC<ViewProps<FileInfoCustom>> = ({
     ))}
   </div>
 )
-
 export default React.memo(SmallIconView)

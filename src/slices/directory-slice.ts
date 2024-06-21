@@ -1,4 +1,3 @@
-// directorySlice.js
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 export interface DirectoryState {

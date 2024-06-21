@@ -7,7 +7,6 @@ import { app, Menu, Tray } from 'electron'
  */
 import { getMainWindow, mainWindowIsExist } from './main-window'
 
-// 全局Tray实例变量
 import * as path from 'path'
 let tray: Tray | null = null
 

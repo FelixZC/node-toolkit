@@ -13,14 +13,12 @@ export interface RouteObject {
   children?: RouteObject[]
 }
 
-// 使用Suspense和lazy加载指定的组件
 const lazyLoad = (Component: React.ComponentType) => (
   <Suspense fallback={<Loading />}>
     <Component />
   </Suspense>
 )
 
-// 以下组件懒加载定义
 const HomePage = lazy(() => import('@src/components/home-page'))
 const ExecBabel = lazy(() => import('@src/components/exec/exec-babel'))
 const ExecJscodemod = lazy(() => import('@src/components/exec/exec-jscodemod'))
@@ -35,7 +33,7 @@ const ExecModifyFile = lazy(() => import('@src/components/exec/exec-modify-file-
 const FileManager = lazy(() => import('@src/components/file-manage'))
 const Exception403 = lazy(() => import('@src/components/exception/exception403'))
 const NoMatch = lazy(() => import('@src/components/no-match'))
-// 路由配置
+
 const rootRouter: RouteObject[] = [
   {
     path: '/',

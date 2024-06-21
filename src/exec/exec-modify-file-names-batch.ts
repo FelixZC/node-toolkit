@@ -296,17 +296,3 @@ export const useModifyFilenameExecPreset = async (
     return await exec.execModifyFileNamesBatch(modifyFilenameOptions)
   }
 }
-
-// test
-// export function test() {
-//   const modifyFilenameOptions: ModifyFilenameOptions = {
-//     filename: 'test',
-//     filenameReg: /Screenshot.*/i,
-//     ignoreFilesPatterns: [],
-//     addTimeStamp: false,
-//     addDateTime: false
-//   }
-//   const modify = new ModifyFilenameExec(path.join('C:/Users/ZC/Pictures/Screenshots'),true)
-//   modify.execModifyFileNamesBatchPreview(modifyFilenameOptions)
-// }
-// test()

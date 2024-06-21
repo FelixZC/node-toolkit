@@ -7,7 +7,6 @@ interface ViewProps<T> {
   onDoubleClick: (event: React.MouseEvent<any, MouseEvent>, record: T) => void
   onContextMenu: (event: React.MouseEvent<any, MouseEvent>, record: T) => void
 }
-
 const LargeIconView: React.FC<ViewProps<FileInfoCustom>> = ({
   files,
   className,

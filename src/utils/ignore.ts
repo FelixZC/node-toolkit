@@ -87,5 +87,4 @@ export function useIgnored(): {
   }
 }
 
-// 初始化忽略文件路径。
 initIgnorePath()

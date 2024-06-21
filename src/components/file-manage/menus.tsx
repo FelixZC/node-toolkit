@@ -1,4 +1,3 @@
-//menus.tsx
 import React, { useEffect } from 'react'
 import { Menu, MenuProps } from 'antd'
 interface ContextMenuProps {
@@ -15,7 +14,6 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
 }) => {
   const menuRef = React.useRef<HTMLDivElement>(null)
 
-  // 渲染菜单项的函数
   const renderMenuItem = (items: MenuProps['items']) => {
     if (!Array.isArray(items)) {
       return null
@@ -46,7 +44,6 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
       }
     })
   }
-
   const adjustMenuPosition = (position: { x: number; y: number }) => {
     const menuElement = menuRef.current
     if (!menuElement) return { left: position.x, top: position.y }
@@ -57,19 +54,16 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     const parentHeight = parentElement ? parentElement.clientHeight : 0
     let adjustedX = position.x
     if (adjustedX + menuWidth > parentWidth) {
-      adjustedX = parentWidth - menuWidth // 调整到视窗右边界内
+      adjustedX = parentWidth - menuWidth
     }
     let adjustedY = position.y
     if (adjustedY + menuHeight > parentHeight) {
-      adjustedY = parentHeight - menuHeight // 调整到视窗下边界内
+      adjustedY = parentHeight - menuHeight
     }
     return { left: adjustedX, top: adjustedY }
   }
-
   useEffect(() => {
-    // 定义一个函数来处理点击事件
     const handleClickOutside = (event: MouseEvent) => {
-      // 检查点击的元素是否不在上下文菜单的DOM元素中
       if (isMenuVisible && !menuRef.current?.contains(event.target as Node)) {
         setTimeout(() => {
           setIsMenuVisible(false)
@@ -80,17 +74,13 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
       const position = adjustMenuPosition(menuPosition)
       menuRef.current.style.left = `${position.left}px`
       menuRef.current.style.top = `${position.top}px`
-      // 如果菜单可见，则添加点击事件监听器
     }
-    // 添加点击事件监听器
     document.addEventListener('mousedown', handleClickOutside)
 
-    // 组件卸载时移除事件监听器
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [isMenuVisible]) // 只有当 isMenuVisible 或 closeMenu 变化时，才重新运行这个副作用
-
+  }, [isMenuVisible])
   const onContextMenu = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.preventDefault()
     e.stopPropagation()
@@ -101,9 +91,8 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
         <div
           ref={menuRef}
           className="context-menu"
-          onContextMenu={onContextMenu} // 阻止默认的上下文菜单显示
+          onContextMenu={onContextMenu}
           style={{
-            // ...adjustMenuPosition(menuPosition), // 使用调整后的位置
             left: menuPosition.x,
             top: menuPosition.y
           }}
@@ -114,5 +103,4 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     </div>
   )
 }
-
 export default React.memo(ContextMenu)

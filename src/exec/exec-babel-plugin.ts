@@ -32,7 +32,6 @@ export const executeBabelPlugins = async (
   }
 }
 
-// 使用示例
 export function test() {
   const babelPluginPathList: string[] = [
     '../plugins/babel-plugins/import-sort',
@@ -41,4 +40,3 @@ export function test() {
   ]
   executeBabelPlugins(path.join('src copy'), babelPluginPathList, true)
 }
-// test()
