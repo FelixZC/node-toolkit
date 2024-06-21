@@ -26,7 +26,6 @@ const Priview: React.FC<Props> = ({ previewFile, className }) => {
   const onResize: ResizeCallback = (event, direction, elementRef, delta) => {
     setWidth(width + delta.width)
   }
-
   return (
     <Resizable
       className={className}
