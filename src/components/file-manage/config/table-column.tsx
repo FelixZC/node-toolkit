@@ -1,6 +1,7 @@
 import React from 'react'
 import type { FileInfoCustom } from '@src/types/file'
 import type { TableColumnsType } from 'antd'
+import { formatFileSize } from '@src/utils/common'
 const columns: TableColumnsType<FileInfoCustom> = [
   {
     title: '名称',
@@ -37,10 +38,18 @@ const columns: TableColumnsType<FileInfoCustom> = [
   },
   {
     title: '文件大小',
-    dataIndex: 'sizeFormat',
-    key: 'sizeFormat',
+    dataIndex: 'size',
+    key: 'size',
     width: 100,
-    sorter: true
+    sorter: true,
+    render: (text, record) => {
+      const result = record.type === 'Folder' ? '' : formatFileSize(record.size)
+      return (
+        <div>
+          <span>{result}</span>
+        </div>
+      )
+    }
   },
   {
     title: '修改时间',
