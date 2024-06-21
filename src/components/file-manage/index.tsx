@@ -4,9 +4,9 @@ import useDirectory from '@src/store/use-directory'
 import { ipcRendererInvoke } from '@src/utils/desktop-utils'
 import { compare, copyTextToClipboard } from '@src/utils/common'
 import debounce from 'lodash/debounce'
-import ContextMenu from './menus'
+import ContextMenu from '@src/components/antd-wrap/menus'
 import Preview from './preview'
-import TableView from './views/table'
+import TableView from '@src/components/antd-wrap/table'
 import LargeIconView from './views/large-icon'
 import MediumIconView from './views/medium-icon'
 import SmallIconView from './views/small-icon'
@@ -31,6 +31,7 @@ const FileManage: React.FC = () => {
   const contextContainerRef = useRef<HTMLDivElement>(null)
   const [isMenuVisible, setIsMenuVisible] = useState<boolean>(false)
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
+
   const getMenus = () => {
     const menus: MenuProps = {
       mode: 'vertical',

@@ -1,5 +1,5 @@
 import { Layout } from 'antd'
-import Loading from '@src/components/loading'
+import Loading from '@src/components/antd-wrap/loading'
 import { Navigate } from 'react-router-dom'
 import React, { lazy, Suspense } from 'react'
 export interface RouteObject {
