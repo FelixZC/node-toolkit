@@ -12,13 +12,11 @@ export interface RouteObject {
   show: boolean
   children?: RouteObject[]
 }
-
 const lazyLoad = (Component: React.ComponentType) => (
   <Suspense fallback={<Loading />}>
     <Component />
   </Suspense>
 )
-
 const HomePage = lazy(() => import('@src/components/home-page'))
 const ExecBabel = lazy(() => import('@src/components/exec/exec-babel'))
 const ExecJscodemod = lazy(() => import('@src/components/exec/exec-jscodemod'))
@@ -33,7 +31,6 @@ const ExecModifyFile = lazy(() => import('@src/components/exec/exec-modify-file-
 const FileManager = lazy(() => import('@src/components/file-manage'))
 const Exception403 = lazy(() => import('@src/components/exception/exception403'))
 const NoMatch = lazy(() => import('@src/components/no-match'))
-
 const rootRouter: RouteObject[] = [
   {
     path: '/',

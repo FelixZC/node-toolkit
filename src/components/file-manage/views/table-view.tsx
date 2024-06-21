@@ -1,15 +1,13 @@
+import FileManageContext from '../context'
 import React, { useContext } from 'react'
 import { Table } from 'antd'
 import { TableColumnsType } from 'antd'
-import FileManageContext from '../context'
 import type { FileInfoCustom } from '@src/types/file'
-
 interface ViewProps {
   files: FileInfoCustom[]
   columns: TableColumnsType<FileInfoCustom>
   className?: string
 }
-
 const TableView: React.FC<ViewProps> = React.memo(
   ({ files, columns, className }) => {
     const context = useContext(FileManageContext)

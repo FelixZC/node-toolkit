@@ -59,7 +59,6 @@ const FeatureListPage: React.FC = () => {
   const handleModeChange = (value: string) => {
     setMode(value)
   }
-
   return (
     <div
       style={{
@@ -76,7 +75,11 @@ const FeatureListPage: React.FC = () => {
           width: '100%'
         }}
       >
-        <div style={{ flex: 1 }}>
+        <div
+          style={{
+            flex: 1
+          }}
+        >
           <Directory />
         </div>
         <Button

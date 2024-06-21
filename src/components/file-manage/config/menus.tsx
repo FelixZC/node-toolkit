@@ -1,10 +1,9 @@
+import { copyTextToClipboard } from '@src/utils/common'
+import FileManageContext from '../context'
+import { MenuProps } from 'antd'
+import { message } from 'antd'
 //menus.tsx
 import { useContext } from 'react'
-import { MenuProps } from 'antd'
-import FileManageContext from '../context'
-import { copyTextToClipboard } from '@src/utils/common'
-import { message } from 'antd'
-
 const getMenus = () => {
   const context = useContext(FileManageContext)
   if (!context) {

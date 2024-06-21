@@ -1,3 +1,6 @@
+import { getProcessNodeEnv, ipcRendererSend, isDesktop } from '@src/utils/desktop-utils'
+import { Input, InputRef } from 'antd'
+import MineLayout from '@src/layout/index'
 import React, {
   ChangeEvent,
   ChangeEventHandler,
@@ -6,10 +9,7 @@ import React, {
   useEffect,
   useRef
 } from 'react'
-import { Input, InputRef } from 'antd'
 import '../../style/less/app.less'
-import { getProcessNodeEnv, ipcRendererSend, isDesktop } from '@src/utils/desktop-utils'
-import MineLayout from '@src/layout/index'
 
 /**
  * 主应用组件
@@ -20,18 +20,15 @@ import MineLayout from '@src/layout/index'
 function App() {
   const openDevtoolInput = useRef<InputRef>(null)
   const isDevelopment = useRef(getProcessNodeEnv() === 'development')
-
   const openDevtool = useCallback(() => {
     ipcRendererSend('mainWindow-open-devtool')
   }, [])
-
   const openDevtoolInputChange: ChangeEventHandler = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target
     if (value === 'openDevtool') {
       openDevtool()
     }
   }
-
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const { ctrlKey, metaKey, altKey, key } = e
@@ -43,18 +40,14 @@ function App() {
         }
       }
     }
-
     document.addEventListener('keydown', handleKeyDown)
-
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
     }
   }, [openDevtoolInput, isDevelopment])
-
   const handleBlur: FocusEventHandler<HTMLInputElement> = (event) => {
     event.target.value = ''
   }
-
   return (
     <div id="electron-app">
       {!isDevelopment.current && (
@@ -73,5 +66,4 @@ function App() {
     </div>
   )
 }
-
 export default App

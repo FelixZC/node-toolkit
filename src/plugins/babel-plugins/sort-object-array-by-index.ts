@@ -1,5 +1,4 @@
 import { declare } from '@babel/helper-plugin-utils'
-
 import { findObjectPropertyWithKey } from './ast-utils'
 import * as t from '@babel/types'
 export default declare((babel) => {

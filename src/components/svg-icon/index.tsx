@@ -89,5 +89,4 @@ const SvgIcon = ({
     </Tooltip>
   )
 }
-
 export default memo(SvgIcon)

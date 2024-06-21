@@ -4,15 +4,14 @@
  */
 import { BrowserWindow } from 'electron'
 import { createMenu } from './menus'
-
 import { initTray } from './system-tray'
-import mainWindowHandleEvents from './handle'
-import mainWindowListenEvents from './listen'
-import * as path from 'path'
 import installExtension, {
   REACT_DEVELOPER_TOOLS,
   REDUX_DEVTOOLS
 } from 'electron-devtools-installer'
+import mainWindowHandleEvents from './handle'
+import mainWindowListenEvents from './listen'
+import * as path from 'path'
 type DevelopmentOrProduction = 'development' | 'production'
 const isDevelopment: DevelopmentOrProduction = process.env.NODE_ENV! as DevelopmentOrProduction
 let mainWindow: BrowserWindow | null = null // 全局变量，用于存储主窗口对象
@@ -53,14 +52,10 @@ function createMainWindow(): void {
       installExtension(REACT_DEVELOPER_TOOLS),
       installExtension(REDUX_DEVTOOLS)
     ]
-
     try {
       // 等待所有扩展安装完成,访问不了谷歌商城就不用等了,注释掉或者离线下载
       await Promise.all(installPromises)
-      console.log('All DevTools extensions have been installed.')
-    } catch (err) {
-      console.log('An error occurred while installing extensions:', err)
-    }
+    } catch (err) {}
   })
   mainWindowListenEvents(mainWindow)
   mainWindowHandleEvents()
@@ -81,5 +76,4 @@ function mainWindowIsExist(): boolean {
 function getMainWindow(): BrowserWindow | null {
   return mainWindow
 }
-
 export { createMainWindow, getMainWindow, mainWindowIsExist }

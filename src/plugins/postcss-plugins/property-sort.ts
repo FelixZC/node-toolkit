@@ -1,6 +1,5 @@
 import { AcceptedPlugin, AtRule, Comment, Declaration, Root, Rule } from 'postcss'
 const pluginName = 'postcss-sort-props-alphabetically'
-
 const sortRuleDeclarations = (rule: Rule | AtRule): void => {
   if (rule.nodes) {
     // 过滤出所有 Declaration 类型的子节点
@@ -49,7 +48,6 @@ const sortRuleDeclarations = (rule: Rule | AtRule): void => {
     }
   }
 }
-
 const plugin = (): AcceptedPlugin => ({
   postcssPlugin: pluginName,
   Once(root: Root) {
@@ -60,7 +58,5 @@ const plugin = (): AcceptedPlugin => ({
     root.walkAtRules(sortRuleDeclarations)
   }
 })
-
 plugin.postcss = true
-
 export default plugin

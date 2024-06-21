@@ -69,7 +69,6 @@ export const ipcRendererInvoke = (eventName: string, ...args: any[]) => {
   try {
     return window.ipcRenderer?.invoke(eventName, ...args)
   } catch (error) {
-    console.error(`Error invoking IPC: ${eventName}`, error)
     return null
   }
 }

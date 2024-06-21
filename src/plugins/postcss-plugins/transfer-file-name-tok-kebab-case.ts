@@ -33,6 +33,5 @@ const plugin = (): AcceptedPlugin => ({
     root.walkAtRules(transferHandler)
   }
 })
-
 plugin.postcss = true
 export default plugin

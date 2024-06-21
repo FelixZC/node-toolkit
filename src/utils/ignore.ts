@@ -86,5 +86,4 @@ export function useIgnored(): {
     ignore: (filePath: string) => parser.test(filePath)
   }
 }
-
 initIgnorePath()

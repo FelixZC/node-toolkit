@@ -29,7 +29,6 @@ fs.ensureDirSync(logDirectory)
 export const getFilename = () => {
   return `operate-${getCurrentDateFormatted()}.log`
 }
-
 export const getLogPath = () => {
   return path.join(logDirectory, getFilename())
 }
@@ -65,9 +64,7 @@ export const logger: WinstonLogger = createLogger({
 })
 function saveOperateLog(record: LogRecord | ErrorRecord) {
   const { methodName, arguments: args, timestamp, ...rest } = record
-  const logMessage = `${methodName} called at ${timestamp.toISOString()} with arguments: ${JSON.stringify(
-    args
-  )}`
+  const logMessage = `${methodName} called at ${timestamp.toISOString()} with arguments: ${JSON.stringify(args)}`
   if ('result' in rest) {
     logger.info(logMessage, {
       ...rest

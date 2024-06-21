@@ -1,7 +1,7 @@
 import { Button, List, message, Switch } from 'antd'
+import Directory from '@src/components/file-manage/directory'
 import { ipcRendererInvoke } from '../../utils/desktop-utils'
 import React, { useState } from 'react'
-import Directory from '@src/components/file-manage/directory'
 import useDirectory from '@src/store/use-directory'
 import '@src/style/less/icon.less'
 interface Feature {
@@ -95,7 +95,6 @@ const FeatureListPage: React.FC = () => {
       message.error('Failed to execute: ' + error)
     }
   }
-
   return (
     <div
       style={{

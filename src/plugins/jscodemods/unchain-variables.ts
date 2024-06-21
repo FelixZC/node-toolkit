@@ -1,8 +1,5 @@
 //@ts-nocheck
 
-/**
- * Unchains chained variable declarations.
- */
 import { Transform } from 'jscodeshift'
 /**
  * 使用jscodeshift进行代码转换的函数。

@@ -1,4 +1,3 @@
-import * as mime from 'mime-types'
 import { FileType } from '@src/types/file'
 import { message } from 'antd'
 /**
@@ -16,6 +15,7 @@ import { message } from 'antd'
    | 'Array'
    | 'Function'
  */
+import * as mime from 'mime-types'
 export const getDataType = (obj: any) => {
   return Object.prototype.toString.call(obj).slice(8, -1)
 }
@@ -60,7 +60,6 @@ export function sortArray(arr: Array<Record<string, any>>, customSort: Function 
     }
   })
 }
-
 interface GroupCache<T> {
   [key: string]: {
     count: number
@@ -68,7 +67,6 @@ interface GroupCache<T> {
     groupKey: string
   }
 }
-
 export function groupBy<T extends Record<string, any>>(arr: T[], groupKey: string): GroupCache<T> {
   if (!Array.isArray(arr)) {
     throw new Error('非数组类型，无法分类')
@@ -242,7 +240,6 @@ export const getValueByKeys = (target: Record<string, any> = {}, keys: string[] 
     return previousValue?.[currentKey]
   }, target)
 }
-
 interface NodeWithId {
   id?: string | number
   parentId?: string | number | null
@@ -280,7 +277,6 @@ export function buildTree<T extends NodeWithId>(
   })
   return rootNodes // 返回根节点数组
 }
-
 export function pickProperties<T extends object, K extends keyof T>(
   objects: T[],
   propertiesToKeep: K[]
@@ -318,12 +314,10 @@ export const getIgnorePatterns = (str: string): RegExp[] => {
     })
   return ignoreFilesPatterns
 }
-
 export const escapeReg = (string: string) => {
   // 转义正则表达式中的特殊字符，包括 -
   return string.replace(/[.*+?^${}()|[\]\\-]/g, '\\$&')
 }
-
 export const convertToReg = (
   query: string,
   matchReg: boolean,
@@ -353,11 +347,9 @@ export const convertToReg = (
     // 创建正则表达式对象，需要将模式和标志作为两个参数传递
     return new RegExp(regExpString, flags)
   } catch (error) {
-    console.error('Invalid regular expression:', regExpString, flags)
     return null
   }
 }
-
 function mimeTypeToFileType(mimeType: string): FileType {
   // 移除可能的参数，只保留基本 MIME 类型
   const baseMimeType = mimeType.split(';')[0].trim().toLowerCase()
@@ -373,7 +365,8 @@ function mimeTypeToFileType(mimeType: string): FileType {
     case baseMimeType.startsWith('text/') || baseMimeType === 'application/xml':
       return 'Plain Text'
     case baseMimeType === 'application/pdf':
-      return 'Document' // 单独处理 PDF
+      return 'Document'
+    // 单独处理 PDF
     case baseMimeType.startsWith('application/'):
       if (baseMimeType.startsWith('application/font') || baseMimeType.endsWith('+x-woff')) {
         return 'Font'
@@ -395,12 +388,13 @@ function mimeTypeToFileType(mimeType: string): FileType {
       baseMimeType.startsWith('application/x-executable') ||
       baseMimeType.startsWith('application/x-elf') ||
       baseMimeType.endsWith('x-mach-o'):
-      return 'Executable' // 处理 Windows 可执行文件
+      return 'Executable'
+    // 处理 Windows 可执行文件
     default:
-      return 'Other' // 默认类别
+      return 'Other'
+    // 默认类别
   }
 }
-
 export function classifyFileMimeType(ext: string): FileType {
   const mimeType = mime.lookup(ext)
   if (mimeType) {
@@ -408,21 +402,15 @@ export function classifyFileMimeType(ext: string): FileType {
   }
   return 'Other'
 }
-
 export function formatFileSize(bytes: number, decimalPlaces = 2) {
   if (bytes === 0) return '0 Bytes'
-
   const k = 1024
   const dm = decimalPlaces < 0 ? 0 : decimalPlaces
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-
   const i = Math.floor(Math.log(bytes) / Math.log(k))
-
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
-
 type SortOrder = 'ascend' | 'descend'
-
 export const compare = (
   a: Record<string, any>,
   b: Record<string, any>,
@@ -447,7 +435,6 @@ export const compare = (
   })
   return order === 'ascend' ? result : -result
 }
-
 export async function copyTextToClipboard(text: string): Promise<void> {
   if (navigator.clipboard && window.isSecureContext) {
     try {
@@ -457,15 +444,12 @@ export async function copyTextToClipboard(text: string): Promise<void> {
       message.error('复制失败')
     }
   } else {
-    console.error('Clipboard API 不可用')
   }
 }
-
 export function getArrayDepth<T>(arr: T[]): number {
   if (arr.length === 0) {
     return 1 // 空数组的深度为1
   }
-
   let maxDepth = 1 // 初始深度为1
 
   // 遍历数组中的每个元素

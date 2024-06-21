@@ -26,7 +26,6 @@ export function classifyFilesFirstBasenameThenExtname(dir: string) {
   const result = exec.classifyFilesFirstBasenameThenExtname()
   return result
 }
-
 export function test() {
   const result = getProjectTree(path.join('src copy'), true).resultMd
   // const result = classifyFilesByExtname(path.join('src copy'))

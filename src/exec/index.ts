@@ -3,7 +3,6 @@ import * as cliProgress from '../utils/cli-progress'
 import fsUtils, { getFileInfo, readFile, writeFile } from '../utils/fs'
 import { getMainWindow } from '../desktop/main-window'
 import { logger } from '../utils/log'
-
 import mdUtils from '../utils/md'
 import { Notification } from 'electron'
 import * as path from 'path'
@@ -23,17 +22,14 @@ interface AttrsCollection {
   value: string | number
   standingInitial?: string
 }
-
 export interface RegExec {
   reg: RegExp
   matchContentHandle(content: string): string
 }
-
 export interface FilterConditionType {
   (item: FileInfo): boolean
 }
 export type ExecListType = Array<RegExec>
-
 interface ExecInterface {
   fsInstance: FsInstance
   fileInfoList: FileInfo[]

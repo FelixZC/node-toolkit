@@ -1,7 +1,7 @@
-import React, { useEffect, useState, memo } from 'react'
-import type { FileInfoCustom } from '@src/types/file'
 import { ipcRendererInvoke } from '@src/utils/desktop-utils'
+import React, { memo, useEffect, useState } from 'react'
 import { Resizable, ResizeCallback } from 're-resizable'
+import type { FileInfoCustom } from '@src/types/file'
 interface Props {
   previewFile: FileInfoCustom | null
   className?: string
@@ -24,15 +24,31 @@ const Priview: React.FC<Props> = ({ previewFile, className }) => {
   return (
     <Resizable
       className={className}
-      size={{ width: width }}
-      enable={{ left: true }}
+      size={{
+        width: width
+      }}
+      enable={{
+        left: true
+      }}
       onResizeStop={onResize}
     >
       <div>
         {previewFile ? (
-          <pre style={{ margin: 0 }}>{fileContent}</pre>
+          <pre
+            style={{
+              margin: 0
+            }}
+          >
+            {fileContent}
+          </pre>
         ) : (
-          <span style={{ margin: 0 }}>No Content</span>
+          <span
+            style={{
+              margin: 0
+            }}
+          >
+            No Content
+          </span>
         )}
       </div>
     </Resizable>

@@ -1,6 +1,6 @@
-import React, { useContext } from 'react'
 import { FileInfoCustom } from '@src/types/file'
 import FileManageContext from '../context'
+import React, { useContext } from 'react'
 interface ViewProps<T> {
   files: T[]
   className?: string

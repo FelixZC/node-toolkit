@@ -113,7 +113,6 @@ const FeatureListPage: React.FC = () => {
       message.error('Failed to execute: ' + error)
     }
   }
-
   return (
     <div
       style={{

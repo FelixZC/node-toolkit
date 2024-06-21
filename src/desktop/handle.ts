@@ -1,6 +1,6 @@
 import { dialog, ipcMain, shell } from 'electron'
-import { readFile } from '../utils/fs'
 import { logger } from '../utils/log'
+import { readFile } from '../utils/fs'
 export default function mainWindowHandleEvents() {
   ipcMain.handle('choose-directory', async () => {
     const result = await dialog.showOpenDialog({
@@ -98,17 +98,14 @@ export default function mainWindowHandleEvents() {
       )
     }
   )
-
   ipcMain.handle('get-dir-and-file-info', async (event, dir: string) => {
     const { getDirAndFileInfo } = await import('../file-manage/index')
     return await getDirAndFileInfo(dir)
   })
-
   ipcMain.handle('read-file', async (event, filePath: string) => {
     const content = await readFile(filePath)
     return content
   })
-
   ipcMain.handle('open-file', async (event, filePath: string) => {
     try {
       await shell.openPath(filePath)
@@ -119,7 +116,6 @@ export default function mainWindowHandleEvents() {
         message: 'Error opening file',
         buttons: ['OK']
       })
-      console.error(`Error opening file: ${error}`)
     }
   })
 }

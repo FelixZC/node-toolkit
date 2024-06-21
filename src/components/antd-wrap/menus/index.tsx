@@ -1,7 +1,10 @@
-import React, { useEffect } from 'react'
 import { Menu, MenuProps } from 'antd'
+import React, { useEffect } from 'react'
 interface ContextMenuProps {
-  menuPosition: { x: number; y: number }
+  menuPosition: {
+    x: number
+    y: number
+  }
   isMenuVisible: boolean
   getMenus: () => MenuProps
   onRequestClose: () => void
@@ -46,7 +49,11 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   }
   const adjustMenuPosition = (position: { x: number; y: number }) => {
     const menuElement = menuRef.current
-    if (!menuElement) return { left: position.x, top: position.y }
+    if (!menuElement)
+      return {
+        left: position.x,
+        top: position.y
+      }
     const menuWidth = menuElement.offsetWidth
     const menuHeight = menuElement.offsetHeight
     const parentElement = menuElement.offsetParent
@@ -60,7 +67,10 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     if (adjustedY + menuHeight > parentHeight) {
       adjustedY = parentHeight - menuHeight
     }
-    return { left: adjustedX, top: adjustedY }
+    return {
+      left: adjustedX,
+      top: adjustedY
+    }
   }
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -76,7 +86,6 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
       menuRef.current.style.top = `${position.top}px`
     }
     document.addEventListener('mousedown', handleClickOutside)
-
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }

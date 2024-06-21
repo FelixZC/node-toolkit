@@ -12,11 +12,9 @@ export type FileType =
   | 'Plain Text'
   | 'Other'
   | 'Application'
-
 export interface FileInfo extends ParsedPath {
   filePath: string
 }
-
 export interface FileInfoWithStats extends ParsedPath, Stats {
   filePath: string
   type: FileType
@@ -27,7 +25,6 @@ export interface FileInfoWithStats extends ParsedPath, Stats {
   ctimeFormat: string
   birthtimeFormat: string
 }
-
 export interface FileInfoCustom extends FileInfoWithStats {
   key: string
   isSelected: boolean

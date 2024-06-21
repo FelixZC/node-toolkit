@@ -36,7 +36,6 @@ const getMenuTemplate = (mainWindow: Electron.BrowserWindow): Array<MenuItemCons
                 message: 'Error opening file',
                 buttons: ['OK']
               })
-              console.error(`Error opening file: ${error}`)
             }
           }
         },
@@ -67,7 +66,6 @@ const getMenuTemplate = (mainWindow: Electron.BrowserWindow): Array<MenuItemCons
               message: 'Alreadly clear cache all',
               buttons: ['OK']
             })
-            console.log('Alreadly clear cache all')
           }
         },
         {

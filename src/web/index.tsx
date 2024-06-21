@@ -6,7 +6,6 @@ import { HashRouter as Router } from 'react-router-dom' // 引入 useNavigate �
 import store from '@src/store'
 import '../utils/svg-icons'
 import openRendererListenEvents from './listen'
-
 const rootElement = document.getElementById('root') as HTMLElement
 const root = ReactDOM.createRoot(rootElement)
 root.render(

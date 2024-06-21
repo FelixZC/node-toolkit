@@ -4,7 +4,6 @@ import { getTray } from './system-tray'
 app.on('ready', () => {
   createMainWindow()
 })
-
 app.on(
   'certificate-error',
   (
@@ -20,25 +19,15 @@ app.on(
     callback(true)
   }
 )
-app.on('before-quit', () => {
-  console.log('app before-quit')
-})
+app.on('before-quit', () => {})
 app.on('window-all-closed', () => {
-  console.log('window-all-closed')
   app.quit()
 })
-app.on('activate', () => {
-  console.log('activate')
-})
+app.on('activate', () => {})
 app.on('quit', () => {
-  console.log('quit')
   if (getTray()) {
     getTray()!.destroy()
   }
 })
-app.on('will-quit', () => {
-  console.log('will-quit')
-})
-app.on('will-finish-launching', () => {
-  console.log('will-finish-launching')
-})
+app.on('will-quit', () => {})
+app.on('will-finish-launching', () => {})

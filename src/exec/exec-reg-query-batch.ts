@@ -1,5 +1,6 @@
 import { Exec } from './index'
 import path from 'path'
+import { writeFile } from '../utils/fs'
 
 /**
  * 执行指定目录下的批量正则查询并返回结果
@@ -7,7 +8,6 @@ import path from 'path'
  * @param {RegExp} reg - 要应用的正则表达式
  * @returns {string} - 查询结果
  */
-import { writeFile } from '../utils/fs'
 export async function batchRegQueryAndReturnResult(
   dir: string,
   reg: RegExp,
@@ -19,7 +19,6 @@ export async function batchRegQueryAndReturnResult(
   const result = await exec.batchRegQuery(reg, ignoreFilesPatterns, isAddSourcePath)
   return result
 }
-
 export async function test() {
   const dirPath = path.join('src copy') // 指定要查询的目录
   // const regexPattern = /(\w+)?(Date|Term)\b/gi; // 指定要使用的正则表达式

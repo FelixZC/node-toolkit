@@ -1,7 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
-import progressReducer from '../slices/progress-slice'
 import directoryReducer from '../slices/directory-slice'
-
+import progressReducer from '../slices/progress-slice'
 export interface RootState {
   progress: ReturnType<typeof progressReducer>
   directory: ReturnType<typeof directoryReducer>

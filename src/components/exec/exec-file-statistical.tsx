@@ -1,14 +1,13 @@
 import { Button, message, Tooltip } from 'antd'
+import Directory from '@src/components/file-manage/directory'
 import { ipcRendererInvoke } from '../../utils/desktop-utils'
 import MonacoEditor from 'react-monaco-editor'
 import React, { useEffect, useState } from 'react'
 import { SwapOutlined } from '@ant-design/icons'
-import Directory from '@src/components/file-manage/directory'
 import useDirectory from '@src/store/use-directory'
 import '@src/style/less/icon.less'
 const MemoizedMonacoEditor = React.memo(MonacoEditor)
 const FeatureListPage: React.FC = () => {
-  console.log('exec-file-statistical重新渲染了')
   const [output, setOutput] = useState('') // 存储执行结果
   const [isShowInJson, setIsShowInJson] = useState(false)
   const [resultJson, setResultJson] = useState('')
@@ -36,14 +35,12 @@ const FeatureListPage: React.FC = () => {
       message.error('Failed to execute: ' + error)
     }
   }
-
   const toggleOutputFormat = () => {
     setIsShowInJson(!isShowInJson)
   }
   useEffect(() => {
     setOutput(isShowInJson ? resultJson : resultMd)
   }, [isShowInJson])
-
   return (
     <div
       style={{
@@ -60,7 +57,11 @@ const FeatureListPage: React.FC = () => {
           width: '100%'
         }}
       >
-        <div style={{ flex: 1 }}>
+        <div
+          style={{
+            flex: 1
+          }}
+        >
           <Directory />
         </div>
         <Button

@@ -1,12 +1,12 @@
 import { Exec } from './index'
 import { logger } from '../utils/log'
+import path from 'path'
+import type { Transform } from 'jscodeshift'
 
 /**
  * 执行 JSCodeMod 模板的公共方法。
  * @param jscodemodeList 需要执行的 JSCodeMod 模板路径列表。
  */
-import path from 'path'
-import type { Transform } from 'jscodeshift'
 export const executeJSCodemods = async (
   dir: string,
   jscodemodeList: string[],
@@ -31,7 +31,6 @@ export const executeJSCodemods = async (
     logger.warn('执行 JSCodeMod 模板时发生错误:', e)
   }
 }
-
 export function test() {
   const jscodemodeList = [
     '../plugins/jscodemods/arrow-function',

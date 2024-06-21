@@ -28,7 +28,6 @@ export async function executePosthtmlPlugins(
     logger.error('Error executing PostHTML plugins:', e)
   }
 }
-
 export function test() {
   const pluginsPathList: string[] = ['../plugins/posthtml-plugins/property-sort']
   executePosthtmlPlugins(path.join('src copy'), pluginsPathList, true)

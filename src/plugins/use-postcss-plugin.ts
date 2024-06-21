@@ -3,17 +3,17 @@ import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
 import path from 'path'
 import postcss from 'postcss'
 import postcssHtml from 'postcss-html'
-// @ts-ignore
+//@ts-ignore
 import postcssJsx from 'postcss-jsx'
 import postcssLess from 'postcss-less'
-// @ts-ignore
+//@ts-ignore
 import postcssMarkdown from 'postcss-markdown'
 import postcssSafeParser from 'postcss-safe-parser'
 import postcssSass from 'postcss-sass'
 import postcssScss from 'postcss-scss'
-// @ts-ignore
+//@ts-ignore
 import postcssStyl from 'postcss-styl'
-// @ts-ignore
+//@ts-ignore
 import sugarss from 'sugarss'
 import type { AcceptedPlugin } from 'postcss'
 import type { Parser, Syntax } from 'postcss'

@@ -1,7 +1,6 @@
-import { useSelector, useDispatch } from 'react-redux'
-import { RootState } from '@src/store'
 import { progressSlice } from '@src/slices/progress-slice'
-
+import { RootState } from '@src/store'
+import { useDispatch, useSelector } from 'react-redux'
 const useProgress = () => {
   const dispatch = useDispatch()
   const { value, isVisible, isReset } = useSelector((state: RootState) => state.progress)

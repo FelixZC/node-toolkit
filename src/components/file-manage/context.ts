@@ -14,7 +14,5 @@ interface FileManageContextType {
   hideMenu: () => void
   tableChange: TableProps<FileInfoCustom>['onChange']
 }
-
 const FileManageContext = React.createContext<FileManageContextType | undefined>(undefined)
-
 export default FileManageContext

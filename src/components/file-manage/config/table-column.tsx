@@ -1,6 +1,6 @@
-import type { TableColumnsType } from 'antd'
-import type { FileInfoCustom } from '@src/types/file'
 import React from 'react'
+import type { FileInfoCustom } from '@src/types/file'
+import type { TableColumnsType } from 'antd'
 const columns: TableColumnsType<FileInfoCustom> = [
   {
     title: '名称',
@@ -8,8 +8,21 @@ const columns: TableColumnsType<FileInfoCustom> = [
     key: 'base',
     render: (text, record) => {
       return (
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <img src={record.fileIcon} alt="icon" style={{ width: 24, height: 24, marginRight: 8 }} />
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center'
+          }}
+        >
+          <img
+            src={record.fileIcon}
+            alt="icon"
+            style={{
+              width: 24,
+              height: 24,
+              marginRight: 8
+            }}
+          />
           <span>{text}</span>
         </div>
       )
@@ -36,5 +49,4 @@ const columns: TableColumnsType<FileInfoCustom> = [
     sorter: true
   }
 ]
-
 export default columns

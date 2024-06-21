@@ -1,23 +1,23 @@
-import React, { useEffect, useState, useRef } from 'react'
-import { Layout, Input, Select } from 'antd'
-import useDirectory from '@src/store/use-directory'
-import { ipcRendererInvoke } from '@src/utils/desktop-utils'
+import columns from './config/table-column'
 import { compare } from '@src/utils/common'
+import ContextMenu from '@src/components/antd-wrap/menus/index'
 import debounce from 'lodash/debounce'
-import Preview from './views/preview'
-import TableView from './views/table-view'
+import FileManageContext from './context'
+import getMenus from './config/menus'
+import { Input, Layout, Select } from 'antd'
+import { ipcRendererInvoke } from '@src/utils/desktop-utils'
 import LargeIconView from './views/large-icon'
 import MediumIconView from './views/medium-icon'
+import options from './config/options'
+import Preview from './views/preview'
+import React, { useEffect, useRef, useState } from 'react'
 import SmallIconView from './views/small-icon'
+import TableView from './views/table-view'
+import useContextMenu from '@src/components/antd-wrap/menus/use-context-menu'
+import useDirectory from '@src/store/use-directory'
 import '@src/style/less/file-manage.less'
 import type { FileInfoCustom, FileInfoWithStats } from '@src/types/file'
 import type { TableProps } from 'antd'
-import columns from './config/table-column'
-import options from './config/options'
-import FileManageContext from './context' // 引入Context文件
-import ContextMenu from '@src/components/antd-wrap/menus/index'
-import useContextMenu from '@src/components/antd-wrap/menus/use-context-menu'
-import getMenus from './config/menus'
 const { Header, Content, Footer } = Layout
 const { Option } = Select
 const FileManage: React.FC = () => {
@@ -39,13 +39,15 @@ const FileManage: React.FC = () => {
       const rect = contextContainerRef.current.getBoundingClientRect()
       const x = e.clientX - window.scrollX - rect.left
       const y = e.clientY - window.scrollY - rect.top
-      showMenu({ x, y })
+      showMenu({
+        x,
+        y
+      })
     }
     if (record) {
       setCurrentRow(record)
     }
   }
-
   const onRowClick = (event: React.MouseEvent<HTMLDivElement>, record: FileInfoCustom) => {
     if (previewFile?.filePath === record.filePath) {
       return
@@ -87,13 +89,11 @@ const FileManage: React.FC = () => {
           compare(a, b, curSorter.order!, [curSorter.field as string])
         )
       } else {
-        console.error('Invalid sorter configuration:', curSorter)
       }
     })
     setIsSorted(true)
     setFilterResult(sortedData)
   }
-
   const currentViewComponent = () => {
     switch (currentView) {
       case 'small-icon':
@@ -120,7 +120,6 @@ const FileManage: React.FC = () => {
       setFilterResult(originalData)
     }
   }, 300)
-
   const execSearch = async () => {
     if (!directoryPath) {
       return
@@ -138,19 +137,14 @@ const FileManage: React.FC = () => {
         }
       })
       setOriginalData(customResult)
-    } catch (error) {
-      console.error('Error loading directory info:', error)
-    }
+    } catch (error) {}
   }
-
   useEffect(() => {
     execSearch()
   }, [directoryPath])
-
   useEffect(() => {
     handleFilterChange()
   }, [searchValue, originalData])
-
   const handleFilterTypeChange = (value: string) => {
     let filteredResults: FileInfoCustom[]
     if (value == 'All') {
@@ -160,7 +154,6 @@ const FileManage: React.FC = () => {
     }
     setFilterResult(filteredResults)
   }
-
   return (
     <FileManageContext.Provider
       value={{
@@ -191,7 +184,10 @@ const FileManage: React.FC = () => {
           <Select
             size="small"
             className="file-manage-header__select"
-            style={{ width: 120, marginLeft: 8 }}
+            style={{
+              width: 120,
+              marginLeft: 8
+            }}
             defaultValue="All"
             onChange={handleFilterTypeChange}
           >

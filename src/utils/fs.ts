@@ -1,4 +1,10 @@
+import { app } from 'electron'
 import { classifyFileMimeType, formatFileSize } from './common'
+import { formatInputDateTime } from '../utils/time'
+/**`
+ * fs.ts使用读异步，写同步
+ * TODO 添加缓存功能操作
+ */
 import * as fs from 'fs-extra'
 import { logDecorator, logger } from '../utils/log'
 import { LRUCache } from 'lru-cache'
@@ -6,13 +12,6 @@ import * as os from 'os'
 import * as path from 'path'
 import { useIgnored } from '../utils/ignore'
 import type { FileInfo, FileInfoWithStats } from '@src/types/file'
-import { app } from 'electron'
-import { formatInputDateTime } from '../utils/time'
-/**`
- * fs.ts使用读异步，写同步
- * TODO 添加缓存功能操作
- */
-
 const fileContentCache = new LRUCache<string, string>({
   max: 1000,
   ttl: 10 * 60 * 1000 // 10 minutes
@@ -21,12 +20,10 @@ const fileStatsCache = new LRUCache<string, fs.Stats>({
   max: 1000,
   ttl: 10 * 60 * 1000 // 10 minutes
 })
-
 export const clearCacheAll = () => {
   fileContentCache.clear() // 清除所有缓存项
   fileStatsCache.clear() // 清除所有缓存项
 }
-
 export const writeFile = async (filePath: string, content: string) => {
   // 先更新缓存
   fileContentCache.set(filePath, content)
@@ -71,13 +68,18 @@ export function getFileInfo(filePath: string): FileInfo {
 export async function getFileInfoWithStats(filePath: string): Promise<FileInfoWithStats> {
   const stats = await readFileStats(filePath)
   const parsedPath = path.parse(filePath)
-  const image = await app.getFileIcon(filePath, { size: 'large' })
+  const image = await app.getFileIcon(filePath, {
+    size: 'large'
+  })
   return {
     filePath,
     ...parsedPath,
     ...stats,
-    type: stats.isDirectory() ? 'Folder' : classifyFileMimeType(parsedPath.ext), // 文件类型
-    fileIcon: image.toDataURL({ scaleFactor: 1 }),
+    type: stats.isDirectory() ? 'Folder' : classifyFileMimeType(parsedPath.ext),
+    // 文件类型
+    fileIcon: image.toDataURL({
+      scaleFactor: 1
+    }),
     sizeFormat: stats.isDirectory() ? '' : formatFileSize(stats.size),
     atimeFormat: formatInputDateTime(stats.atime),
     mtimeFormat: formatInputDateTime(stats.mtime),
@@ -196,7 +198,6 @@ export interface FsInstance {
     uniqueNewFilePath: string
   }
 }
-
 class fsUtils implements FsInstance {
   rootPath: string
   filePathList: string[] = []
@@ -267,7 +268,6 @@ class fsUtils implements FsInstance {
   async getFileInfoListWithStats(): Promise<FileInfo[]> {
     return Promise.all(this.filePathList.map((filePath) => getFileInfoWithStats(filePath)))
   }
-
   getDirectoryList(): FileInfo[] {
     return this.dirPathList.map((dirPath) => getFileInfo(dirPath))
   }

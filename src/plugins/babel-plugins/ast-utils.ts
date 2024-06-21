@@ -2,7 +2,6 @@ import { NodePath } from '@babel/core'
 import * as parser from '@babel/parser'
 import * as t from '@babel/types'
 import type { GeneratorOptions, ParserOptions } from '@babel/core'
-
 interface SpecifierInfo {
   source: string
   type: 'ImportSpecifier' | 'ImportNamespaceSpecifier' | 'ImportDefaultSpecifier'

@@ -1,5 +1,4 @@
 import * as cliProgress from 'cli-progress'
-
 export const useCliProgress = (total: number = 0) => {
   let count = 0
   const bar1 = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic)

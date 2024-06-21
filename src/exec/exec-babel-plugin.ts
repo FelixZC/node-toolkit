@@ -1,12 +1,12 @@
 import { Exec } from './index'
 import { logger } from '../utils/log'
+import path from 'path'
+import type { BabelPlugin } from '../plugins/use-babel-plugin'
 
 /**
  * 执行 Babel 插件的公共方法。
  * @param babelPluginPathList 需要执行的 Babel 插件路径列表。
  */
-import path from 'path'
-import type { BabelPlugin } from '../plugins/use-babel-plugin'
 export const executeBabelPlugins = async (
   dir: string,
   babelPluginPathList: string[],
@@ -31,7 +31,6 @@ export const executeBabelPlugins = async (
     logger.warn('执行 Babel 插件时发生错误:', e)
   }
 }
-
 export function test() {
   const babelPluginPathList: string[] = [
     '../plugins/babel-plugins/import-sort',

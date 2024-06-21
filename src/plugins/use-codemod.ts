@@ -3,13 +3,13 @@ import { ExecFileInfo } from '@src/types/common'
 import getParser from 'jscodeshift/src/getParser'
 import jscodeshift, { Options, Parser, Transform } from 'jscodeshift'
 import { logger } from '../utils/log'
+import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
+import type { SFCDescriptor } from '@vue/compiler-sfc'
 
 /**
  * parser可传的值有 babylon、flow、ts、tsx、babel,会去获取对应的解析器
  * 定义一个代码转换器的类型，它扩展了jscodeshift的Transform类型，并可选地包含一个parser属性。
  */
-import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
-import type { SFCDescriptor } from '@vue/compiler-sfc'
 export type Codemod = Transform & {
   parser?: string | Parser
 }

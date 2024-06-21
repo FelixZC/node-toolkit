@@ -31,7 +31,6 @@ export async function executePostcssPlugins(
     logger.warn(e)
   }
 }
-
 export function test() {
   const pluginsPathList = ['../plugins/postcss-plugins/property-sort']
   executePostcssPlugins(path.join('src copy'), pluginsPathList, true)

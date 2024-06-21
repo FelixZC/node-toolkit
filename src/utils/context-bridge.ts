@@ -46,13 +46,11 @@ const exposedIpcRenderer: ExposedInMainWorld = {
   },
   invoke: (channel: string, ...args: any[]): Promise<any> => {
     return ipcRenderer.invoke(channel, ...args).catch((error) => {
-      console.error(`Error invoking API: ${channel}`, error)
       throw error // 重新抛出错误，以便调用者可以处理
     })
   }
 }
 contextBridge.exposeInMainWorld('ipcRenderer', exposedIpcRenderer)
-
 contextBridge.exposeInMainWorld('process', {
   get NODE_ENV(): string {
     return process.env.NODE_ENV || 'development' // 默认为 development，如果 NODE_ENV 未定义
