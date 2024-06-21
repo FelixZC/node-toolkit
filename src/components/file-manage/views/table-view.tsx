@@ -1,19 +1,22 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Table } from 'antd'
 import { TableColumnsType } from 'antd'
-import type { TableProps } from 'antd'
+import FileManageContext from '../context'
+import type { FileInfoCustom } from '@src/types/file'
 
-interface ViewProps<R> {
-  files: R[]
-  columns: TableColumnsType<R>
+interface ViewProps {
+  files: FileInfoCustom[]
+  columns: TableColumnsType<FileInfoCustom>
   className?: string
-  onRowClick: (event: React.MouseEvent<any, MouseEvent>, record: R) => void
-  onDoubleClick: (event: React.MouseEvent<any, MouseEvent>, record: R) => void
-  onContextMenu: (event: React.MouseEvent<any, MouseEvent>, record: R) => void
-  tableChange: TableProps<R>['onChange']
 }
-const TableView: React.FC<ViewProps<any>> = React.memo(
-  ({ files, columns, className, onRowClick, onDoubleClick, onContextMenu, tableChange }) => {
+
+const TableView: React.FC<ViewProps> = React.memo(
+  ({ files, columns, className }) => {
+    const context = useContext(FileManageContext)
+    if (!context) {
+      throw new Error('useContext must be inside a FileManageContext.Provider')
+    }
+    const { onRowClick, onDoubleClick, onContextMenu, tableChange } = context
     return (
       <Table
         className={className}
@@ -23,7 +26,7 @@ const TableView: React.FC<ViewProps<any>> = React.memo(
         size="small"
         showHeader={true}
         columns={columns}
-        rowKey={(record) => record.key || record.id}
+        rowKey={(record) => record.key}
         onRow={(record) => {
           return {
             onClick: (event) => {

@@ -1,19 +1,16 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { FileInfoCustom } from '@src/types/file'
+import FileManageContext from '../context'
 interface ViewProps<T> {
   files: T[]
   className?: string
-  onRowClick: (event: React.MouseEvent<any, MouseEvent>, record: T) => void
-  onDoubleClick: (event: React.MouseEvent<any, MouseEvent>, record: T) => void
-  onContextMenu: (event: React.MouseEvent<any, MouseEvent>, record: T) => void
 }
-const LargeIconView: React.FC<ViewProps<FileInfoCustom>> = ({
-  files,
-  className,
-  onRowClick,
-  onDoubleClick,
-  onContextMenu
-}) => {
+const LargeIconView: React.FC<ViewProps<FileInfoCustom>> = ({ files, className }) => {
+  const context = useContext(FileManageContext)
+  if (!context) {
+    throw new Error('useContext must be inside a FileManageContext.Provider')
+  }
+  const { onRowClick, onDoubleClick, onContextMenu } = context
   return (
     <div className={'icon-view__lager ' + className}>
       {files.map((file) => (

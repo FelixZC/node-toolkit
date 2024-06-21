@@ -1,19 +1,19 @@
 import React, { useEffect } from 'react'
 import { Menu, MenuProps } from 'antd'
 interface ContextMenuProps {
-  menu: MenuProps
   menuPosition: { x: number; y: number }
   isMenuVisible: boolean
-  setIsMenuVisible: (visible: boolean) => void
+  getMenus: () => MenuProps
+  onRequestClose: () => void
 }
 const ContextMenu: React.FC<ContextMenuProps> = ({
-  menu,
   menuPosition,
   isMenuVisible,
-  setIsMenuVisible
+  getMenus,
+  onRequestClose
 }) => {
   const menuRef = React.useRef<HTMLDivElement>(null)
-
+  const menu = getMenus()
   const renderMenuItem = (items: MenuProps['items']) => {
     if (!Array.isArray(items)) {
       return null
@@ -66,7 +66,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     const handleClickOutside = (event: MouseEvent) => {
       if (isMenuVisible && !menuRef.current?.contains(event.target as Node)) {
         setTimeout(() => {
-          setIsMenuVisible(false)
+          onRequestClose()
         }, 100)
       }
     }
