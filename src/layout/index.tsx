@@ -42,10 +42,10 @@ const Lay: React.FC = () => {
       }}
     >
       <Sider
-        width={250}
+        width={200}
         collapsedWidth={0}
-        zeroWidthTriggerStyle={{ zIndex: 1008611, top: 50 }}
         theme="light"
+        zeroWidthTriggerStyle={{ zIndex: 10086, top: '40%' }}
         collapsible={true}
       >
         <Menu

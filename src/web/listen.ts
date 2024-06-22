@@ -1,6 +1,7 @@
 import { directorySlice } from '@src/slices/directory-slice'
 import { ipcRendererOn } from '@src/utils/desktop-utils'
 import store from '@src/store'
+import '@src/style/less/common.less'
 export default function openRendererListenEvents() {
   // ipcRendererOn('main-window-ready', () => {
   //   console.log('main-window-ready')

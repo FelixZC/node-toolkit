@@ -23,14 +23,18 @@
 }
 
 .flex-container {
-  align-items: center; /* flex-start | flex-end | center | baseline | stretch*/
+  align-items: center;
+  /* flex-start | flex-end | center | baseline | stretch*/
   display: flex;
-  flex-direction: row; /* row | row-reverse | column | column-reverse*/
-  justify-content: center; /* flex-start | flex-end | center | space-between | space-around*/
+  flex-direction: row;
+  /* row | row-reverse | column | column-reverse*/
+  justify-content: center;
+  /* flex-start | flex-end | center | space-between | space-around*/
 }
 
 .flex-item {
-  flex: 1; /* 可以设置flex-grow, flex-shrink, flex-basis*/
+  flex: 1;
+  /* 可以设置flex-grow, flex-shrink, flex-basis*/
 }
 
 .center-horizontal {
@@ -38,13 +42,10 @@
   margin-right: auto;
 }
 
-.center-vertical-flex {
-  align-items: center;
-  @flex-container();
-}
 
 .center-vertical-item {
-  flex: none; /* 不伸缩*/
+  flex: none;
+  /* 不伸缩*/
 }
 
 .center-absolute {
@@ -80,4 +81,25 @@
 
 .transition(@transition) {
   transition: @transition;
+}
+
+/* 定义滚动条轨道的样式 */
+::-webkit-scrollbar {
+  width: 8px;
+  /* 滚动条宽度 */
+  height: 8px;
+}
+
+/* 定义滚动条滑块的样式 */
+::-webkit-scrollbar-thumb {
+  background-color: #d6dee1;
+  /* 滑块颜色 */
+  border-radius: 4px;
+  /* 滑块圆角 */
+}
+
+/* 定义滚动条轨道的样式 */
+::-webkit-scrollbar-track {
+  background-color: #f5f5f5;
+  /* 轨道颜色 */
 }

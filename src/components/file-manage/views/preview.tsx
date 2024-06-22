@@ -47,7 +47,7 @@ const Priview: React.FC<Props> = ({ previewFile, className }) => {
           // </pre>
           <CodeMirrorMemo
             value={fileContent}
-            height="90vh"
+            height="calc(100vh - 70px)"
             theme={'light'}
             readOnly={true}
             editable={false}
@@ -58,7 +58,7 @@ const Priview: React.FC<Props> = ({ previewFile, className }) => {
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              height: '90vh'
+              height: 'calc(100vh - 70px)'
             }}
           >
             <p style={{ textAlign: 'center' }}>No Content.</p>

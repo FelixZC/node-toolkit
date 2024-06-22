@@ -1,4 +1,3 @@
-
 :root {
   --content-bg-color: #f5f5f5;
   --header-footer-bg-color: #fff;
@@ -31,37 +30,46 @@
   background-color: var(--content-bg-color);
   display: flex;
   flex: 1;
-  height: calc(100% - 70px); /* 保持不变*/
+  height: calc(100% - 70px);
   position: relative;
-  table {
-    height: 90vh;
-  }
-}
-
-.file-manage-content__left {
-  flex: 1;
-  max-height: 100%; /* 添加 max-height 以确保滚动条出现*/
-  overflow: auto; /* 保持滚动条设置*/
-
-}
-
-.file-manage-content__right {
-  position: relative; /* 为伪元素定位做准备 */
-  max-height: 100%;
   overflow: auto;
 }
 
-.file-manage-content__right::before {
-  content: ""; /* 伪元素需要content属性 */
-  position: absolute; /* 绝对定位相对于其包含块 */
-  left: 0; /* 边界位于最左侧 */
-  top: 0; /* 从顶部开始 */
-  bottom: 0; /* 延伸到底部 */
-  width: 1px; /* 边界的宽度 */
-  background-color: #ccc; /* 边界的颜色 */
+.file-manage-content__left {
+  position: relative;
+  flex: 1;
+  max-height: 100%;
+  overflow: auto;
+
+  .ant-table-placeholder {
+    min-height: calc(100vh - 70px - 40px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .ant-table-tbody {
+    min-height: calc(100vh - 70px - 40px);
+  }
 }
 
-.file-manage-path {
+.file-manage-content__right {
+  position: relative;
+  max-height: 100%;
+  overflow: auto;
+
+  ::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: #ccc;
+  }
+}
+
+.file-manage-content__right .file-manage-path {
   background-color: var(--header-footer-bg-color);
   border-bottom: 1px solid var(--header-footer-border-color);
   height: 20px;
@@ -77,56 +85,55 @@
   text-align: left;
 }
 
-
 .context-menu {
   background-color: var(--menus-bg-color);
   position: absolute;
   z-index: 999;
 }
 
-
 .icon-view__lager {
   display: grid;
-  grid-gap: 10px; /* 网格项之间的间隙*/
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* 根据容器宽度自动创建列*/
-  grid-template-rows: repeat(auto-fill, minmax(150px, 1fr)); /* 根据容器宽度自动创建列*/
-  padding: 10px; /* 容器内边距*/
+  grid-gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-rows: repeat(auto-fill, minmax(150px, 1fr));
+  padding: 10px;
+  overflow-y: auto;
 
   .file-item {
-    align-items: center; /* 垂直居中对齐图标和文件名*/
-    background-color: #f9f9f9; /* 背景颜色*/
-    border: 1px solid #ddd; /* 边框*/
-    border-radius: 5px; /* 边框圆角*/
-    cursor: pointer; /* 鼠标悬停时显示为指针*/
+    align-items: center;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
     display: flex;
     flex-direction: column;
-    padding: 5px; /* 网格项内边距*/
-    text-align: center; /* 文件名文本居中对齐*/
-    justify-content: space-around; /* 添加间距 */
-    box-sizing: border-box; /* 边框和内边距包含在宽度和高度内 */
+    padding: 5px;
+    text-align: center;
+    justify-content: space-around;
+    box-sizing: border-box;
     overflow: visible;
 
     &:hover {
-      background-color: #e9e9e9; /* 鼠标悬停时的背景色*/
+      background-color: #e9e9e9;
     }
   }
 
   .file-icon {
     user-select: none;
-    width: 100%; /* 确保图标宽度自适应 */
-    height: auto; /* 保持宽高比 */
-    object-fit: contain; /* 保持图标比例 */
-    max-width: 100%; /* 最大宽度不超过容器宽度 */
-    max-height: 70%; /* 限制图标最大高度，为文字留空间 */
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    max-width: 100%;
+    max-height: 70%;
   }
 
   .file-name {
     flex: 1;
     height: 100%;
     width: 100%;
-    color: #333; /* 文件名颜色*/
-    font-size: 14px; /* 文件名字体大小*/
-    white-space: wrap; /* 允许文本正常换行 */
+    color: #333;
+    font-size: 14px;
+    white-space: wrap;
   }
 }
 
@@ -134,44 +141,45 @@
   display: grid;
   grid-gap: 8px;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  grid-template-rows: repeat(auto-fill, minmax(120px, 1fr)); /* 根据容器宽度自动创建列*/
+  grid-template-rows: repeat(auto-fill, minmax(120px, 1fr));
   padding: 8px;
+  overflow-y: auto;
 
   .file-item {
-    align-items: center; /* 垂直居中对齐图标和文件名*/
-    background-color: #f9f9f9; /* 背景颜色*/
-    border: 1px solid #ddd; /* 边框*/
+    align-items: center;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
     border-radius: 4px;
-    cursor: pointer; /* 鼠标悬停时显示为指针*/
+    cursor: pointer;
     display: flex;
     flex-direction: column;
     padding: 4px;
-    justify-content: space-around; /* 添加间距 */
-    box-sizing: border-box; /* 边框和内边距包含在宽度和高度内 */
-    text-align: center; /* 水平文本居中 */
+    justify-content: space-around;
+    box-sizing: border-box;
+    text-align: center;
     overflow: visible;
+
     &:hover {
       background-color: #f0f0f0;
     }
-
   }
 
   .file-icon {
     user-select: none;
-    width: 100%; /* 确保图标宽度自适应 */
-    height: auto; /* 保持宽高比 */
-    object-fit: contain; /* 保持图标比例 */
-    max-width: 100%; /* 最大宽度不超过容器宽度 */
-    max-height: 70%; /* 限制图标最大高度，为文字留空间 */
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    max-width: 100%;
+    max-height: 70%;
   }
 
   .file-name {
     flex: 1;
     height: 100%;
     width: 100%;
-    color: #333; /* 文件名颜色*/
-    font-size: 13px; /* 文件名字体大小*/
-    white-space: wrap; /* 允许文本正常换行 */
+    color: #333;
+    font-size: 13px;
+    white-space: wrap;
   }
 }
 
@@ -179,21 +187,22 @@
   display: grid;
   grid-gap: 6px;
   grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  grid-template-rows: repeat(auto-fill, minmax(90px, 1fr)); /* 根据容器宽度自动创建列*/
+  grid-template-rows: repeat(auto-fill, minmax(90px, 1fr));
   padding: 6px;
+  overflow-y: auto;
 
   .file-item {
-    align-items: center; /* 垂直居中对齐图标和文件名*/
-    background-color: #f9f9f9; /* 背景颜色*/
-    border: 1px solid #ddd; /* 边框*/
+    align-items: center;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
     border-radius: 3px;
-    cursor: pointer; /* 鼠标悬停时显示为指针*/
+    cursor: pointer;
     display: flex;
     flex-direction: column;
     padding: 3px;
-    text-align: center; /* 文件名文本居中对齐*/
+    text-align: center;
     justify-content: space-between;
-    box-sizing: border-box; /* 边框和内边距包含在宽度和高度内 */
+    box-sizing: border-box;
     overflow: visible;
 
     &:hover {
@@ -203,20 +212,20 @@
 
   .file-icon {
     user-select: none;
-    width: 100%; /* 确保图标宽度自适应 */
-    height: auto; /* 保持宽高比 */
-    object-fit: contain; /* 保持图标比例 */
-    max-width: 100%; /* 最大宽度不超过容器宽度 */
-    max-height: 70%; /* 限制图标最大高度，为文字留空间 */
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    max-width: 100%;
+    max-height: 70%;
   }
 
   .file-name {
     flex: 1;
     height: 100%;
     width: 100%;
-    color: #333; /* 文件名颜色*/
-    font-size: 12px; /* 文件名字体大小*/
-    white-space: wrap; /* 允许文本正常换行 */
+    color: #333;
+    font-size: 12px;
+    white-space: wrap;
   }
 }
 
