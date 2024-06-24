@@ -174,7 +174,7 @@
     "productName": "node-toolkit",
     "appId": "node.toolkit.electron.app",
     "directories": {
-      "output": "./dist/win"
+      "output": "./dist/output"
     },
     "files": [
       "./package.json",
@@ -197,6 +197,6 @@
       "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
       "target": "nsis"
     },
-    "electronDist": "./electron"
+    "electronVersion": "26.6.10"
   }
 }
