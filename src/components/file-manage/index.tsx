@@ -15,6 +15,7 @@ import useDirectory from '@src/store/use-directory'
 import '@src/style/less/file-manage.less'
 import RegExpInput from '../antd-wrap/search/reg-exp-input'
 import IconView from './views/icon-view'
+import Loading from '@src/components/common/loading' // 引入 Loading 组件
 import type { FileInfoCustom, FileInfoWithStats, FileType } from '@src/types/file'
 import type { TableProps } from 'antd'
 
@@ -38,7 +39,7 @@ const FileManage: React.FC = () => {
   const [currentRow, setCurrentRow] = useState<FileInfoCustom | null>(null)
   const contextContainerRef = useRef<HTMLDivElement>(null)
   const { isMenuVisible, menuPosition, showMenu, hideMenu } = useContextMenu()
-
+  const [isShowLoading, setIsShowLoading] = React.useState(false)
   // 添加过滤类型和排序配置的状态
   const [filterType, setFilterType] = useState<FileTypeExtend>('All')
   const [sortConfig, setSortConfig] = useState<SortConfigType>([])
@@ -172,6 +173,7 @@ const FileManage: React.FC = () => {
     if (!directoryPath) {
       return
     }
+    setIsShowLoading(true)
     try {
       const result: FileInfoWithStats[] = await ipcRendererInvoke(
         'get-dir-and-file-info',
@@ -185,7 +187,10 @@ const FileManage: React.FC = () => {
         }
       })
       setOriginalData(customResult)
-    } catch (error) {}
+    } catch (error) {
+    } finally {
+      setIsShowLoading(false)
+    }
   }
 
   useEffect(() => {
@@ -208,6 +213,7 @@ const FileManage: React.FC = () => {
       }}
     >
       <Layout className="file-manage-layout">
+        {isShowLoading && <Loading />}
         <div className="file-manage-path">
           <span className="file-manage-path_result">当前路径：{directoryPath}</span>
         </div>
