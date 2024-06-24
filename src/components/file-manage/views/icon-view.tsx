@@ -112,7 +112,7 @@ const LargeIconView: React.FC<ViewProps<FileInfoCustom>> = (props) => {
         resizeObserver.disconnect()
       }
     }
-  }, [viewRef.current])
+  }, [viewRef.current, props.files])
 
   const onScroll = debounce(calculateVisibleItems, 10)
 
