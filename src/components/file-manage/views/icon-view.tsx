@@ -44,14 +44,14 @@ const LargeIconView: React.FC<ViewProps<FileInfoCustom>> = (props) => {
       const fileItemWidth = fileItemElement.clientWidth
       const fileItemHeight = fileItemElement.clientHeight
       return {
-        width: fileItemWidth + gap,
-        height: fileItemHeight + gap,
+        width: fileItemWidth,
+        height: fileItemHeight,
         gap
       }
     } else {
       return {
-        width: gridColumnsValues + gap,
-        height: gridRowsValues + gap,
+        width: gridColumnsValues,
+        height: gridRowsValues,
         gap
       }
     }
@@ -62,7 +62,7 @@ const LargeIconView: React.FC<ViewProps<FileInfoCustom>> = (props) => {
       const view = viewRef.current
       if (!view) return
       const itemInfo = getItemInfo()
-      const columns = Math.floor((view.parentElement!.offsetWidth - itemInfo.gap) / itemInfo.width)
+      const columns = Math.floor((view.clientWidth - itemInfo.gap) / itemInfo.width)
       const clientRows = Math.floor(view.clientHeight / itemInfo.height)
       const rowsTotal = Math.ceil(props.files.length / columns)
       const virtualHeight = rowsTotal * itemInfo.height
@@ -70,7 +70,9 @@ const LargeIconView: React.FC<ViewProps<FileInfoCustom>> = (props) => {
       const scrollTop = view.scrollTop
       const startRow = Math.round(scrollTop / itemInfo.height)
       const startIdx = startRow * columns
-      const endIdx = startIdx + columns * clientRows
+      //补充视野
+      let endIdx = startIdx + columns * clientRows
+      // endIdx += (endIdx - startIdx + 1) % columns
       const newVisibleItems = props.files.slice(
         Math.max(startIdx, 0),
         Math.min(endIdx, props.files.length)
@@ -96,13 +98,21 @@ const LargeIconView: React.FC<ViewProps<FileInfoCustom>> = (props) => {
 
   useEffect(() => {
     if (getIsNeedVisible()) {
-      const handleResize = () => {
+      const handleResize = debounce(() => {
         calculateVisibleItems()
-      }
+      }, 100)
       window.addEventListener('resize', handleResize)
-      return () => window.removeEventListener('resize', handleResize)
+      const resizeObserver = new ResizeObserver((entries) => {
+        handleResize()
+      })
+      viewRef.current && resizeObserver.observe(viewRef.current)
+      return () => {
+        window.removeEventListener('resize', handleResize)
+        viewRef.current && resizeObserver.unobserve(viewRef.current)
+        resizeObserver.disconnect()
+      }
     }
-  }, [])
+  }, [viewRef.current])
 
   const onScroll = debounce(calculateVisibleItems, 10)
 
