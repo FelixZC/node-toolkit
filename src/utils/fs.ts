@@ -14,15 +14,23 @@ import { useIgnored } from '../utils/ignore'
 import type { FileInfo, FileInfoWithStats } from '@src/types/file'
 const fileContentCache = new LRUCache<string, string>({
   max: 1000,
-  ttl: 10 * 60 * 1000 // 10 minutes
+  ttl: 30 * 60 * 1000 // 10 minutes
 })
 const fileStatsCache = new LRUCache<string, fs.Stats>({
-  max: 1000,
-  ttl: 10 * 60 * 1000 // 10 minutes
+  max: 100000,
+  ttl: 30 * 60 * 1000 // 30 minutes
 })
+
+// 创建一个 LRU 缓存实例
+const iconCache = new LRUCache<string, string>({
+  max: 100000,
+  ttl: 30 * 60 * 1000 // 30 minutes
+})
+
 export const clearCacheAll = () => {
   fileContentCache.clear() // 清除所有缓存项
   fileStatsCache.clear() // 清除所有缓存项
+  iconCache.clear()
 }
 export const writeFile = async (filePath: string, content: string) => {
   // 先更新缓存
@@ -30,23 +38,16 @@ export const writeFile = async (filePath: string, content: string) => {
   // 然后写入文件系统
   await fs.outputFile(filePath, content, 'utf-8')
 }
-export const readFile = (filePath: string): Promise<string> => {
+export const readFile = async (filePath: string): Promise<string> => {
   // 检查缓存中是否存在内容
   const cachedContent = fileContentCache.get(filePath)
   if (cachedContent) {
     return Promise.resolve(cachedContent)
   }
   // 如果缓存中没有，读取文件并更新缓存
-  return new Promise((resolve, reject) => {
-    fs.readFile(filePath, 'utf-8', (err, data) => {
-      if (err) {
-        reject(err)
-      } else {
-        fileContentCache.set(filePath, data)
-        resolve(data)
-      }
-    })
-  })
+  const data = await fs.readFile(filePath, 'utf-8')
+  fileContentCache.set(filePath, data)
+  return data
 }
 export const readFileStats = async (filePath: string): Promise<fs.Stats> => {
   const cachedStats = fileStatsCache.get(filePath)
@@ -58,6 +59,19 @@ export const readFileStats = async (filePath: string): Promise<fs.Stats> => {
     return stats
   }
 }
+
+async function getCachedFileIcon(filePath: string): Promise<string> {
+  if (iconCache.has(filePath)) {
+    return iconCache.get(filePath) as string
+  }
+  const icon = await app.getFileIcon(filePath, { size: 'large' })
+  const iconDataUrl = icon.toDataURL({
+    scaleFactor: 1
+  })
+  iconCache.set(filePath, iconDataUrl)
+  return iconDataUrl
+}
+
 export function getFileInfo(filePath: string): FileInfo {
   const parsedPath = path.parse(filePath)
   return {
@@ -67,19 +81,15 @@ export function getFileInfo(filePath: string): FileInfo {
 }
 export async function getFileInfoWithStats(filePath: string): Promise<FileInfoWithStats> {
   const stats = await readFileStats(filePath)
+  const fileIcon = await getCachedFileIcon(filePath)
   const parsedPath = path.parse(filePath)
-  const image = await app.getFileIcon(filePath, {
-    size: 'large'
-  })
   return {
     filePath,
     ...parsedPath,
     ...stats,
     type: stats.isDirectory() ? 'Folder' : classifyFileMimeType(parsedPath.ext),
     // 文件类型
-    fileIcon: image.toDataURL({
-      scaleFactor: 1
-    }),
+    fileIcon,
     sizeFormat: stats.isDirectory() ? '' : formatFileSize(stats.size),
     atimeFormat: formatInputDateTime(stats.atime),
     mtimeFormat: formatInputDateTime(stats.mtime),
@@ -144,6 +154,7 @@ export async function deleteFile(filePath: string): Promise<void> {
     await fs.remove(filePath)
     fileContentCache.delete(filePath)
     fileStatsCache.delete(filePath)
+    iconCache.delete(filePath)
   } catch (err) {
     logger.error(`Error deleting file ${filePath}:`, err)
     throw err
