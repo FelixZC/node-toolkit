@@ -17,14 +17,19 @@ const TableView: React.FC<ViewProps> = ({ files, columns, className }) => {
   }
   const { onRowClick, onDoubleClick, onContextMenu, tableChange } = context
   const tableRef = useRef<HTMLElement>(null)
+
+  const getIsNeedVisible = () => {
+    return files.length > 100
+  }
   const [scroll, setScroll] = useState({ y: 648 })
 
   const handleResize = useCallback(() => {
-    if (tableRef.current?.parentElement) {
-      const parentHeight = tableRef.current.parentElement.offsetHeight
-      setScroll({ y: parentHeight - 40 })
+    if (!tableRef.current) {
+      return
     }
-  }, [])
+    const parentHeight = tableRef.current.parentElement?.offsetHeight || 688
+    setScroll({ y: parentHeight - 40 })
+  }, [tableRef.current])
 
   useEffect(() => {
     window.addEventListener('resize', handleResize)
@@ -32,7 +37,7 @@ const TableView: React.FC<ViewProps> = ({ files, columns, className }) => {
     return () => {
       window.removeEventListener('resize', handleResize)
     }
-  }, [handleResize])
+  }, [])
 
   const onRow = useCallback(
     (record: FileInfoCustom) => {
@@ -47,23 +52,39 @@ const TableView: React.FC<ViewProps> = ({ files, columns, className }) => {
     },
     [onRowClick, onDoubleClick, onContextMenu]
   )
-
-  return (
-    <Table
-      ref={tableRef as any}
-      className={className}
-      dataSource={files}
-      pagination={false}
-      size="small"
-      virtual={true}
-      scroll={scroll}
-      showHeader={true}
-      columns={columns}
-      rowKey={(record) => record.key}
-      onRow={onRow}
-      onChange={tableChange}
-    />
-  )
+  if (getIsNeedVisible()) {
+    return (
+      <Table
+        ref={tableRef as any}
+        className={className}
+        dataSource={files}
+        pagination={false}
+        size="small"
+        virtual={true}
+        scroll={scroll}
+        showHeader={true}
+        columns={columns}
+        rowKey={(record) => record.key}
+        onRow={onRow}
+        onChange={tableChange}
+      />
+    )
+  } else {
+    return (
+      <Table
+        ref={tableRef as any}
+        className={className}
+        dataSource={files}
+        pagination={false}
+        size="small"
+        showHeader={true}
+        columns={columns}
+        rowKey={(record) => record.key}
+        onRow={onRow}
+        onChange={tableChange}
+      />
+    )
+  }
 }
 
 export default React.memo(TableView, (prevProps, nextProps) => {

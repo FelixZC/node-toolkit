@@ -43,7 +43,7 @@ const Lay: React.FC = () => {
     >
       <Sider
         width={200}
-        collapsedWidth={0}
+        collapsedWidth={50}
         theme="light"
         zeroWidthTriggerStyle={{ zIndex: 10086, top: '40%' }}
         collapsible={true}

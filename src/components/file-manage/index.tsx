@@ -6,17 +6,15 @@ import FileManageContext from './context'
 import getMenus from './config/menus'
 import { Layout, Select } from 'antd'
 import { ipcRendererInvoke } from '@src/utils/desktop-utils'
-import LargeIconView from './views/large-icon'
-import MediumIconView from './views/medium-icon'
 import options from './config/options'
 import Preview from './views/preview'
 import React, { useEffect, useRef, useState } from 'react'
-import SmallIconView from './views/small-icon'
 import TableView from './views/table-view'
 import useContextMenu from '@src/components/antd-wrap/menus/use-context-menu'
 import useDirectory from '@src/store/use-directory'
 import '@src/style/less/file-manage.less'
 import RegExpInput from '../antd-wrap/search/reg-exp-input'
+import IconView from './views/icon-view'
 import type { FileInfoCustom, FileInfoWithStats, FileType } from '@src/types/file'
 import type { TableProps } from 'antd'
 
@@ -139,11 +137,29 @@ const FileManage: React.FC = () => {
   const currentViewComponent = () => {
     switch (currentView) {
       case 'small-icon':
-        return <SmallIconView className="file-manage-content__left" files={showData} />
+        return (
+          <IconView
+            key="small-icon"
+            className="file-manage-content__left icon-view__small"
+            files={showData}
+          />
+        )
       case 'medium-icon':
-        return <MediumIconView className="file-manage-content__left" files={showData} />
+        return (
+          <IconView
+            key="medium-icon"
+            className="file-manage-content__left icon-view__medium"
+            files={showData}
+          />
+        )
       case 'large-icon':
-        return <LargeIconView className="file-manage-content__left" files={showData} />
+        return (
+          <IconView
+            key="large-icon"
+            className="file-manage-content__left icon-view__large"
+            files={showData}
+          />
+        )
       case 'detail':
       default:
         return (
