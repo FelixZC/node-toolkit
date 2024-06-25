@@ -130,7 +130,7 @@ const FeatureListPage: React.FC = () => {
           display: 'flex',
           justifyContent: 'space-between',
           width: '100%',
-          height: 'calc(100vh - 160px)'
+          height: 'calc(100vh - 120px)'
         }}
       >
         {(mode == 'split' || mode == 'edit') && (
@@ -147,7 +147,8 @@ const FeatureListPage: React.FC = () => {
               enableLiveAutocompletion: true,
               enableSnippets: true,
               showLineNumbers: true,
-              tabSize: 2
+              tabSize: 2,
+              showPrintMargin: false
             }}
             style={{
               flex: 1,

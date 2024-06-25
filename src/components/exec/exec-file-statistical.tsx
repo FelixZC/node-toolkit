@@ -1,7 +1,7 @@
 import { Button, message, Tooltip } from 'antd'
 import Directory from '@src/components/file-manage/directory'
 import { ipcRendererInvoke } from '../../utils/desktop-utils'
-import MonacoEditor from 'react-monaco-editor'
+import MonacoEditor, { EditorDidMount, EditorWillUnmount } from 'react-monaco-editor'
 import React, { useEffect, useState } from 'react'
 import { SwapOutlined } from '@ant-design/icons'
 import useDirectory from '@src/store/use-directory'
@@ -35,12 +35,31 @@ const FeatureListPage: React.FC = () => {
       message.error('Failed to execute: ' + error)
     }
   }
+
   const toggleOutputFormat = () => {
     setIsShowInJson(!isShowInJson)
   }
+
   useEffect(() => {
     setOutput(isShowInJson ? resultJson : resultMd)
   }, [isShowInJson])
+
+  type ParametersType<T> = T extends (...args: infer U) => any ? U : never
+  type ChangeParams = ParametersType<EditorDidMount>
+  type IStandaloneCodeEditor = ChangeParams[0]
+
+  const handleResize = (editor: IStandaloneCodeEditor) => {
+    editor.layout()
+  }
+
+  const editorDidMount: EditorDidMount = (editor) => {
+    window.addEventListener('resize', handleResize.bind(window, editor))
+  }
+
+  const editorWillUnmount: EditorWillUnmount = (editor) => {
+    window.removeEventListener('resize', handleResize.bind(window, editor))
+  }
+
   return (
     <div
       style={{
@@ -87,10 +106,12 @@ const FeatureListPage: React.FC = () => {
       {/* 显示执行结果的Monaco Editor组件 */}
       <MemoizedMonacoEditor
         width="100%"
-        height="calc(100vh - 160px)" // 根据需要调整这个值
+        height="calc(100vh - 120px)" // 根据需要调整这个值
         language="json" // 可以是json, javascript, css, html等
         theme="vs" // 编辑器主题
         value={output}
+        editorDidMount={editorDidMount}
+        editorWillUnmount={editorWillUnmount}
         options={{
           readOnly: true,
           // 使编辑器只读
