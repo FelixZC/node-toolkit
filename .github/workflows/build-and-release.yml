@@ -20,7 +20,7 @@ jobs:
         node-version: '14' # 或者您项目所需的 Node.js 版本
 
     - name: Install dependencies
-      run: npm ci
+      run: npm i
 
     - name: Lint
       run: |
