@@ -110,6 +110,7 @@
     "lru-cache": "^10.2.2",
     "mime-types": "^2.1.35",
     "monaco-editor": "^0.44.0",
+    "natural-orderby": "^3.0.2",
     "postcss": "^8.4.38",
     "postcss-html": "^1.7.0",
     "postcss-js": "^4.0.1",
