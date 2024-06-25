@@ -17,7 +17,7 @@ const LargeIconView: React.FC<ViewProps<FileInfoCustom>> = (props) => {
   const context = useContext(FileManageContext)
   if (!context) return null
 
-  const { onRowClick, onDoubleClick, onContextMenu } = context
+  const { onRowClick, onDoubleClick, onContextMenu, currentRow } = context
   const [visibleItems, setVisibleItems] = useState<FileInfoWithIcon[]>([])
   const [containHeight, setContainHeight] = useState(0)
   const viewRef = useRef<HTMLDivElement | null>(null)
@@ -125,8 +125,11 @@ const LargeIconView: React.FC<ViewProps<FileInfoCustom>> = (props) => {
           // style={getIsNeedVisible() ? { transform: `translateY(${file.scrollTop}px)` } : {}}
           style={
             getIsNeedVisible()
-              ? { transform: `translateY(${file.startRow! * file.itemHeight!}px)` }
-              : {}
+              ? {
+                  transform: `translateY(${file.startRow! * file.itemHeight!}px)`,
+                  backgroundColor: file.key === currentRow?.key ? '#f5f5f5' : 'transparent'
+                }
+              : { backgroundColor: file.key === currentRow?.key ? '#f5f5f5' : 'transparent' }
           }
           onClick={(event) => onRowClick(event, file)}
           onDoubleClick={(event) => onDoubleClick(event, file)}

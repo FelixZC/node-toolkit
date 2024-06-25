@@ -15,7 +15,7 @@ const TableView: React.FC<ViewProps> = ({ files, getColumns, className }) => {
   if (!context) {
     throw new Error('useContext must be inside a FileManageContext.Provider')
   }
-  const { onRowClick, onDoubleClick, onContextMenu, tableChange } = context
+  const { onRowClick, onDoubleClick, onContextMenu, tableChange, currentRow } = context
   const tableRef = useRef<HTMLElement>(null)
 
   const getIsNeedVisible = () => {
@@ -46,7 +46,8 @@ const TableView: React.FC<ViewProps> = ({ files, getColumns, className }) => {
         onDoubleClick: (event: React.MouseEvent<HTMLDivElement>) => onDoubleClick(event, record),
         onContextMenu: (event: React.MouseEvent<HTMLDivElement>) => onContextMenu(event, record),
         style: {
-          cursor: 'pointer'
+          cursor: 'pointer',
+          backgroundColor: record.key === currentRow?.key ? '#f5f5f5' : 'transparent'
         }
       }
     },
