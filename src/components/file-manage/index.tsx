@@ -18,6 +18,7 @@ import IconView from './views/icon-view'
 import Loading from '@src/components/common/loading' // 引入 Loading 组件
 import type { FileInfoCustom, FileInfoWithStats, FileType } from '@src/types/file'
 import type { TableProps } from 'antd'
+import Checkbox from 'antd/es/checkbox/Checkbox'
 
 type ParametersType<T> = T extends (...args: infer U) => any ? U : never
 type TableChangeType = TableProps<FileInfoCustom>['onChange']
@@ -29,7 +30,7 @@ const { Header, Content, Footer } = Layout
 const { Option } = Select
 
 const FileManage: React.FC = () => {
-  const { directoryPath } = useDirectory()
+  const { directoryPath, isUseIgnoredFiles, setUseIgnoredFiles } = useDirectory()
   const [searchReg, setSearchReg] = useState<RegExp | null>(null)
   const [originalData, setOriginalData] = useState<FileInfoCustom[]>([])
   const [showData, setShowData] = useState<FileInfoCustom[]>([])
@@ -229,7 +230,14 @@ const FileManage: React.FC = () => {
       <Layout className="file-manage-layout">
         {isShowLoading && <Loading />}
         <div className="file-manage-path">
-          <span className="file-manage-path_result">当前路径：{directoryPath}</span>
+          <span className="file-manage-path__result">当前路径：{directoryPath}</span>
+          <Checkbox
+            className="file-manage-path__checkbox"
+            checked={isUseIgnoredFiles}
+            onChange={(e) => setUseIgnoredFiles(e.target.checked)}
+          >
+            使用忽略文件
+          </Checkbox>
         </div>
         <Header className="file-manage-header">
           <RegExpInput

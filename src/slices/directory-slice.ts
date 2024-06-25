@@ -5,7 +5,7 @@ export interface DirectoryState {
 }
 const initialState: DirectoryState = {
   directoryPath: '',
-  isUseIgnoredFiles: false
+  isUseIgnoredFiles: true
 }
 export const directorySlice = createSlice({
   name: 'directory',

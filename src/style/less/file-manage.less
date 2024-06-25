@@ -1,16 +1,23 @@
-:root {
-  --content-bg-color: #ffffff;
-  --header-footer-bg-color: #fff;
-  --header-footer-border-color: hsl(0, 0%, 91%);
-  --header-path-bg-color: #fff;
-  --header-path-border-color: hsl(0, 0%, 91%);
-}
-
 .file-manage-layout {
   position: relative;
   display: flex;
   flex-direction: column;
   height: 100vh;
+}
+
+
+.file-manage-path {
+  background-color: var(--header-footer-bg-color);
+  border-bottom: 1px solid var(--header-footer-border-color);
+  height: 20px;
+  padding: 0;
+  text-align: left;
+  display: flex;
+  justify-content: space-around;
+
+  .file-manage-path__result {
+    flex: 1;
+  }
 }
 
 .file-manage-header {
@@ -62,13 +69,6 @@
   }
 }
 
-.file-manage-content__right .file-manage-path {
-  background-color: var(--header-footer-bg-color);
-  border-bottom: 1px solid var(--header-footer-border-color);
-  height: 20px;
-  padding: 0;
-  text-align: left;
-}
 
 .file-manage-footer {
   background-color: var(--header-footer-bg-color);
