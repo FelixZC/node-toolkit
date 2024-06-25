@@ -79,7 +79,7 @@ function createdAttributesGroupTable(attrGroup: Record<string, any>) {
       attributesDescriptionTable += `## ${title}${br}`
       attributesDescriptionTable += `|字段|描述|位置|${br}`
       attributesDescriptionTable += `|-|-|-|${br}`
-      const group = sortArray(attrGroupItem.group, 'key')
+      const group = sortArray(attrGroupItem.group, { fields: ['key'] })
       for (const groupItem of group) {
         const [name, position] = groupItem.key.split('->')
         const description = groupItem.value

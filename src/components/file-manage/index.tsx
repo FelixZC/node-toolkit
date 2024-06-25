@@ -1,5 +1,5 @@
 import getTableColunm from './config/table-column'
-import { compare } from '@src/utils/common'
+import { enhancedCompare } from '@src/utils/common'
 import ContextMenu from '@src/components/antd-wrap/menus/index'
 import debounce from 'lodash/debounce'
 import FileManageContext from './context'
@@ -71,9 +71,10 @@ const FileManage: React.FC = () => {
     let sortedData = [...data]
     localSorter.forEach((curSorter, index) => {
       if (curSorter.order && typeof curSorter.field === 'string') {
-        sortedData = sortedData.sort((a, b) =>
-          compare(a, b, curSorter.order!, [curSorter.field as string])
-        )
+        sortedData = sortedData.sort((a, b) => {
+          const order = curSorter.order === 'ascend' ? 'asc' : 'desc'
+          return enhancedCompare(a, b, order, curSorter.field as string)
+        })
       } else {
       }
     })

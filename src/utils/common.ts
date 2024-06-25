@@ -1,5 +1,6 @@
 import { FileType } from '@src/types/file'
 import { message } from 'antd'
+import { compare, orderBy } from 'natural-orderby'
 /**
  * 获取数据类型
  * @param {any} obj - 任意待检测的数据
@@ -40,26 +41,33 @@ export function sortObjAttr(target: Record<string, any>) {
   return newObj
 }
 
-/**
- * 数组排序
- * @param {Array} arr - 原数组
- * @param {Function|string} customSort - 自定义排序规则，可以是比较函数或基于对象属性的字符串键名
- * @returns {Array} 排序后的新数组
- */
-export function sortArray(arr: Array<Record<string, any>>, customSort: Function | string) {
-  const dataType = getDataType(arr)
-  if (dataType !== 'Array') {
+export interface SortOptions {
+  fields: string[] // 需要排序的字段名称数组
+  orders?: 'asc' | 'desc'[] // 每个字段的排序顺序数组
+}
+
+export function sortArray(arr: Array<Record<string, any>>, options: SortOptions) {
+  if (!Array.isArray(arr)) {
     throw new Error('sortArray数据类型错误')
   }
-  return arr.sort((a, b) => {
-    if (typeof customSort === 'function') {
-      return customSort(a, b)
-    }
-    if (typeof customSort === 'string') {
-      return a[customSort].localeCompare(b[customSort])
-    }
-  })
+
+  // 检查 options 是否包含必要的字段
+  if (!options.fields || !Array.isArray(options.fields)) {
+    throw new Error('必须提供至少一个排序字段')
+  }
+
+  // 如果未提供 orders，设置默认为所有字段升序排序
+  const orders = options.orders || options.fields.map(() => 'asc')
+
+  // 确保 orders 数组的长度与 fields 数组相同
+  if (options.fields.length !== orders.length) {
+    throw new Error('每个排序字段必须有一个对应的排序顺序')
+  }
+
+  // 使用 natural-orderby 的 orderBy 函数进行自然排序
+  return orderBy(arr, options.fields, orders)
 }
+
 interface GroupCache<T> {
   [key: string]: {
     count: number
@@ -410,31 +418,22 @@ export function formatFileSize(bytes: number, decimalPlaces = 2) {
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
-type SortOrder = 'ascend' | 'descend'
-export const compare = (
+
+export const enhancedCompare = (
   a: Record<string, any>,
   b: Record<string, any>,
-  order: SortOrder,
-  fields: string[]
-) => {
-  let result = 0
-  if (!order) {
-    return 0
-  }
-  fields.forEach((field) => {
-    if (result === 0) {
-      // 仅在前面的比较结果相同的情况下比较下一个字段
-      const aValue = a[field]
-      const bValue = b[field]
-      if (aValue < bValue) {
-        result = -1
-      } else if (aValue > bValue) {
-        result = 1
-      }
-    }
-  })
-  return order === 'ascend' ? result : -result
+  order: 'asc' | 'desc' = 'asc',
+  field: string
+): number => {
+  // 定义一个比较函数，用于自然排序
+  const naturalCompare = compare({ order: order })
+
+  let aValue = a[field]
+  let bValue = b[field]
+
+  return naturalCompare(String(aValue), String(bValue))
 }
+
 export async function copyTextToClipboard(text: string): Promise<void> {
   if (navigator.clipboard && window.isSecureContext) {
     try {
