@@ -98,10 +98,13 @@ export default function mainWindowHandleEvents() {
       )
     }
   )
-  ipcMain.handle('get-dir-and-file-info', async (event, dir: string) => {
-    const { getDirAndFileInfo } = await import('../file-manage/index')
-    return await getDirAndFileInfo(dir)
-  })
+  ipcMain.handle(
+    'get-dir-and-file-info',
+    async (event, dir: string, isUseIgnoredFiles: boolean) => {
+      const { getDirAndFileInfo } = await import('../file-manage/index')
+      return await getDirAndFileInfo(dir, isUseIgnoredFiles)
+    }
+  )
   ipcMain.handle('read-file', async (event, filePath: string) => {
     const content = await readFile(filePath)
     return content

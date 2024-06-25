@@ -188,7 +188,8 @@ const FileManage: React.FC = () => {
     try {
       const result: FileInfoWithStats[] = await ipcRendererInvoke(
         'get-dir-and-file-info',
-        directoryPath
+        directoryPath,
+        isUseIgnoredFiles
       )
       const customResult: FileInfoCustom[] = result.map((item) => {
         return {
