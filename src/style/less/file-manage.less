@@ -4,7 +4,6 @@
   --header-footer-border-color: hsl(0, 0%, 91%);
   --header-path-bg-color: #fff;
   --header-path-border-color: hsl(0, 0%, 91%);
-  --menus-bg-color: #f9f9f9;
 }
 
 .file-manage-layout {
@@ -79,17 +78,13 @@
   text-align: left;
 }
 
-.context-menu {
-  background-color: var(--menus-bg-color);
-  position: absolute;
-  z-index: 999;
-}
+
 
 .icon-view__large {
   display: grid;
   grid-gap: 10px;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  grid-template-rows: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-rows: repeat(auto-fill, minmax(180px, 1fr));
   padding: 10px;
   overflow-y: auto;
 
@@ -123,11 +118,11 @@
 
   .file-name {
     flex: 1;
-    height: 100%;
     width: 100%;
     color: #333;
     font-size: 14px;
     white-space: wrap;
+    word-break: normal;
   }
 }
 
@@ -135,7 +130,7 @@
   display: grid;
   grid-gap: 8px;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  grid-template-rows: repeat(auto-fill, minmax(120px, 1fr));
+  grid-template-rows: repeat(auto-fill, minmax(150px, 1fr));
   padding: 8px;
   overflow-y: auto;
 
@@ -151,7 +146,6 @@
     justify-content: space-around;
     box-sizing: border-box;
     text-align: center;
-    overflow: visible;
 
     &:hover {
       background-color: #f0f0f0;
@@ -169,11 +163,11 @@
 
   .file-name {
     flex: 1;
-    height: 100%;
     width: 100%;
     color: #333;
     font-size: 13px;
     white-space: wrap;
+    word-break: normal;
   }
 }
 
@@ -181,7 +175,7 @@
   display: grid;
   grid-gap: 6px;
   grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  grid-template-rows: repeat(auto-fill, minmax(90px, 1fr));
+  grid-template-rows: repeat(auto-fill, minmax(120px, 1fr));
   padding: 6px;
   overflow-y: auto;
 
@@ -197,7 +191,6 @@
     text-align: center;
     justify-content: space-between;
     box-sizing: border-box;
-    overflow: visible;
 
     &:hover {
       background-color: #f5f5f5;
@@ -215,11 +208,11 @@
 
   .file-name {
     flex: 1;
-    height: 100%;
     width: 100%;
     color: #333;
     font-size: 12px;
     white-space: wrap;
+    word-break: normal;
   }
 }
 

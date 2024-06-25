@@ -2,6 +2,7 @@
 import React from 'react'
 import type { FileInfoCustom } from '@src/types/file'
 import type { TableProps } from 'antd'
+import type { SortConfigType } from './index'
 interface FileManageContextType {
   currentRow: FileInfoCustom | null
   showData: FileInfoCustom[]
@@ -13,6 +14,10 @@ interface FileManageContextType {
   setIsUsePreview: React.Dispatch<React.SetStateAction<boolean>>
   hideMenu: () => void
   tableChange: TableProps<FileInfoCustom>['onChange']
+  sortConfig: SortConfigType
+  setSortConfig: React.Dispatch<React.SetStateAction<SortConfigType>>
+  lockOrder: 'ascend' | 'descend'
+  setLockOrder: React.Dispatch<React.SetStateAction<'ascend' | 'descend'>>
 }
 const FileManageContext = React.createContext<FileManageContextType | undefined>(undefined)
 export default FileManageContext

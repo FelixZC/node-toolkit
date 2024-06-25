@@ -1,5 +1,6 @@
 import { Menu, MenuProps } from 'antd'
 import React, { useEffect, useRef, useCallback } from 'react'
+import '@src/style/less/menu.less'
 
 interface ContextMenuProps {
   menuPosition: {
@@ -77,27 +78,59 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     )
   )
 }
-
+/**
+ * 结合menu.less改变原始菜单高
+ * @param style
+ * @returns
+ */
+const handleStyle = (style: React.CSSProperties | undefined): React.CSSProperties => {
+  const localStyle = style || {}
+  return {
+    ...localStyle,
+    height: 25,
+    lineHeight: '25px'
+  }
+}
 const renderMenuItem = (items: MenuProps['items']) => {
   if (!items) return <div>Menu Without Items!!</div>
   return items.map((item) => {
     if (item?.type === 'divider') {
-      return <Menu.Divider key={item.key || 'divider'} />
+      return (
+        <Menu.Divider key={item.key || 'divider'} className={item.className} style={item.style} />
+      )
     } else if (item?.type === 'submenu') {
       return (
-        <Menu.SubMenu key={item.key} title={item.label} onTitleClick={item.onTitleClick}>
+        <Menu.SubMenu
+          key={item.key}
+          title={item.label}
+          icon={item.icon}
+          onTitleClick={item.onTitleClick}
+          className={item.className}
+          style={handleStyle(item.style)}
+        >
           {renderMenuItem(item.children)}
         </Menu.SubMenu>
       )
     } else if (item?.type === 'item') {
       return (
-        <Menu.Item key={item.key} onClick={item.onClick}>
+        <Menu.Item
+          key={item.key}
+          onClick={item.onClick}
+          icon={item.icon}
+          className={item.className}
+          style={handleStyle(item.style)}
+        >
           {item.label}
         </Menu.Item>
       )
     } else if (item?.type === 'group') {
       return (
-        <Menu.ItemGroup key={item.key} title={item.label}>
+        <Menu.ItemGroup
+          key={item.key}
+          title={item.label}
+          className={item.className}
+          style={handleStyle(item.style)}
+        >
           {renderMenuItem(item.children)}
         </Menu.ItemGroup>
       )

@@ -1,4 +1,4 @@
-import columns from './config/table-column'
+import getTableColunm from './config/table-column'
 import { compare } from '@src/utils/common'
 import ContextMenu from '@src/components/antd-wrap/menus/index'
 import debounce from 'lodash/debounce'
@@ -22,7 +22,7 @@ import type { TableProps } from 'antd'
 type ParametersType<T> = T extends (...args: infer U) => any ? U : never
 type TableChangeType = TableProps<FileInfoCustom>['onChange']
 type ChangeParams = ParametersType<TableChangeType>
-type SortConfigType = ChangeParams[2]
+export type SortConfigType = ChangeParams[2]
 type FileTypeExtend = FileType | 'All'
 
 const { Header, Content, Footer } = Layout
@@ -43,10 +43,16 @@ const FileManage: React.FC = () => {
   // 添加过滤类型和排序配置的状态
   const [filterType, setFilterType] = useState<FileTypeExtend>('All')
   const [sortConfig, setSortConfig] = useState<SortConfigType>([])
+  const [lockOrder, setLockOrder] = React.useState<'ascend' | 'descend'>('ascend')
 
   // 处理表格排序变化
   const handleTableSortChange = (sorter: SortConfigType) => {
     const localSorter = Array.isArray(sorter) ? sorter : [sorter]
+    if (localSorter.every((item) => item.order === 'ascend')) {
+      setLockOrder('ascend')
+    } else if (localSorter.every((item) => item.order === 'descend')) {
+      setLockOrder('descend')
+    }
     setSortConfig(localSorter)
   }
 
@@ -164,7 +170,11 @@ const FileManage: React.FC = () => {
       case 'detail':
       default:
         return (
-          <TableView className="file-manage-content__left" files={showData} columns={columns} />
+          <TableView
+            className="file-manage-content__left"
+            files={showData}
+            getColumns={getTableColunm}
+          />
         )
     }
   }
@@ -209,7 +219,11 @@ const FileManage: React.FC = () => {
         isUsePreview,
         setCurrentView,
         setIsUsePreview,
-        hideMenu
+        hideMenu,
+        sortConfig,
+        setSortConfig,
+        lockOrder,
+        setLockOrder
       }}
     >
       <Layout className="file-manage-layout">

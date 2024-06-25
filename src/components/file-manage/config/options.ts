@@ -2,7 +2,7 @@
 const fileTypeOptions = [
   {
     value: 'All',
-    label: '所有文件'
+    label: '所有'
   },
   {
     value: 'Folder',

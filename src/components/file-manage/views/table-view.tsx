@@ -5,12 +5,12 @@ import type { TableColumnsType } from 'antd'
 import type { FileInfoCustom } from '@src/types/file'
 
 interface ViewProps {
+  getColumns: () => TableColumnsType<FileInfoCustom>
   files: FileInfoCustom[]
-  columns: TableColumnsType<FileInfoCustom>
   className?: string
 }
 
-const TableView: React.FC<ViewProps> = ({ files, columns, className }) => {
+const TableView: React.FC<ViewProps> = ({ files, getColumns, className }) => {
   const context = useContext(FileManageContext)
   if (!context) {
     throw new Error('useContext must be inside a FileManageContext.Provider')
@@ -52,6 +52,7 @@ const TableView: React.FC<ViewProps> = ({ files, columns, className }) => {
     },
     [onRowClick, onDoubleClick, onContextMenu]
   )
+  const columnsList = getColumns()
   if (getIsNeedVisible()) {
     return (
       <Table
@@ -63,10 +64,11 @@ const TableView: React.FC<ViewProps> = ({ files, columns, className }) => {
         virtual={true}
         scroll={scroll}
         showHeader={true}
-        columns={columns}
+        columns={columnsList}
         rowKey={(record) => record.key}
         onRow={onRow}
         onChange={tableChange}
+        showSorterTooltip={false}
       />
     )
   } else {
@@ -78,10 +80,11 @@ const TableView: React.FC<ViewProps> = ({ files, columns, className }) => {
         pagination={false}
         size="small"
         showHeader={true}
-        columns={columns}
+        columns={columnsList}
         rowKey={(record) => record.key}
         onRow={onRow}
         onChange={tableChange}
+        showSorterTooltip={false}
       />
     )
   }
