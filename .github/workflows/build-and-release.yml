@@ -3,7 +3,7 @@ name: Build and Release Node Toolkit
 on:
   push:
     branches:
-      - publish
+      - publish-test
   release:
     types:
       - created
