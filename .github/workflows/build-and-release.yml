@@ -41,6 +41,17 @@ jobs:
     # - name: Compile TypeScript
     #   run: npm run compile
 
+    - name: Check Docker status
+      run: docker --version
+
+    - name: Start Docker service
+      run: |
+        echo "Ensuring Docker service is running..."
+        if ! docker info &>/dev/null; then
+          echo "Docker service not running, starting it..."
+          sudo systemctl start docker
+        fi
+
     # Build for Windows using Docker
     - name: Build Electron App for Windows
       run: >
