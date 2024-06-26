@@ -4,36 +4,62 @@ on:
   push:
     branches:
       - publish
-  # 您还可以添加其他触发条件，例如在创建标签时触发
+  release:
+    types:
+      - created
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest  # 使用 macOS 运行器来构建 macOS 应用
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Setup Node.js
+    - name: Setup Node.js for macOS build
+      if: startsWith(github.ref, 'refs/tags/')
       uses: actions/setup-node@v2
       with:
-        node-version: '18' # 或者您项目所需的 Node.js 版本
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Setup Node.js for Windows build
+      if: startsWith(github.ref, 'refs/heads/publish')
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18'
+        cache: 'npm'
 
     - name: Install dependencies
-      run: npm i
+      run: npm ci
 
     - name: Lint
       run: |
         npm run lint:eslint
         npm run lint:prettier
 
-    - name: Compile TypeScript
-      run: npm run compile
+    # - name: Compile TypeScript
+    #   run: npm run compile
 
+    # Build for Windows using Docker
     - name: Build Electron App for Windows
-      run: npm run build-win64
+      run: >
+        docker run --rm -v ${{ github.workspace }}:/project
+        -v ~/.cache/electron:/root/.cache/electron
+        -v ~/.cache/electron-builder:/root/.cache/electron-builder
+        electronuserland/builder:wine /bin/bash -c "npm run build-win64"
 
+    # Setup macOS build environment
+    - name: Setup macOS build environment
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        sudo xcode-select -s /Applications/Xcode.app
+        xcodebuild -version
+        xcodebuild -showsdks
+
+    # Build for macOS
     - name: Build Electron App for macOS
+      if: startsWith(github.ref, 'refs/tags/')
       run: npm run build-mac64
 
     - name: Release
@@ -43,5 +69,6 @@ jobs:
         files: |
           dist/win/*.exe
           dist/mac/*.dmg
+        draft: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
