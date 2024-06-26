@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     runs-on: macos-latest  # 使用 macOS 运行器来构建 macOS 应用
-
+    #test
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
