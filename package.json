@@ -15,9 +15,7 @@
     "dev-electron": "npm run compile && cross-env NODE_ENV=development electron ./dist/main/src/desktop/index.js",
     "prod-electron": "npm run compile && cross-env NODE_ENV=production electron ./dist/main/src/desktop/index.js",
     "build-electron-win64": "npm run compile && electron-builder -w --x64",
-    "build-electron-mac64": "npm run compile && electron-builder -m --x64",
-    "build-win64": "npm run webpack && npm run build-electron-win64",
-    "build-mac64": "npm run webpack && npm run build-electron-mac64"
+    "build-win64": "npm run webpack && npm run build-electron-win64"
   },
   "author": "pzc",
   "license": "ISC",
