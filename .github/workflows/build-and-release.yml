@@ -17,10 +17,10 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '14' # 或者您项目所需的 Node.js 版本
+        node-version: '18' # 或者您项目所需的 Node.js 版本
 
     - name: Install dependencies
-      run: npm ci
+      run: npm i
 
     - name: Lint
       run: |

@@ -8,7 +8,6 @@
     "lint:lint-staged": "lint-staged",
     "lint:eslint": "eslint --fix \"src/**/*.{js,jsx,ts,tsx}\"",
     "lint:prettier": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
-    "prepare": "husky install",
     "compile": "tsc",
     "dev": "cross-env NODE_ENV=development webpack server --config ./config/webpack.config.js",
     "webpack": "cross-env NODE_ENV=production webpack --config ./config/webpack.config.js",
@@ -152,7 +151,13 @@
     ]
   },
   "engines": {
-    "node": ">= 10.0"
+    "node": ">= 18.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
