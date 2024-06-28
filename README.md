@@ -70,6 +70,16 @@ npm i
    如果需要为macOS 64位系统构建Electron应用，运行：
    `npm run build-electron-mac64`
 
+   macOS 应用需要进行代码签名才能被信任打开。这需要 Apple 开发者账号，通过 Xcode 或 electron-builder 进行签名。签名过程包括生成 CSR（Certificate Signing Request），下载并安装 Developer ID 证书，导出为 .p12 文件，并配置环境变量。
+   自 macOS 10.15 起，应用程序除了签名外还需要进行公证。这可以通过 electron-notarize 插件来实现，确保应用程序符合 Apple 的安全标准。
+   从 macOS 10.15 Catalina 开始，Apple 引入了更严格的权限和隐私保护措施，应用程序需要在 Info.plist 中声明对特定功能的访问请求，并且在运行时提供用户可接受的描述。
+   在 Info.plist 文件中添加权限请求时，需要确保添加正确的键和描述，以便系统能够正确地提示用户授权。例如：
+   ```xml
+   <key>NSAppleEventsUsageDescription</key>
+   <string>This app requires access to send Apple events to other apps.</string>
+   ```
+   苦苹果发布流程久矣，一言难尽。
+
 5. **找到安装文件**：
    构建完成后，你需要在`dist`目录下的`win`子目录中找到生成的`.exe`安装文件。根据你提供的指令，文件名可能是`node-toolkit-2.1.0-win-x64.exe`。
    在macOS上，你需要在`dist`目录下的`mac`子目录中找到生成的`.dmg`安装文件。
@@ -113,7 +123,7 @@ npm i
     │   │   ╰─ restore-icon.svg
     │   ╰─ images // 图片资源
     │       ╰─ electron-img.png
-    ├─ components // 组件目录
+    ├─ components // **组件目录**
     │   ├─ antd-wrap // 封装antd组件
     │   │   ├─ loading // 加载组件
     │   │   │   ╰─ index.jsx

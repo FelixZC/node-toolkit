@@ -14,7 +14,11 @@
     "dev-electron": "npm run compile && cross-env NODE_ENV=development electron ./dist/main/src/desktop/index.js",
     "prod-electron": "npm run compile && cross-env NODE_ENV=production electron ./dist/main/src/desktop/index.js",
     "build-electron-win64": "npm run compile && electron-builder -w --x64",
-    "build-win64": "npm run webpack && npm run build-electron-win64"
+    "build-win64": "npm run webpack && npm run build-electron-win64",
+    "build-electron-win32": "npm run compile && electron-builder -w --ia32",
+    "build-win32": "npm run webpack && npm run build-electron-win32",
+    "build-electron-mac": "npm run compile && electron-builder -w --mac",
+    "build-mac": "npm run webpack && npm run build-electron-mac"
   },
   "author": "pzc",
   "license": "ISC",
@@ -200,6 +204,41 @@
       "icon": "./public/electron-logo1.ico",
       "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
       "target": "nsis"
+    },
+    "mac": {
+      "icon": "./public/electron-logo1.ico",
+      "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+      "target": "dmg",
+      "category": "public.app-category.developer-tools",
+      "hardenedRuntime": true,
+      "entitlements": "./public/entitlements.mac.plist",
+      "entitlementsInherit": "./public/entitlements.mac.plist",
+      "gatekeeperAssess": false,
+      "sign": {
+        "applicationIdentity": {
+          "path": "path/to/your/Developer ID Application certificate.p12",
+          "password": "certificatePassword"
+        },
+        "dmg": {
+          "path": "path/to/your/Developer ID Installer certificate.p12",
+          "password": "certificatePassword"
+        }
+      },
+      "dmg": {
+        "contents": [
+          {
+            "x": 410,
+            "y": 150,
+            "type": "link",
+            "path": "/Applications"
+          },
+          {
+            "x": 130,
+            "y": 150,
+            "type": "file"
+          }
+        ]
+      }
     },
     "electronVersion": "26.6.10"
   }
