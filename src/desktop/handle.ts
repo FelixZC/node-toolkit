@@ -13,52 +13,50 @@ export default function mainWindowHandleEvents() {
   ipcMain.handle(
     'exec-babel',
     async (event, dir: string, babelPluginPathList: string[], isUseIgnoredFiles: boolean) => {
-      const { executeBabelPlugins } = await import('../exec/exec-babel-plugin')
-      await executeBabelPlugins(dir, babelPluginPathList, isUseIgnoredFiles)
+      const { execBabelPlugin } = await import('../exec/exec-babel-plugin')
+      await execBabelPlugin(dir, babelPluginPathList, isUseIgnoredFiles)
     }
   )
   ipcMain.handle(
     'exec-jscodemod',
     async (event, dir: string, jscodemodeList: string[], isUseIgnoredFiles: boolean) => {
-      const { executeJSCodemods } = await import('../exec/exec-jscodemod')
-      await executeJSCodemods(dir, jscodemodeList, isUseIgnoredFiles)
+      const { execJSCodemods } = await import('../exec/exec-jscodemod')
+      await execJSCodemods(dir, jscodemodeList, isUseIgnoredFiles)
     }
   )
   ipcMain.handle(
     'exec-posthtml',
     async (event, dir: string, posthtmlPluginPathList: string[], isUseIgnoredFiles: boolean) => {
-      const { executePosthtmlPlugins } = await import('../exec/exec-posthtml-plugin')
-      await executePosthtmlPlugins(dir, posthtmlPluginPathList, isUseIgnoredFiles)
+      const { execPosthtmlPlugins } = await import('../exec/exec-posthtml-plugin')
+      await execPosthtmlPlugins(dir, posthtmlPluginPathList, isUseIgnoredFiles)
     }
   )
   ipcMain.handle(
     'exec-postcss',
     async (event, dir: string, postcssPluginPathList: string[], isUseIgnoredFiles: boolean) => {
-      const { executePostcssPlugins } = await import('../exec/exec-postcss-plugin')
-      await executePostcssPlugins(dir, postcssPluginPathList, isUseIgnoredFiles)
+      const { execPostcssPlugins } = await import('../exec/exec-postcss-plugin')
+      await execPostcssPlugins(dir, postcssPluginPathList, isUseIgnoredFiles)
     }
   )
   ipcMain.handle(
     'exec-file-statistical',
     async (event, dir: string, isUseIgnoredFiles: boolean) => {
-      const { getProjectTree } = await import('../exec/exec-file-statistical')
-      return await getProjectTree(dir, isUseIgnoredFiles)
+      const { createFileStatisticalExec } = await import('../exec/exec-file-statistical')
+      return await createFileStatisticalExec(dir, 'tree', isUseIgnoredFiles)
     }
   )
   ipcMain.handle(
     'exec-get-attrs-and-annotation',
     async (event, dir: string, isUseIgnoredFiles: boolean) => {
-      const { getAttributesDescriptionTable } = await import(
-        '../exec/exec-get-attrs-and-annotation'
-      )
-      return await getAttributesDescriptionTable(dir, isUseIgnoredFiles)
+      const { getAttrsAndAnnotation } = await import('../exec/exec-get-attrs-and-annotation')
+      return await getAttrsAndAnnotation(dir, isUseIgnoredFiles)
     }
   )
   ipcMain.handle(
     'exec-modify-file-names-batch-priview',
     async (event, dir: string, modifyFilenameOptions, isUseIgnoredFiles: boolean) => {
-      const { useModifyFilenameExecPreset } = await import('../exec/exec-modify-file-names-batch')
-      return await useModifyFilenameExecPreset(
+      const { createModifyFilenameExec } = await import('../exec/exec-modify-file-names-batch')
+      return await createModifyFilenameExec(
         dir,
         'preview',
         modifyFilenameOptions,
@@ -69,13 +67,8 @@ export default function mainWindowHandleEvents() {
   ipcMain.handle(
     'exec-modify-file-names-batch',
     async (event, dir: string, modifyFilenameOptions, isUseIgnoredFiles: boolean) => {
-      const { useModifyFilenameExecPreset } = await import('../exec/exec-modify-file-names-batch')
-      return await useModifyFilenameExecPreset(
-        dir,
-        'exec',
-        modifyFilenameOptions,
-        isUseIgnoredFiles
-      )
+      const { createModifyFilenameExec } = await import('../exec/exec-modify-file-names-batch')
+      return await createModifyFilenameExec(dir, 'exec', modifyFilenameOptions, isUseIgnoredFiles)
     }
   )
   ipcMain.handle(
@@ -88,14 +81,8 @@ export default function mainWindowHandleEvents() {
       isAddSourcePath: boolean,
       isUseIgnoredFiles: boolean
     ) => {
-      const { batchRegQueryAndReturnResult } = await import('../exec/exec-reg-query-batch')
-      return await batchRegQueryAndReturnResult(
-        dir,
-        queryReg,
-        ignoreReg,
-        isAddSourcePath,
-        isUseIgnoredFiles
-      )
+      const { execRegQueryBatch } = await import('../exec/exec-reg-query-batch')
+      return await execRegQueryBatch(dir, isUseIgnoredFiles, queryReg, isAddSourcePath, ignoreReg)
     }
   )
   ipcMain.handle(

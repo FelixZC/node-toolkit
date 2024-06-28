@@ -189,31 +189,11 @@ export function renameFile(
 /******************************************************************************************************************** */
 
 /******************************************************************************************************************** */
-
-export interface FsInstance {
+class fsUtils {
   rootPath: string
-  filePathList: string[]
-  dirPathList: string[]
   eol: string
-  getFileInfoList(): FileInfo[]
-  getDirectoryList(): FileInfo[]
-  getFileInfoListWithStats(): Promise<FileInfo[]>
-  getDirectoryListWithStats(): Promise<FileInfo[]>
-  addFile(filePath: string, content: string): Promise<void>
-  deleteFile(filePath: string): Promise<void>
-  renameFile(
-    oldFilePath: string,
-    newFilePath: string
-  ): {
-    isChange: boolean
-    uniqueNewFilePath: string
-  }
-}
-class fsUtils implements FsInstance {
-  rootPath: string
   filePathList: string[] = []
   dirPathList: string[] = []
-  eol: string
   constructor(
     public inputRootPath: string,
     isUseIgnore?: boolean

@@ -3,6 +3,7 @@ import type { ExecFileInfo } from '@src/types/common'
 import type { Options, Plugin as PosthtmlPlugin } from 'posthtml'
 import type { Options as parserOptions } from 'posthtml-parser'
 import type { Options as renderOptions } from 'posthtml-render'
+
 interface MergeOptions extends Options, parserOptions, renderOptions {}
 
 /**

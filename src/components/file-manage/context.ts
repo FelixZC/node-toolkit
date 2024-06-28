@@ -6,17 +6,17 @@ import type { SortConfigType } from './index'
 interface FileManageContextType {
   currentRow: FileInfoCustom | null
   showData: FileInfoCustom[]
+  isUsePreview: boolean
+  sortConfig: SortConfigType
+  lockOrder: 'ascend' | 'descend'
+  hideMenu: () => void
   onRowClick: (e: React.MouseEvent<HTMLDivElement>, record: FileInfoCustom) => void
   onDoubleClick: (e: React.MouseEvent<HTMLDivElement>, record: FileInfoCustom) => void
   onContextMenu: (e: React.MouseEvent<HTMLDivElement>, record?: FileInfoCustom) => void
-  isUsePreview: boolean
   setCurrentView: React.Dispatch<React.SetStateAction<string>>
   setIsUsePreview: React.Dispatch<React.SetStateAction<boolean>>
-  hideMenu: () => void
   tableChange: TableProps<FileInfoCustom>['onChange']
-  sortConfig: SortConfigType
   setSortConfig: React.Dispatch<React.SetStateAction<SortConfigType>>
-  lockOrder: 'ascend' | 'descend'
   setLockOrder: React.Dispatch<React.SetStateAction<'ascend' | 'descend'>>
 }
 const FileManageContext = React.createContext<FileManageContextType | undefined>(undefined)

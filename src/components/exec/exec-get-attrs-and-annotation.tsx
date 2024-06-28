@@ -37,8 +37,8 @@ const FeatureListPage: React.FC = () => {
       setOutput(result) // 设置执行结果到状态
       message.success('Executed successfully.')
     } catch (error) {
-      setOutput('Failed to execute: ' + error) // 设置错误信息到状态
-      message.error('Failed to execute: ' + error)
+      setOutput('Failed to exec: ' + error) // 设置错误信息到状态
+      message.error('Failed to exec: ' + error)
     }
   }
 

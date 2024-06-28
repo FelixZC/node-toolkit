@@ -84,7 +84,7 @@ const FeatureListPage: React.FC = () => {
     }
     const selectedFeatures = features.filter((f) => f.isSelected)
     if (selectedFeatures.length === 0) {
-      message.warning('Please select at least one feature to execute.')
+      message.warning('Please select at least one feature to exec.')
       return
     }
     const babelPathList = selectedFeatures.map((f) => f.path)
@@ -92,7 +92,7 @@ const FeatureListPage: React.FC = () => {
       await ipcRendererInvoke('exec-babel', directoryPath, babelPathList, isUseIgnoredFiles)
       message.success(`Executing: ${selectedFeatures.map((f) => f.name).join(', ')}`)
     } catch (error) {
-      message.error('Failed to execute: ' + error)
+      message.error('Failed to exec: ' + error)
     }
   }
   return (
