@@ -2,7 +2,7 @@ import { Button, Col, Input, message, Modal, Row, Tooltip } from "antd";
 import { CalendarOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { getIgnorePatterns } from "@src/utils/common";
 import { ipcRendererInvoke } from "../../utils/desktop-utils";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import "@src/style/less/markdown-styles.less";
 import "@src/style/less/icon.less";
 import Directory from "@src/components/file-manage/directory";
@@ -12,11 +12,9 @@ import type {
   ModifyResultReturnType,
   PriviewResultReturnType,
 } from "@src/exec/exec-modify-file-names-batch";
-import MonacoEditor, {
-  EditorDidMount,
-  EditorWillUnmount,
-} from "react-monaco-editor";
-const MemoizedMonacoEditor = React.memo(MonacoEditor);
+
+import MonacoEditorWrapper from "@src/components/editor/monaco-editor-wrapper";
+
 const FeatureListPage: React.FC = () => {
   const [output, setOutput] = useState(""); // 存储执行结果
   const [replaceFilename, setReplaceFilename] = useState(""); //用户想要替换的内容
@@ -157,21 +155,11 @@ const FeatureListPage: React.FC = () => {
   const handleAddDateTime = () => {
     setAddDateTime(!addDateTime);
   };
-  type ParametersType<T> = T extends (...args: infer U) => any ? U : never;
-  type ChangeParams = ParametersType<EditorDidMount>;
-  type IStandaloneCodeEditor = ChangeParams[0];
-  const handleResize = (editor: IStandaloneCodeEditor) => {
-    editor.layout();
-  };
-  const editorDidMount: EditorDidMount = (editor) => {
-    window.addEventListener("resize", handleResize.bind(window, editor));
-  };
-  const editorWillUnmount: EditorWillUnmount = (editor) => {
-    window.removeEventListener("resize", handleResize.bind(window, editor));
-  };
   return (
     <div
       style={{
+        height: "100%",
+        width: "100%",
         padding: "20px",
         display: "flex",
         flexDirection: "column",
@@ -289,29 +277,9 @@ const FeatureListPage: React.FC = () => {
           </Button>
         </Col>
       </Row>
-      <Row gutter={16}>
-        <Col span={24}>
-          <div
-            style={{
-              width: "100%",
-              height: "calc(100vh - 320px)",
-              overflow: "auto",
-              whiteSpace: "pre-wrap",
-            }}
-          >
-            <MemoizedMonacoEditor
-              width="100%"
-              height="100%"
-              value={output}
-              editorDidMount={editorDidMount}
-              editorWillUnmount={editorWillUnmount}
-              options={{
-                readOnly: true,
-              }}
-            />
-          </div>
-        </Col>
-      </Row>
+      <div style={{ flex: 1, width: "100%" }}>
+        <MonacoEditorWrapper value={output} />
+      </div>
     </div>
   );
 };

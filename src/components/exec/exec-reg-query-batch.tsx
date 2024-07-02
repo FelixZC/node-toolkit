@@ -6,11 +6,8 @@ import React, { useState } from "react";
 import useDirectory from "@src/store/use-directory";
 import "@src/style/less/markdown-styles.less";
 import RegExpInput from "../antd-wrap/search/reg-exp-input";
-import MonacoEditor, {
-  EditorDidMount,
-  EditorWillUnmount,
-} from "react-monaco-editor";
-const MemoizedMonacoEditor = React.memo(MonacoEditor);
+import MonacoEditorWrapper from "@src/components/editor/monaco-editor-wrapper";
+
 const FeatureListPage: React.FC = () => {
   const [output, setOutput] = useState(""); // 存储执行结果
   const [isAddSourcePath, setIsAddSourcePath] = useState(false); // 是否添加源路径
@@ -43,24 +40,11 @@ const FeatureListPage: React.FC = () => {
       message.error("Failed to exec: " + error);
     }
   };
-
-  type ParametersType<T> = T extends (...args: infer U) => any ? U : never;
-  type ChangeParams = ParametersType<EditorDidMount>;
-  type IStandaloneCodeEditor = ChangeParams[0];
-
-  const handleResize = (editor: IStandaloneCodeEditor) => {
-    editor.layout();
-  };
-  const editorDidMount: EditorDidMount = (editor) => {
-    window.addEventListener("resize", handleResize.bind(window, editor));
-  };
-  const editorWillUnmount: EditorWillUnmount = (editor) => {
-    window.removeEventListener("resize", handleResize.bind(window, editor));
-  };
-
   return (
     <div
       style={{
+        height: "100%",
+        width: "100%",
         padding: "20px",
         display: "flex",
         flexDirection: "column",
@@ -120,29 +104,9 @@ const FeatureListPage: React.FC = () => {
           </Button>
         </Col>
       </Row>
-      <Row gutter={16}>
-        <Col span={24}>
-          <div
-            style={{
-              width: "100%",
-              height: "calc(100vh - 200px)",
-              overflow: "auto",
-              whiteSpace: "pre-wrap",
-            }}
-          >
-            <MemoizedMonacoEditor
-              width="100%"
-              height="100%"
-              value={output}
-              editorDidMount={editorDidMount}
-              editorWillUnmount={editorWillUnmount}
-              options={{
-                readOnly: true,
-              }}
-            />
-          </div>
-        </Col>
-      </Row>
+      <div style={{ flex: 1, width: "100%" }}>
+        <MonacoEditorWrapper value={output} />
+      </div>
     </div>
   );
 };

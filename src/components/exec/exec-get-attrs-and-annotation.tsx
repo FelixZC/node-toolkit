@@ -66,6 +66,8 @@ const FeatureListPage: React.FC = () => {
   return (
     <div
       style={{
+        height: "100%",
+        width: "100%",
         padding: "20px",
         display: "flex",
         flexDirection: "column",
@@ -134,7 +136,7 @@ const FeatureListPage: React.FC = () => {
           display: "flex",
           justifyContent: "space-between",
           width: "100%",
-          height: "calc(100vh - 120px)",
+          flex: 1,
         }}
       >
         {(mode == "split" || mode == "edit") && (
@@ -170,7 +172,6 @@ const FeatureListPage: React.FC = () => {
               flex: 1,
               height: "100%",
               width: "100%",
-              overflow: "auto",
             }}
           >
             <MemoizedReactMarkdown

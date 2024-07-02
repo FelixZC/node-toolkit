@@ -3,6 +3,7 @@ import React from "react";
 import rootRouter from "@src/routers";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import type { RouteObject } from "@src/routers";
+import useLayout from "@src/store/use-layout";
 const { Content, Sider } = Layout;
 function filterMenuItems(routes: RouteObject[]) {
   return routes
@@ -26,6 +27,8 @@ const rootRouterFlattenArray = rootRouter.reduce((acc: RouteObject[], cur) => {
   }
   return acc;
 }, []);
+const width = 250;
+const collapsedWidth = 50;
 const Lay: React.FC = () => {
   const navigate = useNavigate(); // 初始化 useNavigate 钩子
   const onMenuItemClick = (item: { key: string }) => {
@@ -37,6 +40,13 @@ const Lay: React.FC = () => {
       navigate(targetRoute.path);
     }
   };
+  const { setSliderWith } = useLayout();
+  const onCollapse = (
+    collapsed: boolean,
+    type: "clickTrigger" | "responsive",
+  ) => {
+    setSliderWith(collapsed ? width : collapsedWidth);
+  };
   return (
     <Layout
       style={{
@@ -44,11 +54,12 @@ const Lay: React.FC = () => {
       }}
     >
       <Sider
-        width={200}
-        collapsedWidth={50}
+        width={width}
+        collapsedWidth={collapsedWidth}
         theme="light"
         zeroWidthTriggerStyle={{ zIndex: 10086, top: "40%" }}
         collapsible={true}
+        onCollapse={onCollapse}
       >
         <Menu
           mode="inline"
