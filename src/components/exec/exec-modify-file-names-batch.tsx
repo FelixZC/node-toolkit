@@ -5,7 +5,6 @@ import { ipcRendererInvoke } from "../../utils/desktop-utils";
 import React, { useState } from "react";
 import "@src/style/less/markdown-styles.less";
 import "@src/style/less/icon.less";
-import "@src/style/less/pre.less";
 import Directory from "@src/components/file-manage/directory";
 import useDirectory from "@src/store/use-directory";
 import RegExpInput from "../antd-wrap/search/reg-exp-input";
@@ -13,6 +12,11 @@ import type {
   ModifyResultReturnType,
   PriviewResultReturnType,
 } from "@src/exec/exec-modify-file-names-batch";
+import MonacoEditor, {
+  EditorDidMount,
+  EditorWillUnmount,
+} from "react-monaco-editor";
+const MemoizedMonacoEditor = React.memo(MonacoEditor);
 const FeatureListPage: React.FC = () => {
   const [output, setOutput] = useState(""); // 存储执行结果
   const [replaceFilename, setReplaceFilename] = useState(""); //用户想要替换的内容
@@ -21,7 +25,6 @@ const FeatureListPage: React.FC = () => {
   const [addTimeStamp, setAddTimeStamp] = useState(false); // 文件名是否添加时间戳
   const [addDateTime, setAddDateTime] = useState(false); //文件名是否添加时间秒onds
   const { directoryPath, isUseIgnoredFiles } = useDirectory();
-
   const [filenameReg, setFilenameReg] = useState<RegExp | null>(null);
   const [extnameReg, setExtnameReg] = useState<RegExp | null>(null);
   //处理预览结果
@@ -79,16 +82,13 @@ const FeatureListPage: React.FC = () => {
       message.error("Failed to exec: " + error);
     }
   };
-
   // 执行选中的功能
   const handleExecute = async () => {
     if (!directoryPath.length) {
       message.warning("Please select an exec directory.");
       return;
     }
-
     const ignoreFilesPatterns = getIgnorePatterns(filesToExclude);
-
     // 检查输入条件
     if (filenameReg && !replaceFilename.length) {
       message.warning("Please enter the filename to replace.");
@@ -106,7 +106,6 @@ const FeatureListPage: React.FC = () => {
       message.warning("Please enter the extension to search.");
       return;
     }
-
     // 弹出确认对话框
     Modal.confirm({
       title: "Confirm Execution",
@@ -151,13 +150,24 @@ const FeatureListPage: React.FC = () => {
       },
     });
   };
-
   // 图标点击事件处理函数
   const handleAddTimeStamp = () => {
     setAddTimeStamp(!addTimeStamp);
   };
   const handleAddDateTime = () => {
     setAddDateTime(!addDateTime);
+  };
+  type ParametersType<T> = T extends (...args: infer U) => any ? U : never;
+  type ChangeParams = ParametersType<EditorDidMount>;
+  type IStandaloneCodeEditor = ChangeParams[0];
+  const handleResize = (editor: IStandaloneCodeEditor) => {
+    editor.layout();
+  };
+  const editorDidMount: EditorDidMount = (editor) => {
+    window.addEventListener("resize", handleResize.bind(window, editor));
+  };
+  const editorWillUnmount: EditorWillUnmount = (editor) => {
+    window.removeEventListener("resize", handleResize.bind(window, editor));
   };
   return (
     <div
@@ -179,7 +189,6 @@ const FeatureListPage: React.FC = () => {
           <Directory />
         </Col>
       </Row>
-
       <Row
         gutter={16}
         style={{
@@ -280,19 +289,26 @@ const FeatureListPage: React.FC = () => {
           </Button>
         </Col>
       </Row>
-
       <Row gutter={16}>
         <Col span={24}>
           <div
             style={{
               width: "100%",
-              height: "calc(100vh - 360px)",
+              height: "calc(100vh - 320px)",
               overflow: "auto",
               whiteSpace: "pre-wrap",
             }}
           >
-            {/* 使用pre标签来显示纯文本输出 */}
-            <pre>{output}</pre>
+            <MemoizedMonacoEditor
+              width="100%"
+              height="100%"
+              value={output}
+              editorDidMount={editorDidMount}
+              editorWillUnmount={editorWillUnmount}
+              options={{
+                readOnly: true,
+              }}
+            />
           </div>
         </Col>
       </Row>

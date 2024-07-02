@@ -247,7 +247,6 @@ npm i
     │       ├─ loading.less
     │       ├─ markdown-styles.less
     │       ├─ menu.less
-    │       ├─ pre.less
     │       ╰─ variables.less
     ├─ types // 类型定义
     │   ├─ common.d.ts

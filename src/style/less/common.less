@@ -103,3 +103,30 @@
   background-color: #f5f5f5;
   /* 轨道颜色 */
 }
+
+/* 添加一些基本的样式到 <pre> 标签 */
+pre {
+  background-color: #f5f5f5; /* 轻微的背景颜色 */
+  border: 1px solid #ddd; /* 边框 */
+  border-radius: 4px; /* 边框圆角 */
+  color: #333; /* 文本颜色 */
+  font-family: 'Courier New', Courier, monospace; /* 等宽字体 */
+  height: 100%;
+  line-height: 1.5; /* 行高 */
+  overflow-x: auto; /* 水平滚动条 */
+  padding: 10px; /* 内边距 */
+  width: 100%;
+}
+
+/* 当 <pre> 标签是 contentEditable 的时候，移除一些样式以便于编辑 */
+pre[contentEditable] {
+  background-color: #fff; /* 背景色改为白色，便于编辑 */
+  border: 1px solid #ccc; /* 编辑状态下的边框颜色 */
+  outline: none; /* 移除轮廓，避免干扰 */
+}
+
+/* 添加一些样式到 <pre> 标签中的代码 */
+pre code {
+  color: #666; /* 代码文本颜色 */
+  font-size: 14px; /* 代码字体大小 */
+}

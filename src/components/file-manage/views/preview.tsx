@@ -41,13 +41,6 @@ const Priview: React.FC<Props> = ({ previewFile, className }) => {
     >
       <div>
         {previewFile ? (
-          // <pre
-          //   style={{
-          //     margin: 0
-          //   }}
-          // >
-          //   {fileContent}
-          // </pre>
           <CodeMirrorMemo
             value={fileContent}
             height="calc(100vh - 70px)"
