@@ -1,18 +1,18 @@
-import { ExecFileInfo } from '@src/types/common'
+import { ExecFileInfo } from "@src/types/common";
 //@ts-ignore
-import getParser from 'jscodeshift/src/getParser'
-import jscodeshift, { Options, Parser, Transform } from 'jscodeshift'
-import { logger } from '../utils/log'
-import { parse as parseSFC, stringify as stringifySFC } from './sfc-utils'
-import type { SFCDescriptor } from '@vue/compiler-sfc'
+import getParser from "jscodeshift/src/getParser";
+import jscodeshift, { Options, Parser, Transform } from "jscodeshift";
+import { logger } from "../utils/log";
+import { parse as parseSFC, stringify as stringifySFC } from "./sfc-utils";
+import type { SFCDescriptor } from "@vue/compiler-sfc";
 
 /**
  * parser可传的值有 babylon、flow、ts、tsx、babel,会去获取对应的解析器
  * 定义一个代码转换器的类型，它扩展了jscodeshift的Transform类型，并可选地包含一个parser属性。
  */
 export type Codemod = Transform & {
-  parser?: string | Parser
-}
+  parser?: string | Parser;
+};
 
 /**
  * 对给定的文件信息执行一系列的代码转换操作。
@@ -27,7 +27,7 @@ const transform = (
   execFileInfo: ExecFileInfo,
   codemodList: Codemod[],
   options: Options,
-  lang = 'js'
+  lang = "js",
 ) => {
   try {
     // 遍历每个转换器，应用它们到源代码上
@@ -38,48 +38,50 @@ const transform = (
         tabWidth: 2,
         printWidth: 100,
         singleQuote: true,
-        trailingComma: 'none',
+        trailingComma: "none",
         bracketSpacing: true,
-        semi: false
-      }
+        semi: false,
+      };
       //使用默认解析器babel
-      let parser = getParser('babel', formatOptions)
-      let parserOption = codemod.parser
+      let parser = getParser("babel", formatOptions);
+      let parserOption = codemod.parser;
 
       // 根据源代码语言选择合适的parser
-      if (typeof parserOption !== 'object') {
-        if (lang.startsWith('ts')) {
-          parserOption = 'ts'
+      if (typeof parserOption !== "object") {
+        if (lang.startsWith("ts")) {
+          parserOption = "ts";
         }
-        if (lang.startsWith('tsx')) {
-          parserOption = 'tsx'
+        if (lang.startsWith("tsx")) {
+          parserOption = "tsx";
         }
       }
 
       // 获取或指定parser
       if (parserOption) {
         parser =
-          typeof parserOption === 'string' ? getParser(parserOption, formatOptions) : parserOption
+          typeof parserOption === "string"
+            ? getParser(parserOption, formatOptions)
+            : parserOption;
       }
-      const j = jscodeshift.withParser(parser)
+      const j = jscodeshift.withParser(parser);
       const api = {
         j,
         jscodeshift: j,
         stats: () => {},
-        report: () => {}
-      }
+        report: () => {},
+      };
       // 执行转换器，并在有返回值时更新源代码
-      const out = codemod(execFileInfo, api, options)
+      const out = codemod(execFileInfo, api, options);
       if (out) {
-        execFileInfo.source = out
+        execFileInfo.source = out;
       }
     }
-    return execFileInfo.source
+    return execFileInfo.source;
   } catch (e) {
-    logger.error(e)
-    return execFileInfo.source
+    logger.error(e);
+    return execFileInfo.source;
   }
-}
+};
 
 /**
  * 主函数，用于运行代码转换。
@@ -92,42 +94,52 @@ const transform = (
 export default function runCodemod(
   execFileInfo: ExecFileInfo,
   codemodList: Codemod[],
-  options: Options
+  options: Options,
 ) {
   // 如果没有转换器，则直接返回源代码
   if (!codemodList.length) {
-    return execFileInfo.source
+    return execFileInfo.source;
   }
-  const { path, source } = execFileInfo
-  const extension = (/\.([^.]*)$/.exec(path) || [])[0]
-  let lang = extension?.slice(1)
-  let descriptor: SFCDescriptor
+  const { path, source } = execFileInfo;
+  const extension = (/\.([^.]*)$/.exec(path) || [])[0];
+  let lang = extension?.slice(1);
+  let descriptor: SFCDescriptor;
 
   // 针对非.vue文件的处理逻辑
-  if (extension !== '.vue') {
-    return transform(execFileInfo, codemodList, options, lang)
+  if (extension !== ".vue") {
+    return transform(execFileInfo, codemodList, options, lang);
   }
 
   // 解析.vue文件
   descriptor = parseSFC(source, {
-    filename: path
-  }).descriptor
+    filename: path,
+  }).descriptor;
 
   // 针对<script>和<script setup>块的处理
   if (!descriptor.script?.content && !descriptor.scriptSetup?.content) {
-    return source
+    return source;
   }
   if (descriptor.script && descriptor.script.content) {
-    lang = descriptor.script.lang || 'js'
-    execFileInfo.source = descriptor.script.content
-    descriptor.script.content = transform(execFileInfo, codemodList, options, lang)
+    lang = descriptor.script.lang || "js";
+    execFileInfo.source = descriptor.script.content;
+    descriptor.script.content = transform(
+      execFileInfo,
+      codemodList,
+      options,
+      lang,
+    );
   }
   if (descriptor.scriptSetup && descriptor.scriptSetup.content) {
-    lang = descriptor.scriptSetup.lang || 'js'
-    execFileInfo.source = descriptor.scriptSetup.content
-    descriptor.scriptSetup.content = transform(execFileInfo, codemodList, options, lang)
+    lang = descriptor.scriptSetup.lang || "js";
+    execFileInfo.source = descriptor.scriptSetup.content;
+    descriptor.scriptSetup.content = transform(
+      execFileInfo,
+      codemodList,
+      options,
+      lang,
+    );
   }
 
   // 将处理后的.vue文件组件重新字符串化
-  return stringifySFC(descriptor)
+  return stringifySFC(descriptor);
 }

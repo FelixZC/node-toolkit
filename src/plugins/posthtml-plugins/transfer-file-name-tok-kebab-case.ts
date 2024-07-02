@@ -1,8 +1,8 @@
 /**
  * 驼峰命名转化
  */
-import { isPath, transferRef } from '../../utils/common'
-import type PostHTML from 'posthtml'
+import { isPath, transferRef } from "../../utils/common";
+import type PostHTML from "posthtml";
 /**
  * 驼峰命名转化的PostHTML插件
  * 该插件遍历HTML树节点，对节点的属性进行处理：
@@ -19,32 +19,32 @@ const propertySort: PostHTML.Plugin<unknown> = (tree) => {
       for (const key in node.attrs) {
         if (Object.prototype.hasOwnProperty.call(node.attrs, key)) {
           if (!node.attrs[key]) {
-            node.attrs[key] = '_pzc_'
+            node.attrs[key] = "_pzc_";
           }
         }
       }
-      const urlReg = /(?:url|require)\(['"`]?([\s\S]*?)['"`]?\)/
+      const urlReg = /(?:url|require)\(['"`]?([\s\S]*?)['"`]?\)/;
 
       // 检查并处理属性值中的路径
       for (const [key, value] of Object.entries(node.attrs)) {
-        if (typeof value === 'string' && !value.includes('$')) {
-          let result
+        if (typeof value === "string" && !value.includes("$")) {
+          let result;
 
           // 处理URL和require语句中的路径
           if ((result = urlReg.exec(value))) {
             if (isPath(result[1])) {
-              node.attrs[key] = transferRef(value)
+              node.attrs[key] = transferRef(value);
             }
           } else {
             // 直接处理其他路径
             if (isPath(value)) {
-              node.attrs[key] = transferRef(value)
+              node.attrs[key] = transferRef(value);
             }
           }
         }
       }
     }
-    return node
-  })
-}
-export default propertySort
+    return node;
+  });
+};
+export default propertySort;

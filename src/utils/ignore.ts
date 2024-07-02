@@ -1,7 +1,7 @@
-import { app } from 'electron'
-import fs from 'fs-extra'
-import ignore from 'ignore'
-import path from 'path'
+import { app } from "electron";
+import fs from "fs-extra";
+import ignore from "ignore";
+import path from "path";
 /**
  * 获取忽略文件的路径。
  *
@@ -9,8 +9,11 @@ import path from 'path'
  * 返回拼接后的 .gitignore 文件路径。
  */
 export function getIgnorePath(): string {
-  const basePath = process.env.NODE_ENV === 'production' ? app.getPath('appData') : process.cwd()
-  return path.join(basePath, '.gitignore')
+  const basePath =
+    process.env.NODE_ENV === "production"
+      ? app.getPath("appData")
+      : process.cwd();
+  return path.join(basePath, ".gitignore");
 }
 
 /**
@@ -19,9 +22,9 @@ export function getIgnorePath(): string {
  * 检查是否存在 .gitignore 文件，如果不存在，则创建一个默认的忽略文件。
  */
 export function initIgnorePath() {
-  const gitIgnorePath = getIgnorePath()
+  const gitIgnorePath = getIgnorePath();
   if (!fs.existsSync(gitIgnorePath)) {
-    fs.ensureFileSync(gitIgnorePath)
+    fs.ensureFileSync(gitIgnorePath);
     const gitIgnoreContent = `
 # Default ignore rules
 node_modules
@@ -35,8 +38,8 @@ dist
 .idea
 .vscode
 .husky
-`
-    fs.writeFileSync(gitIgnorePath, gitIgnoreContent)
+`;
+    fs.writeFileSync(gitIgnorePath, gitIgnoreContent);
   }
 }
 
@@ -44,9 +47,9 @@ dist
  * GitIgnoreParser 类用于解析 .gitignore 文件中的忽略规则。
  */
 class GitIgnoreParser {
-  private ignoreRules: ReturnType<typeof ignore>
+  private ignoreRules: ReturnType<typeof ignore>;
   constructor() {
-    this.ignoreRules = ignore()
+    this.ignoreRules = ignore();
   }
 
   /**
@@ -55,9 +58,9 @@ class GitIgnoreParser {
    * 加载并解析 .gitignore 文件的内容，将其作为忽略规则。
    */
   loadFromFile() {
-    const gitIgnorePath = getIgnorePath()
-    const gitIgnoreContent = fs.readFileSync(gitIgnorePath, 'utf-8')
-    this.ignoreRules.add(gitIgnoreContent)
+    const gitIgnorePath = getIgnorePath();
+    const gitIgnoreContent = fs.readFileSync(gitIgnorePath, "utf-8");
+    this.ignoreRules.add(gitIgnoreContent);
   }
 
   /**
@@ -68,7 +71,7 @@ class GitIgnoreParser {
    */
   test(filePath: string): boolean {
     // 传入的 filePath 应该是相对于项目根目录的相对路径
-    return this.ignoreRules.ignores(filePath)
+    return this.ignoreRules.ignores(filePath);
   }
 }
 
@@ -78,12 +81,12 @@ class GitIgnoreParser {
  * @returns 返回一个对象，其中的 ignore 方法可用于检查文件路径是否被忽略。
  */
 export function useIgnored(): {
-  ignore: (filePath: string) => boolean
+  ignore: (filePath: string) => boolean;
 } {
-  const parser = new GitIgnoreParser()
-  parser.loadFromFile()
+  const parser = new GitIgnoreParser();
+  parser.loadFromFile();
   return {
-    ignore: (filePath: string) => parser.test(filePath)
-  }
+    ignore: (filePath: string) => parser.test(filePath),
+  };
 }
-initIgnorePath()
+initIgnorePath();

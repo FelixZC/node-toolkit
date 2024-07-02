@@ -1,49 +1,49 @@
-import { Button, List, message, Switch } from 'antd'
-import Directory from '@src/components/file-manage/directory'
-import { ipcRendererInvoke } from '../../utils/desktop-utils'
-import React, { useState } from 'react'
-import useDirectory from '@src/store/use-directory'
-import '@src/style/less/icon.less'
+import { Button, List, message, Switch } from "antd";
+import Directory from "@src/components/file-manage/directory";
+import { ipcRendererInvoke } from "../../utils/desktop-utils";
+import React, { useState } from "react";
+import useDirectory from "@src/store/use-directory";
+import "@src/style/less/icon.less";
 interface Feature {
-  id: number
-  name: string
-  isSelected: boolean
-  path: string
+  id: number;
+  name: string;
+  isSelected: boolean;
+  path: string;
 }
 const initialFeatures: Feature[] = [
   {
     id: 0,
-    name: 'property-sort',
+    name: "property-sort",
     isSelected: false,
-    path: '../plugins/posthtml-plugins/property-sort'
-  }
-]
+    path: "../plugins/posthtml-plugins/property-sort",
+  },
+];
 const FeatureListPage: React.FC = () => {
-  const [features, setFeatures] = useState(initialFeatures)
-  const { directoryPath, isUseIgnoredFiles } = useDirectory()
+  const [features, setFeatures] = useState(initialFeatures);
+  const { directoryPath, isUseIgnoredFiles } = useDirectory();
 
   // 切换所有功能的选中状态
   const handleSelectRevert = () => {
     const newFeatures = features.map((f) => ({
       ...f,
-      isSelected: !f.isSelected
-    }))
-    setFeatures(newFeatures)
-  }
+      isSelected: !f.isSelected,
+    }));
+    setFeatures(newFeatures);
+  };
   const handleSelectAll = () => {
     const newFeatures = features.map((f) => ({
       ...f,
-      isSelected: true
-    }))
-    setFeatures(newFeatures)
-  }
+      isSelected: true,
+    }));
+    setFeatures(newFeatures);
+  };
   const handleSelectNone = () => {
     const newFeatures = features.map((f) => ({
       ...f,
-      isSelected: false
-    }))
-    setFeatures(newFeatures)
-  }
+      isSelected: false,
+    }));
+    setFeatures(newFeatures);
+  };
 
   // 切换单个功能的选中状态
   const handleSelectFeature = (featureId: number, isSelected: boolean) => {
@@ -51,36 +51,43 @@ const FeatureListPage: React.FC = () => {
       f.id === featureId
         ? {
             ...f,
-            isSelected
+            isSelected,
           }
-        : f
-    )
-    setFeatures(newFeatures)
-  }
+        : f,
+    );
+    setFeatures(newFeatures);
+  };
 
   // 执行选中的功能
   const handleExecute = async () => {
     if (!directoryPath.length) {
-      message.warning('Please select a exec derecroty.')
-      return
+      message.warning("Please select a exec derecroty.");
+      return;
     }
-    const selectedFeatures = features.filter((f) => f.isSelected)
+    const selectedFeatures = features.filter((f) => f.isSelected);
     if (selectedFeatures.length === 0) {
-      message.warning('Please select at least one feature to exec.')
-      return
+      message.warning("Please select at least one feature to exec.");
+      return;
     }
-    const posthtmlList = selectedFeatures.map((f) => f.path)
+    const posthtmlList = selectedFeatures.map((f) => f.path);
     try {
-      await ipcRendererInvoke('exec-posthtml', directoryPath, posthtmlList, isUseIgnoredFiles)
-      message.success(`Executing: ${selectedFeatures.map((f) => f.name).join(', ')}`)
+      await ipcRendererInvoke(
+        "exec-posthtml",
+        directoryPath,
+        posthtmlList,
+        isUseIgnoredFiles,
+      );
+      message.success(
+        `Executing: ${selectedFeatures.map((f) => f.name).join(", ")}`,
+      );
     } catch (error) {
-      message.error('Failed to exec: ' + error)
+      message.error("Failed to exec: " + error);
     }
-  }
+  };
   return (
     <div
       style={{
-        padding: '20px'
+        padding: "20px",
       }}
     >
       <h1>Posthtml Plugin List Execution Page</h1>
@@ -88,8 +95,8 @@ const FeatureListPage: React.FC = () => {
       <Directory />
       <div
         style={{
-          marginTop: '10px',
-          marginBottom: '10px'
+          marginTop: "10px",
+          marginBottom: "10px",
         }}
       >
         <Button onClick={handleSelectRevert}>Toggle Select Revert</Button>
@@ -111,10 +118,12 @@ const FeatureListPage: React.FC = () => {
               />,
               <Button
                 type="link"
-                onClick={() => handleSelectFeature(feature.id, !feature.isSelected)}
+                onClick={() =>
+                  handleSelectFeature(feature.id, !feature.isSelected)
+                }
               >
-                {feature.isSelected ? 'Deselect' : 'Select'}
-              </Button>
+                {feature.isSelected ? "Deselect" : "Select"}
+              </Button>,
             ]}
           >
             {feature.name}
@@ -122,6 +131,6 @@ const FeatureListPage: React.FC = () => {
         )}
       />
     </div>
-  )
-}
-export default FeatureListPage
+  );
+};
+export default FeatureListPage;

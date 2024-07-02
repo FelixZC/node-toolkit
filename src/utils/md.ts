@@ -1,12 +1,12 @@
-import { getDataType, sortArray, sortObjAttr } from './common'
+import { getDataType, sortArray, sortObjAttr } from "./common";
 /**
  * Markdown 文件生成工具类，持续完善中...
  * @author pzc
  * @date 2021/08/23
  */
 
-import * as os from 'os'
-const br = os.EOL // 行分隔符
+import * as os from "os";
+const br = os.EOL; // 行分隔符
 
 /**
  * 使用指定正则表达式在给定内容中查找匹配项
@@ -20,45 +20,47 @@ function queryContentByReg(
   content: string,
   queryReg: RegExp,
   matchIndex = 0,
-  customHandel?: Function
+  customHandel?: Function,
 ) {
   // 参数验证
-  if (typeof content !== 'string') {
-    throw new Error('Content must be a string.')
+  if (typeof content !== "string") {
+    throw new Error("Content must be a string.");
   }
   if (!(queryReg instanceof RegExp)) {
-    throw new Error('QueryReg must be a RegExp object.')
+    throw new Error("QueryReg must be a RegExp object.");
   }
-  if (typeof matchIndex !== 'number') {
-    throw new Error('MatchIndex must be a number.')
+  if (typeof matchIndex !== "number") {
+    throw new Error("MatchIndex must be a number.");
   }
-  if (customHandel && typeof customHandel !== 'function') {
-    throw new Error('CustomHandel must be a function.')
+  if (customHandel && typeof customHandel !== "function") {
+    throw new Error("CustomHandel must be a function.");
   }
-  let queryResult
-  let str = ''
+  let queryResult;
+  let str = "";
 
   // 确保正则表达式用于全局搜索
   if (!queryReg.global) {
-    queryReg = new RegExp(queryReg.source, queryReg.flags + 'g')
+    queryReg = new RegExp(queryReg.source, queryReg.flags + "g");
   }
-  let lastIndex = 0 // 记录上次匹配的结束位置
+  let lastIndex = 0; // 记录上次匹配的结束位置
   while ((queryResult = queryReg.exec(content))) {
     // 处理匹配结果
-    const resultStr = customHandel ? customHandel(queryResult) : queryResult[matchIndex]
-    str += resultStr
+    const resultStr = customHandel
+      ? customHandel(queryResult)
+      : queryResult[matchIndex];
+    str += resultStr;
     if (queryResult[0].length === 0) {
-      lastIndex = queryReg.lastIndex // 避免无限循环
-      queryReg.lastIndex++ // 移动 lastIndex 以避免空匹配
+      lastIndex = queryReg.lastIndex; // 避免无限循环
+      queryReg.lastIndex++; // 移动 lastIndex 以避免空匹配
     } else {
-      lastIndex = queryReg.lastIndex
+      lastIndex = queryReg.lastIndex;
     }
     // 确保不会重复添加 br
     if (lastIndex < content.length) {
-      str += br
+      str += br;
     }
   }
-  return str
+  return str;
 }
 /**
  * 创建属性描述表格
@@ -66,28 +68,31 @@ function queryContentByReg(
  * @returns {string} 包含首字母索引的属性描述表格字符串
  */
 function createdAttributesGroupTable(attrGroup: Record<string, any>) {
-  let localAttrGroup = attrGroup
-  const dataType = getDataType(localAttrGroup)
-  if (dataType !== 'Object') {
-    throw new Error('createdAttributesGroupTable数据类型错误')
+  let localAttrGroup = attrGroup;
+  const dataType = getDataType(localAttrGroup);
+  if (dataType !== "Object") {
+    throw new Error("createdAttributesGroupTable数据类型错误");
   }
-  localAttrGroup = sortObjAttr(localAttrGroup)
-  let attributesDescriptionTable = ''
+  localAttrGroup = sortObjAttr(localAttrGroup);
+  let attributesDescriptionTable = "";
   for (const attrGroupItem of Object.values(localAttrGroup)) {
-    if (Reflect.get(attrGroupItem, 'groupKey') && Reflect.get(attrGroupItem, 'group')) {
-      const title = Reflect.get(attrGroupItem.group[0], attrGroupItem.groupKey)
-      attributesDescriptionTable += `## ${title}${br}`
-      attributesDescriptionTable += `|字段|描述|位置|${br}`
-      attributesDescriptionTable += `|-|-|-|${br}`
-      const group = sortArray(attrGroupItem.group, { fields: ['key'] })
+    if (
+      Reflect.get(attrGroupItem, "groupKey") &&
+      Reflect.get(attrGroupItem, "group")
+    ) {
+      const title = Reflect.get(attrGroupItem.group[0], attrGroupItem.groupKey);
+      attributesDescriptionTable += `## ${title}${br}`;
+      attributesDescriptionTable += `|字段|描述|位置|${br}`;
+      attributesDescriptionTable += `|-|-|-|${br}`;
+      const group = sortArray(attrGroupItem.group, { fields: ["key"] });
       for (const groupItem of group) {
-        const [name, position] = groupItem.key.split('->')
-        const description = groupItem.value
-        attributesDescriptionTable += `${name}|${description}|${position}|${br}`
+        const [name, position] = groupItem.key.split("->");
+        const description = groupItem.value;
+        attributesDescriptionTable += `${name}|${description}|${position}|${br}`;
       }
     }
   }
-  return attributesDescriptionTable
+  return attributesDescriptionTable;
 }
 
 /**
@@ -103,52 +108,52 @@ function createdStoreTable(
   stateInStore: Record<string, any>,
   annotationObj: Record<string, any>,
   leavl = 1,
-  cache: string[] = []
+  cache: string[] = [],
 ) {
-  let localStateInStore = stateInStore
-  const dataType = getDataType(localStateInStore)
-  if (dataType !== 'Object') {
-    throw new Error('createdStoreTable数据类型错误')
+  let localStateInStore = stateInStore;
+  const dataType = getDataType(localStateInStore);
+  if (dataType !== "Object") {
+    throw new Error("createdStoreTable数据类型错误");
   }
-  localStateInStore = sortObjAttr(localStateInStore)
-  let createdStoreTableStr = ''
-  if (typeof localStateInStore !== 'object') {
-    return ''
+  localStateInStore = sortObjAttr(localStateInStore);
+  let createdStoreTableStr = "";
+  if (typeof localStateInStore !== "object") {
+    return "";
   }
   if (localStateInStore.title) {
-    createdStoreTableStr += `### ${localStateInStore.title}${br}`
+    createdStoreTableStr += `### ${localStateInStore.title}${br}`;
   }
   if (leavl === 1) {
-    createdStoreTableStr += `## root${br}`
+    createdStoreTableStr += `## root${br}`;
   }
-  createdStoreTableStr += `|字段|类型|默认|注释|${br}`
-  createdStoreTableStr += `|-|-|-|-|${br}`
+  createdStoreTableStr += `|字段|类型|默认|注释|${br}`;
+  createdStoreTableStr += `|-|-|-|-|${br}`;
   for (const key in localStateInStore) {
-    const type = getDataType(localStateInStore[key])
-    const value = JSON.stringify(localStateInStore[key])
-    const descript = annotationObj[key] || ''
-    if (type === 'Object' && Object.keys(localStateInStore[key]).length) {
-      const storeModule = localStateInStore[key]
-      storeModule.title = key
-      const nextLeavl = leavl + 1
+    const type = getDataType(localStateInStore[key]);
+    const value = JSON.stringify(localStateInStore[key]);
+    const descript = annotationObj[key] || "";
+    if (type === "Object" && Object.keys(localStateInStore[key]).length) {
+      const storeModule = localStateInStore[key];
+      storeModule.title = key;
+      const nextLeavl = leavl + 1;
       if (nextLeavl <= 2) {
-        createdStoreTable(storeModule, annotationObj, nextLeavl, cache)
+        createdStoreTable(storeModule, annotationObj, nextLeavl, cache);
       }
     } else {
-      createdStoreTableStr += `${key}|${type}|${value}|${descript}|${br}`
+      createdStoreTableStr += `${key}|${type}|${value}|${descript}|${br}`;
     }
   }
   if (leavl === 1) {
-    cache.unshift(createdStoreTableStr) // 添加根记录
+    cache.unshift(createdStoreTableStr); // 添加根记录
   } else {
-    cache.push(createdStoreTableStr)
+    cache.push(createdStoreTableStr);
   }
-  return cache.join(br)
+  return cache.join(br);
 }
 interface NodeWithId {
-  base: string
-  comment?: string
-  children?: NodeWithId[]
+  base: string;
+  comment?: string;
+  children?: NodeWithId[];
 }
 
 /**
@@ -162,46 +167,50 @@ interface NodeWithId {
 function generateProjectTree(
   nodes: NodeWithId[],
   level: number = 0,
-  isLevelLastNode: boolean[] = []
+  isLevelLastNode: boolean[] = [],
 ): string {
-  let treeString = ''
+  let treeString = "";
   nodes.forEach((node, index, array) => {
     // 复制isLevelLastNode数组，以避免在递归调用中修改原始数组
-    const isLevelLastNodeClone: boolean[] = [...isLevelLastNode]
-    let connector
+    const isLevelLastNodeClone: boolean[] = [...isLevelLastNode];
+    let connector;
     // 根据层级和当前节点是否是本层级的最后一个节点，确定连接符
     if (level === 0) {
-      connector = '  '
+      connector = "  ";
     } else {
-      connector = index === array.length - 1 ? '╰─ ' : '├─ '
+      connector = index === array.length - 1 ? "╰─ " : "├─ ";
     }
-    let padding = ''
+    let padding = "";
     // 根据isLevelLastNodeClone的值生成当前节点的前缀空白或竖线，以形成树的结构
     for (const isLevelLastNode of isLevelLastNodeClone) {
       if (isLevelLastNode) {
-        padding += ' '.repeat(4)
+        padding += " ".repeat(4);
       } else {
-        padding += '│' + ' '.repeat(3)
+        padding += "│" + " ".repeat(3);
       }
     }
     // 如果节点有注释，则在节点名称后添加注释
     if (node.comment) {
-      treeString += `${padding}${connector}${node.base} //${node.comment}\n`
+      treeString += `${padding}${connector}${node.base} //${node.comment}\n`;
     } else {
-      treeString += `${padding}${connector}${node.base}\n`
+      treeString += `${padding}${connector}${node.base}\n`;
     }
     // 标记当前层级的最后一个节点
-    isLevelLastNodeClone[level] = index === array.length - 1
+    isLevelLastNodeClone[level] = index === array.length - 1;
     // 如果节点有子节点，则递归生成子节点的树结构
     if (node.children && node.children.length > 0) {
-      treeString += generateProjectTree(node.children, level + 1, isLevelLastNodeClone)
+      treeString += generateProjectTree(
+        node.children,
+        level + 1,
+        isLevelLastNodeClone,
+      );
     }
-  })
-  return treeString
+  });
+  return treeString;
 }
 export default {
   createdAttributesGroupTable,
   createdStoreTable,
   queryContentByReg,
-  generateProjectTree
-}
+  generateProjectTree,
+};

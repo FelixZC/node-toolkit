@@ -1,6 +1,6 @@
-import { declare } from '@babel/helper-plugin-utils'
-import * as t from '@babel/types'
-import type { NodePath } from '@babel/traverse'
+import { declare } from "@babel/helper-plugin-utils";
+import * as t from "@babel/types";
+import type { NodePath } from "@babel/traverse";
 /**
  * 主要用于转换和移除JavaScript代码中的console相关调用。
  * 该插件会在编译时移除指定的console方法调用，或者将它们替换为无操作函数。
@@ -16,14 +16,14 @@ export default declare((babel) => {
    * @return 如果节点是全局console标识符且作用域中没有绑定，则返回true；否则返回false。
    */
   function isGlobalConsoleId(id: NodePath) {
-    const name = 'console'
+    const name = "console";
     return (
       id.isIdentifier({
-        name
+        name,
       }) &&
       !id.scope.getBinding(name) &&
       id.scope.hasGlobal(name)
-    )
+    );
   }
 
   /**
@@ -35,16 +35,16 @@ export default declare((babel) => {
    */
   function isExcluded(
     property: NodePath<t.PrivateName | t.Expression>,
-    excludeArray: string[] = []
+    excludeArray: string[] = [],
   ) {
     return (
       excludeArray &&
       excludeArray.some((name) =>
         property.isIdentifier({
-          name
-        })
+          name,
+        }),
       )
-    )
+    );
   }
 
   /**
@@ -56,22 +56,22 @@ export default declare((babel) => {
    */
   function isIncludedConsole(
     memberExpr: NodePath<t.MemberExpression>,
-    excludeArray: string[] = []
+    excludeArray: string[] = [],
   ) {
-    const object = memberExpr.get('object')
-    const property = memberExpr.get('property')
-    if (isExcluded(property, excludeArray)) return false
-    if (isGlobalConsoleId(object)) return true
+    const object = memberExpr.get("object");
+    const property = memberExpr.get("property");
+    if (isExcluded(property, excludeArray)) return false;
+    if (isGlobalConsoleId(object)) return true;
     return (
       //@ts-ignore
-      isGlobalConsoleId(object.get('object')) &&
+      isGlobalConsoleId(object.get("object")) &&
       (property.isIdentifier({
-        name: 'call'
+        name: "call",
       }) ||
         property.isIdentifier({
-          name: 'apply'
+          name: "apply",
         }))
-    )
+    );
   }
 
   /**
@@ -83,17 +83,17 @@ export default declare((babel) => {
    */
   function isIncludedConsoleBind(
     memberExpr: NodePath<t.MemberExpression>,
-    excludeArray: string[] = []
+    excludeArray: string[] = [],
   ) {
-    const object = memberExpr.get('object')
-    if (!object.isMemberExpression()) return false
-    if (isExcluded(object.get('property'), excludeArray)) return false
+    const object = memberExpr.get("object");
+    if (!object.isMemberExpression()) return false;
+    if (isExcluded(object.get("property"), excludeArray)) return false;
     return (
-      isGlobalConsoleId(object.get('object')) &&
-      memberExpr.get('property').isIdentifier({
-        name: 'bind'
+      isGlobalConsoleId(object.get("object")) &&
+      memberExpr.get("property").isIdentifier({
+        name: "bind",
       })
-    )
+    );
   }
 
   /**
@@ -102,7 +102,7 @@ export default declare((babel) => {
    * @return 返回一个表示无操作的空函数表达式节点。
    */
   function createNoop() {
-    return t.functionExpression(null, [], t.blockStatement([]))
+    return t.functionExpression(null, [], t.blockStatement([]));
   }
 
   /**
@@ -111,43 +111,59 @@ export default declare((babel) => {
    * @return 返回一个表示`void 0`的unaryExpression节点。
    */
   function createVoid0() {
-    return t.unaryExpression('void', t.numericLiteral(0))
+    return t.unaryExpression("void", t.numericLiteral(0));
   }
 
   // 返回Babel插件对象
   return {
-    name: 'transform-remove-console',
+    name: "transform-remove-console",
     visitor: {
       CallExpression(path, state) {
-        const callee = path.get('callee')
-        if (!callee.isMemberExpression()) return
+        const callee = path.get("callee");
+        if (!callee.isMemberExpression()) return;
 
         // 移除或替换符合条件的console调用
-        if (isIncludedConsole(callee, (state?.opts as Record<string, any>)?.exclude)) {
+        if (
+          isIncludedConsole(
+            callee,
+            (state?.opts as Record<string, any>)?.exclude,
+          )
+        ) {
           if (path.parentPath.isExpressionStatement()) {
-            path.remove()
+            path.remove();
           } else {
-            path.replaceWith(createVoid0())
+            path.replaceWith(createVoid0());
           }
-        } else if (isIncludedConsoleBind(callee, (state?.opts as Record<string, any>)?.exclude)) {
-          path.replaceWith(createNoop())
+        } else if (
+          isIncludedConsoleBind(
+            callee,
+            (state?.opts as Record<string, any>)?.exclude,
+          )
+        ) {
+          path.replaceWith(createNoop());
         }
       },
       MemberExpression: {
         exit(path, state) {
           // 移除或替换符合条件的console属性
           if (
-            isIncludedConsole(path, (state?.opts as Record<string, any>)?.exclude) &&
+            isIncludedConsole(
+              path,
+              (state?.opts as Record<string, any>)?.exclude,
+            ) &&
             !path.parentPath.isMemberExpression()
           ) {
-            if (path.parentPath.isAssignmentExpression() && path.parentKey === 'left') {
-              path.parentPath.get('right').replaceWith(createNoop())
+            if (
+              path.parentPath.isAssignmentExpression() &&
+              path.parentKey === "left"
+            ) {
+              path.parentPath.get("right").replaceWith(createNoop());
             } else {
-              path.replaceWith(createNoop())
+              path.replaceWith(createNoop());
             }
           }
-        }
-      }
-    }
-  }
-})
+        },
+      },
+    },
+  };
+});

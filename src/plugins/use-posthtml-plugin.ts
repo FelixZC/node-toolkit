@@ -1,8 +1,8 @@
-import posthtml from 'posthtml'
-import type { ExecFileInfo } from '@src/types/common'
-import type { Options, Plugin as PosthtmlPlugin } from 'posthtml'
-import type { Options as parserOptions } from 'posthtml-parser'
-import type { Options as renderOptions } from 'posthtml-render'
+import posthtml from "posthtml";
+import type { ExecFileInfo } from "@src/types/common";
+import type { Options, Plugin as PosthtmlPlugin } from "posthtml";
+import type { Options as parserOptions } from "posthtml-parser";
+import type { Options as renderOptions } from "posthtml-render";
 
 interface MergeOptions extends Options, parserOptions, renderOptions {}
 
@@ -15,28 +15,31 @@ interface MergeOptions extends Options, parserOptions, renderOptions {}
  */
 const runPosthtmlPlugin = async (
   execFileInfo: ExecFileInfo,
-  posthtmlPlugin: PosthtmlPlugin<unknown>[] = []
+  posthtmlPlugin: PosthtmlPlugin<unknown>[] = [],
 ) => {
   // 使用PostHTML处理HTML内容
-  const result = await posthtml<any, any>(posthtmlPlugin).process(execFileInfo.source, {
-    closingSingleTag: 'slash',
-    recognizeSelfClosing: true
-  } as MergeOptions)
+  const result = await posthtml<any, any>(posthtmlPlugin).process(
+    execFileInfo.source,
+    {
+      closingSingleTag: "slash",
+      recognizeSelfClosing: true,
+    } as MergeOptions,
+  );
 
   // 如果存在额外信息，将处理结果中的消息合并到额外信息中
   if (execFileInfo.extra) {
     for (const message of result.messages) {
       switch (typeof message) {
-        case 'object':
+        case "object":
           // 合并对象消息
           for (const key in message) {
-            execFileInfo.extra[key] = message[key]
+            execFileInfo.extra[key] = message[key];
           }
-          break
-        case 'string':
+          break;
+        case "string":
           // 添加字符串消息
-          execFileInfo.extra[message] = message
-          break
+          execFileInfo.extra[message] = message;
+          break;
 
         /**其他忽略 */
 
@@ -44,6 +47,6 @@ const runPosthtmlPlugin = async (
       }
     }
   }
-  return result.html // 返回处理后的HTML字符串
-}
-export default runPosthtmlPlugin
+  return result.html; // 返回处理后的HTML字符串
+};
+export default runPosthtmlPlugin;

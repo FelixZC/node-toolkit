@@ -1,85 +1,85 @@
-import { Button, List, message, Switch } from 'antd'
-import { ipcRendererInvoke } from '../../utils/desktop-utils'
-import React, { useState } from 'react'
-import '@src/style/less/icon.less'
-import Directory from '@src/components/file-manage/directory'
-import useDirectory from '@src/store/use-directory'
+import { Button, List, message, Switch } from "antd";
+import { ipcRendererInvoke } from "../../utils/desktop-utils";
+import React, { useState } from "react";
+import "@src/style/less/icon.less";
+import Directory from "@src/components/file-manage/directory";
+import useDirectory from "@src/store/use-directory";
 interface Feature {
-  id: number
-  name: string
-  isSelected: boolean
-  path: string
+  id: number;
+  name: string;
+  isSelected: boolean;
+  path: string;
 }
 const initialFeatures: Feature[] = [
   {
     id: 1,
-    name: 'arrow-function',
+    name: "arrow-function",
     isSelected: false,
-    path: '../plugins/jscodemods/arrow-function'
+    path: "../plugins/jscodemods/arrow-function",
   },
   {
     id: 3,
-    name: 'no-vars',
+    name: "no-vars",
     isSelected: false,
-    path: '../plugins/jscodemods/no-vars'
+    path: "../plugins/jscodemods/no-vars",
   },
   {
     id: 4,
-    name: 'object-shorthand',
+    name: "object-shorthand",
     isSelected: false,
-    path: '../plugins/jscodemods/object-shorthand'
+    path: "../plugins/jscodemods/object-shorthand",
   },
   {
     id: 5,
-    name: 'rm-object-assign',
+    name: "rm-object-assign",
     isSelected: false,
-    path: '../plugins/jscodemods/rm-object-assign'
+    path: "../plugins/jscodemods/rm-object-assign",
   },
   {
     id: 6,
-    name: 'rm-requires',
+    name: "rm-requires",
     isSelected: false,
-    path: '../plugins/jscodemods/rm-requires'
+    path: "../plugins/jscodemods/rm-requires",
   },
   {
     id: 7,
-    name: 'template-literals',
+    name: "template-literals",
     isSelected: false,
-    path: '../plugins/jscodemods/template-literals'
+    path: "../plugins/jscodemods/template-literals",
   },
   {
     id: 8,
-    name: 'unchain-variables',
+    name: "unchain-variables",
     isSelected: false,
-    path: '../plugins/jscodemods/unchain-variables'
-  }
-]
+    path: "../plugins/jscodemods/unchain-variables",
+  },
+];
 const FeatureListPage: React.FC = () => {
-  const [features, setFeatures] = useState(initialFeatures)
-  const { directoryPath, isUseIgnoredFiles } = useDirectory()
+  const [features, setFeatures] = useState(initialFeatures);
+  const { directoryPath, isUseIgnoredFiles } = useDirectory();
 
   // 切换所有功能的选中状态
   const handleSelectRevert = () => {
     const newFeatures = features.map((f) => ({
       ...f,
-      isSelected: !f.isSelected
-    }))
-    setFeatures(newFeatures)
-  }
+      isSelected: !f.isSelected,
+    }));
+    setFeatures(newFeatures);
+  };
   const handleSelectAll = () => {
     const newFeatures = features.map((f) => ({
       ...f,
-      isSelected: true
-    }))
-    setFeatures(newFeatures)
-  }
+      isSelected: true,
+    }));
+    setFeatures(newFeatures);
+  };
   const handleSelectNone = () => {
     const newFeatures = features.map((f) => ({
       ...f,
-      isSelected: false
-    }))
-    setFeatures(newFeatures)
-  }
+      isSelected: false,
+    }));
+    setFeatures(newFeatures);
+  };
 
   // 切换单个功能的选中状态
   const handleSelectFeature = (featureId: number, isSelected: boolean) => {
@@ -87,44 +87,51 @@ const FeatureListPage: React.FC = () => {
       f.id === featureId
         ? {
             ...f,
-            isSelected
+            isSelected,
           }
-        : f
-    )
-    setFeatures(newFeatures)
-  }
+        : f,
+    );
+    setFeatures(newFeatures);
+  };
 
   // 执行选中的功能
   const handleExecute = async () => {
     if (!directoryPath.length) {
-      message.warning('Please select a exec derecroty.')
-      return
+      message.warning("Please select a exec derecroty.");
+      return;
     }
-    const selectedFeatures = features.filter((f) => f.isSelected)
+    const selectedFeatures = features.filter((f) => f.isSelected);
     if (selectedFeatures.length === 0) {
-      message.warning('Please select at least one feature to exec.')
-      return
+      message.warning("Please select at least one feature to exec.");
+      return;
     }
-    const jscodemodList = selectedFeatures.map((f) => f.path)
+    const jscodemodList = selectedFeatures.map((f) => f.path);
     try {
-      await ipcRendererInvoke('exec-jscodemod', directoryPath, jscodemodList, isUseIgnoredFiles)
-      message.success(`Executing: ${selectedFeatures.map((f) => f.name).join(', ')}`)
+      await ipcRendererInvoke(
+        "exec-jscodemod",
+        directoryPath,
+        jscodemodList,
+        isUseIgnoredFiles,
+      );
+      message.success(
+        `Executing: ${selectedFeatures.map((f) => f.name).join(", ")}`,
+      );
     } catch (error) {
-      message.error('Failed to exec: ' + error)
+      message.error("Failed to exec: " + error);
     }
-  }
+  };
   return (
     <div
       style={{
-        padding: '20px'
+        padding: "20px",
       }}
     >
       <h1>Jscodemod Plugin List Execution Page</h1>
       <Directory />
       <div
         style={{
-          marginTop: '10px',
-          marginBottom: '10px'
+          marginTop: "10px",
+          marginBottom: "10px",
         }}
       >
         <Button onClick={handleSelectRevert}>Toggle Select Revert</Button>
@@ -146,10 +153,12 @@ const FeatureListPage: React.FC = () => {
               />,
               <Button
                 type="link"
-                onClick={() => handleSelectFeature(feature.id, !feature.isSelected)}
+                onClick={() =>
+                  handleSelectFeature(feature.id, !feature.isSelected)
+                }
               >
-                {feature.isSelected ? 'Deselect' : 'Select'}
-              </Button>
+                {feature.isSelected ? "Deselect" : "Select"}
+              </Button>,
             ]}
           >
             {feature.name}
@@ -157,6 +166,6 @@ const FeatureListPage: React.FC = () => {
         )}
       />
     </div>
-  )
-}
-export default FeatureListPage
+  );
+};
+export default FeatureListPage;

@@ -21,13 +21,13 @@
  *  method() {}
  * }
  */
-import { Transform } from 'jscodeshift'
+import { Transform } from "jscodeshift";
 const transformer: Transform = (file, api, options) => {
-  const j = api.jscodeshift
+  const j = api.jscodeshift;
   const printOptions = options.printOptions || {
-    quote: 'single'
-  }
-  const root = j(file.source)
+    quote: "single",
+  };
+  const root = j(file.source);
   const isRecursive = (value) => {
     return !!(
       value.id &&
@@ -35,41 +35,41 @@ const transformer: Transform = (file, api, options) => {
         .find(j.Identifier)
         .filter((i) => i.node.name === value.id.name)
         .size() !== 0
-    )
-  }
+    );
+  };
   const canBeSimplified = (key, value) => {
     // Can be simplified if both key and value are the same identifier or if the
     // property is a method that is not recursive
-    if (key.type === 'Identifier') {
+    if (key.type === "Identifier") {
       return (
-        (value.type === 'Identifier' && key.name === value.name) ||
-        (value.type === 'FunctionExpression' && !isRecursive(value))
-      )
+        (value.type === "Identifier" && key.name === value.name) ||
+        (value.type === "FunctionExpression" && !isRecursive(value))
+      );
     } // Can be simplified if the key is a string literal which is equal to the
     // identifier name of the value.
 
-    if (key.type === 'Literal') {
-      return value.type === 'Identifier' && key.value === value.name
+    if (key.type === "Literal") {
+      return value.type === "Identifier" && key.value === value.name;
     }
-    return false
-  }
+    return false;
+  };
   root
     .find(j.Property, {
       computed: false,
       method: false,
-      shorthand: false
+      shorthand: false,
     })
     .filter((p) => canBeSimplified(p.value.key, p.value.value))
     .forEach((p) => {
-      if (p.value.key.type === 'Literal') {
-        p.value.key = p.value.value
+      if (p.value.key.type === "Literal") {
+        p.value.key = p.value.value;
       }
-      if (p.value.value.type === 'Identifier') {
-        p.value.shorthand = true
-      } else if (p.value.value.type === 'FunctionExpression') {
-        p.value.method = true
+      if (p.value.value.type === "Identifier") {
+        p.value.shorthand = true;
+      } else if (p.value.value.type === "FunctionExpression") {
+        p.value.method = true;
       }
-    })
-  return root.toSource(printOptions)
-}
-export default transformer
+    });
+  return root.toSource(printOptions);
+};
+export default transformer;

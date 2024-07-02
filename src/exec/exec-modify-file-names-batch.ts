@@ -1,64 +1,64 @@
-import fsUtils from '../utils/fs'
-import { generateSimpleRandomString } from '../utils/random'
-import { generateUniquePathWithoutFs } from '../utils/fs'
-import { getFormattedTimestamp } from '../utils/time'
-import { logger } from '../utils/log'
-import path from 'path'
+import fsUtils from "../utils/fs";
+import { generateSimpleRandomString } from "../utils/random";
+import { generateUniquePathWithoutFs } from "../utils/fs";
+import { getFormattedTimestamp } from "../utils/time";
+import { logger } from "../utils/log";
+import path from "path";
 interface ModifyResult {
-  oldFilePath: string
-  newFilePath: string
+  oldFilePath: string;
+  newFilePath: string;
 }
 export type ModifyResultReturnType = {
-  changeCount: number
-  changeRecords: ModifyResult[]
-}
+  changeCount: number;
+  changeRecords: ModifyResult[];
+};
 interface PreviewResult {
-  oldFilePath: string
-  newFilePath: string
-  oldFilename?: string
-  newFilename?: string
-  oldDirname?: string
-  newDirname?: string
-  oldExtname?: string
-  newExtname?: string
-  isChange: boolean
+  oldFilePath: string;
+  newFilePath: string;
+  oldFilename?: string;
+  newFilename?: string;
+  oldDirname?: string;
+  newDirname?: string;
+  oldExtname?: string;
+  newExtname?: string;
+  isChange: boolean;
 }
 export type PriviewResultReturnType = {
-  changeCount: number
-  changeRecords: PreviewResult[]
-}
+  changeCount: number;
+  changeRecords: PreviewResult[];
+};
 export type ModifyFilenameOptions = {
-  filename?: string
-  extname?: string
-  dirname?: string
-  customFilename?: CustomFilenameFunction
-  customExtname?: CustomExtnameFunction
-  customDirname?: CustomDirnameFunction
-  filenameReg?: RegExp
-  extnameReg?: RegExp
-  dirnameReg?: RegExp
-  ignoreFilesPatterns?: Array<RegExp>
-  addTimeStamp: boolean
-  addDateTime: boolean
-}
+  filename?: string;
+  extname?: string;
+  dirname?: string;
+  customFilename?: CustomFilenameFunction;
+  customExtname?: CustomExtnameFunction;
+  customDirname?: CustomDirnameFunction;
+  filenameReg?: RegExp;
+  extnameReg?: RegExp;
+  dirnameReg?: RegExp;
+  ignoreFilesPatterns?: Array<RegExp>;
+  addTimeStamp: boolean;
+  addDateTime: boolean;
+};
 interface CustomFilenameFunction {
-  (oldFilename: string): string
+  (oldFilename: string): string;
 }
 interface CustomExtnameFunction {
-  (oldExtname: string): string
+  (oldExtname: string): string;
 }
 interface CustomDirnameFunction {
-  (oldDirname: string): string
+  (oldDirname: string): string;
 }
 class Exec {
-  fsInstance: fsUtils // 文件系统实例属性
+  fsInstance: fsUtils; // 文件系统实例属性
   constructor(dir: string, isUseIgnoredFiles: boolean) {
-    this.fsInstance = new fsUtils(dir, isUseIgnoredFiles)
+    this.fsInstance = new fsUtils(dir, isUseIgnoredFiles);
   }
 
   // 确保文件扩展名以点开头
   private ensureExtname(extname: string): string {
-    return extname.startsWith('.') ? extname : `.${extname}`
+    return extname.startsWith(".") ? extname : `.${extname}`;
   }
 
   /**
@@ -70,22 +70,27 @@ class Exec {
    *   如果未提供此参数，则默认筛选所有文件。
    * @returns 返回符合修改条件的文件信息列表。
    */
-  execModifyFileNamesBatchQuery = (modifyFilenameOptions?: ModifyFilenameOptions) => {
+  execModifyFileNamesBatchQuery = (
+    modifyFilenameOptions?: ModifyFilenameOptions,
+  ) => {
     const targetList = this.fsInstance.getFileInfoList().filter((item) => {
       const isFilenameMatch =
-        !modifyFilenameOptions?.filenameReg || modifyFilenameOptions?.filenameReg.test(item.name)
+        !modifyFilenameOptions?.filenameReg ||
+        modifyFilenameOptions?.filenameReg.test(item.name);
       const isExtnameMatch =
-        !modifyFilenameOptions?.extnameReg || modifyFilenameOptions?.extnameReg.test(item.ext)
+        !modifyFilenameOptions?.extnameReg ||
+        modifyFilenameOptions?.extnameReg.test(item.ext);
       const isDirnameMatch =
-        !modifyFilenameOptions?.dirnameReg || modifyFilenameOptions?.dirnameReg.test(item.dir)
+        !modifyFilenameOptions?.dirnameReg ||
+        modifyFilenameOptions?.dirnameReg.test(item.dir);
       const isIgnored =
         modifyFilenameOptions?.ignoreFilesPatterns?.some((pattern) =>
-          pattern.test(item.filePath)
-        ) ?? false
-      return isFilenameMatch && isExtnameMatch && isDirnameMatch && !isIgnored
-    })
-    return targetList
-  }
+          pattern.test(item.filePath),
+        ) ?? false;
+      return isFilenameMatch && isExtnameMatch && isDirnameMatch && !isIgnored;
+    });
+    return targetList;
+  };
 
   /**
    * 批量预览修改文件名的效果。
@@ -96,52 +101,63 @@ class Exec {
    * @returns 返回一个数组，其中每个元素都包含了原始文件名和拟修改后的文件名的详细比较。
    */
   execModifyFileNamesBatchPreview = (
-    modifyFilenameOptions: ModifyFilenameOptions
+    modifyFilenameOptions: ModifyFilenameOptions,
   ): PriviewResultReturnType => {
-    const targetList = this.execModifyFileNamesBatchQuery(modifyFilenameOptions)
-    const filePathListSet = new Set(this.fsInstance.filePathList)
+    const targetList = this.execModifyFileNamesBatchQuery(
+      modifyFilenameOptions,
+    );
+    const filePathListSet = new Set(this.fsInstance.filePathList);
     const replaceResult = targetList.map((item) => {
       let newFilename =
         modifyFilenameOptions.filenameReg && modifyFilenameOptions.filename
-          ? item.name.replace(modifyFilenameOptions.filenameReg, modifyFilenameOptions.filename)
-          : item.name
+          ? item.name.replace(
+              modifyFilenameOptions.filenameReg,
+              modifyFilenameOptions.filename,
+            )
+          : item.name;
       let newExtname =
         modifyFilenameOptions.extnameReg && modifyFilenameOptions.extname
-          ? item.ext.replace(modifyFilenameOptions.extnameReg, modifyFilenameOptions.extname)
-          : item.ext
+          ? item.ext.replace(
+              modifyFilenameOptions.extnameReg,
+              modifyFilenameOptions.extname,
+            )
+          : item.ext;
       const newDirname =
         modifyFilenameOptions.dirnameReg && modifyFilenameOptions.dirname
-          ? item.dir.replace(modifyFilenameOptions.dirnameReg, modifyFilenameOptions.dirname)
-          : item.dir
-      newExtname = this.ensureExtname(newExtname)
+          ? item.dir.replace(
+              modifyFilenameOptions.dirnameReg,
+              modifyFilenameOptions.dirname,
+            )
+          : item.dir;
+      newExtname = this.ensureExtname(newExtname);
       if (modifyFilenameOptions.addTimeStamp) {
-        const timeStamp = Date.now()
-        const randomString = generateSimpleRandomString()
-        newFilename += `_${timeStamp}_${randomString}`
+        const timeStamp = Date.now();
+        const randomString = generateSimpleRandomString();
+        newFilename += `_${timeStamp}_${randomString}`;
       }
       if (modifyFilenameOptions.addDateTime) {
-        const dateTime = getFormattedTimestamp()
-        const randomString = generateSimpleRandomString()
-        newFilename += `_${dateTime}_${randomString}`
+        const dateTime = getFormattedTimestamp();
+        const randomString = generateSimpleRandomString();
+        newFilename += `_${dateTime}_${randomString}`;
       }
       let newFilePath = path.format({
         dir: newDirname,
         name: newFilename,
-        ext: newExtname
-      })
-      newFilePath = generateUniquePathWithoutFs(newFilePath, filePathListSet)
-      filePathListSet.add(newFilePath)
+        ext: newExtname,
+      });
+      newFilePath = generateUniquePathWithoutFs(newFilePath, filePathListSet);
+      filePathListSet.add(newFilePath);
       return {
         oldFilePath: item.filePath,
         newFilePath,
-        isChange: item.filePath !== newFilePath
-      }
-    })
+        isChange: item.filePath !== newFilePath,
+      };
+    });
     return {
       changeCount: replaceResult.length,
-      changeRecords: replaceResult
-    }
-  }
+      changeRecords: replaceResult,
+    };
+  };
   /**
    * 批量修改文件名的执行函数。
    *
@@ -149,66 +165,78 @@ class Exec {
    * @returns 返回一个对象，包含修改的文件数量和修改记录。
    */
   async execModifyFileNamesBatch(
-    modifyFilenameOptions: ModifyFilenameOptions
+    modifyFilenameOptions: ModifyFilenameOptions,
   ): Promise<ModifyResultReturnType> {
-    const changeRecords: ModifyResult[] = []
-    let changeCount = 0
-    const targetList = this.execModifyFileNamesBatchQuery(modifyFilenameOptions)
-    const filePathListSet = new Set(this.fsInstance.filePathList)
+    const changeRecords: ModifyResult[] = [];
+    let changeCount = 0;
+    const targetList = this.execModifyFileNamesBatchQuery(
+      modifyFilenameOptions,
+    );
+    const filePathListSet = new Set(this.fsInstance.filePathList);
     // 使用 map 创建一个包含所有异步操作的 Promise 数组
     const promises = targetList.map(async (fileInfo) => {
       let newFilename =
         modifyFilenameOptions.filenameReg && modifyFilenameOptions.filename
-          ? fileInfo.name.replace(modifyFilenameOptions.filenameReg, modifyFilenameOptions.filename)
-          : fileInfo.name
+          ? fileInfo.name.replace(
+              modifyFilenameOptions.filenameReg,
+              modifyFilenameOptions.filename,
+            )
+          : fileInfo.name;
       let newExtname =
         modifyFilenameOptions.extnameReg && modifyFilenameOptions.extname
-          ? fileInfo.ext.replace(modifyFilenameOptions.extnameReg, modifyFilenameOptions.extname)
-          : fileInfo.ext
+          ? fileInfo.ext.replace(
+              modifyFilenameOptions.extnameReg,
+              modifyFilenameOptions.extname,
+            )
+          : fileInfo.ext;
       const newDirname =
         modifyFilenameOptions.dirnameReg && modifyFilenameOptions.dirname
-          ? fileInfo.dir.replace(modifyFilenameOptions.dirnameReg, modifyFilenameOptions.dirname)
-          : fileInfo.dir
-      newExtname = this.ensureExtname(newExtname)
+          ? fileInfo.dir.replace(
+              modifyFilenameOptions.dirnameReg,
+              modifyFilenameOptions.dirname,
+            )
+          : fileInfo.dir;
+      newExtname = this.ensureExtname(newExtname);
       if (modifyFilenameOptions.addTimeStamp) {
-        const timeStamp = Date.now()
-        const randomString = generateSimpleRandomString()
-        newFilename += `_${timeStamp}_${randomString}`
+        const timeStamp = Date.now();
+        const randomString = generateSimpleRandomString();
+        newFilename += `_${timeStamp}_${randomString}`;
       }
       if (modifyFilenameOptions.addDateTime) {
-        const dateTime = getFormattedTimestamp()
-        const randomString = generateSimpleRandomString()
-        newFilename += `_${dateTime}_${randomString}`
+        const dateTime = getFormattedTimestamp();
+        const randomString = generateSimpleRandomString();
+        newFilename += `_${dateTime}_${randomString}`;
       }
       let newFilePath = path.format({
         dir: newDirname,
         name: newFilename,
-        ext: newExtname
-      })
-      newFilePath = generateUniquePathWithoutFs(newFilePath, filePathListSet)
-      filePathListSet.add(newFilePath)
+        ext: newExtname,
+      });
+      newFilePath = generateUniquePathWithoutFs(newFilePath, filePathListSet);
+      filePathListSet.add(newFilePath);
       try {
-        const { isChange, uniqueNewFilePath } = await this.fsInstance.renameFile(
-          fileInfo.filePath,
-          newFilePath
-        )
+        const { isChange, uniqueNewFilePath } =
+          await this.fsInstance.renameFile(fileInfo.filePath, newFilePath);
         if (isChange) {
           changeRecords.push({
             oldFilePath: fileInfo.filePath,
-            newFilePath: uniqueNewFilePath
-          })
-          changeCount++
+            newFilePath: uniqueNewFilePath,
+          });
+          changeCount++;
         }
       } catch (error) {
-        logger.error(`重命名文件失败：${fileInfo.filePath} -> ${newFilePath}`, error)
+        logger.error(
+          `重命名文件失败：${fileInfo.filePath} -> ${newFilePath}`,
+          error,
+        );
       }
-    })
+    });
     // 等待所有的 Promise 完成
-    await Promise.all(promises)
+    await Promise.all(promises);
     return {
       changeCount,
-      changeRecords
-    }
+      changeRecords,
+    };
   }
 
   /**
@@ -220,69 +248,72 @@ class Exec {
    * @returns 返回一个对象，包含修改计数和变更记录列表。
    */
   async execModifyFileNamesBatchCustom(
-    modifyFilenameCustomOptions: ModifyFilenameOptions
+    modifyFilenameCustomOptions: ModifyFilenameOptions,
   ): Promise<ModifyResultReturnType> {
-    const changeRecords: ModifyResult[] = []
-    let changeCount = 0
-    const targetList = this.execModifyFileNamesBatchQuery(modifyFilenameCustomOptions)
+    const changeRecords: ModifyResult[] = [];
+    let changeCount = 0;
+    const targetList = this.execModifyFileNamesBatchQuery(
+      modifyFilenameCustomOptions,
+    );
 
     // 使用 map 创建一个包含所有异步操作的 Promise 数组
     const promises = targetList.map(async (fileInfo) => {
       const newFilename = modifyFilenameCustomOptions.customFilename
         ? modifyFilenameCustomOptions.customFilename(fileInfo.name)
-        : fileInfo.name
+        : fileInfo.name;
       let newExtname = modifyFilenameCustomOptions.customExtname
         ? modifyFilenameCustomOptions.customExtname(fileInfo.ext)
-        : fileInfo.ext
+        : fileInfo.ext;
       const newDirname = modifyFilenameCustomOptions.customDirname
         ? modifyFilenameCustomOptions.customDirname(fileInfo.dir)
-        : fileInfo.dir
-      newExtname = this.ensureExtname(newExtname) // 假设这是同步函数
+        : fileInfo.dir;
+      newExtname = this.ensureExtname(newExtname); // 假设这是同步函数
 
       const newFilePath = path.format({
         dir: newDirname,
         name: newFilename,
-        ext: newExtname
-      })
+        ext: newExtname,
+      });
       try {
-        const { isChange, uniqueNewFilePath } = await this.fsInstance.renameFile(
-          fileInfo.filePath,
-          newFilePath
-        )
+        const { isChange, uniqueNewFilePath } =
+          await this.fsInstance.renameFile(fileInfo.filePath, newFilePath);
         if (isChange) {
           changeRecords.push({
             oldFilePath: fileInfo.filePath,
-            newFilePath: uniqueNewFilePath
-          })
-          changeCount++
+            newFilePath: uniqueNewFilePath,
+          });
+          changeCount++;
         }
       } catch (error) {
-        logger.error(`重命名文件失败：${fileInfo.filePath} -> ${newFilePath}`, error)
+        logger.error(
+          `重命名文件失败：${fileInfo.filePath} -> ${newFilePath}`,
+          error,
+        );
       }
-    })
+    });
 
     // 等待所有的异步操作完成
-    await Promise.all(promises)
+    await Promise.all(promises);
 
     // 所有操作完成后返回结果
     return {
       changeCount,
-      changeRecords
-    }
+      changeRecords,
+    };
   }
 }
 export const createModifyFilenameExec = async (
   dir: string,
-  mode: 'preview' | 'exec' | 'custom',
+  mode: "preview" | "exec" | "custom",
   modifyFilenameOptions: ModifyFilenameOptions,
-  isUseIgnoredFiles: boolean
+  isUseIgnoredFiles: boolean,
 ) => {
-  const exec = new Exec(dir, isUseIgnoredFiles)
-  if (mode === 'preview') {
-    return exec.execModifyFileNamesBatchPreview(modifyFilenameOptions)
-  } else if (mode === 'exec') {
-    return await exec.execModifyFileNamesBatch(modifyFilenameOptions)
-  } else if (mode === 'custom') {
-    return await exec.execModifyFileNamesBatchCustom(modifyFilenameOptions)
+  const exec = new Exec(dir, isUseIgnoredFiles);
+  if (mode === "preview") {
+    return exec.execModifyFileNamesBatchPreview(modifyFilenameOptions);
+  } else if (mode === "exec") {
+    return await exec.execModifyFileNamesBatch(modifyFilenameOptions);
+  } else if (mode === "custom") {
+    return await exec.execModifyFileNamesBatchCustom(modifyFilenameOptions);
   }
-}
+};

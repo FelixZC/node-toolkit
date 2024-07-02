@@ -7,7 +7,7 @@
  * @property {Record<string, any>?} extra 可选的额外信息，以键值对的形式存储
  */
 export interface ExecFileInfo {
-  source: string
-  path: string
-  extra?: Record<string, any>
+  source: string;
+  path: string;
+  extra?: Record<string, any>;
 }

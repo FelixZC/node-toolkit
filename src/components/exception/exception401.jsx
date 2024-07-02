@@ -1,5 +1,5 @@
-import React from 'react'
-import { Result } from 'antd'
+import React from "react";
+import { Result } from "antd";
 const Exception401 = () => (
   <>
     <Result
@@ -8,5 +8,5 @@ const Exception401 = () => (
       subTitle="Sorry, you are not authorized to access this page."
     />
   </>
-)
-export default Exception401
+);
+export default Exception401;

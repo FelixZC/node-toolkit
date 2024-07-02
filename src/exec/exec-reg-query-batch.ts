@@ -1,6 +1,6 @@
-import fsUtils, { readFile } from '../utils/fs'
-import { getMainWindow } from '../desktop/main-window'
-import mdUtils from '../utils/md'
+import fsUtils, { readFile } from "../utils/fs";
+import { getMainWindow } from "../desktop/main-window";
+import mdUtils from "../utils/md";
 
 /**
  * 执行指定目录下的批量正则查询并返回结果
@@ -12,27 +12,31 @@ export const execRegQueryBatch = async (
   isUseIgnoredFiles: boolean,
   reg: RegExp,
   isAddSourcePath?: boolean,
-  ignoreFilesPatterns?: Array<RegExp>
+  ignoreFilesPatterns?: Array<RegExp>,
 ) => {
-  const fsInstance = new fsUtils(dir, isUseIgnoredFiles)
-  let count = 1
-  const mainWindow = getMainWindow()
+  const fsInstance = new fsUtils(dir, isUseIgnoredFiles);
+  let count = 1;
+  const mainWindow = getMainWindow();
   let promises = fsInstance.filePathList.map(async (filePath) => {
-    let result = ''
-    if (ignoreFilesPatterns && ignoreFilesPatterns.some((pattern) => pattern.test(filePath))) {
+    let result = "";
+    if (
+      ignoreFilesPatterns &&
+      ignoreFilesPatterns.some((pattern) => pattern.test(filePath))
+    ) {
       // 如果文件应该被忽略，则返回空字符串
     } else {
-      const content = await readFile(filePath)
-      result = mdUtils.queryContentByReg(content, reg)
+      const content = await readFile(filePath);
+      result = mdUtils.queryContentByReg(content, reg);
       // 添加文件路径
       if (isAddSourcePath && result.length) {
-        result = `${filePath}${fsInstance.eol}${result}`
+        result = `${filePath}${fsInstance.eol}${result}`;
       }
     }
-    mainWindow && mainWindow.setProgressBar(count++ / fsInstance.filePathList.length)
-    return result
-  })
-  let results = await Promise.all(promises)
-  let str = results.join('')
-  return str
-}
+    mainWindow &&
+      mainWindow.setProgressBar(count++ / fsInstance.filePathList.length);
+    return result;
+  });
+  let results = await Promise.all(promises);
+  let str = results.join("");
+  return str;
+};

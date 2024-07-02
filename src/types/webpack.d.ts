@@ -3,10 +3,10 @@ declare namespace NodeJS {
     context(
       module: string,
       exportStar: boolean,
-      regExp: RegExp
+      regExp: RegExp,
     ): {
-      keys(): string[]
-      (id: string): any
-    }
+      keys(): string[];
+      (id: string): any;
+    };
   }
 }

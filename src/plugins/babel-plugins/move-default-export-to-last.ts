@@ -1,5 +1,5 @@
-import { declare } from '@babel/helper-plugin-utils'
-import * as t from '@babel/types'
+import { declare } from "@babel/helper-plugin-utils";
+import * as t from "@babel/types";
 /**
  * 移动默认导出到最后
  * 定义一个AST（抽象语法树）转换插件。
@@ -8,7 +8,7 @@ import * as t from '@babel/types'
  */
 export default declare((babel) => {
   return {
-    name: 'ast-transform',
+    name: "ast-transform",
     // 插件名称。
     visitor: {
       // 访问器，指定需要转换的AST节点类型。
@@ -17,17 +17,20 @@ export default declare((babel) => {
         exit(path) {
           // 找到默认导出声明的索引。
           const defaultExportIndex = path.node.body.findIndex((item) =>
-            t.isExportDefaultDeclaration(item)
-          )
+            t.isExportDefaultDeclaration(item),
+          );
 
           // 如果存在默认导出且不在代码块的最后，则移动到末尾。
-          if (defaultExportIndex > -1 && defaultExportIndex !== path.node.body.length - 1) {
-            const node = path.node.body[defaultExportIndex] // 获取默认导出节点。
-            path.node.body.splice(defaultExportIndex, 1) // 从原位置移除。
-            path.node.body.push(node) // 将默认导出节点移到代码块末尾。
+          if (
+            defaultExportIndex > -1 &&
+            defaultExportIndex !== path.node.body.length - 1
+          ) {
+            const node = path.node.body[defaultExportIndex]; // 获取默认导出节点。
+            path.node.body.splice(defaultExportIndex, 1); // 从原位置移除。
+            path.node.body.push(node); // 将默认导出节点移到代码块末尾。
           }
-        }
-      }
-    }
-  }
-})
+        },
+      },
+    },
+  };
+});

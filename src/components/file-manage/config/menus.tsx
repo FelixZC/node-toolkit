@@ -1,14 +1,18 @@
-import React from 'react'
-import { copyTextToClipboard } from '@src/utils/common'
-import FileManageContext from '../context'
-import { message } from 'antd'
-import type { MenuProps } from 'antd'
-import { SortAscendingOutlined, SortDescendingOutlined, CheckOutlined } from '@ant-design/icons'
-import { useContext } from 'react'
+import React from "react";
+import { copyTextToClipboard } from "@src/utils/common";
+import FileManageContext from "../context";
+import { message } from "antd";
+import type { MenuProps } from "antd";
+import {
+  SortAscendingOutlined,
+  SortDescendingOutlined,
+  CheckOutlined,
+} from "@ant-design/icons";
+import { useContext } from "react";
 const getMenus = () => {
-  const context = useContext(FileManageContext)
+  const context = useContext(FileManageContext);
   if (!context) {
-    throw new Error('useContext must be inside a FileManageContext.Provider')
+    throw new Error("useContext must be inside a FileManageContext.Provider");
   }
   const {
     currentRow,
@@ -19,195 +23,208 @@ const getMenus = () => {
     sortConfig,
     setSortConfig,
     lockOrder,
-    setLockOrder
-  } = context
+    setLockOrder,
+  } = context;
 
   const getSortIcon = (field: string) => {
-    const localSortConfig = Array.isArray(sortConfig) ? sortConfig : [sortConfig]
-    const sortItem = localSortConfig.find((item) => item.field === field)
+    const localSortConfig = Array.isArray(sortConfig)
+      ? sortConfig
+      : [sortConfig];
+    const sortItem = localSortConfig.find((item) => item.field === field);
     if (sortItem) {
-      if (sortItem.order === 'ascend') {
-        return <SortAscendingOutlined />
-      } else if (sortItem.order === 'descend') {
-        return <SortDescendingOutlined />
+      if (sortItem.order === "ascend") {
+        return <SortAscendingOutlined />;
+      } else if (sortItem.order === "descend") {
+        return <SortDescendingOutlined />;
       } else {
-        return null
+        return null;
       }
     }
-    return null
-  }
+    return null;
+  };
   /**
    * 不搞多列排序烧脑，简简单单才是真
    * 非要搞的话，先把lockOrder去掉
    * @param field 要更新或添加的排序字段名。
    */
   const changeSortConfig = (field: string) => {
-    const localSortConfig = Array.isArray(sortConfig) ? [...sortConfig] : [sortConfig]
-    const sortItemIndex = localSortConfig.findIndex((item) => item.field === field)
+    const localSortConfig = Array.isArray(sortConfig)
+      ? [...sortConfig]
+      : [sortConfig];
+    const sortItemIndex = localSortConfig.findIndex(
+      (item) => item.field === field,
+    );
     if (sortItemIndex !== -1) {
-      const sortItem = localSortConfig[sortItemIndex]
-      sortItem.order = sortItem.order === lockOrder ? null : lockOrder
-      setSortConfig(localSortConfig)
+      const sortItem = localSortConfig[sortItemIndex];
+      sortItem.order = sortItem.order === lockOrder ? null : lockOrder;
+      setSortConfig(localSortConfig);
     } else {
       setSortConfig([
         {
           field,
-          order: lockOrder
-        }
-      ])
+          order: lockOrder,
+        },
+      ]);
     }
-  }
+  };
 
   const revertSortConfig = () => {
-    const localSortConfig = Array.isArray(sortConfig) ? [...sortConfig] : [sortConfig]
+    const localSortConfig = Array.isArray(sortConfig)
+      ? [...sortConfig]
+      : [sortConfig];
     localSortConfig.forEach((item) => {
-      item.order = item.order === 'ascend' ? 'descend' : item.order === 'descend' ? 'ascend' : null
-    })
-    setSortConfig(localSortConfig)
-  }
+      item.order =
+        item.order === "ascend"
+          ? "descend"
+          : item.order === "descend"
+            ? "ascend"
+            : null;
+    });
+    setSortConfig(localSortConfig);
+  };
 
-  const menuStyle: React.CSSProperties = {}
+  const menuStyle: React.CSSProperties = {};
   const menus: MenuProps = {
-    mode: 'vertical',
+    mode: "vertical",
     items: [
       {
-        key: 'view',
-        type: 'submenu',
-        label: '视图切换',
+        key: "view",
+        type: "submenu",
+        label: "视图切换",
         style: menuStyle,
         children: [
           {
-            key: 'large-icon',
-            label: '大图标',
-            type: 'item',
+            key: "large-icon",
+            label: "大图标",
+            type: "item",
             style: menuStyle,
             onClick: () => {
-              setCurrentView('large-icon')
-            }
+              setCurrentView("large-icon");
+            },
           },
           {
-            key: 'medium-icon',
-            label: '中等图标',
-            type: 'item',
+            key: "medium-icon",
+            label: "中等图标",
+            type: "item",
             style: menuStyle,
             onClick: () => {
-              setCurrentView('medium-icon')
-            }
+              setCurrentView("medium-icon");
+            },
           },
           {
-            key: 'small-icon',
-            label: '小图标',
-            type: 'item',
+            key: "small-icon",
+            label: "小图标",
+            type: "item",
             style: menuStyle,
             onClick: () => {
-              setCurrentView('small-icon')
-            }
+              setCurrentView("small-icon");
+            },
           },
           {
-            key: 'detail',
-            label: '详情',
-            type: 'item',
+            key: "detail",
+            label: "详情",
+            type: "item",
             style: menuStyle,
             onClick: () => {
-              setCurrentView('detail')
-            }
+              setCurrentView("detail");
+            },
           },
           {
-            key: 'preview',
-            type: 'item',
-            label: isUsePreview ? '关闭预览' : '开启预览',
+            key: "preview",
+            type: "item",
+            label: isUsePreview ? "关闭预览" : "开启预览",
             style: menuStyle,
             onClick: () => {
-              setIsUsePreview(!isUsePreview)
-            }
-          }
-        ]
+              setIsUsePreview(!isUsePreview);
+            },
+          },
+        ],
       },
       {
-        key: 'sort',
-        type: 'submenu',
+        key: "sort",
+        type: "submenu",
         style: menuStyle,
-        label: '排序',
+        label: "排序",
         children: [
           {
-            icon: getSortIcon('base'),
-            key: 'base',
-            label: '名称',
+            icon: getSortIcon("base"),
+            key: "base",
+            label: "名称",
             style: menuStyle,
-            type: 'item',
+            type: "item",
             onClick: () => {
-              changeSortConfig('base')
-            }
+              changeSortConfig("base");
+            },
           },
           {
-            icon: getSortIcon('filePath'),
-            key: 'filePath',
-            label: '路径',
+            icon: getSortIcon("filePath"),
+            key: "filePath",
+            label: "路径",
             style: menuStyle,
-            type: 'item',
+            type: "item",
             onClick: () => {
-              changeSortConfig('filePath')
-            }
+              changeSortConfig("filePath");
+            },
           },
           {
-            icon: getSortIcon('size'),
-            key: 'size',
-            label: '大小',
+            icon: getSortIcon("size"),
+            key: "size",
+            label: "大小",
             style: menuStyle,
-            type: 'item',
+            type: "item",
             onClick: () => {
-              changeSortConfig('size')
-            }
+              changeSortConfig("size");
+            },
           },
           {
-            icon: getSortIcon('ext'),
-            key: 'ext',
-            label: '扩展名',
+            icon: getSortIcon("ext"),
+            key: "ext",
+            label: "扩展名",
             style: menuStyle,
-            type: 'item',
+            type: "item",
             onClick: () => {
-              changeSortConfig('ext')
-            }
+              changeSortConfig("ext");
+            },
           },
           {
-            icon: getSortIcon('type'),
-            key: 'type',
-            label: '类型',
+            icon: getSortIcon("type"),
+            key: "type",
+            label: "类型",
             style: menuStyle,
-            type: 'item',
+            type: "item",
             onClick: () => {
-              changeSortConfig('type')
-            }
+              changeSortConfig("type");
+            },
           },
           {
-            icon: getSortIcon('mtimeFormat'),
-            key: 'mtimeFormat',
-            label: '修改时间',
+            icon: getSortIcon("mtimeFormat"),
+            key: "mtimeFormat",
+            label: "修改时间",
             style: menuStyle,
-            type: 'item',
+            type: "item",
             onClick: () => {
-              changeSortConfig('mtimeFormat')
-            }
+              changeSortConfig("mtimeFormat");
+            },
           },
           {
-            icon: getSortIcon('birthtime'),
-            key: 'birthtime',
-            label: '创建时间',
+            icon: getSortIcon("birthtime"),
+            key: "birthtime",
+            label: "创建时间",
             style: menuStyle,
-            type: 'item',
+            type: "item",
             onClick: () => {
-              changeSortConfig('birthtime')
-            }
+              changeSortConfig("birthtime");
+            },
           },
           {
-            icon: getSortIcon('atime'),
-            key: 'atime',
-            label: '最后访问时间',
+            icon: getSortIcon("atime"),
+            key: "atime",
+            label: "最后访问时间",
             style: menuStyle,
-            type: 'item',
+            type: "item",
             onClick: () => {
-              changeSortConfig('atime')
-            }
+              changeSortConfig("atime");
+            },
           },
           // {
           //   icon: getSortIcon('ctime'),
@@ -219,47 +236,47 @@ const getMenus = () => {
           //     changeSortConfig('ctime')
           //   },
           // },
-          { type: 'divider' },
+          { type: "divider" },
           {
-            icon: lockOrder === 'ascend' ? <CheckOutlined /> : null,
-            key: 'lockAscend',
-            type: 'item',
+            icon: lockOrder === "ascend" ? <CheckOutlined /> : null,
+            key: "lockAscend",
+            type: "item",
             style: menuStyle,
-            label: '升序',
+            label: "升序",
             onClick: () => {
-              setLockOrder('ascend')
-              revertSortConfig()
-            }
+              setLockOrder("ascend");
+              revertSortConfig();
+            },
           },
           {
-            icon: lockOrder === 'descend' ? <CheckOutlined /> : null,
-            key: 'lockDescend',
-            type: 'item',
+            icon: lockOrder === "descend" ? <CheckOutlined /> : null,
+            key: "lockDescend",
+            type: "item",
             style: menuStyle,
-            label: '降序',
+            label: "降序",
             onClick: () => {
-              setLockOrder('descend')
-              revertSortConfig()
-            }
-          }
-        ]
+              setLockOrder("descend");
+              revertSortConfig();
+            },
+          },
+        ],
       },
       {
-        key: 'copy',
-        type: 'item',
+        key: "copy",
+        type: "item",
         style: menuStyle,
-        label: '复制路径',
+        label: "复制路径",
         onClick: async () => {
           if (currentRow) {
-            await copyTextToClipboard(currentRow.filePath)
+            await copyTextToClipboard(currentRow.filePath);
           } else {
-            message.error('请选择文件')
+            message.error("请选择文件");
           }
-          hideMenu()
-        }
-      }
-    ]
-  }
-  return menus
-}
-export default getMenus
+          hideMenu();
+        },
+      },
+    ],
+  };
+  return menus;
+};
+export default getMenus;

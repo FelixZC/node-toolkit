@@ -1,6 +1,6 @@
-import React from 'react'
-import SvgIcon from '@src/components/svg-icon'
-import '@src/style/less/home-page.less'
+import React from "react";
+import SvgIcon from "@src/components/svg-icon";
+import "@src/style/less/home-page.less";
 const HomePage: React.FC = () => {
   return (
     <div className="home-container">
@@ -41,6 +41,6 @@ const HomePage: React.FC = () => {
         </a>
       </div>
     </div>
-  )
-}
-export default HomePage
+  );
+};
+export default HomePage;

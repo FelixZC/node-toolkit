@@ -1,26 +1,26 @@
-import React, { memo, useState } from 'react'
-import { Tooltip } from 'antd'
+import React, { memo, useState } from "react";
+import { Tooltip } from "antd";
 type SvgIconProps = {
   // 图标名称
-  svgName: string
+  svgName: string;
   // 图标尺寸，不传时为图标默认24px
-  iconSize?: number
+  iconSize?: number;
   /**
    * 若该图标需要hover时改变颜色，请先把该图标内置fill属性删除，然后传入两个值，
    * iconColor：原始颜色，hoverColor：hover时的颜色
    */
-  hasHover?: boolean
+  hasHover?: boolean;
   // 图标默认颜色
-  iconColor?: string
+  iconColor?: string;
   // 图标hover时的颜色
-  hoverColor?: string
+  hoverColor?: string;
   // 图标外层盒子的类名
-  className?: string
+  className?: string;
   // 是否需要显示小手
-  needPointer?: boolean
+  needPointer?: boolean;
   // 图标提示文案
-  toolTipValue?: string
-}
+  toolTipValue?: string;
+};
 /**
  * SvgIcon是一个用于渲染SVG图标的函数组件。
  * @param props - 组件接收的属性。
@@ -39,28 +39,28 @@ const SvgIcon = ({
   svgName,
   iconSize = 24,
   hasHover = false,
-  iconColor = '#000000',
-  hoverColor = '#000000',
-  className = '',
+  iconColor = "#000000",
+  hoverColor = "#000000",
+  className = "",
   needPointer = false,
-  toolTipValue = ''
+  toolTipValue = "",
 }: SvgIconProps) => {
   // 使用useState管理SVG颜色状态
-  const [svgColor, setSvgColor] = useState(iconColor)
+  const [svgColor, setSvgColor] = useState(iconColor);
 
   // 处理鼠标进入事件，改变SVG颜色（如果有悬停效果）
   const handleMouseEnter = () => {
     if (hasHover) {
-      setSvgColor(hoverColor)
+      setSvgColor(hoverColor);
     }
-  }
+  };
 
   // 处理鼠标离开事件，恢复SVG颜色（如果有悬停效果）
   const handleMouseLeave = () => {
     if (hasHover) {
-      setSvgColor(iconColor)
+      setSvgColor(iconColor);
     }
-  }
+  };
 
   // 渲染SVG图标，包括其容器和交互逻辑
   return (
@@ -70,7 +70,7 @@ const SvgIcon = ({
         style={{
           width: iconSize,
           height: iconSize,
-          cursor: needPointer ? 'pointer' : 'normal'
+          cursor: needPointer ? "pointer" : "normal",
         }}
         className={className}
         onMouseEnter={handleMouseEnter}
@@ -79,14 +79,14 @@ const SvgIcon = ({
         <svg
           fill={svgColor}
           style={{
-            width: '100%',
-            height: '100%'
+            width: "100%",
+            height: "100%",
           }}
         >
           <use xlinkHref={`#svg-${svgName}`} />
         </svg>
       </div>
     </Tooltip>
-  )
-}
-export default memo(SvgIcon)
+  );
+};
+export default memo(SvgIcon);

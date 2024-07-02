@@ -1,172 +1,177 @@
-import { clearCacheAll } from '../utils/fs'
-import { getIgnorePath } from '../utils/ignore'
-import { logger } from '../utils/log'
-import { getLogPath } from '../utils/log'
-import { Menu, MenuItemConstructorOptions } from 'electron'
-import { shell } from 'electron'
-import { dialog } from 'electron'
-const getMenuTemplate = (mainWindow: Electron.BrowserWindow): Array<MenuItemConstructorOptions> => {
+import { clearCacheAll } from "../utils/fs";
+import { getIgnorePath } from "../utils/ignore";
+import { logger } from "../utils/log";
+import { getLogPath } from "../utils/log";
+import { Menu, MenuItemConstructorOptions } from "electron";
+import { shell } from "electron";
+import { dialog } from "electron";
+const getMenuTemplate = (
+  mainWindow: Electron.BrowserWindow,
+): Array<MenuItemConstructorOptions> => {
   const menuTemplate: Array<MenuItemConstructorOptions> = [
     {
-      label: 'File',
+      label: "File",
       submenu: [
         {
-          label: 'Open Folder',
-          accelerator: 'CmdOrCtrl+O',
+          label: "Open Folder",
+          accelerator: "CmdOrCtrl+O",
           click: async () => {
             const result = await dialog.showOpenDialog({
-              properties: ['openDirectory'] // 设定为只选择目录
-            })
+              properties: ["openDirectory"], // 设定为只选择目录
+            });
             if (result.filePaths.length > 0) {
-              mainWindow.webContents.send('open-directory', result.filePaths[0])
+              mainWindow.webContents.send(
+                "open-directory",
+                result.filePaths[0],
+              );
             }
-          }
+          },
         },
         {
-          label: 'Open Operate Log',
-          accelerator: 'CmdOrCtrl+L',
+          label: "Open Operate Log",
+          accelerator: "CmdOrCtrl+L",
           click: () => {
-            const logPath = getLogPath()
+            const logPath = getLogPath();
             try {
-              shell.openPath(logPath)
+              shell.openPath(logPath);
             } catch (error) {
-              logger.error(error)
+              logger.error(error);
               dialog.showMessageBox({
-                type: 'error',
-                message: 'Error opening file',
-                buttons: ['OK']
-              })
+                type: "error",
+                message: "Error opening file",
+                buttons: ["OK"],
+              });
             }
-          }
+          },
         },
         {
-          label: 'Open Ignore Setting',
-          accelerator: 'CmdOrCtrl+P',
+          label: "Open Ignore Setting",
+          accelerator: "CmdOrCtrl+P",
           click: () => {
-            const ignorePath = getIgnorePath()
+            const ignorePath = getIgnorePath();
             try {
-              shell.openPath(ignorePath)
+              shell.openPath(ignorePath);
             } catch (error) {
-              logger.error(error)
+              logger.error(error);
               dialog.showMessageBox({
-                type: 'error',
-                message: 'Error opening ignore setting',
-                buttons: ['OK']
-              })
+                type: "error",
+                message: "Error opening ignore setting",
+                buttons: ["OK"],
+              });
             }
-          }
+          },
         },
         {
-          label: 'Clear Files Cache',
-          accelerator: 'CmdOrCtrl+F5',
+          label: "Clear Files Cache",
+          accelerator: "CmdOrCtrl+F5",
           click: () => {
-            clearCacheAll()
+            clearCacheAll();
             dialog.showMessageBox({
-              type: 'info',
-              message: 'Alreadly clear cache all',
-              buttons: ['OK']
-            })
-          }
+              type: "info",
+              message: "Alreadly clear cache all",
+              buttons: ["OK"],
+            });
+          },
         },
         {
-          role: 'quit'
-        }
-      ]
+          role: "quit",
+        },
+      ],
     },
     {
-      label: 'Edit',
+      label: "Edit",
       submenu: [
         {
-          role: 'undo'
+          role: "undo",
         },
         {
-          role: 'redo'
+          role: "redo",
         },
         {
-          type: 'separator'
+          type: "separator",
         },
         {
-          role: 'cut'
+          role: "cut",
         },
         {
-          role: 'copy'
+          role: "copy",
         },
         {
-          role: 'paste'
+          role: "paste",
         },
         {
-          role: 'delete'
+          role: "delete",
         },
         {
-          type: 'separator'
+          type: "separator",
         },
         {
-          role: 'selectAll'
-        }
-      ]
+          role: "selectAll",
+        },
+      ],
     },
     {
-      label: 'View',
+      label: "View",
       submenu: [
         {
-          role: 'reload'
+          role: "reload",
         },
         {
-          role: 'forceReload'
+          role: "forceReload",
         },
         {
-          role: 'toggleDevTools'
+          role: "toggleDevTools",
         },
         {
-          type: 'separator'
+          type: "separator",
         },
         {
-          role: 'resetZoom'
+          role: "resetZoom",
         },
         {
-          role: 'zoomIn'
+          role: "zoomIn",
         },
         {
-          role: 'zoomOut'
+          role: "zoomOut",
         },
         {
-          type: 'separator'
+          type: "separator",
         },
         {
-          role: 'togglefullscreen'
-        }
-      ]
+          role: "togglefullscreen",
+        },
+      ],
     },
     {
-      label: 'Window',
+      label: "Window",
       submenu: [
         {
-          role: 'minimize'
+          role: "minimize",
         },
         {
-          role: 'zoom'
+          role: "zoom",
         },
         {
-          role: 'close'
+          role: "close",
         },
         {
-          type: 'separator'
+          type: "separator",
         },
         {
-          role: 'front'
-        }
-      ]
-    }
-  ]
-  return menuTemplate
-}
+          role: "front",
+        },
+      ],
+    },
+  ];
+  return menuTemplate;
+};
 export const createMenu = (mainWindow: Electron.BrowserWindow) => {
-  const menuTemplate = getMenuTemplate(mainWindow)
-  const applicationMenu = Menu.buildFromTemplate(menuTemplate)
+  const menuTemplate = getMenuTemplate(mainWindow);
+  const applicationMenu = Menu.buildFromTemplate(menuTemplate);
   // 根据平台设置菜单
-  if (process.platform === 'darwin') {
-    Menu.setApplicationMenu(applicationMenu) // macOS上设置应用菜单
+  if (process.platform === "darwin") {
+    Menu.setApplicationMenu(applicationMenu); // macOS上设置应用菜单
   } else {
-    mainWindow.setMenu(applicationMenu) // 其他平台上设置窗口菜单
+    mainWindow.setMenu(applicationMenu); // 其他平台上设置窗口菜单
   }
-}
+};

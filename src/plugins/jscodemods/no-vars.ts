@@ -1,105 +1,110 @@
 //@ts-nocheck
-import { Transform } from 'jscodeshift'
+import { Transform } from "jscodeshift";
 const transformer: Transform = (file, api) => {
-  const j = api.jscodeshift
-  const root = j(file.source)
+  const j = api.jscodeshift;
+  const root = j(file.source);
   const TOP_LEVEL_TYPES = [
-    'ArrowFunctionExpression',
-    'Function',
-    'FunctionDeclaration',
-    'FunctionExpression',
-    'Program'
-  ]
-  const FOR_STATEMENTS = ['ForInStatement', 'ForOfStatement', 'ForStatement']
+    "ArrowFunctionExpression",
+    "Function",
+    "FunctionDeclaration",
+    "FunctionExpression",
+    "Program",
+  ];
+  const FOR_STATEMENTS = ["ForInStatement", "ForOfStatement", "ForStatement"];
   const getScopeNode = (blockScopeNode) => {
-    let scopeNode = blockScopeNode
-    let isInFor = FOR_STATEMENTS.indexOf(blockScopeNode.value.type) !== -1
+    let scopeNode = blockScopeNode;
+    let isInFor = FOR_STATEMENTS.indexOf(blockScopeNode.value.type) !== -1;
     while (TOP_LEVEL_TYPES.indexOf(scopeNode.node.type) === -1) {
-      scopeNode = scopeNode.parentPath
-      isInFor = isInFor || FOR_STATEMENTS.indexOf(scopeNode.value.type) !== -1
+      scopeNode = scopeNode.parentPath;
+      isInFor = isInFor || FOR_STATEMENTS.indexOf(scopeNode.value.type) !== -1;
     }
     return {
       isInFor,
-      scopeNode
-    }
-  }
+      scopeNode,
+    };
+  };
   const findFunctionDeclaration = (node, container) => {
-    let localNode = node
-    while (localNode.value.type !== 'FunctionDeclaration' && localNode !== container) {
-      localNode = localNode.parentPath
+    let localNode = node;
+    while (
+      localNode.value.type !== "FunctionDeclaration" &&
+      localNode !== container
+    ) {
+      localNode = localNode.parentPath;
     }
-    return localNode !== container ? localNode : null
-  }
+    return localNode !== container ? localNode : null;
+  };
   const isForLoopDeclarationWithoutInit = (declaration) => {
-    const parentType = declaration.parentPath.value.type
-    return parentType === 'ForOfStatement' || parentType === 'ForInStatement'
-  }
+    const parentType = declaration.parentPath.value.type;
+    return parentType === "ForOfStatement" || parentType === "ForInStatement";
+  };
   const extractNamesFromIdentifierLike = (id) => {
     if (!id) {
-      return []
+      return [];
     }
-    if (id.type === 'ObjectPattern') {
+    if (id.type === "ObjectPattern") {
       return id.properties
         .map((d) =>
-          d.type === 'SpreadProperty' ? [d.argument.name] : extractNamesFromIdentifierLike(d.value)
+          d.type === "SpreadProperty"
+            ? [d.argument.name]
+            : extractNamesFromIdentifierLike(d.value),
         )
-        .reduce((acc, val) => acc.concat(val), [])
+        .reduce((acc, val) => acc.concat(val), []);
     }
-    if (id.type === 'ArrayPattern') {
+    if (id.type === "ArrayPattern") {
       return id.elements
         .map(extractNamesFromIdentifierLike)
-        .reduce((acc, val) => acc.concat(val), [])
+        .reduce((acc, val) => acc.concat(val), []);
     }
-    if (id.type === 'Identifier') {
-      return [id.name]
+    if (id.type === "Identifier") {
+      return [id.name];
     }
-    if (id.type === 'RestElement') {
-      return [id.argument.name]
+    if (id.type === "RestElement") {
+      return [id.argument.name];
     }
-    return []
-  }
+    return [];
+  };
   const getDeclaratorNames = (declarator) => {
-    return extractNamesFromIdentifierLike(declarator.id)
-  }
+    return extractNamesFromIdentifierLike(declarator.id);
+  };
   const isIdInDeclarator = (declarator, name) => {
-    return getDeclaratorNames(declarator).indexOf(name) !== -1
-  }
+    return getDeclaratorNames(declarator).indexOf(name) !== -1;
+  };
   const getLocalScope = (scope, parentScope) => {
-    let localScope = scope
-    const names = []
+    let localScope = scope;
+    const names = [];
     while (localScope !== parentScope) {
       if (Array.isArray(localScope.value.body)) {
         localScope.value.body.forEach((node) => {
-          if (node.type === 'VariableDeclaration') {
+          if (node.type === "VariableDeclaration") {
             node.declarations.map(getDeclaratorNames).forEach((dNames) => {
               dNames.forEach((name) => {
                 if (names.indexOf(name) === -1) {
-                  names.push(name)
+                  names.push(name);
                 }
-              })
-            })
+              });
+            });
           }
-        })
+        });
       }
       if (Array.isArray(localScope.value.params)) {
         localScope.value.params.forEach((id) => {
           extractNamesFromIdentifierLike(id).forEach((name) => {
             if (names.indexOf(name) === -1) {
-              names.push(name)
+              names.push(name);
             }
-          })
-        })
+          });
+        });
       }
-      localScope = localScope.parentPath
+      localScope = localScope.parentPath;
     }
-    return names
-  }
+    return names;
+  };
   const hasLocalDeclarationFor = (nodePath, parentScope, name) => {
-    return getLocalScope(nodePath, parentScope).indexOf(name) !== -1
-  }
+    return getLocalScope(nodePath, parentScope).indexOf(name) !== -1;
+  };
   const isTruelyVar = (node, declarator) => {
-    const blockScopeNode = node.parentPath
-    const { isInFor, scopeNode } = getScopeNode(blockScopeNode) // if we are in a for loop of some kind, and the variable
+    const blockScopeNode = node.parentPath;
+    const { isInFor, scopeNode } = getScopeNode(blockScopeNode); // if we are in a for loop of some kind, and the variable
     // is referenced within a closure, revert to `var`
     // It would be safe to do the conversion if you can verify
     // that the callback is run synchronously
@@ -113,9 +118,9 @@ const transformer: Transform = (file, api) => {
             j(functionNode)
               .find(j.Identifier)
               .filter((id) => isIdInDeclarator(declarator, id.value.name))
-              .size() !== 0
+              .size() !== 0,
         )
-        .size() !== 0 // if two attempts are made to declare the same variable,
+        .size() !== 0; // if two attempts are made to declare the same variable,
     // revert to `var`
     // TODO: if they are in different block scopes, it may be
     //       safe to convert them anyway
@@ -128,11 +133,11 @@ const transformer: Transform = (file, api) => {
             otherDeclarator.value !== declarator &&
             getScopeNode(otherDeclarator).scopeNode === scopeNode &&
             getDeclaratorNames(otherDeclarator.value).some((name) =>
-              isIdInDeclarator(declarator, name)
+              isIdInDeclarator(declarator, name),
             )
-          )
+          );
         })
-        .size() !== 0
+        .size() !== 0;
     return (
       isUsedInClosure ||
       isDeclaredTwice ||
@@ -140,11 +145,11 @@ const transformer: Transform = (file, api) => {
         .find(j.Identifier)
         .filter((n) => {
           if (!isIdInDeclarator(declarator, n.value.name)) {
-            return false
+            return false;
           } // If the variable is used in a function declaration that gets
           // hoisted, it could get called early
 
-          const functionDeclaration = findFunctionDeclaration(n, scopeNode)
+          const functionDeclaration = findFunctionDeclaration(n, scopeNode);
           const isCalledInHoistedFunction =
             functionDeclaration &&
             j(scopeNode)
@@ -153,33 +158,36 @@ const transformer: Transform = (file, api) => {
                 return (
                   n.value.name === functionDeclaration.value.id.name &&
                   n.value.start < declarator.start
-                )
+                );
               })
-              .size() !== 0
+              .size() !== 0;
           if (isCalledInHoistedFunction) {
-            return true
+            return true;
           }
-          const referenceScope = getScopeNode(n.parent).scopeNode
-          if (referenceScope === scopeNode || !hasLocalDeclarationFor(n, scopeNode, n.value.name)) {
+          const referenceScope = getScopeNode(n.parent).scopeNode;
+          if (
+            referenceScope === scopeNode ||
+            !hasLocalDeclarationFor(n, scopeNode, n.value.name)
+          ) {
             // if the variable is referenced outside the current block
             // scope, revert to using `var`
             const isOutsideCurrentScope =
               j(blockScopeNode)
                 .find(j.Identifier)
                 .filter((innerNode) => innerNode.node.start === n.node.start)
-                .size() === 0 // if a variable is used before it is declared, revert to
+                .size() === 0; // if a variable is used before it is declared, revert to
             // `var`
             // TODO: If `isDeclaredTwice` is improved, and there is
             //       another declaration for this variable, it may be
             //       safe to convert this anyway
 
-            const isUsedBeforeDeclaration = n.value.start < declarator.start
-            return isOutsideCurrentScope || isUsedBeforeDeclaration
+            const isUsedBeforeDeclaration = n.value.start < declarator.start;
+            return isOutsideCurrentScope || isUsedBeforeDeclaration;
           }
         })
         .size() > 0
-    )
-  }
+    );
+  };
   /**
    * isMutated utility function to determine whether a VariableDeclaration
    * contains mutations. Takes an optional VariableDeclarator node argument to
@@ -191,47 +199,50 @@ const transformer: Transform = (file, api) => {
    */
 
   const isMutated = (node, declarator) => {
-    const scopeNode = node.parent
+    const scopeNode = node.parent;
     const hasAssignmentMutation =
       j(scopeNode)
         .find(j.AssignmentExpression)
         .filter((n) => {
           return extractNamesFromIdentifierLike(n.value.left).some((name) => {
-            return isIdInDeclarator(declarator, name)
-          })
+            return isIdInDeclarator(declarator, name);
+          });
         })
-        .size() > 0
+        .size() > 0;
     const hasUpdateMutation =
       j(scopeNode)
         .find(j.UpdateExpression)
         .filter((n) => {
-          return isIdInDeclarator(declarator, n.value.argument.name)
+          return isIdInDeclarator(declarator, n.value.argument.name);
         })
-        .size() > 0
-    return hasAssignmentMutation || hasUpdateMutation
-  }
+        .size() > 0;
+    return hasAssignmentMutation || hasUpdateMutation;
+  };
   const updatedAnything =
     root
       .find(j.VariableDeclaration)
-      .filter((dec) => dec.value.kind === 'var')
+      .filter((dec) => dec.value.kind === "var")
       .filter((declaration) => {
         return declaration.value.declarations.every((declarator) => {
-          return !isTruelyVar(declaration, declarator)
-        })
+          return !isTruelyVar(declaration, declarator);
+        });
       })
       .forEach((declaration) => {
-        const forLoopWithoutInit = isForLoopDeclarationWithoutInit(declaration)
+        const forLoopWithoutInit = isForLoopDeclarationWithoutInit(declaration);
         if (
           declaration.value.declarations.some((declarator) => {
-            return (!declarator.init && !forLoopWithoutInit) || isMutated(declaration, declarator)
+            return (
+              (!declarator.init && !forLoopWithoutInit) ||
+              isMutated(declaration, declarator)
+            );
           })
         ) {
-          declaration.value.kind = 'let'
+          declaration.value.kind = "let";
         } else {
-          declaration.value.kind = 'const'
+          declaration.value.kind = "const";
         }
       })
-      .size() !== 0
-  return updatedAnything ? root.toSource() : null
-}
-export default transformer
+      .size() !== 0;
+  return updatedAnything ? root.toSource() : null;
+};
+export default transformer;

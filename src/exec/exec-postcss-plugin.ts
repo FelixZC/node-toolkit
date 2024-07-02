@@ -1,11 +1,11 @@
-import { logger } from '../utils/log'
-import * as cliProgress from '../utils/cli-progress'
-import fsUtils, { readFile, writeFile } from '../utils/fs'
-import { getMainWindow } from '../desktop/main-window'
-import { Notification } from 'electron'
-import runPostcssPlugin from '../plugins/use-postcss-plugin'
-import type { ExecFileInfo } from '../types/common'
-import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
+import { logger } from "../utils/log";
+import * as cliProgress from "../utils/cli-progress";
+import fsUtils, { readFile, writeFile } from "../utils/fs";
+import { getMainWindow } from "../desktop/main-window";
+import { Notification } from "electron";
+import runPostcssPlugin from "../plugins/use-postcss-plugin";
+import type { ExecFileInfo } from "../types/common";
+import type { AcceptedPlugin as PostcssPlugin } from "postcss";
 
 /**
  * 执行PostCSS插件。
@@ -19,93 +19,95 @@ import type { AcceptedPlugin as PostcssPlugin } from 'postcss'
 export async function execPostcssPlugins(
   dir: string,
   pluginsPathList: string[],
-  isUseIgnoredFiles: boolean
+  isUseIgnoredFiles: boolean,
 ) {
   try {
-    const fsInstance = new fsUtils(dir, isUseIgnoredFiles)
-    const fileInfoList = fsInstance.getFileInfoList()
+    const fsInstance = new fsUtils(dir, isUseIgnoredFiles);
+    const fileInfoList = fsInstance.getFileInfoList();
     const plugins: PostcssPlugin[] = pluginsPathList.map((pluginPath) => {
-      const result = require(pluginPath)
+      const result = require(pluginPath);
       if (result.default) {
-        return result.default
+        return result.default;
       }
-      return result
-    })
+      return result;
+    });
     /**
      * 执行PostCSS插件处理文件。
      * @param plugins PostCSS插件数组，将按顺序对文件内容进行处理。
      */
-    const successList: string[] = [] // 执行改动文件列表
-    const errorList: string[] = [] // 执行错误列表
+    const successList: string[] = []; // 执行改动文件列表
+    const errorList: string[] = []; // 执行错误列表
     // 定义一个处理单个文件的异步函数。
     const handler = async (filePath: string) => {
       try {
         // 读取文件内容。
-        const content = await readFile(filePath)
+        const content = await readFile(filePath);
         // 准备文件信息，以供插件处理使用。
         const execFileInfo: ExecFileInfo = {
           path: filePath,
-          source: content
-        }
+          source: content,
+        };
         // 使用插件处理文件内容。
-        const result = await runPostcssPlugin(execFileInfo, plugins)
+        const result = await runPostcssPlugin(execFileInfo, plugins);
 
         // 如果处理结果与原内容相同或结果为空，则不进行写入操作。
         if (result === content || !result.length) {
-          return
+          return;
         }
 
         // 将处理后的内容写回文件。
-        await writeFile(filePath, result)
-        successList.push(filePath)
+        await writeFile(filePath, result);
+        successList.push(filePath);
       } catch (e) {
         // 捕获并警告处理过程中可能出现的错误。
-        logger.warn(e)
-        errorList.push(filePath)
+        logger.warn(e);
+        errorList.push(filePath);
       }
-    }
+    };
 
     // 定义有效文件扩展名列表。
     const vaildList = [
-      '.css',
+      ".css",
       // 标准的 CSS 文件
-      '.less',
+      ".less",
       // LESS 预处理器文件
-      '.scss',
+      ".scss",
       // SCSS 预处理器文件
-      '.sass',
+      ".sass",
       // Sass 预处理器文件（使用缩进）
-      '.styl',
+      ".styl",
       // Stylus 预处理器文件
-      '.pcss',
+      ".pcss",
       // PostCSS CSS 兼容语法文件
-      '.sss' // SugarSS 语法文件
+      ".sss", // SugarSS 语法文件
       // '.jsx',  // React JSX 文件，可能包含 CSS-in-JS，太损了
       // '.tsx',   // TypeScript 文件，也可能包含 CSS-in-JS，太损了
       // 可以添加更多通过插件支持的文件后缀
-    ]
+    ];
     // 筛选出需要处理的文件列表。
-    const targetList = fileInfoList.filter((fileInfo) => vaildList.includes(fileInfo.ext))
+    const targetList = fileInfoList.filter((fileInfo) =>
+      vaildList.includes(fileInfo.ext),
+    );
     // 初始化进度条，用于批量处理文件时的进度显示。
-    const { updateBar } = cliProgress.useCliProgress(targetList.length) // 初始化进度条。
+    const { updateBar } = cliProgress.useCliProgress(targetList.length); // 初始化进度条。
     // 遍历所有有效文件，逐一处理，并更新进度条
-    let count = 1
-    const mainWindow = getMainWindow()
+    let count = 1;
+    const mainWindow = getMainWindow();
     for (const item of targetList) {
-      await handler(item.filePath)
-      updateBar()
-      mainWindow && mainWindow.setProgressBar(count++ / targetList.length)
+      await handler(item.filePath);
+      updateBar();
+      mainWindow && mainWindow.setProgressBar(count++ / targetList.length);
     }
     mainWindow &&
       new Notification({
-        title: '处理完成',
-        body: `共扫描${targetList.length}个文件，执行改动文件${successList.length}个，执行失败文件${errorList.length}个`
-      }).show()
+        title: "处理完成",
+        body: `共扫描${targetList.length}个文件，执行改动文件${successList.length}个，执行失败文件${errorList.length}个`,
+      }).show();
     return {
       successList,
-      errorList
-    }
+      errorList,
+    };
   } catch (e) {
-    logger.warn(e)
+    logger.warn(e);
   }
 }

@@ -1,4 +1,4 @@
-import { declare } from '@babel/helper-plugin-utils'
+import { declare } from "@babel/helper-plugin-utils";
 /**
  * @deprecated
  * 移除包含this的无效代码
@@ -8,7 +8,7 @@ import { declare } from '@babel/helper-plugin-utils'
  */
 export default declare((babel) => {
   return {
-    name: 'ast-transform',
+    name: "ast-transform",
     // 插件名称。
     visitor: {
       // 针对BlockStatement节点的访问器。
@@ -16,8 +16,8 @@ export default declare((babel) => {
         // 检查并移除包含特定字符串的前导注释。
         if (path.node.leadingComments && path.node.leadingComments.length) {
           for (const comments of path.node.leadingComments) {
-            if (comments.value.includes('this.')) {
-              path.node.leadingComments = null
+            if (comments.value.includes("this.")) {
+              path.node.leadingComments = null;
             }
           }
         }
@@ -25,8 +25,8 @@ export default declare((babel) => {
         // 检查并移除包含特定字符串的尾随注释。
         if (path.node.trailingComments && path.node.trailingComments.length) {
           for (const comments of path.node.trailingComments) {
-            if (comments.value.includes('this.')) {
-              path.node.trailingComments = null
+            if (comments.value.includes("this.")) {
+              path.node.trailingComments = null;
             }
           }
         }
@@ -34,8 +34,8 @@ export default declare((babel) => {
         // 检查并移除包含特定字符串的内部注释。
         if (path.node.innerComments && path.node.innerComments.length) {
           for (const comments of path.node.innerComments) {
-            if (comments.value.includes('this.')) {
-              path.node.innerComments = null
+            if (comments.value.includes("this.")) {
+              path.node.innerComments = null;
             }
           }
         }
@@ -48,23 +48,29 @@ export default declare((babel) => {
             path.node &&
             (!!path.node.leadingComments ||
               !!path.node.trailingComments ||
-              !!path.node.innerComments)
-        )
+              !!path.node.innerComments),
+        );
         if (parent) {
           // 对父节点的前导注释进行相同的检查和移除操作。
-          if (parent.node.leadingComments && parent.node.leadingComments.length) {
+          if (
+            parent.node.leadingComments &&
+            parent.node.leadingComments.length
+          ) {
             for (const comments of parent.node.leadingComments) {
-              if (comments.value.includes('this.')) {
-                parent.node.leadingComments = null
+              if (comments.value.includes("this.")) {
+                parent.node.leadingComments = null;
               }
             }
           }
 
           // 对父节点的尾随注释进行相同的检查和移除操作。
-          if (parent.node.trailingComments && parent.node.trailingComments.length) {
+          if (
+            parent.node.trailingComments &&
+            parent.node.trailingComments.length
+          ) {
             for (const comments of parent.node.trailingComments) {
-              if (comments.value.includes('this.')) {
-                parent.node.trailingComments = null
+              if (comments.value.includes("this.")) {
+                parent.node.trailingComments = null;
               }
             }
           }
@@ -72,13 +78,13 @@ export default declare((babel) => {
           // 对父节点的内部注释进行相同的检查和移除操作。
           if (parent.node.innerComments && parent.node.innerComments.length) {
             for (const comments of parent.node.innerComments) {
-              if (comments.value.includes('this.')) {
-                parent.node.innerComments = null
+              if (comments.value.includes("this.")) {
+                parent.node.innerComments = null;
               }
             }
           }
         }
-      }
-    }
-  }
-})
+      },
+    },
+  };
+});

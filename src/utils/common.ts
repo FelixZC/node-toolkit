@@ -1,6 +1,6 @@
-import { FileType } from '@src/types/file'
-import { message } from 'antd'
-import { compare, orderBy } from 'natural-orderby'
+import { FileType } from "@src/types/file";
+import { message } from "antd";
+import { compare, orderBy } from "natural-orderby";
 /**
  * 获取数据类型
  * @param {any} obj - 任意待检测的数据
@@ -16,10 +16,10 @@ import { compare, orderBy } from 'natural-orderby'
    | 'Array'
    | 'Function'
  */
-import * as mime from 'mime-types'
+import * as mime from "mime-types";
 export const getDataType = (obj: any) => {
-  return Object.prototype.toString.call(obj).slice(8, -1)
-}
+  return Object.prototype.toString.call(obj).slice(8, -1);
+};
 
 /**
  * 对对象内部属性排序
@@ -27,76 +27,82 @@ export const getDataType = (obj: any) => {
  * @returns {Object} 属性排序后的新对象
  */
 export function sortObjAttr(target: Record<string, any>) {
-  const dataType = getDataType(target)
-  if (dataType !== 'Object') {
-    throw new Error('sortObjAttr数据类型错误')
+  const dataType = getDataType(target);
+  if (dataType !== "Object") {
+    throw new Error("sortObjAttr数据类型错误");
   }
-  const newObj = {} as Record<string, any>
+  const newObj = {} as Record<string, any>;
   const keys = Object.keys(target).sort((a, b) => {
-    return a.localeCompare(b)
-  })
+    return a.localeCompare(b);
+  });
   keys.forEach((key) => {
-    newObj[key] = target[key]
-  })
-  return newObj
+    newObj[key] = target[key];
+  });
+  return newObj;
 }
 
 export interface SortOptions {
-  fields: string[] // 需要排序的字段名称数组
-  orders?: 'asc' | 'desc'[] // 每个字段的排序顺序数组
+  fields: string[]; // 需要排序的字段名称数组
+  orders?: "asc" | "desc"[]; // 每个字段的排序顺序数组
 }
 
-export function sortArray(arr: Array<Record<string, any>>, options: SortOptions) {
+export function sortArray(
+  arr: Array<Record<string, any>>,
+  options: SortOptions,
+) {
   if (!Array.isArray(arr)) {
-    throw new Error('sortArray数据类型错误')
+    throw new Error("sortArray数据类型错误");
   }
 
   // 检查 options 是否包含必要的字段
   if (!options.fields || !Array.isArray(options.fields)) {
-    throw new Error('必须提供至少一个排序字段')
+    throw new Error("必须提供至少一个排序字段");
   }
 
   // 如果未提供 orders，设置默认为所有字段升序排序
-  const orders = options.orders || options.fields.map(() => 'asc')
+  const orders = options.orders || options.fields.map(() => "asc");
 
   // 确保 orders 数组的长度与 fields 数组相同
   if (options.fields.length !== orders.length) {
-    throw new Error('每个排序字段必须有一个对应的排序顺序')
+    throw new Error("每个排序字段必须有一个对应的排序顺序");
   }
 
   // 使用 natural-orderby 的 orderBy 函数进行自然排序
-  return orderBy(arr, options.fields, orders)
+  return orderBy(arr, options.fields, orders);
 }
 
 interface GroupCache<T> {
   [key: string]: {
-    count: number
-    group: T[]
-    groupKey: string
-  }
+    count: number;
+    group: T[];
+    groupKey: string;
+  };
 }
-export function groupBy<T extends Record<string, any>>(arr: T[], groupKey: string): GroupCache<T> {
+export function groupBy<T extends Record<string, any>>(
+  arr: T[],
+  groupKey: string,
+): GroupCache<T> {
   if (!Array.isArray(arr)) {
-    throw new Error('非数组类型，无法分类')
+    throw new Error("非数组类型，无法分类");
   }
-  const cache = {} as GroupCache<T>
+  const cache = {} as GroupCache<T>;
   arr.forEach((element) => {
     if (!element.hasOwnProperty(groupKey)) {
-      throw new Error(`元素缺少分组键：${groupKey}`)
+      throw new Error(`元素缺少分组键：${groupKey}`);
     }
-    const cacheKey = element[groupKey]
+    const cacheKey = element[groupKey];
     if (cache[cacheKey]) {
-      cache[cacheKey].group.push(element)
-      cache[cacheKey].count++
+      cache[cacheKey].group.push(element);
+      cache[cacheKey].count++;
     } else {
       cache[cacheKey] = {
         count: 1,
         group: [element],
-        groupKey
-      }
+        groupKey,
+      };
     }
-  })
-  return cache
+  });
+  return cache;
 }
 
 /**
@@ -105,9 +111,12 @@ export function groupBy<T extends Record<string, any>>(arr: T[], groupKey: strin
  * @returns {string} 短横线分隔的字符串
  */
 export const kebabCase = function (str: string) {
-  const hyphenateRE = /([^-])([A-Z])/g
-  return str.replace(hyphenateRE, '$1-$2').replace(hyphenateRE, '$1-$2').toLowerCase()
-}
+  const hyphenateRE = /([^-])([A-Z])/g;
+  return str
+    .replace(hyphenateRE, "$1-$2")
+    .replace(hyphenateRE, "$1-$2")
+    .toLowerCase();
+};
 
 /**
  * 移除字符串开头的下划线和连字符
@@ -115,9 +124,9 @@ export const kebabCase = function (str: string) {
  * @returns {string} 处理后的字符串
  */
 export const easeUnline = function (str: string) {
-  const easeReg2 = /^[_-]/g
-  return str.replace(easeReg2, '')
-}
+  const easeReg2 = /^[_-]/g;
+  return str.replace(easeReg2, "");
+};
 
 /**
  * 首字母大写
@@ -125,9 +134,9 @@ export const easeUnline = function (str: string) {
  * @returns {string} 首字母大写的字符串
  */
 export const capitalize = function (str: string) {
-  if (typeof str !== 'string') return str
-  return str.charAt(0).toUpperCase() + str.slice(1)
-}
+  if (typeof str !== "string") return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
 
 /**
  * 判断给定的字符串是否为引用路径。
@@ -137,30 +146,30 @@ export const capitalize = function (str: string) {
  */
 export const isPath = (str: string): boolean => {
   const startsWithList: string[] = [
-    'src',
-    '@',
-    '@src',
-    'images',
-    'img',
-    'styles',
-    '~',
-    '../',
-    './',
-    '/',
-    'dist',
-    'node_modules',
-    'assets',
-    'components',
-    'utils',
-    'scripts',
-    'lib',
-    'public'
+    "src",
+    "@",
+    "@src",
+    "images",
+    "img",
+    "styles",
+    "~",
+    "../",
+    "./",
+    "/",
+    "dist",
+    "node_modules",
+    "assets",
+    "components",
+    "utils",
+    "scripts",
+    "lib",
+    "public",
     // 其他可能的引用路径前缀...
-  ]
+  ];
 
   // 检查 str 是否以 startsWithList 中的任何一个字符串开头
-  return startsWithList.some((prefix) => str.startsWith(prefix))
-}
+  return startsWithList.some((prefix) => str.startsWith(prefix));
+};
 
 /**
  * 转化导入路径引用为驼峰规则，使用指定分隔符
@@ -168,17 +177,17 @@ export const isPath = (str: string): boolean => {
  * @param {string} seperator - 分隔符，默认为 '/'
  * @returns {string} 转化后的字符串
  */
-export const transferRef = (str: string, seperator = '/') => {
+export const transferRef = (str: string, seperator = "/") => {
   if (!str) {
-    return str
+    return str;
   }
   return str
     .split(seperator)
     .map((item) => {
       let result = kebabCase(item)
-        .replace(/[_-]{2}/g, '-')
-        .replace(/(['"`/\\])-/g, '$1')
-        .replace(/(\b\w\b)-(?=\b\w\b)/g, '$1')
+        .replace(/[_-]{2}/g, "-")
+        .replace(/(['"`/\\])-/g, "$1")
+        .replace(/(\b\w\b)-(?=\b\w\b)/g, "$1");
 
       /** 当代码管理工具和window组合使用，会出现文件大小写同源问题 */
       /** too stupid to continue  */
@@ -189,10 +198,10 @@ export const transferRef = (str: string, seperator = '/') => {
       /** this is situation two,exec after one ，also you can skip them */
       // result = easeUnline(result);
 
-      return result
+      return result;
     })
-    .join(seperator)
-}
+    .join(seperator);
+};
 
 /**
  * 执行字符串形式的 JavaScript 代码，存在无效引用时会报错
@@ -200,8 +209,8 @@ export const transferRef = (str: string, seperator = '/') => {
  * @returns {any} 代码执行结果
  */
 export function strToJson(str: string) {
-  const json = eval('(' + str + ')')
-  return json
+  const json = eval("(" + str + ")");
+  return json;
 }
 
 /**
@@ -213,25 +222,25 @@ export function strToJson(str: string) {
 export const setValueByKeys = (
   target: Record<string, any> = {},
   keys: string[] | string,
-  value: any
+  value: any,
 ) => {
-  let localKeys = keys
-  if (typeof localKeys === 'string') {
-    localKeys = localKeys.split(',')
+  let localKeys = keys;
+  if (typeof localKeys === "string") {
+    localKeys = localKeys.split(",");
   }
   localKeys.reduce((previousValue, currentKey, currentIndex) => {
     if (currentIndex === localKeys.length - 1) {
-      previousValue[currentKey] = value
+      previousValue[currentKey] = value;
     } else {
       return (
         previousValue?.[currentKey] ||
         Object.defineProperty({}, currentKey, {
-          value: {}
+          value: {},
         })
-      )
+      );
     }
-  }, target)
-}
+  }, target);
+};
 
 /**
  * 获取嵌套对象属性值
@@ -239,229 +248,238 @@ export const setValueByKeys = (
  * @param {string[] | string} keys - 属性路径，可以是逗号分隔的字符串或键名数组
  * @returns {any} 指定路径的属性值，若不存在则返回 undefined
  */
-export const getValueByKeys = (target: Record<string, any> = {}, keys: string[] | string): any => {
-  let localKeys = keys
-  if (typeof localKeys === 'string') {
-    localKeys = localKeys.split(',')
+export const getValueByKeys = (
+  target: Record<string, any> = {},
+  keys: string[] | string,
+): any => {
+  let localKeys = keys;
+  if (typeof localKeys === "string") {
+    localKeys = localKeys.split(",");
   }
   return localKeys.reduce((previousValue, currentKey) => {
-    return previousValue?.[currentKey]
-  }, target)
-}
+    return previousValue?.[currentKey];
+  }, target);
+};
 interface NodeWithId {
-  id?: string | number
-  parentId?: string | number | null
-  children?: NodeWithId[]
+  id?: string | number;
+  parentId?: string | number | null;
+  children?: NodeWithId[];
 }
 export function buildTree<T extends NodeWithId>(
   nodes: T[],
   idProp: keyof T,
-  parentProp: keyof T
+  parentProp: keyof T,
 ): T[] {
   const nodeMap: {
-    [key: string]: T
-  } = {}
-  const rootNodes: T[] = []
+    [key: string]: T;
+  } = {};
+  const rootNodes: T[] = [];
 
   // 初始化节点映射
   nodes.forEach((node) => {
-    const nodeId = String(node[idProp]) // 确保 id 是字符串
+    const nodeId = String(node[idProp]); // 确保 id 是字符串
     nodeMap[nodeId] = {
       ...node,
-      children: node.children || [] // 初始化子节点数组
-    }
-  })
+      children: node.children || [], // 初始化子节点数组
+    };
+  });
 
   // 构建树结构
   nodes.forEach((node) => {
-    const parentId = String(node[parentProp]) // 确保 parentId 是字符串
+    const parentId = String(node[parentProp]); // 确保 parentId 是字符串
     if (parentId && nodeMap[parentId]) {
       // 如果存在父节点，则将当前节点添加到父节点的子节点中
-      nodeMap[parentId].children?.push(nodeMap[String(node[idProp])])
+      nodeMap[parentId].children?.push(nodeMap[String(node[idProp])]);
     } else {
       // 如果没有父节点，则认为是根节点
-      rootNodes.push(nodeMap[String(node[idProp])])
+      rootNodes.push(nodeMap[String(node[idProp])]);
     }
-  })
-  return rootNodes // 返回根节点数组
+  });
+  return rootNodes; // 返回根节点数组
 }
 export function pickProperties<T extends object, K extends keyof T>(
   objects: T[],
-  propertiesToKeep: K[]
+  propertiesToKeep: K[],
 ): Pick<T, K>[] {
   return (Array.isArray(objects) ? objects : [objects]).map((obj) => {
-    const picked: any = {}
+    const picked: any = {};
     for (const propertyKey of propertiesToKeep) {
-      const value = obj[propertyKey]
+      const value = obj[propertyKey];
       // 如果属性是对象且存在，则递归调用pickProperties
-      if (value && typeof value === 'object') {
+      if (value && typeof value === "object") {
         // 这里假设嵌套对象的键也在 propertiesToKeep 中
-        picked[propertyKey] = pickProperties(value as T[], propertiesToKeep)
+        picked[propertyKey] = pickProperties(value as T[], propertiesToKeep);
       } else {
         // 否则，直接复制属性值
-        picked[propertyKey] = value
+        picked[propertyKey] = value;
       }
     }
     // 确保返回的对象类型是 Pick<T, K>
-    return picked as Pick<T, K>
-  })
+    return picked as Pick<T, K>;
+  });
 }
 export const getIgnorePatterns = (str: string): RegExp[] => {
   // 将排除文件列表转换为正则表达式数组
   const ignoreFilesPatterns = str
-    .split(',')
+    .split(",")
     .map((pattern) => pattern.trim())
     .filter((pattern) => pattern.length)
     .map((pattern) => {
       // 转义正则表达式中的特殊字符，除了星号（*）之外
-      let escapedPattern = escapeReg(pattern)
+      let escapedPattern = escapeReg(pattern);
       // 替换星号（*）为正则表达式中的量词 .*，表示匹配任意字符任意次
-      escapedPattern = escapedPattern.replace(/\*/g, '.*')
+      escapedPattern = escapedPattern.replace(/\*/g, ".*");
       // 创建正则表达式对象
-      return new RegExp(escapedPattern)
-    })
-  return ignoreFilesPatterns
-}
+      return new RegExp(escapedPattern);
+    });
+  return ignoreFilesPatterns;
+};
 export const escapeReg = (string: string) => {
   // 转义正则表达式中的特殊字符，包括 -
-  return string.replace(/[.*+?^${}()|[\]\\-]/g, '\\$&')
-}
+  return string.replace(/[.*+?^${}()|[\]\\-]/g, "\\$&");
+};
 export const convertToReg = (
   query: string,
   matchReg: boolean,
   matchCase: boolean,
   matchWholeWord: boolean,
-  matchGlobal?: boolean
+  matchGlobal?: boolean,
 ) => {
   if (!query.length) {
-    return null
+    return null;
   }
   // 如果是使用正则表达式，直接创建，否则需要转义查询字符串以避免特殊字符
-  const pattern = matchReg ? query : escapeReg(query)
+  const pattern = matchReg ? query : escapeReg(query);
 
   // 构建正则表达式字符串
-  let regExpString = matchWholeWord ? `\\b${pattern}\\b` : pattern
+  let regExpString = matchWholeWord ? `\\b${pattern}\\b` : pattern;
 
   // 默认全局搜索
-  let flags = ''
+  let flags = "";
   if (matchGlobal) {
-    flags += 'g'
+    flags += "g";
   }
   // 如果不区分大小写，则添加 'i' 标志
   if (!matchCase) {
-    flags += 'i'
+    flags += "i";
   }
   try {
     // 创建正则表达式对象，需要将模式和标志作为两个参数传递
-    return new RegExp(regExpString, flags)
+    return new RegExp(regExpString, flags);
   } catch (error) {
-    return null
+    return null;
   }
-}
+};
 function mimeTypeToFileType(mimeType: string): FileType {
   // 移除可能的参数，只保留基本 MIME 类型
-  const baseMimeType = mimeType.split(';')[0].trim().toLowerCase()
+  const baseMimeType = mimeType.split(";")[0].trim().toLowerCase();
 
   // 根据 MIME 类型的基本部分进行分类
   switch (true) {
-    case baseMimeType.startsWith('audio/'):
-      return 'Audio'
-    case baseMimeType.startsWith('video/'):
-      return 'Video'
-    case baseMimeType.startsWith('image/'):
-      return 'Image'
-    case baseMimeType.startsWith('text/') || baseMimeType === 'application/xml':
-      return 'Plain Text'
-    case baseMimeType === 'application/pdf':
-      return 'Document'
+    case baseMimeType.startsWith("audio/"):
+      return "Audio";
+    case baseMimeType.startsWith("video/"):
+      return "Video";
+    case baseMimeType.startsWith("image/"):
+      return "Image";
+    case baseMimeType.startsWith("text/") || baseMimeType === "application/xml":
+      return "Plain Text";
+    case baseMimeType === "application/pdf":
+      return "Document";
     // 单独处理 PDF
-    case baseMimeType.startsWith('application/'):
-      if (baseMimeType.startsWith('application/font') || baseMimeType.endsWith('+x-woff')) {
-        return 'Font'
-      } else if (baseMimeType.includes('font/') || baseMimeType.endsWith('+x-woff')) {
-        return 'Font' // 处理 WOFF 字体
-      } else if (
-        baseMimeType.endsWith('x-tar') ||
-        baseMimeType.endsWith('zip') ||
-        baseMimeType.endsWith('x-rar-compressed') ||
-        baseMimeType.endsWith('x-7z-compressed')
+    case baseMimeType.startsWith("application/"):
+      if (
+        baseMimeType.startsWith("application/font") ||
+        baseMimeType.endsWith("+x-woff")
       ) {
-        return 'Archive' // 处理归档文件
+        return "Font";
+      } else if (
+        baseMimeType.includes("font/") ||
+        baseMimeType.endsWith("+x-woff")
+      ) {
+        return "Font"; // 处理 WOFF 字体
+      } else if (
+        baseMimeType.endsWith("x-tar") ||
+        baseMimeType.endsWith("zip") ||
+        baseMimeType.endsWith("x-rar-compressed") ||
+        baseMimeType.endsWith("x-7z-compressed")
+      ) {
+        return "Archive"; // 处理归档文件
       } else {
-        return 'Application' // 其他 application 类型
+        return "Application"; // 其他 application 类型
       }
-    case baseMimeType.startsWith('application/x-msdownload') ||
-      baseMimeType.startsWith('application/x-ms-') ||
-      baseMimeType.endsWith('x-msdownload') ||
-      baseMimeType.startsWith('application/x-executable') ||
-      baseMimeType.startsWith('application/x-elf') ||
-      baseMimeType.endsWith('x-mach-o'):
-      return 'Executable'
+    case baseMimeType.startsWith("application/x-msdownload") ||
+      baseMimeType.startsWith("application/x-ms-") ||
+      baseMimeType.endsWith("x-msdownload") ||
+      baseMimeType.startsWith("application/x-executable") ||
+      baseMimeType.startsWith("application/x-elf") ||
+      baseMimeType.endsWith("x-mach-o"):
+      return "Executable";
     // 处理 Windows 可执行文件
     default:
-      return 'Other'
+      return "Other";
     // 默认类别
   }
 }
 export function classifyFileMimeType(ext: string): FileType {
-  const mimeType = mime.lookup(ext)
+  const mimeType = mime.lookup(ext);
   if (mimeType) {
-    return mimeTypeToFileType(mimeType)
+    return mimeTypeToFileType(mimeType);
   }
-  return 'Other'
+  return "Other";
 }
 export function formatFileSize(bytes: number, decimalPlaces = 2) {
-  if (bytes === 0) return '0 Bytes'
-  const k = 1024
-  const dm = decimalPlaces < 0 ? 0 : decimalPlaces
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
+  if (bytes === 0) return "0 Bytes";
+  const k = 1024;
+  const dm = decimalPlaces < 0 ? 0 : decimalPlaces;
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
 }
 
 export const enhancedCompare = (
   a: Record<string, any>,
   b: Record<string, any>,
-  order: 'asc' | 'desc' = 'asc',
-  field: string
+  order: "asc" | "desc" = "asc",
+  field: string,
 ): number => {
   // 定义一个比较函数，用于自然排序
-  const naturalCompare = compare({ order: order })
+  const naturalCompare = compare({ order: order });
 
-  let aValue = a[field]
-  let bValue = b[field]
+  let aValue = a[field];
+  let bValue = b[field];
 
-  return naturalCompare(String(aValue), String(bValue))
-}
+  return naturalCompare(String(aValue), String(bValue));
+};
 
 export async function copyTextToClipboard(text: string): Promise<void> {
   if (navigator.clipboard && window.isSecureContext) {
     try {
-      await navigator.clipboard.writeText(text)
-      message.success('复制成功')
+      await navigator.clipboard.writeText(text);
+      message.success("复制成功");
     } catch (err) {
-      message.error('复制失败')
+      message.error("复制失败");
     }
   } else {
   }
 }
 export function getArrayDepth<T>(arr: T[]): number {
   if (arr.length === 0) {
-    return 1 // 空数组的深度为1
+    return 1; // 空数组的深度为1
   }
-  let maxDepth = 1 // 初始深度为1
+  let maxDepth = 1; // 初始深度为1
 
   // 遍历数组中的每个元素
   arr.forEach((element: T) => {
     // 检查元素是否是数组
     if (Array.isArray(element)) {
       // 递归调用getArrayDepth，计算子数组的深度
-      const depth = getArrayDepth(element)
+      const depth = getArrayDepth(element);
       // 更新最大深度
-      maxDepth = Math.max(maxDepth, depth)
+      maxDepth = Math.max(maxDepth, depth);
     }
-  })
+  });
 
   // 加上当前层级
-  return maxDepth + 1
+  return maxDepth + 1;
 }
