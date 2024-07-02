@@ -1,6 +1,6 @@
 {
   "name": "toolkit",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "node-toolkit",
   "main": "./dist/main/src/desktop/index.js",
   "scripts": {

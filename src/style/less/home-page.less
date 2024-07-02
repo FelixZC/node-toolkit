@@ -8,7 +8,6 @@
   overflow: hidden;
   padding: 20px;
 }
-
 .welcome-title {
   align-items: center;
   animation: fadeInDown 2s ease forwards;
@@ -21,19 +20,16 @@
   margin-bottom: 20px;
   opacity: 0;
 }
-
-
 @keyframes fadeInDown {
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
-
 .icon-links {
   align-items: end;
   display: flex;
-  gap: 10px; /* 间距设置在容器上 */
+  gap: 10px;
   grid-column: 2;
   grid-row: 3;
   justify-content: center;
@@ -42,7 +38,7 @@
   color: #333;
   text-decoration: none;
   transition: color 0.3s;
-  width: max-content; /* 确保元素宽度不会超过其内容 */
+  width: max-content;
   &:hover {
     color: #007bff;
   }
