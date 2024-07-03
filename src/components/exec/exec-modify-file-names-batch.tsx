@@ -2,7 +2,7 @@ import { Button, Col, Input, message, Modal, Row, Tooltip } from "antd";
 import { CalendarOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { getIgnorePatterns } from "@src/utils/common";
 import { ipcRendererInvoke } from "../../utils/desktop-utils";
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import "@src/style/less/markdown-styles.less";
 import "@src/style/less/icon.less";
 import Directory from "@src/components/file-manage/directory";

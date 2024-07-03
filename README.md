@@ -78,7 +78,6 @@ npm i
    <key>NSAppleEventsUsageDescription</key>
    <string>This app requires access to send Apple events to other apps.</string>
    ```
-   苦苹果发布流程久矣，一言难尽。
 
 5. **找到安装文件**：
    构建完成后，你需要在`dist`目录下的`win`子目录中找到生成的`.exe`安装文件。根据你提供的指令，文件名可能是`node-toolkit-2.1.0-win-x64.exe`。
