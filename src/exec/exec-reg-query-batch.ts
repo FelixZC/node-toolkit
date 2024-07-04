@@ -29,7 +29,7 @@ export const execRegQueryBatch = async (
       result = mdUtils.queryContentByReg(content, reg);
       // 添加文件路径
       if (isAddSourcePath && result.length) {
-        result = `${filePath}${fsInstance.eol}${result}`;
+        result = `//${filePath}${fsInstance.eol}${result}`;
       }
     }
     mainWindow &&
