@@ -1,21 +1,18 @@
-// RegExpInput.tsx
-import React, { useEffect, useState } from "react";
-import { Input, Tooltip } from "antd";
 import {
   CheckSquareOutlined,
   CloseSquareOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
 import { convertToReg } from "@src/utils/common";
+import { Input, Tooltip } from "antd";
+import React, { useEffect, useState } from "react";
 import "@src/style/less/icon.less";
-
 interface RegExpInputProps {
   setRegExp: (reg: RegExp | null) => void;
   placeholder?: string;
   size?: "small" | "middle" | "large" | undefined;
   className?: string;
 }
-
 const RegExpInput: React.FC<RegExpInputProps> = ({
   setRegExp,
   placeholder,
@@ -36,7 +33,6 @@ const RegExpInput: React.FC<RegExpInputProps> = ({
     );
     setRegExp(regExp);
   }, [searchQuery, matchReg, matchCase, matchWholeWord]);
-
   return (
     <Input
       className={className}
@@ -66,9 +62,10 @@ const RegExpInput: React.FC<RegExpInputProps> = ({
           </Tooltip>
         </div>
       }
-      style={{ width: "100%" }}
+      style={{
+        width: "100%",
+      }}
     />
   );
 };
-
 export default RegExpInput;

@@ -1,7 +1,7 @@
-import { logger } from "../utils/log";
-import * as cliProgress from "../utils/cli-progress";
-import fsUtils, { readFile, writeFile } from "../utils/fs";
+import { createCliProgress } from "../utils/cli-progress";
+import { fsUtils, readFile, writeFile } from "../utils/fs";
 import { getMainWindow } from "../desktop/main-window";
+import { Logger } from "../utils/log";
 import { Notification } from "electron";
 import runPostcssPlugin from "../plugins/use-postcss-plugin";
 import type { ExecFileInfo } from "../types/common";
@@ -60,7 +60,7 @@ export async function execPostcssPlugins(
         successList.push(filePath);
       } catch (e) {
         // 捕获并警告处理过程中可能出现的错误。
-        logger.warn(e);
+        Logger.getInstance().warn(e);
         errorList.push(filePath);
       }
     };
@@ -89,7 +89,7 @@ export async function execPostcssPlugins(
       vaildList.includes(fileInfo.ext),
     );
     // 初始化进度条，用于批量处理文件时的进度显示。
-    const { updateBar } = cliProgress.useCliProgress(targetList.length); // 初始化进度条。
+    const { updateBar } = createCliProgress(targetList.length); // 初始化进度条。
     // 遍历所有有效文件，逐一处理，并更新进度条
     let count = 1;
     const mainWindow = getMainWindow();
@@ -108,6 +108,6 @@ export async function execPostcssPlugins(
       errorList,
     };
   } catch (e) {
-    logger.warn(e);
+    Logger.getInstance().warn(e);
   }
 }

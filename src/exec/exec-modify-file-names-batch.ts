@@ -1,8 +1,7 @@
-import fsUtils from "../utils/fs";
+import { fsUtils, generateUniquePathWithoutFs } from "../utils/fs";
 import { generateSimpleRandomString } from "../utils/random";
-import { generateUniquePathWithoutFs } from "../utils/fs";
 import { getFormattedTimestamp } from "../utils/time";
-import { logger } from "../utils/log";
+import { Logger } from "../utils/log";
 import path from "path";
 interface ModifyResult {
   oldFilePath: string;
@@ -225,7 +224,7 @@ class Exec {
           changeCount++;
         }
       } catch (error) {
-        logger.error(
+        Logger.getInstance().error(
           `重命名文件失败：${fileInfo.filePath} -> ${newFilePath}`,
           error,
         );
@@ -285,7 +284,7 @@ class Exec {
           changeCount++;
         }
       } catch (error) {
-        logger.error(
+        Logger.getInstance().error(
           `重命名文件失败：${fileInfo.filePath} -> ${newFilePath}`,
           error,
         );

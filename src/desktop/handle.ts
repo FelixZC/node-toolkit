@@ -1,5 +1,5 @@
 import { dialog, ipcMain, shell } from "electron";
-import { logger } from "../utils/log";
+import { Logger } from "../utils/log";
 import { readFile } from "../utils/fs";
 export default function mainWindowHandleEvents() {
   ipcMain.handle("choose-directory", async () => {
@@ -155,7 +155,7 @@ export default function mainWindowHandleEvents() {
     try {
       await shell.openPath(filePath);
     } catch (error) {
-      logger.error(error);
+      Logger.getInstance().error(error);
       dialog.showMessageBox({
         type: "error",
         message: "Error opening file",

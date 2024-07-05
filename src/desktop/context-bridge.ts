@@ -1,5 +1,4 @@
-import { contextBridge, ipcRenderer } from "electron";
-import type { IpcRendererEvent } from "electron";
+import { contextBridge, ipcRenderer, IpcRendererEvent } from "electron";
 type ExposedInMainWorld = {
   send: (channel: string, ...args: any[]) => void;
   on: (

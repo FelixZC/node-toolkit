@@ -1,38 +1,34 @@
-import getTableColunm from "./config/table-column";
-import { enhancedCompare } from "@src/utils/common";
+import Checkbox from "antd/es/checkbox/Checkbox";
 import ContextMenu from "@src/components/antd-wrap/menus/index";
 import debounce from "lodash/debounce";
+import { enhancedCompare } from "@src/utils/common";
 import FileManageContext from "./context";
 import getMenus from "./config/menus";
-import { Layout, Select } from "antd";
+import getTableColunm from "./config/table-column";
+import IconView from "./views/icon-view";
 import { ipcRendererInvoke } from "@src/utils/desktop-utils";
+import { Layout, Select, TableProps } from "antd";
+import Loading from "@src/components/common/loading"; // 引入 Loading 组件
 import options from "./config/options";
 import Preview from "./views/preview";
 import React, { useEffect, useRef, useState } from "react";
+import RegExpInput from "../antd-wrap/search/reg-exp-input";
 import TableView from "./views/table-view";
 import useContextMenu from "@src/components/antd-wrap/menus/use-context-menu";
 import useDirectory from "@src/store/use-directory";
 import "@src/style/less/file-manage.less";
-import RegExpInput from "../antd-wrap/search/reg-exp-input";
-import IconView from "./views/icon-view";
-import Loading from "@src/components/common/loading"; // 引入 Loading 组件
 import type {
   FileInfoCustom,
   FileInfoWithStats,
   FileType,
 } from "@src/types/file";
-import type { TableProps } from "antd";
-import Checkbox from "antd/es/checkbox/Checkbox";
-
 type ParametersType<T> = T extends (...args: infer U) => any ? U : never;
 type TableChangeType = TableProps<FileInfoCustom>["onChange"];
 type ChangeParams = ParametersType<TableChangeType>;
 export type SortConfigType = ChangeParams[2];
 type FileTypeExtend = FileType | "All";
-
 const { Header, Content, Footer } = Layout;
 const { Option } = Select;
-
 const FileManage: React.FC = () => {
   const { directoryPath, isUseIgnoredFiles, setUseIgnoredFiles } =
     useDirectory();
@@ -63,7 +59,6 @@ const FileManage: React.FC = () => {
     }
     setSortConfig(localSorter);
   };
-
   const filterDataByFileType = (
     data: FileInfoCustom[],
     type: FileTypeExtend,
@@ -71,7 +66,6 @@ const FileManage: React.FC = () => {
     if (type === "All") return data;
     return data.filter((item) => item.type === type);
   };
-
   const sortData = (data: FileInfoCustom[], sorter: SortConfigType) => {
     let localSorter = Array.isArray(sorter) ? sorter : [sorter];
     const isNeedOrder = localSorter.some((item) => item.order);
@@ -90,7 +84,6 @@ const FileManage: React.FC = () => {
     });
     return sortedData;
   };
-
   const filterDataByRegExp = (data: FileInfoCustom[]) => {
     if (!searchReg) {
       return data;
@@ -106,7 +99,6 @@ const FileManage: React.FC = () => {
     const Result = filterDataByRegExp(sortedData);
     setShowData(Result);
   }, [searchReg, originalData, filterType, sortConfig, searchReg]);
-
   const onContextMenu = (
     e: React.MouseEvent<HTMLDivElement>,
     record?: FileInfoCustom,
@@ -199,7 +191,6 @@ const FileManage: React.FC = () => {
         );
     }
   };
-
   const execSearch = async () => {
     if (!directoryPath) {
       return;
@@ -224,11 +215,9 @@ const FileManage: React.FC = () => {
       setIsShowLoading(false);
     }
   };
-
   useEffect(() => {
     execSearch();
   }, [directoryPath]);
-
   return (
     <FileManageContext.Provider
       value={{

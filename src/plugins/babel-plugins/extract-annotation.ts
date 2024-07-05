@@ -1,12 +1,5 @@
 import { declare } from "@babel/helper-plugin-utils";
 import * as t from "@babel/types";
-import type {
-  FunctionDeclaration,
-  ObjectMethod,
-  ObjectProperty,
-  TSPropertySignature,
-  VariableDeclaration,
-} from "@babel/types";
 import type { NodePath } from "@babel/traverse";
 
 /**
@@ -30,11 +23,11 @@ export default declare((babel) => {
    */
   const getAnnatation = (
     path: NodePath<
-      | ObjectMethod
-      | ObjectProperty
-      | VariableDeclaration
-      | FunctionDeclaration
-      | TSPropertySignature
+      | t.ObjectMethod
+      | t.ObjectProperty
+      | t.VariableDeclaration
+      | t.FunctionDeclaration
+      | t.TSPropertySignature
     >,
   ) => {
     // 检查节点是否有前导或后置注释

@@ -1,15 +1,15 @@
-import type { Transform } from "jscodeshift";
-import { logger } from "../utils/log";
-import fsUtils, { readFile, writeFile } from "../utils/fs";
-import * as cliProgress from "../utils/cli-progress";
-import { Notification } from "electron";
+import { createCliProgress } from "../utils/cli-progress";
+import { fsUtils, readFile, writeFile } from "../utils/fs";
 import { getMainWindow } from "../desktop/main-window";
+import { Logger } from "../utils/log";
+import { Notification } from "electron";
 import runCodemod from "../plugins/use-codemod";
 import type { ExecFileInfo } from "../types/common";
 /**
  * 执行 JSCodeMod 模板的公共方法。
  * @param jscodemodeList 需要执行的 JSCodeMod 模板路径列表。
  */
+import type { Transform } from "jscodeshift";
 export const execJSCodemods = async (
   dir: string,
   jscodemodeList: string[],
@@ -28,7 +28,6 @@ export const execJSCodemods = async (
       }
       return result;
     });
-
     const successList: string[] = []; // 执行改动文件列表
     const errorList: string[] = []; // 执行错误列表
     // 定义一个处理函数，用于处理单个文件的转换
@@ -54,7 +53,7 @@ export const execJSCodemods = async (
         successList.push(filePath);
       } catch (e) {
         // 捕获并打印转换过程中可能出现的错误
-        logger.warn(e);
+        Logger.getInstance().warn(e);
         errorList.push(filePath);
       }
     };
@@ -78,7 +77,7 @@ export const execJSCodemods = async (
       vaildList.includes(fileInfo.ext),
     );
     // 初始化进度条，用于显示转换进度
-    const { updateBar } = cliProgress.useCliProgress(targetList.length);
+    const { updateBar } = createCliProgress(targetList.length);
     // 遍历所有有效文件，逐一处理，并更新进度条
     let count = 1;
     const mainWindow = getMainWindow();
@@ -97,6 +96,6 @@ export const execJSCodemods = async (
       errorList,
     };
   } catch (e) {
-    logger.warn("执行 JSCodeMod 模板时发生错误:", e);
+    Logger.getInstance().warn("执行 JSCodeMod 模板时发生错误:", e);
   }
 };

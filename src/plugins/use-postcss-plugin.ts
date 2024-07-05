@@ -1,7 +1,7 @@
-import { logger } from "../utils/log";
+import { Logger } from "../utils/log";
 import { parse as parseSFC, stringify as stringifySFC } from "./sfc-utils";
 import path from "path";
-import postcss from "postcss";
+import postcss, { AcceptedPlugin, Parser, Syntax } from "postcss";
 import postcssHtml from "postcss-html";
 //@ts-ignore
 import postcssJsx from "postcss-jsx";
@@ -15,8 +15,6 @@ import postcssScss from "postcss-scss";
 import postcssStyl from "postcss-styl";
 //@ts-ignore
 import sugarss from "sugarss";
-import type { AcceptedPlugin } from "postcss";
-import type { Parser, Syntax } from "postcss";
 import type { ExecFileInfo } from "@src/types/common";
 const getDefaultSyntax = (stypeType: string): Syntax | Parser => {
   if (/\.(?:[sx]?html?|[sx]ht|ux|php)$/i.test(stypeType)) {
@@ -66,7 +64,7 @@ const transform = async (
     });
     return result.css;
   } catch (error) {
-    logger.error("PostCSS processing error:", error);
+    Logger.getInstance().error("PostCSS processing error:", error);
     throw error;
   }
 };

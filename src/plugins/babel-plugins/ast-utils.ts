@@ -1,7 +1,6 @@
-import { NodePath } from "@babel/core";
+import { GeneratorOptions, NodePath, ParserOptions } from "@babel/core";
 import * as parser from "@babel/parser";
 import * as t from "@babel/types";
-import type { GeneratorOptions, ParserOptions } from "@babel/core";
 interface SpecifierInfo {
   source: string;
   type:
@@ -360,11 +359,18 @@ export const replaceExpressionProperty = (
 export const getGeneratorOption = (): GeneratorOptions => {
   // 默认的生成器配置项
   let options: GeneratorOptions = {
+    minified: false,
     compact: "auto",
     concise: false,
     retainLines: false,
     jsescOption: {
-      minimal: true,
+      quotes: "double",
+      // 使用双引号
+      wrap: true,
+      // 确保字符串被引号包裹
+      es6: false,
+      // 不使用 ES6 Unicode 转义序列
+      json: false, // 不输出 JSON 格式，允许使用特定转义序列
     },
   };
   return options;

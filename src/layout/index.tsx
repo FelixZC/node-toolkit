@@ -1,8 +1,7 @@
 import { Layout, Menu } from "antd";
 import React from "react";
-import rootRouter from "@src/routers";
+import rootRouter, { RouteObject } from "@src/routers";
 import { Route, Routes, useNavigate } from "react-router-dom";
-import type { RouteObject } from "@src/routers";
 import useLayout from "@src/store/use-layout";
 const { Content, Sider } = Layout;
 function filterMenuItems(routes: RouteObject[]) {
@@ -57,7 +56,10 @@ const Lay: React.FC = () => {
         width={width}
         collapsedWidth={collapsedWidth}
         theme="light"
-        zeroWidthTriggerStyle={{ zIndex: 10086, top: "40%" }}
+        zeroWidthTriggerStyle={{
+          zIndex: 10086,
+          top: "40%",
+        }}
         collapsible={true}
         onCollapse={onCollapse}
       >

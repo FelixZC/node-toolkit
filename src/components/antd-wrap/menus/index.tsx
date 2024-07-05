@@ -1,7 +1,6 @@
 import { Menu, MenuProps } from "antd";
-import React, { useEffect, useRef, useCallback } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import "@src/style/less/menu.less";
-
 interface ContextMenuProps {
   menuPosition: {
     x: number;
@@ -11,7 +10,6 @@ interface ContextMenuProps {
   getMenus: () => MenuProps;
   onRequestClose: () => void;
 }
-
 const ContextMenu: React.FC<ContextMenuProps> = ({
   menuPosition,
   isMenuVisible,
@@ -20,26 +18,28 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
 }) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const menu = getMenus();
-
   const adjustMenuPosition = useCallback(
     (position: ContextMenuProps["menuPosition"]) => {
       const menuElement = menuRef.current;
-      if (!menuElement) return { left: position.x, top: position.y };
-
+      if (!menuElement)
+        return {
+          left: position.x,
+          top: position.y,
+        };
       const { offsetWidth: menuWidth, offsetHeight: menuHeight } = menuElement;
       const { offsetParent } = menuElement;
       const { clientWidth: parentWidth, clientHeight: parentHeight } =
         offsetParent!;
-
       let { x, y } = position;
       if (x + menuWidth > parentWidth) x = parentWidth - menuWidth;
       if (y + menuHeight > parentHeight) y = parentHeight - menuHeight;
-
-      return { left: x, top: y };
+      return {
+        left: x,
+        top: y,
+      };
     },
     [menuRef],
   );
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (isMenuVisible && !menuRef.current?.contains(event.target as Node)) {
@@ -48,31 +48,30 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
         }, 100);
       }
     };
-
     if (isMenuVisible && menuRef.current) {
       const position = adjustMenuPosition(menuPosition);
       menuRef.current.style.left = `${position.left}px`;
       menuRef.current.style.top = `${position.top}px`;
     }
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isMenuVisible, menuPosition, adjustMenuPosition, onRequestClose]);
-
   const onContextMenu = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.preventDefault();
     e.stopPropagation();
   };
-
   return (
     isMenuVisible && (
       <div
         ref={menuRef}
         className="context-menu"
         onContextMenu={onContextMenu}
-        style={{ left: menuPosition.x, top: menuPosition.y }}
+        style={{
+          left: menuPosition.x,
+          top: menuPosition.y,
+        }}
       >
         <Menu mode={menu.mode}>{renderMenuItem(menu.items)}</Menu>
       </div>
@@ -146,7 +145,6 @@ const renderMenuItem = (items: MenuProps["items"]) => {
     }
   });
 };
-
 export default React.memo(ContextMenu, (prevProps, nextProps) => {
   return (
     prevProps.isMenuVisible === nextProps.isMenuVisible &&

@@ -1,21 +1,18 @@
-import path from "path";
-import fsUtils, { readFile } from "../utils/fs";
-import runBabelPlugin from "../plugins/use-babel-plugin";
-import { logger } from "../utils/log";
-import * as cliProgress from "../utils/cli-progress";
+import { createCliProgress } from "../utils/cli-progress";
+import { createdAttributesGroupTable } from "../utils/md";
+import { fsUtils, readFile } from "../utils/fs";
 import { getMainWindow } from "../desktop/main-window";
-import { Notification } from "electron";
 import { groupBy } from "../utils/common";
-import mdUtils from "../utils/md";
+import { Logger } from "../utils/log";
+import { Notification } from "electron";
+import path from "path";
+import runBabelPlugin, { BabelPlugin } from "../plugins/use-babel-plugin";
 import type { ExecFileInfo } from "../types/common";
-import type { BabelPlugin } from "../plugins/use-babel-plugin";
-
 interface AttrsCollection {
   key: string | number;
   value: string | number;
   standingInitial?: string;
 }
-
 export const getAttrsAndAnnotation = async (
   dir: string,
   isUseIgnoredFiles: boolean,
@@ -95,7 +92,7 @@ export const getAttrsAndAnnotation = async (
       }
       successList.push(filePath);
     } catch (e) {
-      logger.warn(e);
+      Logger.getInstance().warn(e);
       errorList.push(filePath);
     }
   };
@@ -117,7 +114,7 @@ export const getAttrsAndAnnotation = async (
   const targetList = fileInfoList.filter((fileInfo) =>
     vaildList.includes(fileInfo.ext),
   );
-  const { updateBar } = cliProgress.useCliProgress(targetList.length); // 初始化进度条。
+  const { updateBar } = createCliProgress(targetList.length); // 初始化进度条。
   // 遍历所有有效文件，逐一处理，并更新进度条
   let count = 1;
   const mainWindow = getMainWindow();
@@ -134,8 +131,7 @@ export const getAttrsAndAnnotation = async (
   // 根据首字母对收集到的属性信息进行分组，并生成属性描述表格
   const attrsGroup = groupBy(attrsCollectionGroup, "standingInitial"); // 根据首字母排序
 
-  let attributesDescriptionTable =
-    mdUtils.createdAttributesGroupTable(attrsGroup); // 获取项目使用属性描述
+  let attributesDescriptionTable = createdAttributesGroupTable(attrsGroup); // 获取项目使用属性描述
   attributesDescriptionTable = attributesDescriptionTable
     .replace(/\{\{.*\}\}/g, "")
     .replace(/<.*>/g, "");

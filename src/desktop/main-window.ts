@@ -5,10 +5,10 @@
 import { BrowserWindow } from "electron";
 import { createMenu } from "./menus";
 import { initTray } from "./system-tray";
-import installExtension, {
-  REACT_DEVELOPER_TOOLS,
-  REDUX_DEVTOOLS,
-} from "electron-devtools-installer";
+// import installExtension, {
+//   REACT_DEVELOPER_TOOLS,
+//   REDUX_DEVTOOLS,
+// } from "electron-devtools-installer";
 import mainWindowHandleEvents from "./handle";
 import mainWindowListenEvents from "./listen";
 import * as path from "path";
@@ -33,7 +33,7 @@ function createMainWindow(): void {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: true,
-      preload: path.resolve(__dirname, "../utils/context-bridge.js"),
+      preload: path.resolve(__dirname, "./context-bridge.js"),
     },
     icon: path.resolve(__dirname, "../../../build/electron-logo1.ico"),
   });
@@ -48,15 +48,15 @@ function createMainWindow(): void {
     createMenu(mainWindow!);
     mainWindow!.show();
 
-    // 安装 React Developer Tools 和 Redux DevTools 扩展，并行处理,
-    const installPromises = [
-      installExtension(REACT_DEVELOPER_TOOLS),
-      installExtension(REDUX_DEVTOOLS),
-    ];
-    try {
-      // 等待所有扩展安装完成,访问不了谷歌商城就不用等了,注释掉或者离线下载
-      await Promise.all(installPromises);
-    } catch (err) {}
+    // 安装 React Developer Tools 和 Redux DevTools 扩展，并行处理,需要外网访问
+    // const installPromises = [
+    //   installExtension(REACT_DEVELOPER_TOOLS),
+    //   installExtension(REDUX_DEVTOOLS),
+    // ];
+    // try {
+    //   // 等待所有扩展安装完成,访问不了谷歌商城就不用等了,注释掉或者离线下载
+    //   await Promise.all(installPromises);
+    // } catch (err) {}
   });
   mainWindowListenEvents(mainWindow);
   mainWindowHandleEvents();

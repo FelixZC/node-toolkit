@@ -1,17 +1,14 @@
-import React from "react";
+import FileManageContext from "../context";
+import { formatFileSize } from "@src/utils/common";
+import React, { useContext } from "react";
 import type { FileInfoCustom } from "@src/types/file";
 import type { TableColumnsType } from "antd";
-import { formatFileSize } from "@src/utils/common";
-import { useContext } from "react";
-import FileManageContext from "../context";
-
 const getTabelColumn = () => {
   const context = useContext(FileManageContext);
   if (!context) {
     throw new Error("useContext must be inside a FileManageContext.Provider");
   }
   const { sortConfig } = context;
-
   const getSort = (field: string) => {
     const localSortConfig = Array.isArray(sortConfig)
       ? sortConfig
@@ -23,12 +20,12 @@ const getTabelColumn = () => {
       return null;
     }
   };
-
   const columns: TableColumnsType<FileInfoCustom> = [
     {
       title: "名称",
       dataIndex: "base",
       key: "base",
+      width: 200,
       render: (text, record) => {
         return (
           <div
@@ -54,11 +51,24 @@ const getTabelColumn = () => {
       sortOrder: getSort("base"),
     },
     {
-      title: "文件路径",
+      title: (props) => {
+        return (
+          <div style={{ minWidth: 300 }}>
+            <span>文件路径</span>
+          </div>
+        );
+      },
       dataIndex: "filePath",
       key: "filePath",
       sorter: true,
       sortOrder: getSort("filePath"),
+      render: (text, record) => {
+        return (
+          <div style={{ minWidth: 300 }}>
+            <span>{text}</span>
+          </div>
+        );
+      },
     },
     {
       title: "文件大小",

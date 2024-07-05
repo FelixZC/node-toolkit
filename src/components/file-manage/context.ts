@@ -1,8 +1,8 @@
 // FileManageContext.ts
 import React from "react";
 import type { FileInfoCustom } from "@src/types/file";
-import type { TableProps } from "antd";
 import type { SortConfigType } from "./index";
+import type { TableProps } from "antd";
 interface FileManageContextType {
   currentRow: FileInfoCustom | null;
   showData: FileInfoCustom[];

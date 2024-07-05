@@ -1,5 +1,4 @@
-import { ipcMain } from "electron";
-import { BrowserWindow } from "electron";
+import { BrowserWindow, ipcMain } from "electron";
 import { mainWindowIsExist } from "./main-window";
 
 /**

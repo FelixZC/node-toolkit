@@ -1,10 +1,10 @@
-import * as path from "path";
-import { transferRef } from "../utils/common";
+import { createModifyFilenameExec } from "./exec-modify-file-names-batch";
 import { execBabelPlugin } from "./exec-babel-plugin";
 import { execPostcssPlugins } from "./exec-postcss-plugin";
 import { execPosthtmlPlugins } from "./exec-posthtml-plugin";
-import { createModifyFilenameExec } from "./exec-modify-file-names-batch";
-
+import * as path from "path";
+import { transferRef } from "../utils/common";
+//
 /**
  * 不常用，不优化，总共读取了四次路径
  * 批量修改文件命名和引用为驼峰式规范
@@ -23,14 +23,12 @@ export async function execTransferFileNameToKebabCase() {
   const postcssPluginsPathList: string[] = [
     "../plugins/postcss-plugins/transfer-file-name-tok-kebab-case",
   ];
-
   await execPostcssPlugins(dir, postcssPluginsPathList, true);
 
   // 定义posthtml插件路径列表，用于加载插件
   const posthtmlPluginsPathList: string[] = [
     "../plugins/posthtml-plugins/transfer-file-name-tok-kebab-case",
   ];
-
   await execPosthtmlPlugins(dir, posthtmlPluginsPathList, true);
   // 定义文件名转换函数，将文件名从其他格式转换为驼峰式
   const customFilename = (oldFilename: string) => {
@@ -42,7 +40,6 @@ export async function execTransferFileNameToKebabCase() {
     const relativeDir = path.relative(process.cwd(), oldDirname);
     return transferRef(relativeDir, "\\");
   };
-
   await createModifyFilenameExec(
     dir,
     "custom",

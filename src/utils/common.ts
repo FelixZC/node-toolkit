@@ -1,6 +1,9 @@
+import { compare, orderBy } from "natural-orderby";
+
 import { FileType } from "@src/types/file";
 import { message } from "antd";
-import { compare, orderBy } from "natural-orderby";
+import * as mime from "mime-types";
+
 /**
  * 获取数据类型
  * @param {any} obj - 任意待检测的数据
@@ -16,7 +19,6 @@ import { compare, orderBy } from "natural-orderby";
    | 'Array'
    | 'Function'
  */
-import * as mime from "mime-types";
 export const getDataType = (obj: any) => {
   return Object.prototype.toString.call(obj).slice(8, -1);
 };
@@ -40,12 +42,10 @@ export function sortObjAttr(target: Record<string, any>) {
   });
   return newObj;
 }
-
 export interface SortOptions {
   fields: string[]; // 需要排序的字段名称数组
   orders?: "asc" | "desc"[]; // 每个字段的排序顺序数组
 }
-
 export function sortArray(
   arr: Array<Record<string, any>>,
   options: SortOptions,
@@ -70,7 +70,6 @@ export function sortArray(
   // 使用 natural-orderby 的 orderBy 函数进行自然排序
   return orderBy(arr, options.fields, orders);
 }
-
 interface GroupCache<T> {
   [key: string]: {
     count: number;
@@ -202,16 +201,6 @@ export const transferRef = (str: string, seperator = "/") => {
     })
     .join(seperator);
 };
-
-/**
- * 执行字符串形式的 JavaScript 代码，存在无效引用时会报错
- * @param {string} str - 要执行的 JavaScript 代码字符串
- * @returns {any} 代码执行结果
- */
-export function strToJson(str: string) {
-  const json = eval("(" + str + ")");
-  return json;
-}
 
 /**
  * 设置嵌套对象属性值
@@ -370,7 +359,7 @@ export const convertToReg = (
     return null;
   }
 };
-function mimeTypeToFileType(mimeType: string): FileType {
+export function mimeTypeToFileType(mimeType: string): FileType {
   // 移除可能的参数，只保留基本 MIME 类型
   const baseMimeType = mimeType.split(";")[0].trim().toLowerCase();
 
@@ -436,7 +425,6 @@ export function formatFileSize(bytes: number, decimalPlaces = 2) {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
 }
-
 export const enhancedCompare = (
   a: Record<string, any>,
   b: Record<string, any>,
@@ -444,14 +432,13 @@ export const enhancedCompare = (
   field: string,
 ): number => {
   // 定义一个比较函数，用于自然排序
-  const naturalCompare = compare({ order: order });
-
+  const naturalCompare = compare({
+    order: order,
+  });
   let aValue = a[field];
   let bValue = b[field];
-
   return naturalCompare(String(aValue), String(bValue));
 };
-
 export async function copyTextToClipboard(text: string): Promise<void> {
   if (navigator.clipboard && window.isSecureContext) {
     try {

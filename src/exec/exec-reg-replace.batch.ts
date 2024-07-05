@@ -1,6 +1,6 @@
-import fsUtils, { readFile, writeFile } from "../utils/fs";
+import { fsUtils, readFile, writeFile } from "../utils/fs";
 import { getMainWindow } from "../desktop/main-window";
-import { logger } from "../utils/log";
+import { Logger } from "../utils/log";
 
 /**
  * 根据提供正则表达式替换内容，直接传入内容，可能链式修改
@@ -97,5 +97,5 @@ export const execReplaceByRegBatch = async (
   });
   // 等待所有的替换操作完成
   await Promise.all(promises);
-  logger.info(`${changeList.length} files changed`);
+  Logger.getInstance().info(`${changeList.length} files changed`);
 };

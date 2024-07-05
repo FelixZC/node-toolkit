@@ -6,7 +6,7 @@ import { formatInputDateTime } from "../utils/time";
  * TODO 添加缓存功能操作
  */
 import * as fs from "fs-extra";
-import { logDecorator, logger } from "../utils/log";
+import { logDecorator, Logger } from "../utils/log";
 import { LRUCache } from "lru-cache";
 import * as os from "os";
 import * as path from "path";
@@ -20,13 +20,10 @@ const fileStatsCache = new LRUCache<string, fs.Stats>({
   max: 100000,
   ttl: 30 * 60 * 1000, // 30 minutes
 });
-
-// 创建一个 LRU 缓存实例
 const iconCache = new LRUCache<string, string>({
   max: 100000,
   ttl: 30 * 60 * 1000, // 30 minutes
 });
-
 export const clearCacheAll = () => {
   fileContentCache.clear(); // 清除所有缓存项
   fileStatsCache.clear(); // 清除所有缓存项
@@ -59,19 +56,19 @@ export const readFileStats = async (filePath: string): Promise<fs.Stats> => {
     return stats;
   }
 };
-
 async function getCachedFileIcon(filePath: string): Promise<string> {
   if (iconCache.has(filePath)) {
     return iconCache.get(filePath) as string;
   }
-  const icon = await app.getFileIcon(filePath, { size: "large" });
+  const icon = await app.getFileIcon(filePath, {
+    size: "large",
+  });
   const iconDataUrl = icon.toDataURL({
     scaleFactor: 1,
   });
   iconCache.set(filePath, iconDataUrl);
   return iconDataUrl;
 }
-
 export function getFileInfo(filePath: string): FileInfo {
   const parsedPath = path.parse(filePath);
   return {
@@ -150,7 +147,7 @@ export async function copyFile(filePath: string): Promise<string> {
     fileContentCache.set(newFilePath, await readFile(filePath));
     return newFilePath;
   } catch (err) {
-    logger.error(`Error copying file ${filePath}:`, err);
+    Logger.getInstance().error(`Error copying file ${filePath}:`, err);
     throw err;
   }
 }
@@ -161,7 +158,7 @@ export async function deleteFile(filePath: string): Promise<void> {
     fileStatsCache.delete(filePath);
     iconCache.delete(filePath);
   } catch (err) {
-    logger.error(`Error deleting file ${filePath}:`, err);
+    Logger.getInstance().error(`Error deleting file ${filePath}:`, err);
     throw err;
   }
 }
@@ -187,7 +184,7 @@ export function renameFile(
       uniqueNewFilePath,
     };
   } catch (err) {
-    logger.error(
+    Logger.getInstance().error(
       `Error renaming file from ${oldFilePath} to ${uniqueNewFilePath}:`,
       err,
     );
@@ -197,7 +194,7 @@ export function renameFile(
 /******************************************************************************************************************** */
 
 /******************************************************************************************************************** */
-class fsUtils {
+export class fsUtils {
   rootPath: string;
   eol: string;
   filePathList: string[] = [];
@@ -328,4 +325,3 @@ class fsUtils {
     return newFilePath;
   }
 }
-export default fsUtils;

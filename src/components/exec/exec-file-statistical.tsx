@@ -38,7 +38,6 @@ const FeatureListPage: React.FC = () => {
   useEffect(() => {
     setOutput(isShowInJson ? resultJson : resultMd);
   }, [isShowInJson]);
-
   return (
     <div
       style={{
@@ -84,7 +83,12 @@ const FeatureListPage: React.FC = () => {
           ></Button>
         </Tooltip>
       </div>
-      <div style={{ flex: 1, width: "100%" }}>
+      <div
+        style={{
+          flex: 1,
+          width: "100%",
+        }}
+      >
         <MonacoEditorWrapper value={output} />
       </div>
     </div>

@@ -1,11 +1,12 @@
-import { logger } from "../utils/log";
-import * as cliProgress from "../utils/cli-progress";
-import fsUtils, { readFile, writeFile } from "../utils/fs";
+import { createCliProgress } from "../utils/cli-progress";
+import { fsUtils, readFile, writeFile } from "../utils/fs";
 import { getMainWindow } from "../desktop/main-window";
+import { Logger } from "../utils/log";
 import { Notification } from "electron";
 import runPosthtmlPlugin from "../plugins/use-posthtml-plugin";
 import type { ExecFileInfo } from "../types/common";
-import type { Plugin as PosthtmlPlugin } from "posthtml";
+import type { Plugin as PosthtmlPlugin } from "posthtml"; //
+
 /**
  * 在给定目录下执行PostHTML插件。
  * 此函数负责加载并执行一系列PostHTML插件，这些插件由插件路径列表指定。
@@ -69,7 +70,7 @@ export async function execPosthtmlPlugins(
         successList.push(filePath);
       } catch (e) {
         // 打印错误警告
-        logger.warn(e);
+        Logger.getInstance().warn(e);
         errorList.push(filePath);
       }
     };
@@ -91,7 +92,7 @@ export async function execPosthtmlPlugins(
       vaildList.includes(fileInfo.ext),
     );
     // 初始化进度条，用于显示处理进度
-    const { updateBar } = cliProgress.useCliProgress(targetList.length); // 初始化进度条。
+    const { updateBar } = createCliProgress(targetList.length); // 初始化进度条。
     // 遍历所有有效文件，逐一处理，并更新进度条
     let count = 1;
     const mainWindow = getMainWindow();
@@ -111,6 +112,6 @@ export async function execPosthtmlPlugins(
     };
   } catch (e) {
     // 可以在这里添加更详细的错误处理逻辑
-    logger.error("Error executing PostHTML plugins:", e);
+    Logger.getInstance().error("Error executing PostHTML plugins:", e);
   }
 }

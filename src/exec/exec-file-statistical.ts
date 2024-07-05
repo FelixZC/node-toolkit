@@ -1,7 +1,6 @@
-import fsUtils, { getFileInfo } from "../utils/fs";
 import { buildTree, groupBy, pickProperties } from "../utils/common";
-import mdUtils from "../utils/md";
-
+import { fsUtils, getFileInfo } from "../utils/fs";
+import { generateProjectTree } from "../utils/md";
 class Exec {
   fsInstance: fsUtils; // 文件系统实例属性
   constructor(dir: string, isUseIgnoredFiles: boolean) {
@@ -20,7 +19,7 @@ class Exec {
     const trees = buildTree(treeData, "filePath", "dir");
     const result = pickProperties(trees, ["base", "dir", "children"]);
     const resultJson = JSON.stringify(result, null, 2);
-    const resultMd = mdUtils.generateProjectTree(result);
+    const resultMd = generateProjectTree(result);
     return {
       resultJson,
       resultMd,
@@ -36,14 +35,12 @@ class Exec {
     const group = groupBy(fileInfoList, "ext");
     return JSON.stringify(group, null, 2);
   };
-
   classifyFilesByBasename = () => {
     const fileInfoList = this.fsInstance.getFileInfoList();
     const group = groupBy(fileInfoList, "name");
     return JSON.stringify(group, null, 2);
   };
 }
-
 export const createFileStatisticalExec = async (
   dir: string,
   mode: "tree" | "ext" | "base",

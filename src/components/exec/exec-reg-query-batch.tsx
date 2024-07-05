@@ -1,13 +1,12 @@
 import { Button, Checkbox, Col, Input, message, Row } from "antd";
-import { getIgnorePatterns } from "@src/utils/common";
 import Directory from "@src/components/file-manage/directory";
+import { getIgnorePatterns } from "@src/utils/common";
 import { ipcRendererInvoke } from "../../utils/desktop-utils";
+import MonacoEditorWrapper from "@src/components/editor/monaco-editor-wrapper";
 import React, { useState } from "react";
+import RegExpInput from "../antd-wrap/search/reg-exp-input";
 import useDirectory from "@src/store/use-directory";
 import "@src/style/less/markdown-styles.less";
-import RegExpInput from "../antd-wrap/search/reg-exp-input";
-import MonacoEditorWrapper from "@src/components/editor/monaco-editor-wrapper";
-
 const FeatureListPage: React.FC = () => {
   const [output, setOutput] = useState(""); // 存储执行结果
   const [isAddSourcePath, setIsAddSourcePath] = useState(false); // 是否添加源路径
@@ -104,7 +103,12 @@ const FeatureListPage: React.FC = () => {
           </Button>
         </Col>
       </Row>
-      <div style={{ flex: 1, width: "100%" }}>
+      <div
+        style={{
+          flex: 1,
+          width: "100%",
+        }}
+      >
         <MonacoEditorWrapper value={output} />
       </div>
     </div>

@@ -1,10 +1,7 @@
 import { clearCacheAll } from "../utils/fs";
+import { dialog, Menu, MenuItemConstructorOptions, shell } from "electron";
 import { getIgnorePath } from "../utils/ignore";
-import { logger } from "../utils/log";
-import { getLogPath } from "../utils/log";
-import { Menu, MenuItemConstructorOptions } from "electron";
-import { shell } from "electron";
-import { dialog } from "electron";
+import { Logger } from "../utils/log";
 const getMenuTemplate = (
   mainWindow: Electron.BrowserWindow,
 ): Array<MenuItemConstructorOptions> => {
@@ -31,11 +28,11 @@ const getMenuTemplate = (
           label: "Open Operate Log",
           accelerator: "CmdOrCtrl+L",
           click: () => {
-            const logPath = getLogPath();
+            const logPath = Logger.getLogPath();
             try {
               shell.openPath(logPath);
             } catch (error) {
-              logger.error(error);
+              Logger.getInstance().error(error);
               dialog.showMessageBox({
                 type: "error",
                 message: "Error opening file",
@@ -52,7 +49,7 @@ const getMenuTemplate = (
             try {
               shell.openPath(ignorePath);
             } catch (error) {
-              logger.error(error);
+              Logger.getInstance().error(error);
               dialog.showMessageBox({
                 type: "error",
                 message: "Error opening ignore setting",

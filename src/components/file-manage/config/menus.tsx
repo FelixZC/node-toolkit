@@ -1,14 +1,12 @@
-import React from "react";
-import { copyTextToClipboard } from "@src/utils/common";
-import FileManageContext from "../context";
-import { message } from "antd";
-import type { MenuProps } from "antd";
 import {
+  CheckOutlined,
   SortAscendingOutlined,
   SortDescendingOutlined,
-  CheckOutlined,
 } from "@ant-design/icons";
-import { useContext } from "react";
+import { copyTextToClipboard } from "@src/utils/common";
+import FileManageContext from "../context";
+import { MenuProps, message } from "antd";
+import React, { useContext } from "react";
 const getMenus = () => {
   const context = useContext(FileManageContext);
   if (!context) {
@@ -25,7 +23,6 @@ const getMenus = () => {
     lockOrder,
     setLockOrder,
   } = context;
-
   const getSortIcon = (field: string) => {
     const localSortConfig = Array.isArray(sortConfig)
       ? sortConfig
@@ -67,7 +64,6 @@ const getMenus = () => {
       ]);
     }
   };
-
   const revertSortConfig = () => {
     const localSortConfig = Array.isArray(sortConfig)
       ? [...sortConfig]
@@ -82,7 +78,6 @@ const getMenus = () => {
     });
     setSortConfig(localSortConfig);
   };
-
   const menuStyle: React.CSSProperties = {};
   const menus: MenuProps = {
     mode: "vertical",
@@ -236,7 +231,9 @@ const getMenus = () => {
           //     changeSortConfig('ctime')
           //   },
           // },
-          { type: "divider" },
+          {
+            type: "divider",
+          },
           {
             icon: lockOrder === "ascend" ? <CheckOutlined /> : null,
             key: "lockAscend",

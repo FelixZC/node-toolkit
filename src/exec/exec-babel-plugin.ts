@@ -1,12 +1,11 @@
-import { logger } from "../utils/log";
-import fsUtils, { readFile, writeFile } from "../utils/fs";
-import runBabelPlugin from "../plugins/use-babel-plugin";
-import * as cliProgress from "../utils/cli-progress";
-import { Notification } from "electron";
+import { createCliProgress } from "../utils/cli-progress";
+import { fsUtils, readFile, writeFile } from "../utils/fs";
 import { getMainWindow } from "../desktop/main-window";
-import type { BabelPlugin } from "../plugins/use-babel-plugin";
+import { Logger } from "../utils/log";
+import { Notification } from "electron";
+import path from "path";
+import runBabelPlugin, { BabelPlugin } from "../plugins/use-babel-plugin";
 import type { ExecFileInfo } from "../types/common";
-
 export const execBabelPlugin = async (
   dir: string,
   babelPluginPathList: string[],
@@ -25,7 +24,6 @@ export const execBabelPlugin = async (
       }
       return result;
     });
-
     const globalExtra: Record<string, any> = {}; // 用于存储全局额外信息的字典。
     const successList: string[] = []; // 执行改动文件列表
     const errorList: string[] = []; // 执行错误列表
@@ -56,7 +54,7 @@ export const execBabelPlugin = async (
         await writeFile(filePath, newContent); // 写入处理后的新内容。
         successList.push(filePath); // 添加到执行改动文件列表
       } catch (e) {
-        logger.warn(e); // 捕获并警告处理过程中的任何错误。
+        Logger.getInstance().warn(e); // 捕获并警告处理过程中的任何错误。
         errorList.push(filePath); // 添加到执行错误列表
       }
     };
@@ -64,7 +62,7 @@ export const execBabelPlugin = async (
     const targetList = fileInfoList.filter((fileInfo) =>
       vaildList.includes(fileInfo.ext),
     ); // 筛选出需要处理的文件列表。
-    const { updateBar } = cliProgress.useCliProgress(targetList.length); // 初始化进度条。
+    const { updateBar } = createCliProgress(targetList.length); // 初始化进度条。
     // 遍历所有有效文件，逐一处理，并更新进度条
     let count = 1;
     const mainWindow = getMainWindow();
@@ -83,6 +81,14 @@ export const execBabelPlugin = async (
       errorList,
     };
   } catch (e) {
-    logger.warn("执行 Babel 插件时发生错误:", e);
+    Logger.getInstance().warn("执行 Babel 插件时发生错误:", e);
   }
 };
+export function test() {
+  const babelPluginPathList: string[] = [
+    "../plugins/babel-plugins/merge-imports-plugin",
+    "../plugins/babel-plugins/import-sort",
+  ];
+  execBabelPlugin(path.join("src"), babelPluginPathList, true);
+}
+test();

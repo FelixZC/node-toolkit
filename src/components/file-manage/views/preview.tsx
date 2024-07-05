@@ -1,10 +1,8 @@
+import CodeMirror from "@uiw/react-codemirror";
 import { ipcRendererInvoke } from "@src/utils/desktop-utils";
 import React, { memo, useEffect, useState } from "react";
 import { Resizable, ResizeCallback } from "re-resizable";
 import type { FileInfoCustom } from "@src/types/file";
-
-import CodeMirror from "@uiw/react-codemirror"; // 如果你安装了React包装器
-
 const CodeMirrorMemo = React.memo(CodeMirror);
 interface Props {
   previewFile: FileInfoCustom | null;
@@ -57,7 +55,13 @@ const Priview: React.FC<Props> = ({ previewFile, className }) => {
               height: "calc(100vh - 70px)",
             }}
           >
-            <p style={{ textAlign: "center" }}>No Content.</p>
+            <p
+              style={{
+                textAlign: "center",
+              }}
+            >
+              No Content.
+            </p>
           </div>
         )}
       </div>

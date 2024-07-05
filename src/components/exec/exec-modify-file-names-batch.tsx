@@ -1,20 +1,18 @@
 import { Button, Col, Input, message, Modal, Row, Tooltip } from "antd";
 import { CalendarOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { getIgnorePatterns } from "@src/utils/common";
-import { ipcRendererInvoke } from "../../utils/desktop-utils";
+import { ipcRendererInvoke } from "@src/utils/desktop-utils";
 import React, { useState } from "react";
 import "@src/style/less/markdown-styles.less";
 import "@src/style/less/icon.less";
 import Directory from "@src/components/file-manage/directory";
-import useDirectory from "@src/store/use-directory";
+import MonacoEditorWrapper from "@src/components/editor/monaco-editor-wrapper";
 import RegExpInput from "../antd-wrap/search/reg-exp-input";
+import useDirectory from "@src/store/use-directory";
 import type {
   ModifyResultReturnType,
   PriviewResultReturnType,
 } from "@src/exec/exec-modify-file-names-batch";
-
-import MonacoEditorWrapper from "@src/components/editor/monaco-editor-wrapper";
-
 const FeatureListPage: React.FC = () => {
   const [output, setOutput] = useState(""); // 存储执行结果
   const [replaceFilename, setReplaceFilename] = useState(""); //用户想要替换的内容
@@ -277,7 +275,12 @@ const FeatureListPage: React.FC = () => {
           </Button>
         </Col>
       </Row>
-      <div style={{ flex: 1, width: "100%" }}>
+      <div
+        style={{
+          flex: 1,
+          width: "100%",
+        }}
+      >
         <MonacoEditorWrapper value={output} />
       </div>
     </div>

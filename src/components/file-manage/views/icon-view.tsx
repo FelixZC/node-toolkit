@@ -1,37 +1,32 @@
-import React, {
-  useContext,
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
-} from "react";
+import debounce from "lodash/debounce";
 import { FileInfoCustom } from "@src/types/file";
 import FileManageContext from "../context";
-import debounce from "lodash/debounce";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 interface ViewProps<T> {
   files: T[];
   className?: string;
 }
-
 interface FileInfoWithIcon extends FileInfoCustom {
   scrollTop?: number;
   itemHeight?: number;
   startRow?: number;
 }
-
 const LargeIconView: React.FC<ViewProps<FileInfoCustom>> = (props) => {
   const context = useContext(FileManageContext);
   if (!context) return null;
-
   const { onRowClick, onDoubleClick, onContextMenu, currentRow } = context;
   const [visibleItems, setVisibleItems] = useState<FileInfoWithIcon[]>([]);
   const [containHeight, setContainHeight] = useState(0);
   const viewRef = useRef<HTMLDivElement | null>(null);
-
   const getIsNeedVisible = () => {
     return props.files.length > 100;
   };
-
   const getItemInfo = () => {
     // 获取元素的计算后的样式
     const computedStyle = window.getComputedStyle(viewRef.current!);
@@ -64,7 +59,6 @@ const LargeIconView: React.FC<ViewProps<FileInfoCustom>> = (props) => {
       };
     }
   };
-
   const calculateVisibleItems = useCallback(() => {
     if (getIsNeedVisible()) {
       const view = viewRef.current;
@@ -96,7 +90,6 @@ const LargeIconView: React.FC<ViewProps<FileInfoCustom>> = (props) => {
       setVisibleItems(result);
     }
   }, [viewRef.current, props.files]);
-
   useEffect(() => {
     if (getIsNeedVisible()) {
       calculateVisibleItems();
@@ -105,7 +98,6 @@ const LargeIconView: React.FC<ViewProps<FileInfoCustom>> = (props) => {
       setContainHeight(0);
     }
   }, [props.files]);
-
   useEffect(() => {
     if (getIsNeedVisible()) {
       const handleResize = debounce(() => {
@@ -123,9 +115,7 @@ const LargeIconView: React.FC<ViewProps<FileInfoCustom>> = (props) => {
       };
     }
   }, [viewRef.current, props.files]);
-
   const onScroll = debounce(calculateVisibleItems, 10);
-
   return (
     <div ref={viewRef} className={props.className} onScroll={onScroll}>
       {visibleItems.map((file) => (

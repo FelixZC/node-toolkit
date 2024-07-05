@@ -1,17 +1,15 @@
 import * as babel from "@babel/core";
 import generator from "@babel/generator";
 import { getGeneratorOption, getParserOption } from "./babel-plugins/ast-utils";
-import { logger } from "../utils/log";
+import { Logger } from "../utils/log";
 import * as parser from "@babel/parser";
 import { parse as parseSFC, stringify as stringifySFC } from "./sfc-utils";
 import traverse from "@babel/traverse";
-import type * as Babel from "@babel/core";
-import type { PluginObj, Visitor } from "@babel/core";
 import type { ExecFileInfo } from "@src/types/common";
-export type BabelAPI = typeof Babel;
-export interface CustomPluginObj extends PluginObj {
+export type BabelAPI = typeof babel;
+export interface CustomPluginObj extends babel.PluginObj {
   getExtra?: () => Record<string, any>;
-  visitor: Visitor;
+  visitor: babel.Visitor;
 }
 export interface BabelPlugin {
   (
@@ -22,9 +20,9 @@ export interface BabelPlugin {
 }
 
 /**
- * 使用提供的 Babel 插件列表对给定的代码进行转换。
+ * 使用提供的 babel 插件列表对给定的代码进行转换。
  * @param execFileInfo - 包含执行时文件信息的对象，如源代码、文件路径等。
- * @param pluginsList - 一个 Babel 插件函数列表。
+ * @param pluginsList - 一个 babel 插件函数列表。
  * @returns 转换后的代码字符串。
  */
 const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
@@ -56,18 +54,18 @@ const transform = (execFileInfo: ExecFileInfo, pluginsList: BabelPlugin[]) => {
     // 返回转换后的代码
     return `\n${newCode.code}\n`;
   } catch (e) {
-    logger.error(e);
+    Logger.getInstance().error(e);
     // 如果转换过程中出错，则返回原始代码
     return execFileInfo.source;
   }
 };
 
 /**
- * 运行 Babel 插件。
+ * 运行 babel 插件。
  * 对于非 .vue 文件，直接使用 transform 函数转换代码。
  * 对于 .vue 文件，解析 SFC（Single File Component），并对 script 和 scriptSetup 部分应用转换。
  * @param execFileInfo - 包含执行时文件信息的对象，如源代码、文件路径等。
- * @param pluginsList - 一个 Babel 插件函数列表。
+ * @param pluginsList - 一个 babel 插件函数列表。
  * @returns 转换后的代码字符串。
  */
 const runBabelPlugin = (

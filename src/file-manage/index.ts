@@ -1,4 +1,4 @@
-import fsUtils from "../utils/fs";
+import { fsUtils } from "../utils/fs";
 export async function getDirAndFileInfo(
   dir: string,
   isUseIgnoredFiles: boolean,

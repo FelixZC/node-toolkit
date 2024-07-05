@@ -6,7 +6,6 @@ const useDirectory = () => {
   const { directoryPath, isUseIgnoredFiles } = useSelector(
     (state: RootState) => state.directory,
   );
-
   const setDirectoryPath = (path: string) =>
     dispatch(directorySlice.actions.setDirectoryPath(path));
   const setUseIgnoredFiles = (ignoreFiles: boolean) =>

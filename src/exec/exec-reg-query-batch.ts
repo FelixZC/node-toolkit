@@ -1,6 +1,6 @@
-import fsUtils, { readFile } from "../utils/fs";
+import { fsUtils, readFile } from "../utils/fs";
 import { getMainWindow } from "../desktop/main-window";
-import mdUtils from "../utils/md";
+import { queryContentByReg } from "../utils/md";
 
 /**
  * 执行指定目录下的批量正则查询并返回结果
@@ -26,10 +26,10 @@ export const execRegQueryBatch = async (
       // 如果文件应该被忽略，则返回空字符串
     } else {
       const content = await readFile(filePath);
-      result = mdUtils.queryContentByReg(content, reg);
+      result = queryContentByReg(content, reg);
       // 添加文件路径
       if (isAddSourcePath && result.length) {
-        result = `${filePath}${fsInstance.eol}${result}`;
+        result = `//${filePath}${fsInstance.eol}${result}`;
       }
     }
     mainWindow &&

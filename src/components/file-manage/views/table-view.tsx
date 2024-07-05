@@ -1,21 +1,18 @@
 import FileManageContext from "../context";
 import React, {
+  useCallback,
   useContext,
+  useEffect,
   useRef,
   useState,
-  useEffect,
-  useCallback,
 } from "react";
-import { Table } from "antd";
-import type { TableColumnsType } from "antd";
+import { Table, TableColumnsType } from "antd";
 import type { FileInfoCustom } from "@src/types/file";
-
 interface ViewProps {
   getColumns: () => TableColumnsType<FileInfoCustom>;
   files: FileInfoCustom[];
   className?: string;
 }
-
 const TableView: React.FC<ViewProps> = ({ files, getColumns, className }) => {
   const context = useContext(FileManageContext);
   if (!context) {
@@ -24,20 +21,21 @@ const TableView: React.FC<ViewProps> = ({ files, getColumns, className }) => {
   const { onRowClick, onDoubleClick, onContextMenu, tableChange, currentRow } =
     context;
   const tableRef = useRef<HTMLElement>(null);
-
   const getIsNeedVisible = () => {
     return files.length > 100;
   };
-  const [scroll, setScroll] = useState({ y: 648 });
-
+  const [scroll, setScroll] = useState({
+    y: 648,
+  });
   const handleResize = useCallback(() => {
     if (!tableRef.current) {
       return;
     }
     const parentHeight = tableRef.current.parentElement?.offsetHeight || 688;
-    setScroll({ y: parentHeight - 40 });
+    setScroll({
+      y: parentHeight - 40,
+    });
   }, [tableRef.current]);
-
   useEffect(() => {
     window.addEventListener("resize", handleResize);
     handleResize(); // 初始化时调用一次
@@ -45,7 +43,6 @@ const TableView: React.FC<ViewProps> = ({ files, getColumns, className }) => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-
   const onRow = useCallback(
     (record: FileInfoCustom) => {
       return {
@@ -101,7 +98,6 @@ const TableView: React.FC<ViewProps> = ({ files, getColumns, className }) => {
     );
   }
 };
-
 export default React.memo(TableView, (prevProps, nextProps) => {
   return prevProps.files === nextProps.files;
 });

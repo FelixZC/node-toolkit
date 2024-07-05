@@ -1,13 +1,5 @@
 import { getDataType, sortArray, sortObjAttr } from "./common";
-/**
- * Markdown 文件生成工具类，持续完善中...
- * @author pzc
- * @date 2021/08/23
- */
-
 import * as os from "os";
-const br = os.EOL; // 行分隔符
-
 /**
  * 使用指定正则表达式在给定内容中查找匹配项
  * @param {string} content - 要搜索的文本内容
@@ -16,7 +8,7 @@ const br = os.EOL; // 行分隔符
  * @param {Function} [customHandel] - 可选的自定义处理函数，用于处理匹配结果
  * @returns {string} 提取或处理后的文本内容
  */
-function queryContentByReg(
+export function queryContentByReg(
   content: string,
   queryReg: RegExp,
   matchIndex = 0,
@@ -55,9 +47,8 @@ function queryContentByReg(
     } else {
       lastIndex = queryReg.lastIndex;
     }
-    // 确保不会重复添加 br
     if (lastIndex < content.length) {
-      str += br;
+      str += os.EOL;
     }
   }
   return str;
@@ -67,7 +58,7 @@ function queryContentByReg(
  * @param {*} attrGroup - 属性描述分组后的对象
  * @returns {string} 包含首字母索引的属性描述表格字符串
  */
-function createdAttributesGroupTable(attrGroup: Record<string, any>) {
+export function createdAttributesGroupTable(attrGroup: Record<string, any>) {
   let localAttrGroup = attrGroup;
   const dataType = getDataType(localAttrGroup);
   if (dataType !== "Object") {
@@ -81,14 +72,16 @@ function createdAttributesGroupTable(attrGroup: Record<string, any>) {
       Reflect.get(attrGroupItem, "group")
     ) {
       const title = Reflect.get(attrGroupItem.group[0], attrGroupItem.groupKey);
-      attributesDescriptionTable += `## ${title}${br}`;
-      attributesDescriptionTable += `|字段|描述|位置|${br}`;
-      attributesDescriptionTable += `|-|-|-|${br}`;
-      const group = sortArray(attrGroupItem.group, { fields: ["key"] });
+      attributesDescriptionTable += `## ${title}${os.EOL}`;
+      attributesDescriptionTable += `|字段|描述|位置|${os.EOL}`;
+      attributesDescriptionTable += `|-|-|-|${os.EOL}`;
+      const group = sortArray(attrGroupItem.group, {
+        fields: ["key"],
+      });
       for (const groupItem of group) {
         const [name, position] = groupItem.key.split("->");
         const description = groupItem.value;
-        attributesDescriptionTable += `${name}|${description}|${position}|${br}`;
+        attributesDescriptionTable += `${name}|${description}|${position}|${os.EOL}`;
       }
     }
   }
@@ -104,7 +97,7 @@ function createdAttributesGroupTable(attrGroup: Record<string, any>) {
  * @param {Array} [cache=[]] - 模块属性缓存数组
  * @returns {string} 带索引的 Store 对应字段表述表格
  */
-function createdStoreTable(
+export function createdStoreTable(
   stateInStore: Record<string, any>,
   annotationObj: Record<string, any>,
   leavl = 1,
@@ -121,13 +114,13 @@ function createdStoreTable(
     return "";
   }
   if (localStateInStore.title) {
-    createdStoreTableStr += `### ${localStateInStore.title}${br}`;
+    createdStoreTableStr += `### ${localStateInStore.title}${os.EOL}`;
   }
   if (leavl === 1) {
-    createdStoreTableStr += `## root${br}`;
+    createdStoreTableStr += `## root${os.EOL}`;
   }
-  createdStoreTableStr += `|字段|类型|默认|注释|${br}`;
-  createdStoreTableStr += `|-|-|-|-|${br}`;
+  createdStoreTableStr += `|字段|类型|默认|注释|${os.EOL}`;
+  createdStoreTableStr += `|-|-|-|-|${os.EOL}`;
   for (const key in localStateInStore) {
     const type = getDataType(localStateInStore[key]);
     const value = JSON.stringify(localStateInStore[key]);
@@ -140,7 +133,7 @@ function createdStoreTable(
         createdStoreTable(storeModule, annotationObj, nextLeavl, cache);
       }
     } else {
-      createdStoreTableStr += `${key}|${type}|${value}|${descript}|${br}`;
+      createdStoreTableStr += `${key}|${type}|${value}|${descript}|${os.EOL}`;
     }
   }
   if (leavl === 1) {
@@ -148,7 +141,7 @@ function createdStoreTable(
   } else {
     cache.push(createdStoreTableStr);
   }
-  return cache.join(br);
+  return cache.join(os.EOL);
 }
 interface NodeWithId {
   base: string;
@@ -164,7 +157,7 @@ interface NodeWithId {
  * @param isLevelLastNode 一个布尔数组，表示每个层级的最后一个节点的标记，默认为空数组。
  * @returns 返回项目结构树的字符串。
  */
-function generateProjectTree(
+export function generateProjectTree(
   nodes: NodeWithId[],
   level: number = 0,
   isLevelLastNode: boolean[] = [],
@@ -208,9 +201,3 @@ function generateProjectTree(
   });
   return treeString;
 }
-export default {
-  createdAttributesGroupTable,
-  createdStoreTable,
-  queryContentByReg,
-  generateProjectTree,
-};

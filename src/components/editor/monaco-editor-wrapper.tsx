@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from "react";
+import { debounce } from "lodash";
 import MonacoEditor, {
   EditorDidMount,
   EditorWillUnmount,
   MonacoEditorProps,
 } from "react-monaco-editor";
-import { debounce } from "lodash";
+import React, { useEffect, useState } from "react";
 type ParametersType<T> = T extends (...args: infer U) => any ? U : never;
 type ChangeParams = ParametersType<EditorDidMount>;
 type IStandaloneCodeEditor = ChangeParams[0];
-
 const MemoizedMonacoEditor = React.memo(MonacoEditor);
 const CustomMonacoEditor: React.FC<MonacoEditorProps> = (props) => {
   const [editorRef, setEditorRef] = useState<IStandaloneCodeEditor | null>(
@@ -40,7 +39,6 @@ const CustomMonacoEditor: React.FC<MonacoEditorProps> = (props) => {
       window.removeEventListener("resize", handleWindowResize);
     };
   }, [editorRef]);
-
   return (
     <MemoizedMonacoEditor
       width="100%"
@@ -56,5 +54,4 @@ const CustomMonacoEditor: React.FC<MonacoEditorProps> = (props) => {
     />
   );
 };
-
 export default React.memo(CustomMonacoEditor);

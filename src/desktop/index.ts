@@ -6,7 +6,9 @@ import {
 } from "electron";
 import { createMainWindow } from "./main-window";
 import { getTray } from "./system-tray";
+import { initIgnorePath } from "../utils/ignore";
 app.on("ready", () => {
+  initIgnorePath();
   createMainWindow();
 });
 app.on(

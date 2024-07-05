@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import type { ProgressProps } from "./index";
 const useProgress = () => {
   const [state, setState] = useState<ProgressProps>({
@@ -6,7 +6,6 @@ const useProgress = () => {
     isVisible: false,
     isReset: false,
   });
-
   const updateProgress = useCallback((newValue: number) => {
     setState((prevState) => ({
       ...prevState,
@@ -15,14 +14,12 @@ const useProgress = () => {
       isReset: false,
     }));
   }, []);
-
   const toggleVisibility = useCallback(() => {
     setState((prevState) => ({
       ...prevState,
       isVisible: !prevState.isVisible,
     }));
   }, []);
-
   const resetProgress = useCallback(() => {
     setState({
       value: 0,
@@ -30,7 +27,6 @@ const useProgress = () => {
       isReset: true,
     });
   }, []);
-
   return {
     value: state.value,
     isVisible: state.isVisible,
@@ -40,5 +36,4 @@ const useProgress = () => {
     resetProgress,
   };
 };
-
 export default useProgress;

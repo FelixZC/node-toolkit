@@ -13,6 +13,12 @@ interface Feature {
 const initialFeatures: Feature[] = [
   {
     id: 4,
+    name: "merge-imports-plugin",
+    isSelected: false,
+    path: "../plugins/babel-plugins/merge-imports-plugin",
+  },
+  {
+    id: 4,
     name: "import-sort",
     isSelected: false,
     path: "../plugins/babel-plugins/import-sort",

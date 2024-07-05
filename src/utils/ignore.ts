@@ -2,9 +2,9 @@ import { app } from "electron";
 import fs from "fs-extra";
 import ignore from "ignore";
 import path from "path";
+
 /**
  * 获取忽略文件的路径。
- *
  * 根据环境变量决定是使用应用数据目录还是当前工作目录。
  * 返回拼接后的 .gitignore 文件路径。
  */
@@ -18,15 +18,13 @@ export function getIgnorePath(): string {
 
 /**
  * 初始化忽略文件路径。
- *
  * 检查是否存在 .gitignore 文件，如果不存在，则创建一个默认的忽略文件。
  */
 export function initIgnorePath() {
   const gitIgnorePath = getIgnorePath();
   if (!fs.existsSync(gitIgnorePath)) {
     fs.ensureFileSync(gitIgnorePath);
-    const gitIgnoreContent = `
-# Default ignore rules
+    const gitIgnoreContent = `# Default ignore rules
 node_modules
 dist
 .npmrc
@@ -46,7 +44,7 @@ dist
 /**
  * GitIgnoreParser 类用于解析 .gitignore 文件中的忽略规则。
  */
-class GitIgnoreParser {
+export class GitIgnoreParser {
   private ignoreRules: ReturnType<typeof ignore>;
   constructor() {
     this.ignoreRules = ignore();
@@ -89,4 +87,3 @@ export function useIgnored(): {
     ignore: (filePath: string) => parser.test(filePath),
   };
 }
-initIgnorePath();
