@@ -7,8 +7,13 @@ import {
 import { createMainWindow } from "./main-window";
 import { getTray } from "./system-tray";
 import { initIgnorePath } from "../utils/ignore";
+import { Logger } from "../utils/log";
 app.on("ready", () => {
-  initIgnorePath();
+  try {
+    initIgnorePath();
+  } catch {
+    Logger.getInstance().error("初始化忽略文件失败");
+  }
   createMainWindow();
 });
 app.on(
