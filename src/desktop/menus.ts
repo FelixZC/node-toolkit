@@ -2,6 +2,7 @@ import { clearCacheAll } from "../utils/fs";
 import { dialog, Menu, MenuItemConstructorOptions, shell } from "electron";
 import { getIgnorePath } from "../utils/ignore";
 import { Logger } from "../utils/log";
+import fs from "fs-extra";
 const getMenuTemplate = (
   mainWindow: Electron.BrowserWindow,
 ): Array<MenuItemConstructorOptions> => {
@@ -29,10 +30,12 @@ const getMenuTemplate = (
           accelerator: "CmdOrCtrl+L",
           click: () => {
             const logPath = Logger.getLogPath();
+            if (!fs.existsSync(logPath)) {
+              fs.ensureFileSync(logPath);
+            }
             try {
               shell.openPath(logPath);
             } catch (error) {
-              Logger.getInstance().error(error);
               dialog.showMessageBox({
                 type: "error",
                 message: "Error opening file",

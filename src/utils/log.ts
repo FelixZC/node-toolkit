@@ -6,7 +6,6 @@ import {
   transports,
 } from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
-import * as fs from "fs-extra";
 import { getCurrentDateFormatted } from "./time";
 import * as os from "os";
 import * as path from "path";
@@ -86,7 +85,6 @@ export class Logger {
   }
   public static getLogPath() {
     const logDirectory = Logger.getLogDirectory();
-    fs.ensureDirSync(logDirectory);
     return path.join(logDirectory, Logger.getFilename());
   }
 }
